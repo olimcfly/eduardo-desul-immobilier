@@ -14,6 +14,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 define('ROOT_PATH', dirname(__DIR__));
 require_once ROOT_PATH . '/config/config.php';
+require_once ROOT_PATH . '/includes/classes/EmailService.php';
 
 /* Déjà connecté */
 
@@ -62,7 +63,54 @@ function sendOTPEmail($to, $otp) {
     $headers = "From: " . ADMIN_EMAIL . "\r\n";
     $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
 
-    return mail($to, $subject, $message, $headers);
+    // 1) Priorité SMTP si config présente (diagnostic explicite)
+    $smtpConfigFile = ROOT_PATH . '/config/smtp.php';
+    if (file_exists($smtpConfigFile)) {
+        try {
+            $emailService = new EmailService();
+            $result = $emailService->sendEmail(
+                $to,
+                $subject,
+                nl2br(htmlspecialchars($message, ENT_QUOTES, 'UTF-8')),
+                [
+                    'from_email' => ADMIN_EMAIL,
+                    'from_name'  => SITE_TITLE,
+                    'reply_to'   => ADMIN_EMAIL,
+                ]
+            );
+
+            if (!empty($result['success'])) {
+                writeLog("OTP envoyé via SMTP à {$to}", 'INFO');
+                return ['success' => true, 'transport' => 'smtp'];
+            }
+
+            $smtpError = $result['error'] ?? 'Erreur SMTP inconnue';
+            writeLog("Échec SMTP OTP pour {$to}: {$smtpError}", 'ERROR');
+
+            // Si SMTP échoue, fallback vers mail() + diagnostic
+            $mailFallback = mail($to, $subject, $message, $headers);
+            if ($mailFallback) {
+                writeLog("OTP envoyé via fallback mail() après échec SMTP pour {$to}", 'WARNING');
+                return ['success' => true, 'transport' => 'mail_fallback', 'smtp_error' => $smtpError];
+            }
+
+            writeLog("Échec fallback mail() pour {$to} après erreur SMTP", 'ERROR');
+            return ['success' => false, 'transport' => 'smtp', 'error' => $smtpError];
+        } catch (Throwable $e) {
+            writeLog("Exception SMTP OTP pour {$to}: " . $e->getMessage(), 'ERROR');
+            return ['success' => false, 'transport' => 'smtp_exception', 'error' => $e->getMessage()];
+        }
+    }
+
+    // 2) Fallback historique mail()
+    $sent = mail($to, $subject, $message, $headers);
+    if ($sent) {
+        writeLog("OTP envoyé via mail() à {$to}", 'INFO');
+        return ['success' => true, 'transport' => 'mail'];
+    }
+
+    writeLog("Échec envoi OTP via mail() pour {$to}", 'ERROR');
+    return ['success' => false, 'transport' => 'mail', 'error' => 'mail() a retourné false'];
 }
 
 /* ─────────────────────────────────────────
@@ -113,10 +161,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['otp_phone'] = $phone;
                 $_SESSION['otp_time'] = time();
 
-                sendOTPEmail($email,$otp);
+                $sendResult = sendOTPEmail($email, $otp);
 
-                $success = "Code envoyé par email";
-                $step = "otp";
+                if (!empty($sendResult['success'])) {
+                    $success = "Code envoyé par email";
+
+                    // Message diagnostic non bloquant si fallback utilisé
+                    if (($sendResult['transport'] ?? '') === 'mail_fallback' && !empty($sendResult['smtp_error'])) {
+                        $success .= " (SMTP en échec, fallback mail() utilisé)";
+                    }
+
+                    $step = "otp";
+                } else {
+                    $error = "Impossible d'envoyer le code de connexion. Vérifiez la configuration SMTP/env.";
+                    if (!empty($sendResult['error'])) {
+                        $error .= " Détail: " . $sendResult['error'];
+                    }
+                    $step = "email";
+                }
             }
         }
     }
