@@ -163,6 +163,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['capture_submit'])) {
                 // Table interactions peut ne pas exister, on continue
             }
 
+            // ── Créer un RDV automatique si source pertinente ──
+            try {
+                $rdvSources = ['estimation', 'visite', 'rdv', 'valuation', 'contact'];
+                $leadSource = strtolower($page['lead_source'] ?? '');
+                $shouldCreateRdv = false;
+                foreach ($rdvSources as $src) {
+                    if (strpos($leadSource, $src) !== false) { $shouldCreateRdv = true; break; }
+                }
+                if ($shouldCreateRdv) {
+                    // Vérifier que la table appointments existe
+                    if ($pdo->query("SHOW TABLES LIKE 'appointments'")->rowCount() > 0) {
+                        $rdvTitle = ucfirst($leadSource) . ' - ' . trim($firstName . ' ' . $lastName);
+                        $rdvType = 'estimation';
+                        if (strpos($leadSource, 'visite') !== false) $rdvType = 'visite';
+                        elseif (strpos($leadSource, 'contact') !== false) $rdvType = 'autre';
+
+                        // Vérifier les colonnes disponibles
+                        $apptCols = $pdo->query("SHOW COLUMNS FROM appointments")->fetchAll(PDO::FETCH_COLUMN);
+                        if (in_array('start_datetime', $apptCols)) {
+                            $rdvDate = !empty($leadData['date']) ? $leadData['date'] : date('Y-m-d', strtotime('+1 day'));
+                            $rdvTime = !empty($leadData['heure']) ? $leadData['heure'] : '09:00';
+                            $startDt = $rdvDate . ' ' . $rdvTime . ':00';
+                            $endDt = date('Y-m-d H:i:s', strtotime($startDt . ' +1 hour'));
+
+                            $rdvStmt = $pdo->prepare("INSERT INTO appointments
+                                (title, type, start_datetime, end_datetime, lead_id, status, notes, created_at)
+                                VALUES (?, ?, ?, ?, ?, 'scheduled', ?, NOW())");
+                            $rdvStmt->execute([
+                                $rdvTitle, $rdvType, $startDt, $endDt, $leadId,
+                                'Demande via page de capture: ' . ($page['titre'] ?? $slug)
+                            ]);
+                        } elseif (in_array('start_at', $apptCols)) {
+                            $rdvDate = !empty($leadData['date']) ? $leadData['date'] : date('Y-m-d', strtotime('+1 day'));
+                            $rdvTime = !empty($leadData['heure']) ? $leadData['heure'] : '09:00';
+                            $startDt = $rdvDate . ' ' . $rdvTime . ':00';
+                            $endDt = date('Y-m-d H:i:s', strtotime($startDt . ' +1 hour'));
+
+                            $rdvStmt = $pdo->prepare("INSERT INTO appointments
+                                (title, type, start_at, end_at, lead_id, status, notes, created_at)
+                                VALUES (?, ?, ?, ?, ?, 'scheduled', ?, NOW())");
+                            $rdvStmt->execute([
+                                $rdvTitle, $rdvType, $startDt, $endDt, $leadId,
+                                'Demande via page de capture: ' . ($page['titre'] ?? $slug)
+                            ]);
+                        }
+                    }
+                }
+            } catch (Exception $e) {
+                // Ne pas bloquer la soumission si la création du RDV échoue
+                error_log('[Capture→RDV] ' . $e->getMessage());
+            }
+
             // ── Incrémenter le compteur de soumissions ──
             $pdo->prepare("UPDATE captures SET
                 conversions = conversions + 1,
