@@ -7,10 +7,11 @@
  * Pas de modifications après!
  */
 
-session_start();
+// Charger la config (qui charge .env)
+require_once dirname(dirname(__FILE__)) . '/config/config.php';
 
 // ═══════════════════════════════════════════════════════════
-// 1. VÉRIFIER L'AUTHENTIFICATION
+// 1. VERIFIER L'AUTHENTIFICATION
 // ═══════════════════════════════════════════════════════════
 
 if (empty($_SESSION['admin_id']) || empty($_SESSION['admin_email'])) {
@@ -22,21 +23,13 @@ $admin_id = $_SESSION['admin_id'];
 $admin_email = $_SESSION['admin_email'];
 
 // ═══════════════════════════════════════════════════════════
-// 2. CONNEXION BD DIRECTE
+// 2. CONNEXION BD VIA CONFIG
 // ═══════════════════════════════════════════════════════════
 
 try {
-    $db = new PDO(
-        "mysql:host=localhost;dbname=mahe6420_cms-site-ed-bordeaux;charset=utf8mb4",
-        "mahe6420_edbordeaux",
-        "1KX(M3wwBbbW",
-        [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-        ]
-    );
-} catch (PDOException $e) {
-    die("❌ Erreur BD: " . $e->getMessage());
+    $db = getDB();
+} catch (Exception $e) {
+    die('Erreur BD: ' . $e->getMessage());
 }
 
 // ═══════════════════════════════════════════════════════════

@@ -4,7 +4,7 @@
  * admin/api/social/gmb-email-processor.php
  *
  * Ancienne position : modules/social/gmb/cron/gmb-email-processor.php
- * Appel crontab : php /home/mahe6420/public_html/admin/api/social/gmb-email-processor.php
+ * Appel crontab : php admin/api/social/gmb-email-processor.php
  */
 if (PHP_SAPI !== 'cli' && empty($_SERVER['HTTP_X_CRON_SECRET'])) {
     // Permettre aussi un appel HTTP sécurisé si besoin

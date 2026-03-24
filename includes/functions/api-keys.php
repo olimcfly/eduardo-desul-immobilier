@@ -1,10 +1,10 @@
 <?php
 /**
  * HELPER CENTRALISÉ — CLÉS API
- * /home/mahe6420/public_html/includes/functions/api-keys.php
+ * includes/functions/api-keys.php
  *
  * Usage dans n'importe quel module :
- *   require_once '/home/mahe6420/public_html/includes/functions/api-keys.php';
+ *   require_once ROOT_PATH . '/includes/functions/api-keys.php';
  *   $key = get_api_key('claude');   // retourne la clé déchiffrée ou ''
  *
  * Source unique : table api_keys (AES-256)
@@ -18,7 +18,7 @@ function _ak_pdo(): ?PDO {
     if (isset($pdo)) return $pdo;
     if (isset($db))  return $db;
     try {
-        if (!defined('DB_HOST')) require_once '/home/mahe6420/public_html/config/config.php';
+        if (!defined('DB_HOST')) require_once dirname(__DIR__, 2) . '/config/config.php';
         $c = new PDO('mysql:host='.DB_HOST.';dbname='.DB_NAME.';charset=utf8mb4', DB_USER, DB_PASS,
             [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
         return $c;

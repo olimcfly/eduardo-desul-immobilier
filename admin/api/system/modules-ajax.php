@@ -9,7 +9,7 @@
 header('Content-Type: application/json; charset=utf-8');
 ob_start();
 
-$rootPath = '/home/mahe6420/public_html';
+$rootPath = dirname(__DIR__, 3);
 
 // Bootstrap minimal
 if (!defined('DB_HOST')) {

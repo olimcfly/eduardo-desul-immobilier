@@ -1,4 +1,4 @@
-# /home/mahe6420/public_html/.htaccess
+# .htaccess
 RewriteEngine On
 RewriteBase /
 

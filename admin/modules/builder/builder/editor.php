@@ -10,7 +10,6 @@ define('ADMIN_ROUTER', true);
 
 $_initPath = dirname(__DIR__, 3) . '/includes/init.php';
 if (!file_exists($_initPath)) $_initPath = $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/init.php';
-if (!file_exists($_initPath)) $_initPath = '/home/mahe6420/public_html/admin/includes/init.php';
 require_once $_initPath;
 
 if (session_status() !== PHP_SESSION_ACTIVE) session_start();

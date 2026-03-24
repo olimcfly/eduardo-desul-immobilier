@@ -1,0 +1,40 @@
+# ═══════════════════════════════════════════════════════════
+# CONFIGURATION (contient des credentials - NE PAS COMMITER)
+# ═══════════════════════════════════════════════════════════
+config/config.php
+config/smtp.php
+config/license.json
+config/.installed
+
+# ═══════════════════════════════════════════════════════════
+# LOGS & CACHE
+# ═══════════════════════════════════════════════════════════
+logs/*.log
+logs/*.txt
+cache/*
+!cache/.gitkeep
+
+# ═══════════════════════════════════════════════════════════
+# UPLOADS (contenu spécifique au site)
+# ═══════════════════════════════════════════════════════════
+uploads/*
+!uploads/.gitkeep
+
+# ═══════════════════════════════════════════════════════════
+# SYSTÈME
+# ═══════════════════════════════════════════════════════════
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+.env
+.env.*
+!.env.example
+*.bak
+*.tmp
+
+# IDE
+.vscode/
+.idea/
+*.sublime-*

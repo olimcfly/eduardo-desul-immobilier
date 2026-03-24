@@ -12,18 +12,24 @@ class Database {
     private $connection = null;
     
     /**
-     * Database credentials - À PERSONNALISER
+     * Database credentials - lues depuis les constantes config.php / .env
      */
-    private $host = 'localhost';
-    private $dbname = 'mahe6420_cms-site-ed-bordeaux';
-    private $user = 'mahe6420_edbordeaux';
-    private $password = '1KX(M3wwBbbW';
-    private $charset = 'utf8mb4';
+    private $host;
+    private $dbname;
+    private $user;
+    private $password;
+    private $charset;
     
     /**
      * Private constructor (singleton pattern)
      */
     private function __construct() {
+        $this->host     = defined('DB_HOST')    ? DB_HOST    : env('DB_HOST', 'localhost');
+        $this->dbname   = defined('DB_NAME')    ? DB_NAME    : env('DB_NAME', '');
+        $this->user     = defined('DB_USER')    ? DB_USER    : env('DB_USER', '');
+        $this->password = defined('DB_PASS')    ? DB_PASS    : env('DB_PASS', '');
+        $this->charset  = defined('DB_CHARSET') ? DB_CHARSET : 'utf8mb4';
+
         try {
             $dsn = "mysql:host={$this->host};dbname={$this->dbname};charset={$this->charset}";
             

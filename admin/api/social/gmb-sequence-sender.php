@@ -4,7 +4,7 @@
  * admin/api/social/gmb-sequence-sender.php
  *
  * Ancienne position : modules/social/gmb/cron/sequence-sender.php
- * Appel crontab : php /home/mahe6420/public_html/admin/api/social/gmb-sequence-sender.php
+ * Appel crontab : php admin/api/social/gmb-sequence-sender.php
  */
 if (PHP_SAPI !== 'cli' && empty($_SERVER['HTTP_X_CRON_SECRET'])) {
     $secret = defined('CRON_SECRET') ? CRON_SECRET : ($_ENV['CRON_SECRET'] ?? '');
