@@ -314,6 +314,64 @@ function buildCaptureForm($page) {
     return $html;
 }
 
+function buildDefaultCaptureTemplate(array $page): string {
+    $template = $page['template'] ?? 'split';
+    $title = htmlspecialchars($page['headline'] ?: ($page['titre'] ?? 'Recevez votre ressource'));
+    $subtitle = nl2br(htmlspecialchars($page['sous_titre'] ?? ''));
+    $desc = nl2br(htmlspecialchars($page['description'] ?? ''));
+    $bg = htmlspecialchars($page['form_button_color'] ?? '#667eea');
+    $tag = htmlspecialchars(strtoupper($page['type'] ?? 'CAPTURE'));
+
+    $leftContent = '
+        <div style="display:inline-block;padding:6px 10px;border-radius:999px;background:' . $bg . '1a;color:' . $bg . ';font-size:12px;font-weight:700;letter-spacing:.04em;margin-bottom:14px">' . $tag . '</div>
+        <h1 style="font-size:clamp(28px,4vw,44px);line-height:1.15;margin-bottom:14px;color:#111827;">' . $title . '</h1>
+        ' . ($subtitle ? '<p style="font-size:18px;line-height:1.45;color:#374151;margin-bottom:14px;">' . $subtitle . '</p>' : '') . '
+        ' . ($desc ? '<p style="font-size:15px;line-height:1.7;color:#6b7280;max-width:700px;">' . $desc . '</p>' : '') . '
+    ';
+
+    $formBlock = '<div class="capture-form-slot">{{FORMULAIRE}}</div>';
+
+    if ($template === 'hero') {
+        return '<section style="min-height:100vh;background:linear-gradient(135deg,#0f172a,#1e293b);padding:80px 20px;display:flex;align-items:center">
+            <div style="max-width:1150px;margin:0 auto;width:100%;display:grid;grid-template-columns:1.1fr .9fr;gap:32px;align-items:center">
+                <div style="color:#fff">
+                    <div style="display:inline-block;padding:6px 10px;border-radius:999px;background:#ffffff22;color:#fff;font-size:12px;font-weight:700;letter-spacing:.04em;margin-bottom:14px">' . $tag . '</div>
+                    <h1 style="font-size:clamp(30px,4.3vw,52px);line-height:1.08;margin-bottom:16px">' . $title . '</h1>
+                    ' . ($subtitle ? '<p style="font-size:20px;line-height:1.45;color:#cbd5e1;margin-bottom:10px">' . $subtitle . '</p>' : '') . '
+                    ' . ($desc ? '<p style="font-size:15px;line-height:1.7;color:#94a3b8;max-width:680px">' . $desc . '</p>' : '') . '
+                </div>
+                ' . $formBlock . '
+            </div>
+        </section>';
+    }
+
+    if ($template === 'minimal') {
+        return '<section style="min-height:100vh;background:#f8fafc;padding:48px 16px;display:flex;align-items:center">
+            <div style="max-width:780px;margin:0 auto;width:100%;text-align:center">
+                ' . $leftContent . '
+                <div style="margin-top:20px">' . $formBlock . '</div>
+            </div>
+        </section>';
+    }
+
+    if ($template === 'simple') {
+        return '<section style="background:#fff;padding:64px 20px">
+            <div style="max-width:860px;margin:0 auto;text-align:center">
+                ' . $leftContent . '
+                <div style="margin-top:22px">' . $formBlock . '</div>
+            </div>
+        </section>';
+    }
+
+    // split (défaut)
+    return '<section style="background:#f8fafc;padding:70px 20px">
+        <div style="max-width:1150px;margin:0 auto;display:grid;grid-template-columns:1.1fr .9fr;gap:34px;align-items:start">
+            <div>' . $leftContent . '</div>
+            <div>' . $formBlock . '</div>
+        </div>
+    </section>';
+}
+
 // ── Choisir le HTML à afficher ──
 if ($showMerci) {
     $displayHtml = $page['html_merci'] ?? '';
@@ -327,6 +385,9 @@ if ($showMerci) {
     }
 } else {
     $displayHtml = $page['html_capture'] ?? '';
+    if (trim($displayHtml) === '') {
+        $displayHtml = buildDefaultCaptureTemplate($page);
+    }
     // Injecter le formulaire à la place de {{FORMULAIRE}}
     $formHtml = buildCaptureForm($page);
     

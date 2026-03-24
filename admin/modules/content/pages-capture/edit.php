@@ -14,6 +14,15 @@ $capture   = [];
 $saveError = null;
 $saveOk    = false;
 
+// ── Colonnes disponibles (compat schémas DB) ────────────────
+$captureCols = [];
+try {
+    $captureCols = $pdo->query("SHOW COLUMNS FROM captures")->fetchAll(PDO::FETCH_COLUMN) ?: [];
+} catch (Exception $e) {
+    $captureCols = [];
+}
+$hasCol = static fn(string $col): bool => in_array($col, $captureCols, true);
+
 // ── Types et templates ────────────────────────────────────────
 $captureTypes = [
     'estimation' => ['icon' => 'fa-calculator', 'label' => 'Estimation',         'color' => '#3b82f6'],
@@ -27,6 +36,41 @@ $captureTemplates = [
     'split'   => ['label' => 'Split',   'desc' => 'Contenu gauche + formulaire droite (recommandé pour guides)'],
     'minimal' => ['label' => 'Minimal', 'desc' => 'Ultra-compact, sans distraction'],
 ];
+$offerFormats = [
+    'pdf'   => ['label' => 'Guide PDF',      'form_title' => 'Recevez votre guide PDF'],
+    'video' => ['label' => 'Vidéo / Replay', 'form_title' => 'Recevez le lien vidéo'],
+    'call'  => ['label' => 'Appel / RDV',    'form_title' => 'Demandez un rappel'],
+];
+$offerObjectives = [
+    'vendeur'      => 'Vendeur',
+    'acheteur'     => 'Acheteur',
+    'proprietaire' => 'Propriétaire',
+    'estimation'   => 'Estimation',
+    'rdv'          => 'Prise de RDV',
+];
+
+function buildCaptureFormPreset(string $format, string $objective, string $crmSource): array {
+    $base = [
+        ['name' => 'prenom', 'label' => 'Prénom', 'type' => 'text',  'required' => true,  'placeholder' => 'Votre prénom'],
+        ['name' => 'email',  'label' => 'Email',  'type' => 'email', 'required' => true,  'placeholder' => 'vous@email.com'],
+        ['name' => 'telephone', 'label' => 'Téléphone', 'type' => 'tel', 'required' => false, 'placeholder' => '06 00 00 00 00'],
+    ];
+
+    if ($format === 'call') {
+        $base[] = ['name' => 'disponibilite', 'label' => 'Disponibilités', 'type' => 'text', 'required' => false, 'placeholder' => 'Ex: demain 18h'];
+        $base[] = ['name' => 'objectif', 'label' => 'Votre objectif', 'type' => 'textarea', 'required' => false, 'placeholder' => 'Décrivez votre projet en 2 lignes'];
+    } elseif ($format === 'video') {
+        $base[] = ['name' => 'projet', 'label' => 'Votre projet', 'type' => 'select', 'required' => false, 'options' => ['Vente', 'Achat', 'Investissement', 'Autre']];
+    } else {
+        $base[] = ['name' => 'consentement', 'label' => 'J’accepte d’être contacté(e) dans le cadre de ma demande.', 'type' => 'checkbox', 'required' => true];
+    }
+
+    $base[] = ['name' => 'capture_format', 'label' => 'Format', 'type' => 'hidden', 'placeholder' => $format];
+    $base[] = ['name' => 'capture_objectif', 'label' => 'Objectif', 'type' => 'hidden', 'placeholder' => $objective];
+    $base[] = ['name' => 'capture_source', 'label' => 'Source', 'type' => 'hidden', 'placeholder' => $crmSource];
+
+    return $base;
+}
 
 // ── Charger la capture existante ─────────────────────────────
 if (!$isNew && $captureId > 0) {
@@ -44,6 +88,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_edit_submit'] ?? '') === 
         'slug'         => trim($_POST['slug']         ?? ''),
         'type'         => $_POST['type']              ?? 'guide',
         'template'     => $_POST['template']          ?? 'split',
+        'offer_format' => $_POST['offer_format']      ?? 'pdf',
+        'objective'    => $_POST['objective']         ?? 'vendeur',
         'headline'     => trim($_POST['headline']     ?? ''),
         'sous_titre'   => trim($_POST['sous_titre']   ?? ''),
         'description'  => trim($_POST['description']  ?? ''),
@@ -59,29 +105,58 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_edit_submit'] ?? '') === 
         $d['slug'] = strtolower(trim(preg_replace('/[^a-z0-9]+/', '-', iconv('UTF-8','ASCII//TRANSLIT', $d['titre'])), '-'));
     }
     $d['slug'] = preg_replace('/[^a-z0-9-]/', '', strtolower($d['slug']));
+    $d['crm_source'] = trim($_POST['lead_source'] ?? ('capture_' . $d['offer_format'] . '_' . $d['objective'] . '_' . $d['slug']));
+    $d['lead_tags']  = trim($_POST['lead_tags'] ?? ('capture,' . $d['offer_format'] . ',' . $d['objective']));
+    $formPreset      = buildCaptureFormPreset($d['offer_format'], $d['objective'], $d['crm_source']);
+    $formTitle       = $offerFormats[$d['offer_format']]['form_title'] ?? 'Demandez votre ressource';
+    $buttonText      = $d['cta_text'] ?: 'Recevoir maintenant';
 
     if (!$d['titre'] || !$d['slug']) {
         $saveError = 'Le titre et le slug sont obligatoires.';
     } else {
         try {
             if ($isNew) {
-                $stmt = $pdo->prepare("INSERT INTO captures
-                    (titre, slug, type, template, headline, sous_titre, description, cta_text, page_merci_url, status, active, actif, vues, conversions, taux_conversion)
-                    VALUES
-                    (:titre,:slug,:type,:template,:headline,:sous_titre,:description,:cta_text,:page_merci_url,:status,:active,:actif,0,0,0.00)");
-                $stmt->execute($d);
+                $insertCols = ['titre','slug','type','template','headline','sous_titre','description','cta_text','page_merci_url','status','active','actif','vues','conversions','taux_conversion'];
+                $insertData = [
+                    'titre' => $d['titre'], 'slug' => $d['slug'], 'type' => $d['type'], 'template' => $d['template'],
+                    'headline' => $d['headline'], 'sous_titre' => $d['sous_titre'], 'description' => $d['description'],
+                    'cta_text' => $d['cta_text'], 'page_merci_url' => $d['page_merci_url'], 'status' => $d['status'],
+                    'active' => $d['active'], 'actif' => $d['actif'], 'vues' => 0, 'conversions' => 0, 'taux_conversion' => 0.00
+                ];
+                if ($hasCol('lead_source'))      { $insertCols[] = 'lead_source';      $insertData['lead_source'] = $d['crm_source']; }
+                if ($hasCol('lead_tags'))        { $insertCols[] = 'lead_tags';        $insertData['lead_tags'] = $d['lead_tags']; }
+                if ($hasCol('form_config'))      { $insertCols[] = 'form_config';      $insertData['form_config'] = json_encode($formPreset, JSON_UNESCAPED_UNICODE); }
+                if ($hasCol('form_titre'))       { $insertCols[] = 'form_titre';       $insertData['form_titre'] = $formTitle; }
+                if ($hasCol('form_button_text')) { $insertCols[] = 'form_button_text'; $insertData['form_button_text'] = $buttonText; }
+
+                $sql = "INSERT INTO captures (" . implode(',', $insertCols) . ")
+                        VALUES (:" . implode(',:', array_keys($insertData)) . ")";
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute($insertData);
                 $newId = (int)$pdo->lastInsertId();
                 header('Location: ?page=captures&action=edit&id=' . $newId . '&msg=created');
                 exit;
             } else {
-                $stmt = $pdo->prepare("UPDATE captures SET
-                    titre=:titre, slug=:slug, type=:type, template=:template,
-                    headline=:headline, sous_titre=:sous_titre, description=:description,
-                    cta_text=:cta_text, page_merci_url=:page_merci_url,
-                    status=:status, active=:active, actif=:actif
-                    WHERE id=:id");
-                $d['id'] = $captureId;
-                $stmt->execute($d);
+                $updateData = [
+                    'titre' => $d['titre'], 'slug' => $d['slug'], 'type' => $d['type'], 'template' => $d['template'],
+                    'headline' => $d['headline'], 'sous_titre' => $d['sous_titre'], 'description' => $d['description'],
+                    'cta_text' => $d['cta_text'], 'page_merci_url' => $d['page_merci_url'],
+                    'status' => $d['status'], 'active' => $d['active'], 'actif' => $d['actif'], 'id' => $captureId
+                ];
+                $setClauses = [
+                    'titre=:titre', 'slug=:slug', 'type=:type', 'template=:template',
+                    'headline=:headline', 'sous_titre=:sous_titre', 'description=:description',
+                    'cta_text=:cta_text', 'page_merci_url=:page_merci_url',
+                    'status=:status', 'active=:active', 'actif=:actif'
+                ];
+                if ($hasCol('lead_source'))      { $setClauses[] = 'lead_source=:lead_source';             $updateData['lead_source'] = $d['crm_source']; }
+                if ($hasCol('lead_tags'))        { $setClauses[] = 'lead_tags=:lead_tags';                 $updateData['lead_tags'] = $d['lead_tags']; }
+                if ($hasCol('form_config'))      { $setClauses[] = 'form_config=:form_config';             $updateData['form_config'] = json_encode($formPreset, JSON_UNESCAPED_UNICODE); }
+                if ($hasCol('form_titre'))       { $setClauses[] = 'form_titre=:form_titre';               $updateData['form_titre'] = $formTitle; }
+                if ($hasCol('form_button_text')) { $setClauses[] = 'form_button_text=:form_button_text';   $updateData['form_button_text'] = $buttonText; }
+
+                $stmt = $pdo->prepare("UPDATE captures SET " . implode(', ', $setClauses) . " WHERE id=:id");
+                $stmt->execute($updateData);
                 // Recharger
                 $stmt2 = $pdo->prepare("SELECT * FROM captures WHERE id = ?");
                 $stmt2->execute([$captureId]);
@@ -95,16 +170,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_edit_submit'] ?? '') === 
 }
 
 // Valeurs courantes (fusion POST pour re-affichage en cas d'erreur)
+$existingFormConfig = json_decode($capture['form_config'] ?? '[]', true);
+$existingFormat = 'pdf';
+if (is_array($existingFormConfig)) {
+    foreach ($existingFormConfig as $f) {
+        if (($f['name'] ?? '') === 'capture_format' && !empty($f['placeholder'])) {
+            $existingFormat = (string)$f['placeholder'];
+            break;
+        }
+    }
+}
+$existingObjective = 'vendeur';
+if (!empty($capture['lead_source'])) {
+    $parts = explode('_', (string)$capture['lead_source']);
+    if (!empty($parts[2])) $existingObjective = $parts[2];
+}
+
 $v = [
     'titre'         => $_POST['titre']         ?? ($capture['titre']         ?? ''),
     'slug'          => $_POST['slug']          ?? ($capture['slug']          ?? ''),
     'type'          => $_POST['type']          ?? ($capture['type']          ?? 'guide'),
     'template'      => $_POST['template']      ?? ($capture['template']      ?? 'split'),
+    'offer_format'  => $_POST['offer_format']  ?? $existingFormat,
+    'objective'     => $_POST['objective']     ?? $existingObjective,
     'headline'      => $_POST['headline']      ?? ($capture['headline']      ?? ''),
     'sous_titre'    => $_POST['sous_titre']    ?? ($capture['sous_titre']    ?? ''),
     'description'   => $_POST['description']  ?? ($capture['description']   ?? ''),
     'cta_text'      => $_POST['cta_text']      ?? ($capture['cta_text']      ?? '📥 Recevoir mon guide gratuitement'),
     'page_merci_url'=> $_POST['page_merci_url']?? ($capture['page_merci_url']?? '/merci'),
+    'lead_source'   => $_POST['lead_source']   ?? ($capture['lead_source']   ?? ''),
+    'lead_tags'     => $_POST['lead_tags']     ?? ($capture['lead_tags']     ?? ''),
     'status'        => $_POST['status']        ?? ($capture['status']        ?? 'inactive'),
     'vues'          => (int)($capture['vues']        ?? 0),
     'conversions'   => (int)($capture['conversions'] ?? 0),
@@ -296,11 +391,44 @@ $capUrl = '/capture/' . ($v['slug'] ?: 'draft');
                         </select>
                     </div>
                     <div class="capedit-field">
+                        <label class="capedit-label">Format de l'offre</label>
+                        <select name="offer_format" class="capedit-select" id="capeditOfferFormat">
+                            <?php foreach ($offerFormats as $key => $fmt): ?>
+                            <option value="<?= $key ?>" <?= $v['offer_format'] === $key ? 'selected' : '' ?>><?= $fmt['label'] ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
+                <div class="capedit-row">
+                    <div class="capedit-field">
+                        <label class="capedit-label">Objectif CRM</label>
+                        <select name="objective" class="capedit-select" id="capeditObjective">
+                            <?php foreach ($offerObjectives as $key => $label): ?>
+                            <option value="<?= $key ?>" <?= $v['objective'] === $key ? 'selected' : '' ?>><?= $label ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    <div class="capedit-field">
                         <label class="capedit-label">URL de remerciement</label>
                         <input type="text" name="page_merci_url" class="capedit-input"
                                value="<?= htmlspecialchars($v['page_merci_url']) ?>"
                                placeholder="/merci?guide=guide-vente-prix">
                         <div class="capedit-hint">Redirect après soumission du formulaire</div>
+                    </div>
+                </div>
+                <div class="capedit-row">
+                    <div class="capedit-field">
+                        <label class="capedit-label">Source CRM (tracking)</label>
+                        <input type="text" name="lead_source" id="capeditLeadSource" class="capedit-input"
+                               value="<?= htmlspecialchars($v['lead_source']) ?>"
+                               placeholder="capture_pdf_vendeur_guide-vente-prix">
+                        <div class="capedit-hint">Permet d’identifier précisément la source dans le CRM</div>
+                    </div>
+                    <div class="capedit-field">
+                        <label class="capedit-label">Tags CRM</label>
+                        <input type="text" name="lead_tags" class="capedit-input"
+                               value="<?= htmlspecialchars($v['lead_tags']) ?>"
+                               placeholder="capture,pdf,vendeur">
                     </div>
                 </div>
             </div>
@@ -506,6 +634,24 @@ document.getElementById('capeditSlug').addEventListener('input', function() {
     this.value = v;
     document.getElementById('capeditSlugPreview').textContent = v || '…';
 });
+
+function capeditBuildLeadSource() {
+    const slug = document.getElementById('capeditSlug').value || 'draft';
+    const fmt = document.getElementById('capeditOfferFormat')?.value || 'pdf';
+    const obj = document.getElementById('capeditObjective')?.value || 'vendeur';
+    const sourceEl = document.getElementById('capeditLeadSource');
+    if (!sourceEl) return;
+    if (!sourceEl.dataset.manual) sourceEl.value = `capture_${fmt}_${obj}_${slug}`;
+}
+const leadSourceEl = document.getElementById('capeditLeadSource');
+if (leadSourceEl) {
+    leadSourceEl.addEventListener('input', () => { leadSourceEl.dataset.manual = '1'; });
+}
+['capeditOfferFormat','capeditObjective','capeditSlug'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('change', capeditBuildLeadSource);
+});
+capeditBuildLeadSource();
 
 // ── Toggle statut ──
 function capeditToggleStatus(checkbox) {
