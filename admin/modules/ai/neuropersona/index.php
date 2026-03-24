@@ -549,7 +549,7 @@ $personasJSON = json_encode($personas, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNES
                 <button class="btn btn-sm btn-outline" onclick="editFromView()" title="Modifier">✏️ Modifier</button>
                 <button class="btn btn-sm btn-outline" onclick="duplicatePersona()" title="Dupliquer">📋 Dupliquer</button>
                 <button class="btn btn-sm btn-danger" onclick="deletePersona()" title="Supprimer">🗑️</button>
-                <button class="modal-close" onclick="closeAllModals()">&times;</button>
+                <button class="modal-close" onclick="closeNPModals()">&times;</button>
             </div>
         </div>
         <div class="modal-tabs" id="viewTabs">
@@ -646,7 +646,7 @@ $personasJSON = json_encode($personas, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNES
     <div class="modal-content">
         <div class="modal-header">
             <h3 id="editTitle">➕ Créer un persona</h3>
-            <button class="modal-close" onclick="closeAllModals()">&times;</button>
+            <button class="modal-close" onclick="closeNPModals()">&times;</button>
         </div>
         <div class="modal-tabs" id="editTabs">
             <button class="modal-tab active" onclick="switchEditTab('e-profil',this)">👤 Profil</button>
@@ -744,7 +744,7 @@ $personasJSON = json_encode($personas, JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNES
                 
                 <!-- FOOTER -->
                 <div class="edit-form-footer">
-                    <button type="button" class="btn btn-secondary" onclick="closeAllModals()">Annuler</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeNPModals()">Annuler</button>
                     <button type="submit" class="btn btn-primary">💾 Enregistrer</button>
                 </div>
             </form>
@@ -782,13 +782,13 @@ function showTypeTab(tab, btn) {
 // ============================================================
 // MODALS
 // ============================================================
-function closeAllModals() {
+function closeNPModals() {
     document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('active'));
 }
 document.querySelectorAll('.modal-overlay').forEach(m => {
-    m.addEventListener('click', e => { if (e.target === m) closeAllModals(); });
+    m.addEventListener('click', e => { if (e.target === m) closeNPModals(); });
 });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAllModals(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeNPModals(); });
 
 function switchViewTab(tab, btn) {
     document.querySelectorAll('#viewModal .modal-tab').forEach(t => t.classList.remove('active'));
@@ -1135,7 +1135,7 @@ function copyGen() {
 // CRUD: EDIT MODAL
 // ============================================================
 function openEditModal(id, defaultCat) {
-    closeAllModals();
+    closeNPModals();
     const form = document.getElementById('personaForm');
     form.reset();
 
