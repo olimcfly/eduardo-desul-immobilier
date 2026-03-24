@@ -72,6 +72,7 @@ function sendOTPEmail($to, $otp) {
                 $to,
                 $subject,
                 nl2br(htmlspecialchars($message, ENT_QUOTES, 'UTF-8')),
+                []
                 [
                     'from_email' => ADMIN_EMAIL,
                     'from_name'  => SITE_TITLE,
@@ -87,6 +88,9 @@ function sendOTPEmail($to, $otp) {
             $smtpError = $result['error'] ?? 'Erreur SMTP inconnue';
             writeLog("Échec SMTP OTP pour {$to}: {$smtpError}", 'ERROR');
 
+            // IMPORTANT: pas de fallback silencieux ici.
+            // Si SMTP échoue, on échoue explicitement pour éviter un faux positif
+            // "code envoyé" alors que l'email n'arrive jamais.
             // Si SMTP échoue, fallback vers mail() + diagnostic
             $mailFallback = mail($to, $subject, $message, $headers);
             if ($mailFallback) {
@@ -165,6 +169,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if (!empty($sendResult['success'])) {
                     $success = "Code envoyé par email";
+
+                    $step = "otp";
+                } else {
+                    $error = "Impossible d'envoyer le code de connexion. Vérifiez la configuration SMTP/env (outil: /diagnostic-smtp.php).";
 
                     // Message diagnostic non bloquant si fallback utilisé
                     if (($sendResult['transport'] ?? '') === 'mail_fallback' && !empty($sendResult['smtp_error'])) {
