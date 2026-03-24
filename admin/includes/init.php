@@ -72,3 +72,56 @@ if (!defined('ADMIN_ROUTER')) {
 $adminName    = $_SESSION['admin_name'] ?? $_SESSION['admin_email'] ?? 'Admin';
 $adminInitial = strtoupper(substr($adminName, 0, 1));
 $adminId      = $_SESSION['admin_id'];
+$adminRole    = $_SESSION['admin_role'] ?? 'admin';
+
+// ─── Helpers rôles & permissions ───
+
+if (!function_exists('isSuperUser')) {
+    function isSuperUser() {
+        return ($_SESSION['admin_role'] ?? 'admin') === 'superuser';
+    }
+}
+
+if (!function_exists('isModuleAllowed')) {
+    /**
+     * Vérifie si l'admin courant a accès à un module.
+     * Le Super User a accès à tout.
+     * Les admins n'ont accès qu'aux modules autorisés dans admin_module_permissions.
+     */
+    function isModuleAllowed($moduleSlug) {
+        if (isSuperUser()) return true;
+
+        // Modules toujours accessibles pour tous
+        $alwaysAllowed = ['dashboard', 'profile', 'advisor-context'];
+        if (in_array($moduleSlug, $alwaysAllowed)) return true;
+
+        static $permissions = null;
+        if ($permissions === null) {
+            $permissions = [];
+            try {
+                $db = getDB();
+                $stmt = $db->prepare("SELECT module_slug FROM admin_module_permissions WHERE admin_id = ? AND is_allowed = 1");
+                $stmt->execute([$_SESSION['admin_id']]);
+                $permissions = $stmt->fetchAll(PDO::FETCH_COLUMN);
+            } catch (Exception $e) {
+                // Si la table n'existe pas encore, autoriser tout
+                return true;
+            }
+        }
+
+        return in_array($moduleSlug, $permissions);
+    }
+}
+
+if (!function_exists('getAdminRole')) {
+    function getAdminRole() {
+        return $_SESSION['admin_role'] ?? 'admin';
+    }
+}
+
+if (!function_exists('getRoleLabel')) {
+    function getRoleLabel($role = null) {
+        $role = $role ?? getAdminRole();
+        return $role === 'superuser' ? 'Super Administrateur' : 'Administrateur';
+    }
+}
