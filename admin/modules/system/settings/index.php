@@ -21,6 +21,95 @@ if (!in_array($tab, $validTabs)) $tab = 'general';
 $flashMsg  = '';
 $flashType = 'ok';
 
+
+$settingsSchemaReport = null;
+
+function ensureSettingsStorageSchema(?PDO $pdo): array {
+    $report = [
+        'table' => 'settings',
+        'created_table' => false,
+        'created_columns' => [],
+        'created_indexes' => [],
+        'columns' => [],
+        'errors' => [],
+    ];
+
+    if (!$pdo) {
+        $report['errors'][] = 'Connexion PDO indisponible';
+        return $report;
+    }
+
+    try {
+        $existsStmt = $pdo->query("SHOW TABLES LIKE 'settings'");
+        $tableExists = (bool)$existsStmt->fetchColumn();
+
+        if (!$tableExists) {
+            $pdo->exec("CREATE TABLE IF NOT EXISTS settings (
+                setting_key VARCHAR(191) NOT NULL,
+                setting_value LONGTEXT NULL,
+                category VARCHAR(100) NULL,
+                updated_at DATETIME NULL,
+                PRIMARY KEY (setting_key)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+            $report['created_table'] = true;
+        }
+
+        $colRows = $pdo->query("SHOW COLUMNS FROM settings")->fetchAll(PDO::FETCH_ASSOC);
+        $existingCols = [];
+        foreach ($colRows as $col) {
+            $existingCols[$col['Field']] = true;
+        }
+
+        $requiredCols = [
+            'setting_key'   => "ALTER TABLE settings ADD COLUMN setting_key VARCHAR(191) NOT NULL",
+            'setting_value' => "ALTER TABLE settings ADD COLUMN setting_value LONGTEXT NULL",
+            'category'      => "ALTER TABLE settings ADD COLUMN category VARCHAR(100) NULL",
+            'updated_at'    => "ALTER TABLE settings ADD COLUMN updated_at DATETIME NULL",
+        ];
+
+        foreach ($requiredCols as $colName => $sql) {
+            if (!isset($existingCols[$colName])) {
+                $pdo->exec($sql);
+                $report['created_columns'][] = $colName;
+                $existingCols[$colName] = true;
+            }
+        }
+
+        if (isset($existingCols['setting_key'])) {
+            $indexRows = $pdo->query("SHOW INDEX FROM settings")->fetchAll(PDO::FETCH_ASSOC);
+            $hasUniqueOnSettingKey = false;
+            foreach ($indexRows as $idx) {
+                if (($idx['Column_name'] ?? '') === 'setting_key' && (int)($idx['Non_unique'] ?? 1) === 0) {
+                    $hasUniqueOnSettingKey = true;
+                    break;
+                }
+            }
+
+            if (!$hasUniqueOnSettingKey) {
+                try {
+                    $pdo->exec("ALTER TABLE settings ADD UNIQUE KEY uniq_setting_key (setting_key)");
+                    $report['created_indexes'][] = 'uniq_setting_key(setting_key)';
+                } catch (Throwable $e) {
+                    try {
+                        $pdo->exec("ALTER TABLE settings ADD PRIMARY KEY (setting_key)");
+                        $report['created_indexes'][] = 'PRIMARY(setting_key)';
+                    } catch (Throwable $e2) {
+                        $report['errors'][] = 'Index setting_key: ' . $e2->getMessage();
+                    }
+                }
+            }
+        }
+
+        $report['columns'] = array_keys($existingCols);
+    } catch (Throwable $e) {
+        $report['errors'][] = $e->getMessage();
+    }
+
+    return $report;
+}
+
+$settingsSchemaReport = ensureSettingsStorageSchema($pdo ?? null);
+
 // ─── Traitement POST ───
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     if (empty($_SESSION['csrf_token']) || ($_POST['csrf_token'] ?? '') !== $_SESSION['csrf_token']) {
@@ -31,12 +120,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         if ($action_post === 'save_settings' && $pdo) {
             $fields = $_POST['settings'] ?? [];
             try {
+                $existing = [];
+                $rows = $pdo->query("SELECT setting_key, setting_value FROM settings")->fetchAll(PDO::FETCH_ASSOC);
+                foreach ($rows as $r) {
+                    $existing[$r['setting_key']] = (string)($r['setting_value'] ?? '');
+                }
+
                 $pdo->beginTransaction();
                 $stmt = $pdo->prepare("INSERT INTO settings (setting_key, setting_value) VALUES (?, ?)
                     ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value), updated_at = NOW()");
                 foreach ($fields as $key => $val) {
                     $key = preg_replace('/[^a-z0-9_]/', '', $key);
-                    if ($key) $stmt->execute([$key, trim($val)]);
+                    if (!$key) continue;
+
+                    $val = trim((string)$val);
+                    if (in_array($key, ['smtp_pass', 'smtp2_pass'], true)) {
+                        if ($val === '' || preg_match('/^[•*\s]+$/u', $val)) {
+                            $val = $existing[$key] ?? '';
+                        }
+                    }
+
+                    $stmt->execute([$key, $val]);
                 }
                 $pdo->commit();
                 $flashMsg = 'Paramètres sauvegardés avec succès.';
@@ -571,7 +675,7 @@ if ($pdo) {
 ══════════════════════════════════════ -->
 <div class="set-panel<?= $tab==='email'?' active':'' ?>" id="tab-email">
 <form method="POST" action="?page=settings&tab=email">
-<input type="hidden" name="action" value="save_settings">
+<input type="hidden" id="email-action" name="action" value="save_settings">
 <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
 
 <div class="set-section anim">
@@ -587,7 +691,7 @@ if ($pdo) {
                 </select>
             </div>
             <div class="set-field"><label>Utilisateur SMTP</label><input class="set-input mono" type="text" name="settings[smtp_user]" value="<?= s('smtp_user') ?>" placeholder="contact@votredomaine.fr"></div>
-            <div class="set-field"><label>Mot de passe SMTP</label><input class="set-input mono" type="password" name="settings[smtp_pass]" value="<?= s('smtp_pass') ? '••••••••' : '' ?>" placeholder="••••••••" autocomplete="new-password"></div>
+            <div class="set-field"><label>Mot de passe SMTP</label><input class="set-input mono" type="password" name="settings[smtp_pass]" value="" placeholder="••••••••" autocomplete="new-password"></div>
             <div class="set-field"><label>Nom expéditeur</label><input class="set-input" type="text" name="settings[smtp_from_name]" value="<?= s('smtp_from_name', 'Eduardo De Sul') ?>"></div>
             <div class="set-field"><label>Email expéditeur (From)</label><input class="set-input mono" type="email" name="settings[smtp_from_email]" value="<?= s('smtp_from_email') ?>" placeholder="contact@votredomaine.fr"></div>
         </div>
@@ -596,24 +700,15 @@ if ($pdo) {
 
 <div class="set-section anim d1">
     <div class="set-section-hd"><i class="fas fa-envelope-circle-check"></i><h3>Tester la configuration SMTP</h3><p><a href="https://www.mail-tester.com/" target="_blank" rel="noopener">Ouvrir Mail-Tester</a></p></div>
-    <div class="set-section-body">
-        <form method="POST" action="?page=settings&tab=email" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
-            <input type="hidden" name="action" value="test_smtp">
-            <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
-            <input type="hidden" name="smtp_host" value="<?= s('smtp_host') ?>">
-            <input type="hidden" name="smtp_port" value="<?= s('smtp_port','587') ?>">
-            <input type="hidden" name="smtp_user" value="<?= s('smtp_user') ?>">
-            <input type="hidden" name="smtp_pass" value="<?= s('smtp_pass') ?>">
-            <input type="hidden" name="smtp_from_name" value="<?= s('smtp_from_name', 'Eduardo De Sul') ?>">
-            <input type="hidden" name="smtp_from_email" value="<?= s('smtp_from_email') ?>">
-            <input type="hidden" name="notify_email" value="<?= s('advisor_email', s('smtp_from_email')) ?>">
-            <div class="set-field" style="flex:1;min-width:220px">
-                <label>Email de test</label>
-                <input class="set-input" type="email" name="test_email" value="<?= s('advisor_email') ?>" placeholder="votre@email.fr" required>
-            </div>
-            <button type="submit" class="set-btn set-btn-s"><i class="fas fa-paper-plane"></i> Envoyer un email de test</button>
-        </form>
-        <small style="display:block;margin-top:8px;color:var(--text-3)">Le test vérifie d’abord la connexion SMTP puis envoie un email de test + une notification de succès.</small>
+    <div class="set-section-body" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
+        <div class="set-field" style="flex:1;min-width:220px">
+            <label>Email de test</label>
+            <input class="set-input" type="email" name="test_email" value="<?= s('advisor_email') ?>" placeholder="votre@email.fr">
+        </div>
+        <button type="submit" class="set-btn set-btn-s" onclick="document.getElementById('email-action').value='test_smtp'">
+            <i class="fas fa-paper-plane"></i> Envoyer un email de test
+        </button>
+        <small style="display:block;margin-top:8px;color:var(--text-3);width:100%">Le test vérifie d’abord la connexion SMTP puis envoie un email de test + une notification de succès.</small>
     </div>
 </div>
 
@@ -647,7 +742,7 @@ if ($pdo) {
             <div class="set-field"><label>Hôte SMTP 2</label><input class="set-input mono" type="text" name="settings[smtp2_host]" value="<?= s('smtp2_host') ?>" placeholder="mail2.votredomaine.fr"></div>
             <div class="set-field"><label>Port</label><input class="set-input mono" type="number" name="settings[smtp2_port]" value="<?= s('smtp2_port','587') ?>"></div>
             <div class="set-field"><label>Utilisateur</label><input class="set-input mono" type="text" name="settings[smtp2_user]" value="<?= s('smtp2_user') ?>"></div>
-            <div class="set-field"><label>Mot de passe</label><input class="set-input mono" type="password" name="settings[smtp2_pass]" value="<?= s('smtp2_pass') ? '••••••••' : '' ?>" autocomplete="new-password"></div>
+            <div class="set-field"><label>Mot de passe</label><input class="set-input mono" type="password" name="settings[smtp2_pass]" value="" autocomplete="new-password"></div>
         </div>
     </div>
 </div>
@@ -664,7 +759,7 @@ if ($pdo) {
     </div>
 </div>
 
-<div class="set-actions"><button type="submit" class="set-btn set-btn-p"><i class="fas fa-save"></i> Enregistrer la configuration email</button></div>
+<div class="set-actions"><button type="submit" class="set-btn set-btn-p" onclick="document.getElementById('email-action').value='save_settings'"><i class="fas fa-save"></i> Enregistrer la configuration email</button></div>
 </form>
 </div>
 
@@ -1035,6 +1130,27 @@ if ($pdo) {
 
 <div class="set-actions"><button type="submit" class="set-btn set-btn-p"><i class="fas fa-save"></i> Enregistrer la configuration IA</button><a href="?page=advisor-context" class="set-btn set-btn-s"><i class="fas fa-user-circle"></i> Éditer le profil complet</a></div>
 </form>
+</div>
+
+<div id="settings-schema-debug" style="position:fixed;left:12px;bottom:12px;z-index:1300;background:rgba(17,24,39,.92);color:#e5e7eb;border:1px solid rgba(148,163,184,.35);border-radius:10px;padding:10px 12px;max-width:min(420px,calc(100vw - 24px));font-size:11px;line-height:1.35;box-shadow:0 10px 30px rgba(0,0,0,.3)">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;font-weight:700">
+        <i class="fas fa-database" aria-hidden="true"></i>
+        Diagnostic DB settings
+    </div>
+    <div><strong>Table:</strong> <?= htmlspecialchars($settingsSchemaReport['table'] ?? 'settings') ?></div>
+    <div><strong>Colonnes:</strong> <?= htmlspecialchars(implode(', ', $settingsSchemaReport['columns'] ?? [])) ?></div>
+    <?php if (!empty($settingsSchemaReport['created_table'])): ?>
+        <div style="color:#86efac">Table créée automatiquement.</div>
+    <?php endif; ?>
+    <?php if (!empty($settingsSchemaReport['created_columns'])): ?>
+        <div style="color:#93c5fd">Colonnes créées: <?= htmlspecialchars(implode(', ', $settingsSchemaReport['created_columns'])) ?></div>
+    <?php endif; ?>
+    <?php if (!empty($settingsSchemaReport['created_indexes'])): ?>
+        <div style="color:#fcd34d">Index créés: <?= htmlspecialchars(implode(', ', $settingsSchemaReport['created_indexes'])) ?></div>
+    <?php endif; ?>
+    <?php if (!empty($settingsSchemaReport['errors'])): ?>
+        <div style="color:#fca5a5">Erreurs: <?= htmlspecialchars(implode(' | ', $settingsSchemaReport['errors'])) ?></div>
+    <?php endif; ?>
 </div>
 
 </div><!-- /set-wrap -->
