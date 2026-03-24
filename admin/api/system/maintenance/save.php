@@ -12,22 +12,17 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit;
 }
 
-// Démarrer la session avant de charger l'init (cohérence avec login.php)
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+// Charger config.php EN PREMIER pour qu'il démarre la session avec le bon nom
+// (ECOSYSTEM_EDUARDO-BORDEAUX) — sinon session_start() utilise PHPSESSID
+// et ne retrouve pas admin_id
+require_once dirname(__FILE__, 4) . '/config/config.php';
 
-// Vérifier l'authentification admin AVANT l'init (pour retourner du JSON, pas un redirect HTML)
+// Vérifier l'authentification admin (JSON au lieu d'un redirect HTML)
 if (empty($_SESSION['admin_id'])) {
-    // Essayer aussi avec le nom de session de config
-    // (au cas où la session a été démarrée avec un autre nom)
     http_response_code(401);
     echo json_encode(['success' => false, 'message' => 'Non authentifié']);
     exit;
 }
-
-// Charger la config pour avoir getDB()
-require_once dirname(__FILE__, 4) . '/config/config.php';
 
 $pdo = getDB();
 
