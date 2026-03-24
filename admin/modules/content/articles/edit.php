@@ -158,6 +158,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && in_array($action, ['edit','create']
                         VALUES ('.implode(', ', array_fill(0,count($fields),'?')).')';
                 $pdo->prepare($sql)->execute(array_values($safeMap));
                 $newId = (int)$pdo->lastInsertId();
+
+                // ── Auto-génération post GMB ──
+                try {
+                    $gmbAutoFile = dirname(__DIR__, 3) . '/includes/classes/GmbArticlePostService.php';
+                    if (file_exists($gmbAutoFile) && !empty($titre)) {
+                        require_once $gmbAutoFile;
+                        $gmbAutoSvc = new GmbArticlePostService($pdo);
+                        $gmbAutoSvc->generateFromArticle([
+                            'id'      => $newId,
+                            'titre'   => $titre,
+                            'extrait' => $extrait,
+                            'contenu' => $contenu,
+                            'slug'    => $slug,
+                        ]);
+                    }
+                } catch (Throwable $gmbErr) {
+                    error_log('[GMB Auto] Erreur génération post : ' . $gmbErr->getMessage());
+                }
+
                 jsRedirectEdit('?page=articles&action=edit&id='.$newId.'&msg=created');
             } else {
                 $sets   = array_map(fn($c)=>"`{$c}` = ?", array_keys($safeMap));
@@ -1043,6 +1062,108 @@ $pageTitle = $isEdit ? 'Modifier l\'article' : 'Nouvel article';
     </div>
     <?php endif; ?>
 
+    <!-- ═══ PANNEAU GMB — Posts Google My Business ═══ -->
+    <?php if ($isEdit):
+        // Charger les posts GMB de cet article
+        $gmbServiceFile = dirname(__DIR__, 3) . '/includes/classes/GmbArticlePostService.php';
+        $gmbPosts = [];
+        $gmbCounts = ['total'=>0,'published'=>0,'draft'=>0,'pending'=>0,'failed'=>0];
+        if (file_exists($gmbServiceFile)) {
+            try {
+                require_once $gmbServiceFile;
+                $gmbSvc = new GmbArticlePostService($pdo);
+                $gmbPosts = $gmbSvc->getByArticle($id);
+                $gmbCounts = $gmbSvc->countByArticle($id);
+            } catch (Throwable $e) {}
+        }
+    ?>
+    <div class="ae5-side-card" id="ae5GmbPanel">
+        <div class="ae5-side-header">
+            <div class="ae5-side-title"><i class="fab fa-google" style="color:#4285f4;"></i> Google My Business</div>
+            <?php if ($gmbCounts['total'] > 0): ?>
+            <span style="font-size:11px;font-weight:600;padding:2px 8px;border-radius:10px;
+                  background:<?= $gmbCounts['published']>0?'#d1fae5':'#fef3c7' ?>;
+                  color:<?= $gmbCounts['published']>0?'#065f46':'#92400e' ?>;">
+                <?= $gmbCounts['published'] ?>/<?= $gmbCounts['total'] ?>
+            </span>
+            <?php endif; ?>
+        </div>
+        <div class="ae5-side-body">
+
+            <?php if (empty($gmbPosts)): ?>
+            <div style="text-align:center;padding:12px 0;color:var(--t3,#9ca3af);font-size:12px;">
+                <i class="fas fa-bullhorn" style="font-size:20px;opacity:.4;display:block;margin-bottom:8px;"></i>
+                Aucun post GMB pour cet article
+            </div>
+            <?php else: ?>
+            <div id="ae5GmbPostsList" style="display:flex;flex-direction:column;gap:8px;">
+                <?php foreach ($gmbPosts as $gp):
+                    $gpStatus = $gp['status'];
+                    $gpStatusColors = [
+                        'published' => ['bg'=>'#d1fae5','color'=>'#065f46','icon'=>'fa-check-circle','label'=>'Publié'],
+                        'draft'     => ['bg'=>'#e0e7ff','color'=>'#3730a3','icon'=>'fa-pencil-alt','label'=>'Brouillon'],
+                        'pending'   => ['bg'=>'#fef3c7','color'=>'#92400e','icon'=>'fa-clock','label'=>'En attente'],
+                        'failed'    => ['bg'=>'#fee2e2','color'=>'#991b1b','icon'=>'fa-exclamation-triangle','label'=>'Échec'],
+                    ];
+                    $sc = $gpStatusColors[$gpStatus] ?? $gpStatusColors['draft'];
+                ?>
+                <div class="ae5-gmb-post-item" data-post-id="<?= (int)$gp['id'] ?>"
+                     style="border:1px solid var(--bdr,#e5e7eb);border-radius:8px;padding:10px;font-size:12px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                        <span style="background:<?= $sc['bg'] ?>;color:<?= $sc['color'] ?>;font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px;">
+                            <i class="fas <?= $sc['icon'] ?>"></i> <?= $sc['label'] ?>
+                        </span>
+                        <span style="color:var(--t3,#9ca3af);font-size:10px;">
+                            <?= !empty($gp['created_at']) ? date('d/m/Y H:i', strtotime($gp['created_at'])) : '' ?>
+                        </span>
+                    </div>
+                    <div style="color:var(--t2,#6b7280);line-height:1.5;max-height:60px;overflow:hidden;">
+                        <?= htmlspecialchars(mb_substr($gp['post_text'] ?? '', 0, 150)) ?><?= mb_strlen($gp['post_text']??'') > 150 ? '...' : '' ?>
+                    </div>
+                    <div style="display:flex;gap:6px;margin-top:8px;">
+                        <?php if (in_array($gpStatus, ['draft','failed'])): ?>
+                        <button type="button" class="ae5-gmb-btn ae5-gmb-btn-pub" onclick="gmbRepublish(<?= (int)$gp['id'] ?>)" title="Republier">
+                            <i class="fas fa-paper-plane"></i> Republier
+                        </button>
+                        <?php endif; ?>
+                        <button type="button" class="ae5-gmb-btn ae5-gmb-btn-del" onclick="gmbDelete(<?= (int)$gp['id'] ?>)" title="Supprimer">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <?php if (!empty($gp['gmb_error'])): ?>
+                    <div style="margin-top:6px;font-size:10px;color:#991b1b;background:#fee2e2;padding:4px 8px;border-radius:4px;">
+                        <i class="fas fa-info-circle"></i> <?= htmlspecialchars($gp['gmb_error']) ?>
+                    </div>
+                    <?php endif; ?>
+                </div>
+                <?php endforeach; ?>
+            </div>
+            <?php endif; ?>
+
+            <button type="button" class="ae5-gmb-generate-btn" id="ae5GmbGenerateBtn" onclick="gmbGenerate()">
+                <i class="fas fa-magic" id="ae5GmbGenIco"></i> Générer un post GMB
+            </button>
+        </div>
+    </div>
+
+    <style>
+    .ae5-gmb-generate-btn {
+        width:100%;margin-top:10px;padding:10px 14px;border:2px dashed var(--bdr,#d1d5db);border-radius:8px;
+        background:transparent;color:var(--ei-primary,#6366f1);font-weight:600;font-size:12px;cursor:pointer;
+        display:flex;align-items:center;justify-content:center;gap:8px;transition:all .2s;
+    }
+    .ae5-gmb-generate-btn:hover { background:var(--ei-primary,#6366f1);color:#fff;border-color:var(--ei-primary,#6366f1); }
+    .ae5-gmb-btn {
+        padding:4px 10px;border-radius:5px;border:none;font-size:10px;font-weight:600;cursor:pointer;
+        display:inline-flex;align-items:center;gap:4px;transition:all .15s;
+    }
+    .ae5-gmb-btn-pub { background:#e0e7ff;color:#4338ca; }
+    .ae5-gmb-btn-pub:hover { background:#4338ca;color:#fff; }
+    .ae5-gmb-btn-del { background:#fee2e2;color:#991b1b; }
+    .ae5-gmb-btn-del:hover { background:#991b1b;color:#fff; }
+    </style>
+    <?php endif; ?>
+
     <!-- Image à la une -->
     <div class="ae5-side-card">
         <div class="ae5-side-header"><div class="ae5-side-title"><i class="fas fa-image"></i> Image à la une</div></div>
@@ -1808,6 +1929,69 @@ function sv(id,v) { const e=g(id); if(e) e.value=v; }
 function st(id,t) { const e=g(id); if(e) e.textContent=t; }
 function show(id) { const e=g(id); if(e) e.style.display=''; }
 function hide(id) { const e=g(id); if(e) e.style.display='none'; }
+
+// ═══ GMB — POSTS GOOGLE MY BUSINESS ════════════════════
+const GMB_API = '/admin/api/router.php?module=gmb-posts';
+
+window.gmbGenerate = async function(){
+    const btn = g('ae5GmbGenerateBtn'), ico = g('ae5GmbGenIco');
+    if(!ARTICLE_ID){ toast('Enregistrez l\'article avant de générer un post GMB','warn'); return; }
+    if(btn) btn.disabled = true;
+    if(ico) ico.className = 'fas fa-spinner ae5-spin';
+    try {
+        const r = await fetch(GMB_API + '&action=generate', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json', 'X-CSRF-TOKEN': CSRF, 'X-Requested-With':'XMLHttpRequest'},
+            body: JSON.stringify({ article_id: ARTICLE_ID, csrf_token: CSRF })
+        });
+        const d = await r.json();
+        if(d.success){
+            toast('Post GMB généré !' + (d.published ? ' (publié sur Google)' : ' (brouillon)'), 'ai', 4000);
+            // Recharger le panneau
+            setTimeout(() => location.reload(), 800);
+        } else {
+            toast('Erreur : ' + (d.error || d.message || 'Erreur inconnue'), 'error');
+        }
+    } catch(err) { toast('Erreur réseau : ' + err.message, 'error'); }
+    if(btn) btn.disabled = false;
+    if(ico) ico.className = 'fas fa-magic';
+};
+
+window.gmbRepublish = async function(postId){
+    if(!confirm('Republier ce post sur Google My Business ?')) return;
+    try {
+        const r = await fetch(GMB_API + '&action=republish', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json', 'X-CSRF-TOKEN': CSRF, 'X-Requested-With':'XMLHttpRequest'},
+            body: JSON.stringify({ post_id: postId, csrf_token: CSRF })
+        });
+        const d = await r.json();
+        if(d.published) {
+            toast('Post publié sur Google !', 'success');
+        } else {
+            toast('Publication échouée : ' + (d.error || 'Clé API GMB non configurée'), 'warn', 5000);
+        }
+        setTimeout(() => location.reload(), 800);
+    } catch(err) { toast('Erreur : ' + err.message, 'error'); }
+};
+
+window.gmbDelete = async function(postId){
+    if(!confirm('Supprimer ce post GMB ?')) return;
+    try {
+        const r = await fetch(GMB_API + '&action=delete', {
+            method: 'POST',
+            headers: {'Content-Type':'application/json', 'X-CSRF-TOKEN': CSRF, 'X-Requested-With':'XMLHttpRequest'},
+            body: JSON.stringify({ post_id: postId, csrf_token: CSRF })
+        });
+        const d = await r.json();
+        if(d.success){
+            toast('Post GMB supprimé', 'success');
+            document.querySelector(`.ae5-gmb-post-item[data-post-id="${postId}"]`)?.remove();
+        } else {
+            toast('Erreur : ' + (d.message || 'Échec suppression'), 'error');
+        }
+    } catch(err) { toast('Erreur : ' + err.message, 'error'); }
+};
 
 // Init
 g('ae5Form')?.addEventListener('submit',()=>{ g('ae5Contenu').value=quill.root.innerHTML; });

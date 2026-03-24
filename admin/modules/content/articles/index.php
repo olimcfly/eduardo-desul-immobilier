@@ -243,6 +243,20 @@ if ($tableExists) {
     }
 }
 
+// ─── GMB Counts (batch) ───
+$gmbCounts = [];
+if (!empty($articles)) {
+    $gmbServiceFile = dirname(__DIR__, 3) . '/includes/classes/GmbArticlePostService.php';
+    if (file_exists($gmbServiceFile)) {
+        try {
+            require_once $gmbServiceFile;
+            $gmbSvc = new GmbArticlePostService($pdo);
+            $articleIds = array_column($articles, 'id');
+            $gmbCounts = $gmbSvc->countByArticles($articleIds);
+        } catch (Throwable $e) {}
+    }
+}
+
 // ─── CSRF ───
 if (!isset($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -784,6 +798,7 @@ $flash = $_GET['msg'] ?? '';
                     <th class="center" title="Score SEO technique">SEO</th>
                     <th class="center" title="Score sémantique">Sémantique</th>
                     <th title="Nombre de mots">Mots</th>
+                    <th class="center" title="Posts Google My Business">GMB</th>
                     <?php if ($hasGoogleIndexed || $hasIsIndexed): ?>
                     <th class="col-indexed">Google</th>
                     <?php endif; ?>
@@ -909,6 +924,27 @@ $flash = $_GET['msg'] ?? '';
                         </div>
                     </td>
 
+                    <!-- ═══ GMB Posts ═══ -->
+                    <td class="center">
+                        <?php
+                        $gc = $gmbCounts[(int)$a['id']] ?? null;
+                        if ($gc && $gc['total'] > 0):
+                            $gmbBadgeBg    = $gc['published'] > 0 ? '#d1fae5' : ($gc['failed'] > 0 ? '#fee2e2' : '#e0e7ff');
+                            $gmbBadgeColor = $gc['published'] > 0 ? '#065f46' : ($gc['failed'] > 0 ? '#991b1b' : '#3730a3');
+                        ?>
+                        <span class="arm-gmb-badge" data-article-id="<?= (int)$a['id'] ?>"
+                              onclick="ARM.gmbPopover(this, <?= (int)$a['id'] ?>)"
+                              style="display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:12px;
+                                     font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;
+                                     background:<?= $gmbBadgeBg ?>;color:<?= $gmbBadgeColor ?>;">
+                            <i class="fab fa-google" style="font-size:10px;"></i>
+                            <?= $gc['published'] ?>/<?= $gc['total'] ?>
+                        </span>
+                        <?php else: ?>
+                        <span style="color:var(--text-3,#9ca3af);font-size:11px;">—</span>
+                        <?php endif; ?>
+                    </td>
+
                     <!-- Indexation -->
                     <?php if ($hasGoogleIndexed || $hasIsIndexed): ?>
                     <td class="col-indexed">
@@ -1024,6 +1060,84 @@ const ARM = {
         const r = await fetch(this.apiUrl, {method:'POST',body:fd});
         const d = await r.json();
         d.success ? location.reload() : alert(d.error || 'Erreur');
+    },
+
+    // ─── GMB Popover ─────────────────────────────────────
+    _gmbPopover: null,
+    async gmbPopover(el, articleId) {
+        // Fermer le popover existant
+        if (this._gmbPopover) { this._gmbPopover.remove(); this._gmbPopover = null; }
+
+        const pop = document.createElement('div');
+        pop.className = 'arm-gmb-popover';
+        pop.innerHTML = '<div style="padding:12px;text-align:center;"><i class="fas fa-spinner fa-spin"></i> Chargement...</div>';
+
+        // Positionner
+        const rect = el.getBoundingClientRect();
+        pop.style.cssText = `position:fixed;top:${rect.bottom+6}px;left:${rect.left-100}px;z-index:9999;
+            background:#fff;border:1px solid #e5e7eb;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.12);
+            min-width:280px;max-width:350px;font-size:12px;`;
+        document.body.appendChild(pop);
+        this._gmbPopover = pop;
+
+        // Fermer au clic extérieur
+        const closeHandler = (e) => {
+            if (!pop.contains(e.target) && e.target !== el) {
+                pop.remove(); this._gmbPopover = null;
+                document.removeEventListener('click', closeHandler);
+            }
+        };
+        setTimeout(() => document.addEventListener('click', closeHandler), 10);
+
+        // Charger les données
+        try {
+            const r = await fetch(`/admin/api/router.php?module=gmb-posts&action=list&article_id=${articleId}`, {
+                headers: {'X-Requested-With':'XMLHttpRequest'}
+            });
+            const d = await r.json();
+            if (!d.success || !d.data?.length) {
+                pop.innerHTML = '<div style="padding:16px;text-align:center;color:#9ca3af;">Aucun post GMB</div>';
+                return;
+            }
+
+            const statusMap = {
+                published: {bg:'#d1fae5',color:'#065f46',icon:'fa-check-circle',label:'Publié'},
+                draft:     {bg:'#e0e7ff',color:'#3730a3',icon:'fa-pencil-alt',label:'Brouillon'},
+                pending:   {bg:'#fef3c7',color:'#92400e',icon:'fa-clock',label:'En attente'},
+                failed:    {bg:'#fee2e2',color:'#991b1b',icon:'fa-exclamation-triangle',label:'Échec'},
+            };
+
+            let html = `<div style="padding:12px 14px 8px;border-bottom:1px solid #f3f4f6;font-weight:600;display:flex;align-items:center;gap:6px;">
+                <i class="fab fa-google" style="color:#4285f4;"></i> Posts GMB
+                <span style="margin-left:auto;font-size:10px;color:#9ca3af;">${d.counts?.published||0}/${d.counts?.total||0} publiés</span>
+            </div>`;
+
+            d.data.forEach(p => {
+                const sc = statusMap[p.status] || statusMap.draft;
+                const date = p.created_at ? new Date(p.created_at).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
+                const preview = (p.post_text || '').substring(0, 120);
+                html += `<div style="padding:10px 14px;border-bottom:1px solid #f9fafb;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                        <span style="background:${sc.bg};color:${sc.color};font-size:10px;font-weight:600;padding:1px 7px;border-radius:8px;">
+                            <i class="fas ${sc.icon}"></i> ${sc.label}
+                        </span>
+                        <span style="color:#9ca3af;font-size:10px;">${date}</span>
+                    </div>
+                    <div style="color:#6b7280;line-height:1.5;">${preview}${p.post_text?.length>120?'...':''}</div>
+                </div>`;
+            });
+
+            html += `<div style="padding:8px 14px;">
+                <a href="?page=articles&action=edit&id=${articleId}#ae5GmbPanel"
+                   style="font-size:11px;color:#6366f1;text-decoration:none;font-weight:600;">
+                    <i class="fas fa-arrow-right"></i> Gérer dans l'éditeur
+                </a>
+            </div>`;
+
+            pop.innerHTML = html;
+        } catch(err) {
+            pop.innerHTML = '<div style="padding:16px;color:#991b1b;">Erreur chargement</div>';
+        }
     }
 };
 </script>

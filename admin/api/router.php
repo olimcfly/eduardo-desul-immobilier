@@ -71,6 +71,7 @@ $moduleMap = [
 
     // ── SOCIAL / GMB ─────────────────────
     'gmb'         => $handlersDir . 'gmb.php',
+    'gmb-posts'   => $handlersDir . 'gmb-posts.php',
 
     // ── SYSTEM ───────────────────────────
     'media'       => $handlersDir . 'media.php',
