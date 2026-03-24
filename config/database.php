@@ -16,6 +16,15 @@ if (!defined('INCLUDES_PATH')) {
     define('INCLUDES_PATH', ROOT_PATH . '/includes');
 }
 
+// Charger le helper d'environnement (env/loadEnv) si disponible
+$envHelper = ROOT_PATH . '/core/env.php';
+if (is_file($envHelper)) {
+    require_once $envHelper;
+}
+if (function_exists('loadEnv')) {
+    loadEnv(ROOT_PATH . '/.env');
+}
+
 // Charger la classe Database
 require_once INCLUDES_PATH . '/classes/Database.php';
 

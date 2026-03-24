@@ -9,10 +9,15 @@
  *   - admin/api/marketing/emails.php
  */
 
-// S'assurer que le .env est charge
+// S'assurer que le .env est charge (sans fatal si helper absent)
 if (!function_exists('env')) {
-    require_once dirname(dirname(__FILE__)) . '/core/env.php';
-    loadEnv(dirname(dirname(__FILE__)) . '/.env');
+    $envHelper = dirname(dirname(__FILE__)) . '/core/env.php';
+    if (is_file($envHelper)) {
+        require_once $envHelper;
+        if (function_exists('loadEnv')) {
+            loadEnv(dirname(dirname(__FILE__)) . '/.env');
+        }
+    }
 }
 
 $domain = env('SITE_DOMAIN', 'localhost');
