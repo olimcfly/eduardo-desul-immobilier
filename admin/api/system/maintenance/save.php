@@ -1,16 +1,35 @@
 <?php
 /**
  * API Maintenance
+ * /admin/api/system/maintenance/save.php
  */
 
-require_once dirname(__FILE__, 4) . '/includes/init.php';
-
-header('Content-Type: application/json');
+header('Content-Type: application/json; charset=utf-8');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
     echo json_encode(['success' => false, 'message' => 'Méthode non autorisée']);
     exit;
 }
+
+// Démarrer la session avant de charger l'init (cohérence avec login.php)
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Vérifier l'authentification admin AVANT l'init (pour retourner du JSON, pas un redirect HTML)
+if (empty($_SESSION['admin_id'])) {
+    // Essayer aussi avec le nom de session de config
+    // (au cas où la session a été démarrée avec un autre nom)
+    http_response_code(401);
+    echo json_encode(['success' => false, 'message' => 'Non authentifié']);
+    exit;
+}
+
+// Charger la config pour avoir getDB()
+require_once dirname(__FILE__, 4) . '/config/config.php';
+
+$pdo = getDB();
 
 $action = trim($_POST['action'] ?? '');
 
