@@ -36,5 +36,6 @@ RewriteRule ^(.*)$ /front/page.php?slug=$1 [L,QSA]
 </IfModule>
 
 # Erreurs
+ErrorDocument 404 /front/renderers/404.php
 ErrorDocument 404 /front/page.php
 ErrorDocument 500 /front/500.php
