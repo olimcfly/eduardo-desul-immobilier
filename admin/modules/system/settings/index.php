@@ -219,6 +219,25 @@ if ($pdo) {
 .flash.ok { background: var(--green-bg); color: var(--green); border: 1px solid rgba(5,150,105,.15); }
 .flash.err { background: var(--red-bg); color: var(--red); border: 1px solid rgba(220,38,38,.15); }
 
+
+.flash-toast {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 1200;
+    min-width: 280px;
+    max-width: min(460px, calc(100vw - 24px));
+    box-shadow: 0 10px 30px rgba(0,0,0,.16);
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
+    transition: opacity .2s ease, transform .2s ease;
+}
+.flash-toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 .api-service {
     display: flex; align-items: center; gap: 14px; padding: 12px 16px;
     background: var(--surface-2); border-radius: var(--radius); margin-bottom: 8px; border: 1px solid var(--border);
@@ -262,6 +281,22 @@ if ($pdo) {
 
 <?php if ($flashMsg): ?>
 <div class="flash <?= $flashType ?> anim"><i class="fas fa-<?= $flashType==='ok'?'check-circle':'exclamation-circle' ?>"></i> <?= $flashMsg ?></div>
+<?php endif; ?>
+
+
+<?php if ($flashMsg): ?>
+<div class="flash <?= $flashType ?> flash-toast" id="settings-toast" role="status" aria-live="polite">
+    <i class="fas fa-<?= $flashType==='ok'?'check-circle':'exclamation-circle' ?>"></i>
+    <span><?= $flashMsg ?></span>
+</div>
+<script>
+(() => {
+    const toast = document.getElementById('settings-toast');
+    if (!toast) return;
+    window.requestAnimationFrame(() => toast.classList.add('show'));
+    window.setTimeout(() => toast.classList.remove('show'), 5000);
+})();
+</script>
 <?php endif; ?>
 
 <!-- ONGLETS -->
