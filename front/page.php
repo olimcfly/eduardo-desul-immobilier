@@ -466,6 +466,13 @@ if ($uri === 'politique-confidentialite') {
     require_once $renderers . 'politique-confidentialite.php'; exit;
 }
 
+// Route dédiée capture dynamique : /capture/{slug}
+if ($parts[0] === 'capture' && !empty($parts[1])) {
+    $_GET['slug'] = preg_replace('/[^a-z0-9\-]/i', '', $parts[1]);
+    require_once __DIR__ . '/capture/{slug}.php';
+    exit;
+}
+
 if ($parts[0] === 'biens' && !empty($parts[1])) {
     $slug = $parts[1]; $_GET['slug'] = $slug;
     $propFound = false;
