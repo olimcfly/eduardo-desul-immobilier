@@ -20,7 +20,7 @@ $all_ressources = [];
 $stats_db       = ['vendeur'=>0,'acheteur'=>0,'proprietaire'=>0];
 try {
     $rows = $pdo->query("
-        SELECT r.*, c.id AS cap_id, c.status AS cap_status, c.vues, c.conversions
+        SELECT r.*, c.id AS cap_id, c.slug AS cap_slug, c.status AS cap_status, c.vues, c.conversions
         FROM ressources r
         LEFT JOIN captures c ON c.id = r.capture_id
         ORDER BY r.persona, r.sort_order, r.id
@@ -286,7 +286,7 @@ $status_styles = [
       <?php if ($chap): ?><span>📋 <?= count($chap) ?> chapitres</span><?php endif; ?>
       <?php if ($cap): ?>
         <span style="font-family:monospace;font-size:10px;color:<?= $color['from'] ?>;background:<?= $color['light'] ?>;padding:2px 7px;border-radius:5px;">
-          🔗 /capture/<?= htmlspecialchars($r['slug']) ?>
+          🔗 /capture/<?= htmlspecialchars($r['cap_slug'] ?: $r['slug']) ?>
         </span>
         <span>👁 <?= (int)($r['vues']??0) ?> vues</span>
         <span>🎯 <?= (int)($r['conversions']??0) ?> leads</span>
@@ -294,9 +294,9 @@ $status_styles = [
     </div>
   </div>
   <div class="res-list-actions">
-    <a class="rl-btn rl-btn-edit" href="?page=ressources&action=edit&id=<?= $r['id'] ?>">✏️ Éditer</a>
+    <a class="rl-btn rl-btn-edit" href="<?= $cap ? '?page=captures&action=edit&id=' . (int)$r['cap_id'] : '#'; ?>" <?= $cap ? '' : 'onclick="createCapture(' . (int)$r['id'] . ', \'' . htmlspecialchars(addslashes($r['slug'])) . '\', \'' . htmlspecialchars(addslashes($r['name'])) . '\', \'' . htmlspecialchars(addslashes($r['icon']??'📄')) . '\', \'' . htmlspecialchars(addslashes($r['description']??'')) . '\'); return false;"' ?>>✏️ Éditer</a>
     <?php if ($cap): ?>
-      <a class="rl-btn rl-btn-view" href="/capture/<?= $r['slug'] ?>" target="_blank">👁️ Voir</a>
+      <a class="rl-btn rl-btn-view" href="/capture/<?= htmlspecialchars($r['cap_slug'] ?: $r['slug']) ?>" target="_blank">👁️ Voir</a>
       <a class="rl-btn rl-btn-capture" href="?page=captures&action=edit&id=<?= (int)$r['cap_id'] ?>">📄 Capture</a>
     <?php else: ?>
       <button class="rl-btn rl-btn-capture" onclick="createCapture(<?= $r['id'] ?>, '<?= htmlspecialchars(addslashes($r['slug'])) ?>', '<?= htmlspecialchars(addslashes($r['name'])) ?>', '<?= htmlspecialchars(addslashes($r['icon']??'📄')) ?>', '<?= htmlspecialchars(addslashes($r['description']??'')) ?>')">
@@ -336,7 +336,7 @@ $status_styles = [
       <?php if ($cap && $cs === 'active'): ?> · 🟢 Capture active<?php elseif ($cap): ?> · 🟡 Capture inactive<?php else: ?> · ⚪ Sans capture<?php endif; ?>
     </div>
     <div class="res-card-btns">
-      <a class="rc-btn rc-btn-edit" href="?page=ressources&action=edit&id=<?= $r['id'] ?>">✏️ Éditer</a>
+      <a class="rc-btn rc-btn-edit" href="<?= $cap ? '?page=captures&action=edit&id=' . (int)$r['cap_id'] : '#'; ?>" <?= $cap ? '' : 'onclick="createCapture(' . (int)$r['id'] . ', \'' . htmlspecialchars(addslashes($r['slug'])) . '\', \'' . htmlspecialchars(addslashes($r['name'])) . '\', \'' . htmlspecialchars(addslashes($r['icon']??'📄')) . '\', \'' . htmlspecialchars(addslashes($r['description']??'')) . '\'); return false;"' ?>>✏️ Éditer</a>
       <?php if ($cap): ?>
         <a class="rc-btn rc-btn-capture" href="?page=captures&action=edit&id=<?= (int)$r['cap_id'] ?>">📄 Capture</a>
       <?php else: ?>
@@ -345,7 +345,7 @@ $status_styles = [
         </button>
       <?php endif; ?>
       <?php if ($cap): ?>
-        <a class="rc-btn rc-btn-view" href="/capture/<?= $r['slug'] ?>" target="_blank">👁️ Voir</a>
+        <a class="rc-btn rc-btn-view" href="/capture/<?= htmlspecialchars($r['cap_slug'] ?: $r['slug']) ?>" target="_blank">👁️ Voir</a>
       <?php endif; ?>
       <button class="rc-btn rc-btn-delete" onclick="confirmDelete(<?= $r['id'] ?>, '<?= htmlspecialchars(addslashes($r['name'])) ?>')">🗑️ Supprimer</button>
     </div>
