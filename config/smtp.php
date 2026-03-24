@@ -3,55 +3,56 @@
  * Configuration SMTP / IMAP
  * config/smtp.php
  *
+ * Les credentials sont lues depuis .env
  * Charge par loadSmtpConfig() dans :
  *   - admin/modules/system/modules.php
  *   - admin/api/marketing/emails.php
  */
 
+// S'assurer que le .env est charge
+if (!function_exists('env')) {
+    require_once dirname(dirname(__FILE__)) . '/core/env.php';
+    loadEnv(dirname(dirname(__FILE__)) . '/.env');
+}
+
+$domain = env('SITE_DOMAIN', 'localhost');
+
 return [
     // SMTP (envoi)
-    'smtp_host'      => 'eduardo-desul-immobilier.fr',
-    'smtp_port'      => 465,
-    'smtp_secure'    => 'ssl',
-    'smtp_user'      => 'admin@eduardo-desul-immobilier.fr',
-    'smtp_pass'      => 'JQP_4}J)dNIy',
-    'smtp_from'      => 'contact@eduardo-desul-immobilier.fr',
-    'smtp_from_name' => 'Eduardo De Sul Immobilier',
+    'smtp_host'      => env('SMTP_HOST', $domain),
+    'smtp_port'      => (int) env('SMTP_PORT', 465),
+    'smtp_secure'    => env('SMTP_SECURE', 'ssl'),
+    'smtp_user'      => env('SMTP_USER', 'admin@' . $domain),
+    'smtp_pass'      => env('SMTP_PASS', ''),
+    'smtp_from'      => env('SMTP_FROM', 'contact@' . $domain),
+    'smtp_from_name' => env('SMTP_FROM_NAME', env('SITE_TITLE', 'Mon Site')),
 
     // IMAP (reception)
-    'imap_host'   => 'eduardo-desul-immobilier.fr',
-    'imap_port'   => 993,
-    'imap_secure' => 'ssl',
-    'imap_user'   => 'admin@eduardo-desul-immobilier.fr',
-    'imap_pass'   => 'JQP_4}J)dNIy',
+    'imap_host'   => env('IMAP_HOST', $domain),
+    'imap_port'   => (int) env('IMAP_PORT', 993),
+    'imap_secure' => env('IMAP_SECURE', 'ssl'),
+    'imap_user'   => env('IMAP_USER', 'admin@' . $domain),
+    'imap_pass'   => env('IMAP_PASS', ''),
 
     // Comptes email du domaine
     'email_accounts' => [
-        'admin@eduardo-desul-immobilier.fr',
-        'contact@eduardo-desul-immobilier.fr',
-        'info@eduardo-desul-immobilier.fr',
-        'estimation@eduardo-desul-immobilier.fr',
-        'guide@eduardo-desul-immobilier.fr',
-        'support@eduardo-desul-immobilier.fr',
-        'ne-pas-repondre@eduardo-desul-immobilier.fr',
-        'bounce@eduardo-desul-immobilier.fr',
-        'replit2@eduardo-desul-immobilier.fr',
+        'admin@' . $domain,
+        'contact@' . $domain,
+        'info@' . $domain,
+        'estimation@' . $domain,
+        'support@' . $domain,
+        'ne-pas-repondre@' . $domain,
+        'bounce@' . $domain,
     ],
 
-    // Alias .com
-    'email_aliases' => [
-        'contact@eduardo-desul-immobilier.com',
-        'info@eduardo-desul-immobilier.com',
-        'support@eduardo-desul-immobilier.com',
-        'ne-pas-repondre@eduardo-desul-immobilier.com',
-        'bounce@eduardo-desul-immobilier.com',
-    ],
+    // Alias (optionnel)
+    'email_aliases' => [],
 
     // Roles
     'email_roles' => [
-        'primary' => 'contact@eduardo-desul-immobilier.fr',
-        'system'  => 'ne-pas-repondre@eduardo-desul-immobilier.fr',
-        'support' => 'support@eduardo-desul-immobilier.fr',
-        'bounce'  => 'bounce@eduardo-desul-immobilier.fr',
+        'primary' => 'contact@' . $domain,
+        'system'  => 'ne-pas-repondre@' . $domain,
+        'support' => 'support@' . $domain,
+        'bounce'  => 'bounce@' . $domain,
     ],
 ];

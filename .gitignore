@@ -4,6 +4,7 @@
 config/config.php
 config/smtp.php
 config/license.json
+config/.installed
 
 # ═══════════════════════════════════════════════════════════
 # LOGS & CACHE
@@ -29,6 +30,7 @@ Thumbs.db
 *~
 .env
 .env.*
+!.env.example
 *.bak
 *.tmp
 

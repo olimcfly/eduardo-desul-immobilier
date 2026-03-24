@@ -13,7 +13,7 @@ defined('ADMIN_ROUTER') or define('ADMIN_ROUTER', true);
 
 ob_start();
 
-$rootPath = '/home/mahe6420/public_html';
+$rootPath = dirname(__DIR__, 3);
 if (!defined('DB_HOST'))      require_once $rootPath . '/config/config.php';
 if (!class_exists('Database')) require_once $rootPath . '/includes/classes/Database.php';
 

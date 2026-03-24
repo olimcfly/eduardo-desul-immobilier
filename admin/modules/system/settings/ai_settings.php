@@ -7,7 +7,7 @@
 
 defined('ADMIN_ROUTER') or define('ADMIN_ROUTER', true);
 
-if (!defined('DB_HOST')) require_once '/home/mahe6420/public_html/config/config.php';
+if (!defined('DB_HOST')) require_once dirname(__DIR__, 4) . '/config/config.php';
 
 if (!isset($pdo)) {
     try {

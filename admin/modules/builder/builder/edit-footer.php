@@ -15,15 +15,10 @@ if (isset($pdo)) {
 }
 if (!$db) {
     try {
-        require_once __DIR__ . '/../../../../config/config.php';
-        $db = new PDO(
-            'mysql:host='.(defined('DB_HOST')?DB_HOST:'localhost').';dbname='.(defined('DB_NAME')?DB_NAME:'mahe6420_cms-site-ed-bordeaux').';charset=utf8mb4',
-            defined('DB_USER')?DB_USER:'mahe6420_edbordeaux',
-            defined('DB_PASS')?DB_PASS:'',
-            [PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC]
-        );
+        if (!defined('DB_HOST')) require_once __DIR__ . '/../../../../config/config.php';
+        $db = getDB();
     } catch (Exception $e) {
-        echo '<div style="padding:20px;color:#dc2626;background:#fee2e2;border-radius:8px;margin:20px">❌ DB impossible : '.htmlspecialchars($e->getMessage()).'</div>';
+        echo '<div style="padding:20px;color:#dc2626;background:#fee2e2;border-radius:8px;margin:20px">DB impossible : '.htmlspecialchars($e->getMessage()).'</div>';
         return;
     }
 }

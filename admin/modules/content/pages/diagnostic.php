@@ -554,7 +554,7 @@ if (empty($diagnostics['errors'])) {
                         <h4>2. Créer la table pages</h4>
                         <ol>
                             <li>Ouvrir phpMyAdmin</li>
-                            <li>Aller sur BD: mahe6420_cms-site-ed-bordeaux</li>
+                            <li>Aller sur votre base de donnees (voir .env → DB_NAME)</li>
                             <li>Exécuter admin_tables.sql</li>
                             <li>Ou créer manuellement la table pages</li>
                         </ol>

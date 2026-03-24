@@ -9,7 +9,6 @@ define('ADMIN_ROUTER', true);
 
 $_initPath = dirname(__DIR__, 2) . '/includes/init.php';
 if (!file_exists($_initPath)) $_initPath = $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/init.php';
-if (!file_exists($_initPath)) $_initPath = '/home/mahe6420/public_html/admin/includes/init.php';
 require_once $_initPath;
 
 header('Content-Type: application/json; charset=utf-8');
