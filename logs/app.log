@@ -1,0 +1,8 @@
+[2026-01-22 21:35:58] [DEBUG] OTP validation attempt for: admin@eduardo-desul-immobilier.fr (input: 110082, stored: 110082)
+[2026-01-22 21:35:58] [INFO] Successful login for: admin@eduardo-desul-immobilier.fr
+[2026-01-22 21:45:26] [INFO] OTP generated for: admin@eduardo-desul-immobilier.fr
+[2026-01-22 21:45:26] [INFO] Email sent successfully to: admin@eduardo-desul-immobilier.fr
+[2026-01-22 21:45:26] [DEBUG] OTP validation attempt for: admin@eduardo-desul-immobilier.fr (input: , stored: 435103)
+[2026-01-22 21:45:26] [WARNING] Invalid OTP for: admin@eduardo-desul-immobilier.fr
+[2026-01-22 21:45:47] [DEBUG] OTP validation attempt for: admin@eduardo-desul-immobilier.fr (input: 435103, stored: 435103)
+[2026-01-22 21:45:47] [INFO] Successful login for: admin@eduardo-desul-immobilier.fr

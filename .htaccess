@@ -1,0 +1,40 @@
+# /home/mahe6420/public_html/.htaccess
+RewriteEngine On
+RewriteBase /
+
+# Fichiers réels
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^ - [L]
+
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Zones protégées
+RewriteRule ^admin(/.*)?$ - [L]
+RewriteRule ^api(/.*)?$ - [L]
+RewriteRule ^assets(/.*)?$ - [L]
+RewriteRule ^uploads(/.*)?$ - [L]
+
+# Sécurité : bloquer fichiers sensibles
+RewriteRule ^(config|logs|vendor)(/.*)?$ - [F,L]
+
+# Router front
+RewriteRule ^(.*)$ /front/router.php?_uri=$1 [L,QSA]
+
+# Cache
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType text/css "access plus 1 week"
+    ExpiresByType application/javascript "access plus 1 week"
+</IfModule>
+
+# Compression
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/css application/javascript
+</IfModule>
+
+# Erreurs
+ErrorDocument 404 /front/router.php
+ErrorDocument 500 /front/500.php

@@ -1,0 +1,43 @@
+# /home/mahe6420/public_html/.htaccess
+RewriteEngine On
+RewriteBase /
+
+# Fichiers réels
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^ - [L]
+
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# ✅ Exclure TOUT le backend
+RewriteRule ^admin - [L]
+RewriteRule ^api(/.*)?$ - [L]
+RewriteRule ^assets(/.*)?$ - [L]
+RewriteRule ^uploads(/.*)?$ - [L]
+RewriteRule ^config - [L]
+RewriteRule ^includes - [L]
+RewriteRule ^logs - [L]
+
+# Bloquer accès sensibles
+RewriteRule ^vendor(/.*)?$ - [F,L]
+
+# ✅ Router FRONT seulement pour pages client
+RewriteCond %{REQUEST_URI} !^/admin
+RewriteCond %{REQUEST_URI} !^/api
+RewriteCond %{REQUEST_URI} !^/assets
+RewriteCond %{REQUEST_URI} !^/uploads
+RewriteRule ^(.*)$ /front/router.php [L,QSA]
+
+# Cache
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType text/css "access plus 1 week"
+    ExpiresByType application/javascript "access plus 1 week"
+</IfModule>
+
+# Compression
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/css application/javascript
+</IfModule>
