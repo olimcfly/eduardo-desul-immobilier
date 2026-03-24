@@ -343,6 +343,15 @@ if ($sourceTable === 'builder_pages') {
     }
 }
 
+// ── Fallback : contenu statique si page vide ─────────────
+if (trim($html) === '') {
+    $fallbackFile = __DIR__ . '/../content/' . basename($pageSlug) . '.html';
+    if (file_exists($fallbackFile)) {
+        $html = file_get_contents($fallbackFile);
+        $externalCss[] = '/front/assets/css/legal.css';
+    }
+}
+
 // ── Header / Footer ──────────────────────────────────────
 $hf = [
     'header' => _loadHF_v5($db, 'header', !empty($page['header_id']) ? (int)$page['header_id'] : null),
