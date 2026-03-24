@@ -8,8 +8,44 @@
  */
 if (!defined('ADMIN_ROUTER')) { http_response_code(403); exit; }
 
+// ── Export CSV (téléchargement direct, pas AJAX) ────────────────────────────
+if (isset($_GET['action']) && $_GET['action'] === 'export-csv') {
+    // Nettoyer tout buffer précédent (header/sidebar du dashboard)
+    while (ob_get_level()) ob_end_clean();
+
+    $rows = $pdo->query("
+        SELECT section, field_key, field_label, field_value, field_type, updated_at
+        FROM advisor_context
+        ORDER BY section, sort_order
+    ")->fetchAll();
+
+    header('Content-Type: text/csv; charset=UTF-8');
+    header('Content-Disposition: attachment; filename="profil-ia-' . date('Y-m-d') . '.csv"');
+    header('Pragma: no-cache');
+
+    $out = fopen('php://output', 'w');
+    // BOM UTF-8 pour compatibilité Excel
+    fwrite($out, "\xEF\xBB\xBF");
+    fputcsv($out, ['Section', 'Clé', 'Label', 'Valeur', 'Type', 'Dernière modification'], ';');
+    foreach ($rows as $r) {
+        fputcsv($out, [
+            $r['section'],
+            $r['field_key'],
+            $r['field_label'],
+            $r['field_value'] ?? '',
+            $r['field_type'],
+            $r['updated_at'] ?? '',
+        ], ';');
+    }
+    fclose($out);
+    exit;
+}
+
 // ── Handler AJAX ────────────────────────────────────────────────────────────
 if (!empty($_POST['_ajax'])) {
+    // Nettoyer tout buffer précédent (header/sidebar du dashboard)
+    while (ob_get_level()) ob_end_clean();
+
     header('Content-Type: application/json; charset=utf-8');
     $action = $_POST['action'] ?? '';
 
@@ -138,6 +174,8 @@ $previewModules = ['articles', 'biens', 'leads', 'seo', 'social', 'gmb', 'captur
 .ac-q-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#f59e0b,#10b981);transition:width .4s}
 .ac-q-pct{font-size:11px;font-weight:700;color:var(--text-2);width:35px;text-align:right}
 .ac-q-tip{font-size:10px;color:var(--text-3)}
+.ac-export-btn{margin-left:auto;padding:6px 14px;background:var(--ac-blue);color:#fff;border:none;border-radius:var(--radius);font-size:10.5px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s;display:flex;align-items:center;gap:5px;text-decoration:none;white-space:nowrap;flex-shrink:0}
+.ac-export-btn:hover{opacity:.88;transform:translateY(-1px);color:#fff}
 
 /* ── Preview panel ──────────────────────────────────────── */
 .ac-preview-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);margin-bottom:20px;overflow:hidden}
@@ -197,6 +235,9 @@ $qTip = $quality >= 80 ? '✅ Profil complet — l\'IA est bien contextualisée'
     <div class="ac-q-bar"><div class="ac-q-fill" style="width:<?= $quality ?>%;background:<?= $qColor ?>"></div></div>
     <span class="ac-q-pct" style="color:<?= $qColor ?>"><?= $quality ?>%</span>
     <span class="ac-q-tip"><?= $qTip ?> (<?= $filledFields ?>/<?= $totalFields ?> champs)</span>
+    <a href="?page=advisor-context&action=export-csv" class="ac-export-btn" title="Exporter le profil IA en CSV">
+        <i class="fas fa-file-csv"></i> Export CSV
+    </a>
 </div>
 
 <!-- Onglets -->
