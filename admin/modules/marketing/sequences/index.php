@@ -37,6 +37,9 @@ if (isset($pdo) && !isset($db)) $db = $pdo;
 $tablesExist = true;
 try {
     $db->query("SELECT 1 FROM crm_sequences LIMIT 1");
+    $db->query("SELECT 1 FROM crm_sequence_steps LIMIT 1");
+    $db->query("SELECT 1 FROM crm_sequence_enrollments LIMIT 1");
+    $db->query("SELECT 1 FROM crm_sequence_sends LIMIT 1");
 } catch (PDOException $e) {
     $tablesExist = false;
 }
@@ -154,7 +157,7 @@ if (!$tablesExist) {
 // GESTION ACTIONS (POST)
 // ====================================================
 $action = $_GET['action'] ?? 'list';
-$sequenceId = (int)($_GET['id'] ?? 0);
+$sequenceId = (int)($_GET['id'] ?? $_POST['sequence_id'] ?? 0);
 $message = '';
 $messageType = 'success';
 
@@ -593,11 +596,128 @@ $templateVars = [
 }
 .seq-var-tag:hover { background:var(--accent); color:#fff; }
 
+/* Enhanced Modal */
+.seq-modal-large {
+    width:90%; max-width:900px; max-height:90vh; overflow-y:auto;
+}
+
+/* Editor Wrapper */
+.seq-editor-wrapper {
+    border:1px solid var(--border); border-radius:var(--radius-lg);
+    overflow:hidden; background:var(--surface);
+}
+.seq-editor-tabs {
+    display:flex; gap:0; border-bottom:1px solid var(--border);
+    background:var(--surface-2);
+}
+.seq-editor-tab {
+    padding:8px 16px; font-size:.8rem; font-weight:600;
+    border:none; background:none; cursor:pointer;
+    color:var(--text-3); transition:all .2s;
+    border-bottom:2px solid transparent;
+}
+.seq-editor-tab:hover { color:var(--accent); }
+.seq-editor-tab.active {
+    color:var(--accent); border-bottom-color:var(--accent);
+    background:var(--surface);
+}
+
+/* Rich Text Toolbar */
+.seq-toolbar {
+    display:flex; flex-wrap:wrap; gap:2px; padding:6px 8px;
+    border-bottom:1px solid var(--border); background:var(--surface-2);
+    align-items:center;
+}
+.seq-toolbar button {
+    width:32px; height:32px; border:none; background:none;
+    border-radius:6px; cursor:pointer; font-size:.8rem;
+    color:var(--text-2); transition:all .15s;
+    display:inline-flex; align-items:center; justify-content:center;
+}
+.seq-toolbar button:hover {
+    background:var(--accent); color:#fff;
+}
+.seq-toolbar-sep {
+    width:1px; height:20px; background:var(--border); margin:0 4px;
+}
+
+/* Visual Editor (contenteditable) */
+.seq-editor-visual {
+    min-height:280px; max-height:450px; overflow-y:auto;
+    padding:20px; font-size:.9rem; line-height:1.7;
+    color:var(--text); outline:none; font-family:system-ui, sans-serif;
+}
+.seq-editor-visual:empty::before {
+    content:'Bonjour {{prenom}},\A\AVotre email ici...';
+    white-space:pre-line; color:var(--text-3); pointer-events:none;
+}
+.seq-editor-visual h2 { font-size:1.3rem; font-weight:700; margin:16px 0 8px; }
+.seq-editor-visual h3 { font-size:1.1rem; font-weight:600; margin:12px 0 6px; }
+.seq-editor-visual a { color:var(--accent); text-decoration:underline; }
+.seq-editor-visual ul, .seq-editor-visual ol { padding-left:24px; margin:8px 0; }
+.seq-editor-visual li { margin-bottom:4px; }
+.seq-editor-visual .email-cta-btn {
+    display:inline-block; padding:12px 28px; background:var(--accent);
+    color:#fff !important; text-decoration:none !important;
+    border-radius:8px; font-weight:600; margin:12px 0;
+}
+.seq-editor-visual .email-signature {
+    margin-top:24px; padding-top:16px;
+    border-top:1px solid var(--border); color:var(--text-3); font-size:.85rem;
+}
+.seq-editor-visual img { max-width:100%; height:auto; border-radius:8px; margin:8px 0; }
+
+/* HTML Source Editor */
+.seq-editor-source {
+    width:100%; border:none; padding:16px; font-family:'Fira Code',monospace,monospace;
+    font-size:.8rem; line-height:1.6; resize:vertical;
+    min-height:280px; background:var(--surface); color:var(--text);
+    outline:none;
+}
+
+/* Email Preview */
+.seq-editor-preview {
+    min-height:280px; max-height:500px; overflow-y:auto;
+    padding:0; background:#f8fafc;
+}
+.seq-preview-frame {
+    max-width:600px; margin:24px auto; background:#fff;
+    border-radius:8px; box-shadow:0 2px 12px rgba(0,0,0,.08);
+    overflow:hidden; font-family:system-ui, sans-serif;
+}
+.seq-preview-header {
+    padding:16px 24px; background:var(--surface-2); border-bottom:1px solid var(--border);
+    font-size:.8rem; color:var(--text-3);
+}
+.seq-preview-header strong { color:var(--text); display:block; margin-bottom:4px; }
+.seq-preview-body {
+    padding:24px; font-size:.9rem; line-height:1.7; color:#1e293b;
+}
+.seq-preview-body a { color:var(--accent); }
+.seq-preview-body .email-cta-btn {
+    display:inline-block; padding:12px 28px; background:#6366f1;
+    color:#fff !important; text-decoration:none !important;
+    border-radius:8px; font-weight:600; margin:12px 0;
+}
+.seq-preview-footer {
+    padding:12px 24px; background:#f1f5f9; text-align:center;
+    font-size:.75rem; color:#94a3b8;
+}
+
+/* Template selector styling */
+#emailTemplateSelect {
+    border:1px dashed var(--accent); background:var(--surface-2);
+}
+#emailTemplateSelect:focus { border-style:solid; }
+
 @media (max-width:768px) {
     .seq-stats-grid { grid-template-columns:repeat(2,1fr); }
     .seq-form-row { grid-template-columns:1fr; }
     .seq-card-header { flex-direction:column; }
     .seq-tabs { overflow-x:auto; }
+    .seq-modal-large { width:95%; max-width:none; }
+    .seq-toolbar { gap:1px; padding:4px; }
+    .seq-toolbar button { width:28px; height:28px; }
 }
 </style>
 
@@ -1067,9 +1187,9 @@ $templateVars = [
     <?php endif; ?>
 </div>
 
-<!-- MODAL ÉTAPE -->
+<!-- MODAL ÉTAPE (Enhanced Email Editor) -->
 <div class="seq-modal-overlay" id="addStepModal">
-    <div class="seq-modal">
+    <div class="seq-modal seq-modal-large">
         <div class="seq-modal-header">
             <h3 id="stepModalTitle"><i class="fas fa-plus"></i> Ajouter une étape</h3>
             <button class="seq-modal-close" onclick="closeModal('addStepModal')">&times;</button>
@@ -1082,34 +1202,112 @@ $templateVars = [
                 <div class="seq-form-group">
                     <label>Type</label>
                     <select name="step_type" id="stepType" onchange="toggleStepFields()">
-                        <option value="email">📧 Email</option>
-                        <option value="sms">📱 SMS</option>
-                        <option value="wait">⏳ Attente</option>
-                        <option value="task">📋 Tâche</option>
+                        <option value="email">Email</option>
+                        <option value="sms">SMS</option>
+                        <option value="wait">Attente</option>
+                        <option value="task">Tache</option>
                     </select>
                 </div>
                 <div class="seq-form-group">
-                    <label>Délai (jours)</label>
+                    <label>Delai (jours)</label>
                     <input type="number" name="delay_days" id="stepDelayDays" value="1" min="0" max="365">
                 </div>
                 <div class="seq-form-group">
-                    <label>Délai (heures)</label>
+                    <label>Delai (heures)</label>
                     <input type="number" name="delay_hours" id="stepDelayHours" value="0" min="0" max="23">
                 </div>
             </div>
             <div id="emailFields">
+                <!-- Template Selector -->
                 <div class="seq-form-group">
-                    <label>Objet</label>
-                    <input type="text" name="subject" id="stepSubject" placeholder="Ex: {{prenom}}, votre projet à Bordeaux">
+                    <label><i class="fas fa-magic"></i> Modele d'email</label>
+                    <select id="emailTemplateSelect" onchange="loadEmailTemplate()">
+                        <option value="">-- Choisir un modele ou ecrire de zero --</option>
+                        <optgroup label="Bienvenue / Premier contact">
+                            <option value="welcome_buyer">Bienvenue acheteur</option>
+                            <option value="welcome_seller">Bienvenue vendeur</option>
+                            <option value="welcome_investor">Bienvenue investisseur</option>
+                        </optgroup>
+                        <optgroup label="Suivi / Relance">
+                            <option value="followup_1">Relance J+3 - Prise de nouvelles</option>
+                            <option value="followup_2">Relance J+7 - Nouveaux biens</option>
+                            <option value="followup_3">Relance J+14 - Valeur ajoutee</option>
+                        </optgroup>
+                        <optgroup label="Estimation">
+                            <option value="estimation_offer">Proposition estimation gratuite</option>
+                            <option value="estimation_result">Resultat estimation</option>
+                        </optgroup>
+                        <optgroup label="Nurturing">
+                            <option value="market_update">Actualite du marche</option>
+                            <option value="testimonial">Temoignage client</option>
+                            <option value="tips_buyer">Conseils acheteur</option>
+                            <option value="tips_seller">Conseils vendeur</option>
+                        </optgroup>
+                    </select>
                 </div>
+
                 <div class="seq-form-group">
-                    <label>Corps (HTML)</label>
-                    <textarea name="body_html" id="stepBodyHtml" rows="10" placeholder="Bonjour {{prenom}},&#10;&#10;..."></textarea>
-                    <small style="color:var(--text-3)">Variables :</small>
-                    <div class="seq-vars-list">
-                        <?php foreach ($templateVars as $var => $desc): ?>
-                        <span class="seq-var-tag" onclick="insertVar('<?= $var ?>')" title="<?= $desc ?>"><?= $var ?></span>
-                        <?php endforeach; ?>
+                    <label>Objet de l'email</label>
+                    <input type="text" name="subject" id="stepSubject" placeholder="Ex: {{prenom}}, votre projet immobilier a Bordeaux">
+                </div>
+
+                <!-- Rich Text Toolbar -->
+                <div class="seq-form-group">
+                    <label>Corps de l'email</label>
+                    <div class="seq-editor-wrapper">
+                        <div class="seq-editor-tabs">
+                            <button type="button" class="seq-editor-tab active" onclick="switchEditorMode('edit', this)">
+                                <i class="fas fa-edit"></i> Editeur
+                            </button>
+                            <button type="button" class="seq-editor-tab" onclick="switchEditorMode('html', this)">
+                                <i class="fas fa-code"></i> HTML
+                            </button>
+                            <button type="button" class="seq-editor-tab" onclick="switchEditorMode('preview', this)">
+                                <i class="fas fa-eye"></i> Apercu
+                            </button>
+                        </div>
+                        <div class="seq-toolbar" id="seqToolbar">
+                            <button type="button" onclick="editorCmd('bold')" title="Gras"><i class="fas fa-bold"></i></button>
+                            <button type="button" onclick="editorCmd('italic')" title="Italique"><i class="fas fa-italic"></i></button>
+                            <button type="button" onclick="editorCmd('underline')" title="Souligne"><i class="fas fa-underline"></i></button>
+                            <span class="seq-toolbar-sep"></span>
+                            <button type="button" onclick="editorCmd('h2')" title="Titre">H2</button>
+                            <button type="button" onclick="editorCmd('h3')" title="Sous-titre">H3</button>
+                            <span class="seq-toolbar-sep"></span>
+                            <button type="button" onclick="editorCmd('ul')" title="Liste a puces"><i class="fas fa-list-ul"></i></button>
+                            <button type="button" onclick="editorCmd('ol')" title="Liste numerotee"><i class="fas fa-list-ol"></i></button>
+                            <span class="seq-toolbar-sep"></span>
+                            <button type="button" onclick="editorCmd('link')" title="Lien"><i class="fas fa-link"></i></button>
+                            <button type="button" onclick="editorCmd('image')" title="Image"><i class="fas fa-image"></i></button>
+                            <button type="button" onclick="editorCmd('button')" title="Bouton CTA"><i class="fas fa-mouse-pointer"></i></button>
+                            <span class="seq-toolbar-sep"></span>
+                            <button type="button" onclick="editorCmd('hr')" title="Separateur"><i class="fas fa-minus"></i></button>
+                            <button type="button" onclick="editorCmd('signature')" title="Signature"><i class="fas fa-signature"></i></button>
+                            <span class="seq-toolbar-sep"></span>
+                            <select onchange="editorInsertColor(this.value); this.selectedIndex=0;" title="Couleur" style="padding:4px;border-radius:4px;border:1px solid var(--border);font-size:.75rem">
+                                <option value="">Couleur</option>
+                                <option value="#6366f1">Violet</option>
+                                <option value="#3b82f6">Bleu</option>
+                                <option value="#10b981">Vert</option>
+                                <option value="#f59e0b">Orange</option>
+                                <option value="#ef4444">Rouge</option>
+                                <option value="#1e293b">Fonce</option>
+                            </select>
+                        </div>
+                        <!-- Visual Editor -->
+                        <div id="seqEditorVisual" contenteditable="true" class="seq-editor-visual" oninput="syncEditorToTextarea()"></div>
+                        <!-- HTML Source -->
+                        <textarea name="body_html" id="stepBodyHtml" rows="12" class="seq-editor-source" style="display:none" placeholder="<p>Bonjour {{prenom}},</p>&#10;&#10;<p>...</p>"></textarea>
+                        <!-- Preview -->
+                        <div id="seqEditorPreview" class="seq-editor-preview" style="display:none"></div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:12px;margin-top:8px;flex-wrap:wrap">
+                        <small style="color:var(--text-3)">Variables :</small>
+                        <div class="seq-vars-list" style="margin-top:0">
+                            <?php foreach ($templateVars as $var => $desc): ?>
+                            <span class="seq-var-tag" onclick="insertVar('<?= $var ?>')" title="<?= $desc ?>"><?= $var ?></span>
+                            <?php endforeach; ?>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1122,13 +1320,13 @@ $templateVars = [
             </div>
             <div id="taskFields" style="display:none">
                 <div class="seq-form-group">
-                    <label>Description de la tâche</label>
+                    <label>Description de la tache</label>
                     <textarea name="task_description" id="stepTaskDesc" rows="4" placeholder="Appeler le lead..."></textarea>
                 </div>
             </div>
             <div style="display:flex;gap:12px;margin-top:24px">
                 <button type="submit" class="btn-seq btn-seq-primary" id="stepSubmitBtn">
-                    <i class="fas fa-save"></i> Ajouter l'étape
+                    <i class="fas fa-save"></i> Ajouter l'etape
                 </button>
                 <button type="button" class="btn-seq btn-seq-outline" onclick="closeModal('addStepModal')">Annuler</button>
             </div>
@@ -1139,14 +1337,334 @@ $templateVars = [
 <?php endif; // fin action=edit ?>
 
 <script>
+// ====================================================
+// Tab Navigation
+// ====================================================
 function switchTab(tab, btn) {
     document.querySelectorAll('.seq-tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.seq-tab-content').forEach(c => c.classList.remove('active'));
     document.getElementById('tab-' + tab).classList.add('active');
     if (btn) btn.classList.add('active');
 }
+
+// ====================================================
+// Editor Mode (Edit / HTML / Preview)
+// ====================================================
+let currentEditorMode = 'edit';
+function switchEditorMode(mode, btn) {
+    currentEditorMode = mode;
+    document.querySelectorAll('.seq-editor-tab').forEach(t => t.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+
+    const visual  = document.getElementById('seqEditorVisual');
+    const source  = document.getElementById('stepBodyHtml');
+    const preview = document.getElementById('seqEditorPreview');
+    const toolbar = document.getElementById('seqToolbar');
+
+    visual.style.display  = mode === 'edit'    ? 'block' : 'none';
+    source.style.display  = mode === 'html'    ? 'block' : 'none';
+    preview.style.display = mode === 'preview' ? 'block' : 'none';
+    toolbar.style.display = mode === 'edit'    ? 'flex'  : 'none';
+
+    if (mode === 'html') {
+        source.value = visual.innerHTML;
+    } else if (mode === 'edit') {
+        visual.innerHTML = source.value;
+    } else if (mode === 'preview') {
+        renderPreview();
+    }
+}
+
+function syncEditorToTextarea() {
+    document.getElementById('stepBodyHtml').value = document.getElementById('seqEditorVisual').innerHTML;
+}
+
+function renderPreview() {
+    const html = document.getElementById('seqEditorVisual').innerHTML;
+    const subject = document.getElementById('stepSubject').value || '(Sans objet)';
+    const fromName = <?= json_encode($sequence['from_name'] ?? 'Eduardo De Sul') ?>;
+    const fromEmail = <?= json_encode($sequence['from_email'] ?? 'contact@eduardodesul.fr') ?>;
+
+    document.getElementById('seqEditorPreview').innerHTML = `
+        <div class="seq-preview-frame">
+            <div class="seq-preview-header">
+                <strong>Objet : ${subject.replace(/</g,'&lt;')}</strong>
+                De : ${fromName} &lt;${fromEmail}&gt;
+            </div>
+            <div class="seq-preview-body">${html}</div>
+            <div class="seq-preview-footer">
+                <a href="#" style="color:#94a3b8">Se desinscrire</a> | Eduardo De Sul Immobilier
+            </div>
+        </div>`;
+}
+
+// ====================================================
+// Rich Text Toolbar Commands
+// ====================================================
+function editorCmd(cmd) {
+    const editor = document.getElementById('seqEditorVisual');
+    editor.focus();
+    const sel = window.getSelection();
+
+    switch(cmd) {
+        case 'bold':
+            document.execCommand('bold', false, null);
+            break;
+        case 'italic':
+            document.execCommand('italic', false, null);
+            break;
+        case 'underline':
+            document.execCommand('underline', false, null);
+            break;
+        case 'h2':
+            document.execCommand('formatBlock', false, '<h2>');
+            break;
+        case 'h3':
+            document.execCommand('formatBlock', false, '<h3>');
+            break;
+        case 'ul':
+            document.execCommand('insertUnorderedList', false, null);
+            break;
+        case 'ol':
+            document.execCommand('insertOrderedList', false, null);
+            break;
+        case 'link': {
+            const url = prompt('URL du lien :', 'https://');
+            if (url) document.execCommand('createLink', false, url);
+            break;
+        }
+        case 'image': {
+            const imgUrl = prompt('URL de l\'image :', 'https://');
+            if (imgUrl) document.execCommand('insertHTML', false, '<img src="'+imgUrl+'" alt="Image" style="max-width:100%;border-radius:8px;margin:8px 0">');
+            break;
+        }
+        case 'button': {
+            const btnUrl  = prompt('URL du bouton :', 'https://eduardo-desul-immobilier.fr');
+            const btnText = prompt('Texte du bouton :', 'Decouvrir nos biens');
+            if (btnUrl && btnText) {
+                document.execCommand('insertHTML', false,
+                    '<p><a href="'+btnUrl+'" class="email-cta-btn" style="display:inline-block;padding:12px 28px;background:#6366f1;color:#fff;text-decoration:none;border-radius:8px;font-weight:600">'+btnText+'</a></p>');
+            }
+            break;
+        }
+        case 'hr':
+            document.execCommand('insertHTML', false, '<hr style="border:none;border-top:1px solid #e2e8f0;margin:16px 0">');
+            break;
+        case 'signature':
+            document.execCommand('insertHTML', false,
+                '<div class="email-signature" style="margin-top:24px;padding-top:16px;border-top:1px solid #e2e8f0;color:#64748b;font-size:14px">' +
+                '<strong>{{agent_nom}}</strong><br>' +
+                'Eduardo De Sul Immobilier<br>' +
+                'Tel : {{agent_tel}}<br>' +
+                '<a href="{{site_url}}" style="color:#6366f1">{{site_url}}</a>' +
+                '</div>');
+            break;
+    }
+    syncEditorToTextarea();
+}
+
+function editorInsertColor(color) {
+    if (!color) return;
+    document.getElementById('seqEditorVisual').focus();
+    document.execCommand('foreColor', false, color);
+    syncEditorToTextarea();
+}
+
+// ====================================================
+// Email Templates
+// ====================================================
+const emailTemplates = {
+    welcome_buyer: {
+        subject: "{{prenom}}, bienvenue chez Eduardo De Sul Immobilier",
+        body: `<p>Bonjour {{prenom}},</p>
+<p>Merci pour votre interet pour nos services ! Je suis ravi de vous accompagner dans votre <strong>projet d'achat immobilier a Bordeaux</strong>.</p>
+<p>En tant qu'expert du marche bordelais, je peux vous aider a :</p>
+<ul>
+<li>Trouver le bien ideal selon vos criteres et votre budget</li>
+<li>Negocier les meilleures conditions d'achat</li>
+<li>Vous accompagner de A a Z jusqu'a la remise des cles</li>
+</ul>
+<p>N'hesitez pas a me partager vos criteres de recherche pour que je puisse commencer a travailler pour vous.</p>
+<p><a href="{{site_url}}" class="email-cta-btn" style="display:inline-block;padding:12px 28px;background:#6366f1;color:#fff;text-decoration:none;border-radius:8px;font-weight:600">Voir nos biens disponibles</a></p>
+<div class="email-signature" style="margin-top:24px;padding-top:16px;border-top:1px solid #e2e8f0;color:#64748b;font-size:14px"><strong>{{agent_nom}}</strong><br>Eduardo De Sul Immobilier<br>Tel : {{agent_tel}}<br><a href="{{site_url}}" style="color:#6366f1">{{site_url}}</a></div>`
+    },
+    welcome_seller: {
+        subject: "{{prenom}}, estimons ensemble la valeur de votre bien",
+        body: `<p>Bonjour {{prenom}},</p>
+<p>Merci de nous avoir contactes concernant la <strong>vente de votre bien immobilier</strong>.</p>
+<p>Le marche immobilier a Bordeaux est actuellement tres dynamique, et c'est le moment ideal pour valoriser votre patrimoine.</p>
+<p>Ce que je vous propose :</p>
+<ul>
+<li><strong>Une estimation gratuite et precise</strong> de votre bien basee sur les transactions recentes du quartier</li>
+<li>Une strategie de mise en vente optimisee pour obtenir le meilleur prix</li>
+<li>Un accompagnement personnalise jusqu'a la signature chez le notaire</li>
+</ul>
+<p>Quand seriez-vous disponible pour un premier echange telephonique ?</p>
+<p><a href="{{site_url}}" class="email-cta-btn" style="display:inline-block;padding:12px 28px;background:#6366f1;color:#fff;text-decoration:none;border-radius:8px;font-weight:600">Demander une estimation gratuite</a></p>
+<div class="email-signature" style="margin-top:24px;padding-top:16px;border-top:1px solid #e2e8f0;color:#64748b;font-size:14px"><strong>{{agent_nom}}</strong><br>Eduardo De Sul Immobilier<br>Tel : {{agent_tel}}<br><a href="{{site_url}}" style="color:#6366f1">{{site_url}}</a></div>`
+    },
+    welcome_investor: {
+        subject: "{{prenom}}, decouvrez nos opportunites d'investissement",
+        body: `<p>Bonjour {{prenom}},</p>
+<p>Merci pour votre interet pour l'<strong>investissement immobilier a Bordeaux</strong>.</p>
+<p>Bordeaux offre d'excellentes opportunites de rendement grace a :</p>
+<ul>
+<li>Une forte demande locative (ville universitaire, bassin d'emploi dynamique)</li>
+<li>Des quartiers en pleine transformation avec un fort potentiel de plus-value</li>
+<li>Des dispositifs fiscaux avantageux (Pinel, LMNP, Denormandie)</li>
+</ul>
+<p>Je serais ravi d'echanger sur votre strategie d'investissement et vos objectifs de rendement.</p>
+<p><a href="{{site_url}}" class="email-cta-btn" style="display:inline-block;padding:12px 28px;background:#6366f1;color:#fff;text-decoration:none;border-radius:8px;font-weight:600">Voir les opportunites</a></p>
+<div class="email-signature" style="margin-top:24px;padding-top:16px;border-top:1px solid #e2e8f0;color:#64748b;font-size:14px"><strong>{{agent_nom}}</strong><br>Eduardo De Sul Immobilier<br>Tel : {{agent_tel}}<br><a href="{{site_url}}" style="color:#6366f1">{{site_url}}</a></div>`
+    },
+    followup_1: {
+        subject: "{{prenom}}, ou en est votre projet immobilier ?",
+        body: `<p>Bonjour {{prenom}},</p>
+<p>Je me permets de prendre de vos nouvelles concernant votre projet immobilier.</p>
+<p>Avez-vous eu le temps de reflechir a nos echanges ? Je reste a votre entiere disposition pour :</p>
+<ul>
+<li>Repondre a vos questions</li>
+<li>Organiser des visites supplementaires</li>
+<li>Ajuster vos criteres de recherche si necessaire</li>
+</ul>
+<p>N'hesitez pas a me rappeler ou a repondre directement a cet email.</p>
+<p>A tres bientot,</p>
+<div class="email-signature" style="margin-top:24px;padding-top:16px;border-top:1px solid #e2e8f0;color:#64748b;font-size:14px"><strong>{{agent_nom}}</strong><br>Eduardo De Sul Immobilier<br>Tel : {{agent_tel}}<br><a href="{{site_url}}" style="color:#6366f1">{{site_url}}</a></div>`
+    },
+    followup_2: {
+        subject: "{{prenom}}, nouveaux biens qui pourraient vous interesser",
+        body: `<p>Bonjour {{prenom}},</p>
+<p>De <strong>nouveaux biens</strong> viennent d'arriver sur le marche et correspondent a vos criteres de recherche !</p>
+<p>Je vous invite a decouvrir notre selection actualisee :</p>
+<p><a href="{{site_url}}" class="email-cta-btn" style="display:inline-block;padding:12px 28px;background:#6366f1;color:#fff;text-decoration:none;border-radius:8px;font-weight:600">Voir les nouveaux biens</a></p>
+<p>Certains de ces biens sont en exclusivite et ne resteront pas longtemps sur le marche. Si l'un d'entre eux vous interesse, n'hesitez pas a me contacter rapidement pour organiser une visite.</p>
+<p>A bientot,</p>
+<div class="email-signature" style="margin-top:24px;padding-top:16px;border-top:1px solid #e2e8f0;color:#64748b;font-size:14px"><strong>{{agent_nom}}</strong><br>Eduardo De Sul Immobilier<br>Tel : {{agent_tel}}<br><a href="{{site_url}}" style="color:#6366f1">{{site_url}}</a></div>`
+    },
+    followup_3: {
+        subject: "{{prenom}}, 3 conseils pour reussir votre projet immobilier",
+        body: `<p>Bonjour {{prenom}},</p>
+<p>Je souhaitais partager avec vous <strong>3 conseils essentiels</strong> pour reussir votre projet immobilier :</p>
+<h3>1. Definissez bien votre budget</h3>
+<p>Incluez tous les frais annexes (notaire, travaux eventuels, demenagement) dans votre calcul global.</p>
+<h3>2. Ne negligez pas le quartier</h3>
+<p>Visitez a differentes heures de la journee, renseignez-vous sur les projets urbains a venir et les commodites.</p>
+<h3>3. Faites-vous accompagner</h3>
+<p>Un professionnel de l'immobilier vous fait gagner du temps, de l'argent et vous securise juridiquement.</p>
+<p>Je suis la pour vous accompagner a chaque etape. Contactez-moi quand vous le souhaitez !</p>
+<p><a href="{{site_url}}" class="email-cta-btn" style="display:inline-block;padding:12px 28px;background:#6366f1;color:#fff;text-decoration:none;border-radius:8px;font-weight:600">Me contacter</a></p>
+<div class="email-signature" style="margin-top:24px;padding-top:16px;border-top:1px solid #e2e8f0;color:#64748b;font-size:14px"><strong>{{agent_nom}}</strong><br>Eduardo De Sul Immobilier<br>Tel : {{agent_tel}}<br><a href="{{site_url}}" style="color:#6366f1">{{site_url}}</a></div>`
+    },
+    estimation_offer: {
+        subject: "{{prenom}}, combien vaut votre bien a Bordeaux ?",
+        body: `<p>Bonjour {{prenom}},</p>
+<p>Savez-vous combien vaut votre bien immobilier aujourd'hui ?</p>
+<p>Le marche bordelais a beaucoup evolue ces derniers mois. Je vous propose une <strong>estimation gratuite et sans engagement</strong> de votre bien, basee sur :</p>
+<ul>
+<li>Les transactions recentes dans votre quartier</li>
+<li>L'etat et les specificites de votre bien</li>
+<li>Les tendances actuelles du marche local</li>
+</ul>
+<p>Cette estimation est entierement gratuite et confidentielle.</p>
+<p><a href="{{site_url}}" class="email-cta-btn" style="display:inline-block;padding:12px 28px;background:#6366f1;color:#fff;text-decoration:none;border-radius:8px;font-weight:600">Demander mon estimation gratuite</a></p>
+<div class="email-signature" style="margin-top:24px;padding-top:16px;border-top:1px solid #e2e8f0;color:#64748b;font-size:14px"><strong>{{agent_nom}}</strong><br>Eduardo De Sul Immobilier<br>Tel : {{agent_tel}}<br><a href="{{site_url}}" style="color:#6366f1">{{site_url}}</a></div>`
+    },
+    estimation_result: {
+        subject: "{{prenom}}, voici l'estimation de votre bien",
+        body: `<p>Bonjour {{prenom}},</p>
+<p>Suite a notre echange, voici les elements cles de l'<strong>estimation de votre bien</strong> :</p>
+<p><em>[A completer avec les details de l'estimation]</em></p>
+<p>Cette estimation est basee sur une analyse comparative des transactions recentes dans votre secteur.</p>
+<p>Pour aller plus loin, je vous propose :</p>
+<ul>
+<li>Un rendez-vous pour discuter de votre strategie de vente</li>
+<li>Une presentation de notre plan marketing personnalise</li>
+<li>Un accompagnement complet jusqu'a la signature</li>
+</ul>
+<p>Quand seriez-vous disponible pour un echange ?</p>
+<div class="email-signature" style="margin-top:24px;padding-top:16px;border-top:1px solid #e2e8f0;color:#64748b;font-size:14px"><strong>{{agent_nom}}</strong><br>Eduardo De Sul Immobilier<br>Tel : {{agent_tel}}<br><a href="{{site_url}}" style="color:#6366f1">{{site_url}}</a></div>`
+    },
+    market_update: {
+        subject: "{{prenom}}, les tendances du marche immobilier a Bordeaux",
+        body: `<p>Bonjour {{prenom}},</p>
+<p>Voici un point sur le <strong>marche immobilier bordelais</strong> :</p>
+<h3>Tendances actuelles</h3>
+<ul>
+<li>Les prix restent stables dans les quartiers recherches</li>
+<li>La demande locative est toujours forte grace a l'attractivite de la metropole</li>
+<li>De nouveaux projets urbains valorisent certains secteurs</li>
+</ul>
+<h3>Quartiers a surveiller</h3>
+<p>Certains quartiers offrent encore un excellent rapport qualite/prix avec un fort potentiel de valorisation.</p>
+<p>Envie d'en savoir plus ? Je suis disponible pour echanger sur les opportunites du moment.</p>
+<p><a href="{{site_url}}" class="email-cta-btn" style="display:inline-block;padding:12px 28px;background:#6366f1;color:#fff;text-decoration:none;border-radius:8px;font-weight:600">Decouvrir nos analyses</a></p>
+<div class="email-signature" style="margin-top:24px;padding-top:16px;border-top:1px solid #e2e8f0;color:#64748b;font-size:14px"><strong>{{agent_nom}}</strong><br>Eduardo De Sul Immobilier<br>Tel : {{agent_tel}}<br><a href="{{site_url}}" style="color:#6366f1">{{site_url}}</a></div>`
+    },
+    testimonial: {
+        subject: "{{prenom}}, decouvrez comment nous avons aide nos clients",
+        body: `<p>Bonjour {{prenom}},</p>
+<p>Rien ne vaut le temoignage de nos clients satisfaits :</p>
+<blockquote style="border-left:3px solid #6366f1;padding:12px 20px;margin:16px 0;background:#f8fafc;border-radius:0 8px 8px 0;font-style:italic;color:#475569">
+"Eduardo nous a accompagnes tout au long de notre achat. Professionnel, reactif et toujours de bon conseil. Nous recommandons vivement ses services !"<br>
+<strong style="font-style:normal;color:#1e293b">— Marie et Pierre D., Bordeaux Chartrons</strong>
+</blockquote>
+<p>Comme eux, faites confiance a un professionnel pour votre projet immobilier.</p>
+<p><a href="{{site_url}}" class="email-cta-btn" style="display:inline-block;padding:12px 28px;background:#6366f1;color:#fff;text-decoration:none;border-radius:8px;font-weight:600">Voir plus de temoignages</a></p>
+<div class="email-signature" style="margin-top:24px;padding-top:16px;border-top:1px solid #e2e8f0;color:#64748b;font-size:14px"><strong>{{agent_nom}}</strong><br>Eduardo De Sul Immobilier<br>Tel : {{agent_tel}}<br><a href="{{site_url}}" style="color:#6366f1">{{site_url}}</a></div>`
+    },
+    tips_buyer: {
+        subject: "{{prenom}}, 5 erreurs a eviter quand on achete un bien",
+        body: `<p>Bonjour {{prenom}},</p>
+<p>L'achat immobilier est un moment important. Voici <strong>5 erreurs courantes</strong> a eviter :</p>
+<h3>1. Ne pas definir son budget en amont</h3>
+<p>Faites valider votre capacite d'emprunt avant de visiter pour eviter les deceptions.</p>
+<h3>2. Se precipiter sur le premier bien</h3>
+<p>Prenez le temps de comparer, revisitez si necessaire.</p>
+<h3>3. Negliger les charges et travaux</h3>
+<p>Renseignez-vous sur les charges de copropriete, la taxe fonciere et les travaux prevus.</p>
+<h3>4. Ne pas verifier le DPE</h3>
+<p>Le diagnostic energetique impacte directement vos futures factures et la valeur de revente.</p>
+<h3>5. Acheter sans accompagnement</h3>
+<p>Un agent immobilier vous protege et vous fait gagner du temps et de l'argent.</p>
+<p>Je suis la pour vous guider. N'hesitez pas !</p>
+<div class="email-signature" style="margin-top:24px;padding-top:16px;border-top:1px solid #e2e8f0;color:#64748b;font-size:14px"><strong>{{agent_nom}}</strong><br>Eduardo De Sul Immobilier<br>Tel : {{agent_tel}}<br><a href="{{site_url}}" style="color:#6366f1">{{site_url}}</a></div>`
+    },
+    tips_seller: {
+        subject: "{{prenom}}, comment vendre votre bien au meilleur prix",
+        body: `<p>Bonjour {{prenom}},</p>
+<p>Vous envisagez de vendre ? Voici nos <strong>conseils pour maximiser la valeur</strong> de votre bien :</p>
+<h3>Soignez la premiere impression</h3>
+<p>Un bien propre, range et lumineux se vend plus vite et plus cher. Pensez au home staging !</p>
+<h3>Fixez le bon prix des le depart</h3>
+<p>Un bien survalue reste en ligne trop longtemps et finit par se vendre en dessous du marche.</p>
+<h3>Preparez vos diagnostics</h3>
+<p>Avoir tous les diagnostics prets rassure les acheteurs et accelere la vente.</p>
+<h3>Choisissez le bon partenaire</h3>
+<p>Un agent immobilier local connait les acheteurs potentiels et sait mettre en valeur votre bien.</p>
+<p><a href="{{site_url}}" class="email-cta-btn" style="display:inline-block;padding:12px 28px;background:#6366f1;color:#fff;text-decoration:none;border-radius:8px;font-weight:600">Estimer mon bien gratuitement</a></p>
+<div class="email-signature" style="margin-top:24px;padding-top:16px;border-top:1px solid #e2e8f0;color:#64748b;font-size:14px"><strong>{{agent_nom}}</strong><br>Eduardo De Sul Immobilier<br>Tel : {{agent_tel}}<br><a href="{{site_url}}" style="color:#6366f1">{{site_url}}</a></div>`
+    }
+};
+
+function loadEmailTemplate() {
+    const sel = document.getElementById('emailTemplateSelect');
+    const key = sel.value;
+    if (!key || !emailTemplates[key]) return;
+
+    const tpl = emailTemplates[key];
+    document.getElementById('stepSubject').value = tpl.subject;
+    document.getElementById('seqEditorVisual').innerHTML = tpl.body;
+    document.getElementById('stepBodyHtml').value = tpl.body;
+
+    // Reset to edit mode
+    switchEditorMode('edit', document.querySelector('.seq-editor-tab'));
+}
+
+// ====================================================
+// Modal Open / Close / Step Management
+// ====================================================
 function openAddStepModal() {
-    document.getElementById('stepModalTitle').innerHTML = '<i class="fas fa-plus"></i> Ajouter une étape';
+    document.getElementById('stepModalTitle').innerHTML = '<i class="fas fa-plus"></i> Ajouter une etape';
     document.getElementById('stepFormAction').value = 'add_step';
     document.getElementById('stepFormId').value = '';
     document.getElementById('stepType').value = 'email';
@@ -1154,14 +1672,18 @@ function openAddStepModal() {
     document.getElementById('stepDelayHours').value = 0;
     document.getElementById('stepSubject').value = '';
     document.getElementById('stepBodyHtml').value = '';
+    document.getElementById('seqEditorVisual').innerHTML = '';
     document.getElementById('stepSmsText').value = '';
     document.getElementById('stepTaskDesc').value = '';
-    document.getElementById('stepSubmitBtn').innerHTML = '<i class="fas fa-save"></i> Ajouter l\'étape';
+    document.getElementById('emailTemplateSelect').selectedIndex = 0;
+    document.getElementById('stepSubmitBtn').innerHTML = '<i class="fas fa-save"></i> Ajouter l\'etape';
     toggleStepFields();
+    switchEditorMode('edit', document.querySelector('.seq-editor-tab'));
     document.getElementById('addStepModal').classList.add('active');
 }
+
 function openEditStepModal(step) {
-    document.getElementById('stepModalTitle').innerHTML = '<i class="fas fa-edit"></i> Modifier l\'étape ' + step.step_order;
+    document.getElementById('stepModalTitle').innerHTML = '<i class="fas fa-edit"></i> Modifier l\'etape ' + step.step_order;
     document.getElementById('stepFormAction').value = 'update_step';
     document.getElementById('stepFormId').value = step.id;
     document.getElementById('stepType').value = step.step_type;
@@ -1169,35 +1691,74 @@ function openEditStepModal(step) {
     document.getElementById('stepDelayHours').value = step.delay_hours;
     document.getElementById('stepSubject').value = step.subject || '';
     document.getElementById('stepBodyHtml').value = step.body_html || '';
+    document.getElementById('seqEditorVisual').innerHTML = step.body_html || '';
     document.getElementById('stepSmsText').value = step.sms_text || '';
     document.getElementById('stepTaskDesc').value = step.task_description || '';
-    document.getElementById('stepSubmitBtn').innerHTML = '<i class="fas fa-save"></i> Mettre à jour';
+    document.getElementById('emailTemplateSelect').selectedIndex = 0;
+    document.getElementById('stepSubmitBtn').innerHTML = '<i class="fas fa-save"></i> Mettre a jour';
     toggleStepFields();
+    switchEditorMode('edit', document.querySelector('.seq-editor-tab'));
     document.getElementById('addStepModal').classList.add('active');
 }
+
 function closeModal(id) {
     document.getElementById(id).classList.remove('active');
 }
+
 function toggleStepFields() {
     const type = document.getElementById('stepType').value;
     document.getElementById('emailFields').style.display = type === 'email' ? 'block' : 'none';
     document.getElementById('smsFields').style.display  = type === 'sms'   ? 'block' : 'none';
     document.getElementById('taskFields').style.display = type === 'task'  ? 'block' : 'none';
 }
+
+// ====================================================
+// Variable Insertion
+// ====================================================
 function insertVar(varName) {
     const type = document.getElementById('stepType').value;
-    const target = type === 'sms' ? document.getElementById('stepSmsText')
-                 : type === 'task' ? document.getElementById('stepTaskDesc')
-                 : document.getElementById('stepBodyHtml');
-    const s = target.selectionStart, e = target.selectionEnd;
-    target.value = target.value.substring(0,s) + varName + target.value.substring(e);
-    target.selectionStart = target.selectionEnd = s + varName.length;
-    target.focus();
+
+    if (type === 'sms') {
+        const target = document.getElementById('stepSmsText');
+        const s = target.selectionStart, e = target.selectionEnd;
+        target.value = target.value.substring(0,s) + varName + target.value.substring(e);
+        target.selectionStart = target.selectionEnd = s + varName.length;
+        target.focus();
+    } else if (type === 'task') {
+        const target = document.getElementById('stepTaskDesc');
+        const s = target.selectionStart, e = target.selectionEnd;
+        target.value = target.value.substring(0,s) + varName + target.value.substring(e);
+        target.selectionStart = target.selectionEnd = s + varName.length;
+        target.focus();
+    } else {
+        // Insert into visual editor
+        const editor = document.getElementById('seqEditorVisual');
+        editor.focus();
+        document.execCommand('insertText', false, varName);
+        syncEditorToTextarea();
+    }
 }
+
+// ====================================================
+// Form submission - sync editor
+// ====================================================
+document.getElementById('stepForm').addEventListener('submit', function() {
+    if (currentEditorMode === 'edit') {
+        document.getElementById('stepBodyHtml').value = document.getElementById('seqEditorVisual').innerHTML;
+    }
+});
+
+// ====================================================
+// SMS Character Counter
+// ====================================================
 const smsTa = document.getElementById('stepSmsText');
 if (smsTa) smsTa.addEventListener('input', function() {
     document.getElementById('smsCharCount').textContent = this.value.length;
 });
+
+// ====================================================
+// Lead Selection
+// ====================================================
 function toggleAllLeads() {
     const boxes = document.querySelectorAll('.lead-checkbox');
     const all = [...boxes].every(c => c.checked);
@@ -1205,6 +1766,10 @@ function toggleAllLeads() {
     const sa = document.getElementById('selectAll');
     if (sa) sa.checked = !all;
 }
+
+// ====================================================
+// Global Event Listeners
+// ====================================================
 document.addEventListener('keydown', e => {
     if (e.key === 'Escape') document.querySelectorAll('.seq-modal-overlay.active').forEach(m => m.classList.remove('active'));
 });
