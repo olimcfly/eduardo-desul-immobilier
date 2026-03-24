@@ -467,6 +467,10 @@ if ($uri === 'biens-immobiliers' || $uri === 'biens') {
     require_once $renderers . 'properties-listing.php'; exit;
 }
 
+if ($uri === 'politique-confidentialite') {
+    require_once $renderers . 'politique-confidentialite.php'; exit;
+}
+
 if ($parts[0] === 'biens' && !empty($parts[1])) {
     $slug = $parts[1]; $_GET['slug'] = $slug;
     $propFound = false;
