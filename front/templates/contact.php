@@ -5,9 +5,9 @@
  * Variables attendues : $pageTitle, $settings (array site)
  */
 $settings = $settings ?? [];
-$phone    = $settings['phone']   ?? '06 24 10 58 16';
-$email    = $settings['email']   ?? 'contact@eduardo-desul-immobilier.fr';
-$address  = $settings['address'] ?? '12A rue du Commandant Charcot, 33290 Blanquefort';
+$phone    = $settings['phone']   ?? _ss('phone', '');
+$email    = $settings['email']   ?? _ss('email', '');
+$address  = $settings['address'] ?? _ss('address', '');
 $success  = $_GET['sent'] ?? false;
 $error    = '';
 
@@ -34,7 +34,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } catch (Exception $e) { /* fallback mail() */ }
         }
         if (!$sent) {
-            $headers = "From: noreply@eduardo-desul-immobilier.fr\r\nReply-To: $mail\r\nContent-Type: text/plain; charset=UTF-8";
+            $noreplyDomain = parse_url(_ss('site_url', ''), PHP_URL_HOST) ?: 'exemple.fr';
+            $headers = "From: noreply@$noreplyDomain\r\nReply-To: $mail\r\nContent-Type: text/plain; charset=UTF-8";
             $sent    = mail($email, "[$subject] $name", "Nom : $name\nEmail : $mail\nTél : $tel\n\nMessage :\n$message", $headers);
         }
         if ($sent) {
@@ -49,16 +50,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <div class="container container--narrow">
 
     <div class="section-title">
-      <h1><?= htmlspecialchars($pageTitle ?? 'Contactez Eduardo') ?></h1>
+      <h1><?= htmlspecialchars($pageTitle ?? _ss('contact_title', 'Contactez-nous')) ?></h1>
       <div class="separator"></div>
-      <p>Réponse garantie sous 24h — Basé à Blanquefort, actif sur tout le Grand Bordeaux</p>
+      <p><?= htmlspecialchars(_ss('contact_subtitle', 'Nous vous répondons dans les meilleurs délais.')) ?></p>
     </div>
 
     <?php if ($success): ?>
     <div style="background:#d1fae5;border:1px solid #6ee7b7;border-radius:12px;padding:20px 24px;text-align:center;margin-bottom:32px">
       <i class="fas fa-check-circle" style="color:#059669;font-size:24px;margin-bottom:8px;display:block"></i>
       <div style="font-weight:700;color:#065f46">Message envoyé !</div>
-      <div style="font-size:13px;color:#047857;margin-top:4px">Eduardo vous répondra dans les meilleurs délais.</div>
+      <div style="font-size:13px;color:#047857;margin-top:4px">Nous vous répondrons dans les meilleurs délais.</div>
     </div>
     <?php elseif ($error): ?>
     <div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:12px;padding:16px 20px;margin-bottom:24px;color:#b91c1c;font-size:14px">
@@ -142,9 +143,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <i class="fas fa-clock" style="margin-right:6px"></i>Disponibilités
           </div>
           <div style="font-size:13px;opacity:.9;line-height:1.8">
-            Lundi – Vendredi : 9h – 19h<br>
-            Samedi : 9h – 17h<br>
-            <span style="opacity:.7;font-size:12px">Dimanche et jours fériés : sur RDV</span>
+            <?= _ss('business_hours', "Lundi – Vendredi : 9h – 19h<br>Samedi : sur RDV") ?>
           </div>
         </div>
       </div>

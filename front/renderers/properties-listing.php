@@ -3,7 +3,7 @@
  * ══════════════════════════════════════════════════════════════
  * FRONTEND — LISTING BIENS IMMOBILIERS  v1.0
  * /front/renderers/properties-listing.php
- * Eduardo De Sul – Bordeaux / Blanquefort
+ * Listing des biens immobiliers
  * Inclus dans front/page.php via routing
  * ══════════════════════════════════════════════════════════════
  * Route : /biens-immobiliers  ou  /biens
@@ -108,9 +108,11 @@ function frontDpeTextClass(string $d): string {
 }
 
 // ─── SEO page ───
-$pageTitle    = 'Biens Immobiliers – Bordeaux et alentours | Eduardo De Sul';
-$pageDesc     = 'Découvrez les biens immobiliers disponibles à Bordeaux, Blanquefort, Mérignac et la Gironde. Maisons, appartements et terrains à vendre ou à louer.';
-$currentUrl   = 'https://eduardo-desul-immobilier.fr/biens-immobiliers';
+$_siteName    = function_exists('siteName') ? siteName() : _ss('site_name', 'Mon entreprise');
+$_siteUrl     = function_exists('siteUrl')  ? siteUrl()  : _ss('site_url', '');
+$pageTitle    = _ss('properties_page_title', 'Biens Immobiliers | ' . $_siteName);
+$pageDesc     = _ss('properties_page_desc', 'Découvrez les biens immobiliers disponibles. Maisons, appartements et terrains à vendre ou à louer.');
+$currentUrl   = rtrim($_siteUrl, '/') . '/biens-immobiliers';
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -130,7 +132,7 @@ $currentUrl   = 'https://eduardo-desul-immobilier.fr/biens-immobiliers';
     {
         "@context": "https://schema.org",
         "@type": "ItemList",
-        "name": "Biens immobiliers disponibles – Eduardo De Sul",
+        "name": "Biens immobiliers disponibles – <?= addslashes($_siteName) ?>",
         "numberOfItems": <?= $totalProps ?>,
         "url": "<?= $currentUrl ?>"
     }
@@ -143,7 +145,7 @@ $currentUrl   = 'https://eduardo-desul-immobilier.fr/biens-immobiliers';
 
     <style>
     /* ══════════════════════════════════════════════════════════
-       LISTING BIENS — FRONTEND Eduardo De Sul
+       LISTING BIENS — FRONTEND
        Palette #1a4d7a / #d4a574 / #f9f6f3
     ══════════════════════════════════════════════════════════ */
     :root {
@@ -621,7 +623,7 @@ $currentUrl   = 'https://eduardo-desul-immobilier.fr/biens-immobiliers';
 <!-- ── CTA ── -->
 <div class="prop-cta-section">
     <h2>Vous ne trouvez pas votre bien idéal ?</h2>
-    <p>Partagez votre projet avec Eduardo — il vous propose les opportunités du marché Bordelais en exclusivité.</p>
+    <p><?= htmlspecialchars(_ss('properties_cta_text', 'Partagez votre projet avec nous — nous vous proposons les meilleures opportunités du marché.')) ?></p>
     <a href="/contact" class="prop-cta-btn"><i class="fas fa-phone"></i> Nous contacter</a>
 </div>
 
