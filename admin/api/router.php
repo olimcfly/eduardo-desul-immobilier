@@ -67,7 +67,8 @@ $moduleMap = [
     'leads'       => $handlersDir . 'leads.php',
 
     // ── SEO ──────────────────────────────
-    'seo'         => $handlersDir . 'seo.php',
+    'seo'              => $handlersDir . 'seo.php',
+    'seo-semantic'     => $handlersDir . 'seo-semantic.php',
 
     // ── SOCIAL / GMB ─────────────────────
     'gmb'         => $handlersDir . 'gmb.php',
