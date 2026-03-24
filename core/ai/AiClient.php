@@ -208,13 +208,21 @@ class AiClient
      */
     public function perplexity(
         string $prompt,
-        string $model = 'llama-3.1-sonar-large-128k-online'
+        string $model = ''
     ): array {
         try {
+            $resolvedModel = $model !== ''
+                ? $model
+                : (defined('PERPLEXITY_MODEL') ? PERPLEXITY_MODEL : 'llama-3.1-sonar-large-128k-online');
+
+            $endpoint = defined('PERPLEXITY_ENDPOINT')
+                ? PERPLEXITY_ENDPOINT
+                : 'https://api.perplexity.ai/chat/completions';
+
             $response = $this->httpPost(
-                'https://api.perplexity.ai/chat/completions',
+                $endpoint,
                 [
-                    'model'    => $model,
+                    'model'    => $resolvedModel,
                     'messages' => [
                         [
                             'role'    => 'system',
