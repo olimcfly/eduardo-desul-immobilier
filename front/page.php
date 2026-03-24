@@ -311,7 +311,8 @@ if (!function_exists('renderHeader')) {
 
 @media (max-width:'.$bp.'px) {
   .'.$uid.' .fh-desktop { display:none !important }
-  .'.$uid.' .fh-burger  { display:flex !important }
+  .'.$uid.' .fh-burger  { display:flex !important; margin-left:0 !important; justify-self:start !important }
+  .'.$uid.' > div { grid-template-columns:auto auto !important; justify-content:start !important; gap:16px !important }
   .'.$uid.' .fh-mobile-nav {
     display:none;flex-direction:column;
     position:absolute;top:100%;left:0;right:0;
