@@ -213,11 +213,11 @@ if ($uri === 'secteurs') {
     exit;
 }
 
-// Secteur individuel : vérifier si le slug correspond à un secteur publié
+// Secteur individuel : vérifier si le slug correspond à un secteur publié (scope website_id)
 if ($uri !== '' && strpos($uri, '/') === false) {
     try {
-        $stSecteur = $pdo->prepare("SELECT id FROM secteurs WHERE slug = ? AND status = 'published' LIMIT 1");
-        $stSecteur->execute([$uri]);
+        $stSecteur = $pdo->prepare("SELECT id FROM secteurs WHERE website_id = ? AND slug = ? AND status = 'published' LIMIT 1");
+        $stSecteur->execute([(int)$website['id'], $uri]);
         if ($stSecteur->fetchColumn()) {
             $_GET['slug'] = $uri;
             require_once $renderers . 'secteur.php';
