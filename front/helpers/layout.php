@@ -65,7 +65,7 @@ if (!function_exists('renderHeader')) {
         }
 
         // ── 2. Génération automatique ──
-        $name     = htmlspecialchars($h['company_name'] ?? $h['name'] ?? _ss('site_name', 'Eduardo De Sul'));
+        $name     = htmlspecialchars($h['company_name'] ?? $h['name'] ?? _ss('site_name', 'Mon entreprise'));
         $logo     = $h['logo_url'] ?? _ss('logo_url', '');
         $logoType = $h['logo_type'] ?? 'image';
         $logoText = $h['logo_text'] ?? $name;
@@ -81,13 +81,8 @@ if (!function_exists('renderHeader')) {
         }
         if (empty($menuItems)) {
             $menuItems = [
-                ['label' => 'Accueil',   'url' => '/'],
-                ['label' => 'Acheter',   'url' => '/acheter'],
-                ['label' => 'Vendre',    'url' => '/vendre'],
-                ['label' => 'Estimer',   'url' => '/estimation'],
-                ['label' => 'Secteurs',  'url' => '/secteurs'],
-                ['label' => 'Blog',      'url' => '/blog'],
-                ['label' => 'Contact',   'url' => '/contact'],
+                ['label' => 'Accueil', 'url' => '/'],
+                ['label' => 'Contact', 'url' => '/contact'],
             ];
         }
 
@@ -161,10 +156,10 @@ if (!function_exists('renderFooter')) {
         }
 
         // ── 2. Génération automatique ──
-        $name          = htmlspecialchars($f['company_name'] ?? $f['name'] ?? _ss('site_name', 'Eduardo De Sul Immobilier'));
+        $name          = htmlspecialchars($f['company_name'] ?? $f['name'] ?? _ss('site_name', 'Mon entreprise'));
         $phone         = htmlspecialchars($f['phone'] ?? $f['contact_phone'] ?? _ss('phone', ''));
         $email         = htmlspecialchars($f['email'] ?? $f['contact_email'] ?? _ss('email', ''));
-        $description   = htmlspecialchars($f['description'] ?? 'Votre conseiller immobilier à Bordeaux. Accompagnement personnalisé pour tous vos projets.');
+        $description   = htmlspecialchars($f['description'] ?? _ss('site_description', 'Votre partenaire immobilier de confiance.'));
         $bgColor       = $f['bg_color'] ?? '#0e3a5c';
         $copyright     = $f['copyright_text'] ?? '© ' . date('Y') . ' ' . strip_tags($name) . ' — Tous droits réservés';
         $paddingTop    = intval($f['padding_top']    ?? 60);
@@ -238,14 +233,13 @@ if (!function_exists('renderFooter')) {
             }
         } else {
             $out .= '<div class="ff__col"><h4>Navigation</h4><ul>';
-            foreach ([['Accueil','/'],['Acheter','/acheter'],['Vendre','/vendre'],['Estimer','/estimation'],['Secteurs','/secteurs'],['Blog','/blog']] as $l) {
+            foreach ([['Accueil','/'],['Contact','/contact']] as $l) {
                 $out .= '<li><a href="' . $l[1] . '">' . $l[0] . '</a></li>';
             }
             $out .= '</ul></div>';
             $out .= '<div class="ff__col"><h4>Informations</h4><ul>';
             $out .= '<li><a href="/mentions-legales">Mentions légales</a></li>';
             $out .= '<li><a href="/politique-confidentialite">Confidentialité</a></li>';
-            $out .= '<li><a href="/contact">Contact</a></li>';
             $out .= '</ul></div>';
         }
 
@@ -284,8 +278,8 @@ if (!function_exists('buildLayoutVars')) {
      */
     function buildLayoutVars(array $data): array {
         $vars = [
-            '{{site_name}}' => htmlspecialchars(_ss('site_name', 'Eduardo De Sul Immobilier')),
-            '{{site_url}}'  => htmlspecialchars(_ss('site_url', 'https://eduardo-desul-immobilier.fr')),
+            '{{site_name}}' => htmlspecialchars(_ss('site_name', 'Mon entreprise')),
+            '{{site_url}}'  => htmlspecialchars(_ss('site_url', '/')),
             '{{logo}}'      => htmlspecialchars($data['logo_url'] ?? _ss('logo_url', '')),
             '{{logo_url}}'  => htmlspecialchars($data['logo_url'] ?? _ss('logo_url', '')),
             '{{phone}}'     => htmlspecialchars($data['phone_number'] ?? $data['phone'] ?? $data['contact_phone'] ?? _ss('phone', '')),

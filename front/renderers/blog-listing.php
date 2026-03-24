@@ -52,7 +52,7 @@ $_siteUrl   = siteUrl();
 $_siteName  = siteName();
 $pageTitle  = $catFilter ? 'Blog · '.$catFilter : 'Conseils immobiliers Bordeaux';
 $metaTitle  = htmlspecialchars(($hubPage['meta_title'] ?? $pageTitle).' | '.$_siteName);
-$metaDesc   = htmlspecialchars($hubPage['meta_description'] ?? 'Conseils immobiliers, guides d\'achat, vente et investissement à Bordeaux par Eduardo De Sul, conseiller indépendant eXp France.');
+$metaDesc   = htmlspecialchars($hubPage['meta_description'] ?? 'Conseils immobiliers, guides d\'achat, vente et investissement. Retrouvez nos articles et analyses du marché.');
 $canonical  = $_siteUrl.'/blog'.($catFilter ? '?categorie='.urlencode($catFilter) : '').($page > 1 ? ($catFilter?'&':'?').'page='.$page : '');
 
 function getCatIcon(string $cat): string {
@@ -102,7 +102,7 @@ function formatDateBlog(string $date): string {
   "name":"<?= addslashes($pageTitle) ?>",
   "description":"<?= addslashes(strip_tags($metaDesc)) ?>",
   "url":"<?= addslashes($canonical) ?>",
-  "publisher":{"@type":"Person","name":"Eduardo De Sul","url":"<?= $_siteUrl ?>"}
+  "publisher":{"@type":"Organization","name":"<?= addslashes($_siteName) ?>","url":"<?= $_siteUrl ?>"}
 }
 </script>
 
@@ -114,7 +114,7 @@ function formatDateBlog(string $date): string {
 
 <style>
 /* ═══════════════════════════════════════════════════════════
-   BLOG — Eduardo De Sul  v2.0
+   BLOG LISTING  v2.0
    Palette : #1a4d7a · #d4a574 · #f9f6f3
    Typo    : Playfair Display + DM Sans
 ═══════════════════════════════════════════════════════════ */
@@ -520,7 +520,7 @@ img{display:block;max-width:100%}
         </h1>
         <p class="bl-hero__sub">
             <?= $catFilter
-                ? 'Tous les articles sur <strong>'.htmlspecialchars($catFilter).'</strong> par Eduardo De Sul, conseiller immobilier indépendant eXp France.'
+                ? 'Tous les articles sur <strong>'.htmlspecialchars($catFilter).'</strong>.'
                 : 'Achat, vente, investissement, marché bordelais — les conseils d\'un expert local à votre service.' ?>
         </p>
         <?php if (!$catFilter && $total > 0): ?>

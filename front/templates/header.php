@@ -79,7 +79,7 @@ if ($template) {
     </style>
     <header class="header-fallback">
         <div class="container">
-            <a href="/" style="font-size: 1.4rem; font-weight: 700;">Eduardo De Sul</a>
+            <a href="/" style="font-size: 1.4rem; font-weight: 700;"><?= htmlspecialchars(_ss('site_name', 'Mon entreprise')) ?></a>
             <nav>
                 <a href="/">Accueil</a>
                 <a href="/contact">Contact</a>

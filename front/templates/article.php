@@ -301,7 +301,7 @@
         <div class="header-content">
             <a href="/" class="logo">
                 <span>🏠</span>
-                <span>Eduardo De Sul</span>
+                <span><?php echo htmlspecialchars(_ss('site_name', 'Mon entreprise')); ?></span>
             </a>
             <nav>
                 <a href="/">Home</a>
@@ -317,7 +317,7 @@
         <div class="article-hero-content">
             <div class="article-meta">
                 <span>📅 <?php echo date('d/m/Y'); ?></span>
-                <span>✍️ Eduardo De Sul</span>
+                <span>✍️ <?php echo htmlspecialchars(_ss('agent_name', _ss('site_name', ''))); ?></span>
                 <span>⏱️ 5 min de lecture</span>
             </div>
             <h1><?php echo htmlspecialchars($page_h1 ?? ''); ?></h1>
@@ -335,15 +335,15 @@
         <div class="article-footer">
             <div class="author-box">
                 <h4>✍️ À Propos de l'Auteur</h4>
-                <p>Eduardo De Sul est un conseiller immobilier indépendant eXp France basé à Bordeaux. Spécialiste de l'immobilier local, il accompagne ses clients dans chaque étape de leur projet immobilier.</p>
+                <p><?php echo htmlspecialchars(_ss('agent_bio', 'Accompagnement personnalisé pour tous vos projets immobiliers.')); ?></p>
             </div>
         </div>
     </main>
 
     <!-- FOOTER -->
     <footer>
-        <p>&copy; <?php echo date('Y'); ?> Eduardo De Sul - Conseiller Immobilier eXp France</p>
-        <p>Bordeaux Métropole · SIRET · Assurance RC Professionnelle</p>
+        <p>&copy; <?php echo date('Y'); ?> <?php echo htmlspecialchars(_ss('site_name', 'Mon entreprise')); ?></p>
+        <p><?php echo htmlspecialchars(_ss('footer_legal_line', '')); ?></p>
         <p><a href="#mentions">Mentions légales</a> · <a href="#rgpd">Politique de confidentialité</a></p>
     </footer>
 
@@ -356,7 +356,7 @@
       "description": "<?php echo addslashes(htmlspecialchars($meta_description ?? '')); ?>",
       "author": {
         "@type": "Person",
-        "name": "Eduardo De Sul"
+        "name": "<?php echo addslashes(_ss('agent_name', _ss('site_name', 'Mon entreprise'))); ?>"
       },
       "datePublished": "<?php echo date('Y-m-d'); ?>"
     }

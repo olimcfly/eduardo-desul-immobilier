@@ -30,14 +30,14 @@ $title     = $article['titre']          ?? '';
 $content   = $article['contenu']        ?? '';
 $excerpt   = $article['extrait']        ?? '';
 $ogImage   = $article['featured_image'] ?? $article['image'] ?? '';
-$author    = $article['author']         ?? 'Eduardo De Sul';
+$author    = $article['author']         ?? _ss('agent_name', '');
 $category  = $article['category']       ?? '';
 $pubDate   = $article['published_at']   ?? $article['date_publication'] ?? $article['created_at'] ?? '';
 $readTime  = $article['reading_time']   ?? readingTime($content);
 $canonical = $_siteUrl . '/blog/' . $articleSlug;
 $metaTitle = $article['meta_title']     ?? $article['seo_title'] ?? $title;
 $metaDesc  = $article['meta_description'] ?? $article['seo_description'] ?? $excerpt;
-$phone     = _ss('phone','06 24 10 58 16');
+$phone     = _ss('phone','');
 ?><!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -153,8 +153,8 @@ $phone     = _ss('phone','06 24 10 58 16');
             <div class="art-author__av"><i class="fas fa-user"></i></div>
             <div>
                 <div class="art-author__name"><?= htmlspecialchars($author) ?></div>
-                <div class="art-author__role">Conseiller immobilier · eXp France</div>
-                <p class="art-author__bio"><?= htmlspecialchars(_ss('agent_bio','Conseiller immobilier indépendant à Bordeaux. Accompagnement personnalisé pour tous vos projets immobiliers.')) ?></p>
+                <div class="art-author__role"><?= htmlspecialchars(_ss('agent_title', 'Conseiller immobilier')) ?></div>
+                <p class="art-author__bio"><?= htmlspecialchars(_ss('agent_bio', 'Accompagnement personnalisé pour tous vos projets immobiliers.')) ?></p>
             </div>
         </div>
 
@@ -184,7 +184,7 @@ $phone     = _ss('phone','06 24 10 58 16');
         </div>
         <div class="art-widget art-cta-widget">
             <div class="art-widget__title"><i class="fas fa-phone-alt" style="margin-right:8px"></i> Besoin de conseils ?</div>
-            <p>Eduardo répond à toutes vos questions gratuitement.</p>
+            <p><?= htmlspecialchars(_ss('cta_sidebar_text', 'Nous répondons à toutes vos questions gratuitement.')) ?></p>
             <a href="tel:<?= htmlspecialchars(preg_replace('/\s+/','',$phone)) ?>" class="art-cta-btn art-cta-btn--primary"><i class="fas fa-phone-alt"></i> <?= htmlspecialchars($phone) ?></a>
             <a href="/estimation" class="art-cta-btn art-cta-btn--ghost"><i class="fas fa-calculator"></i> Estimer mon bien</a>
         </div>

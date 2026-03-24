@@ -45,7 +45,7 @@ $suggestions = array_slice($suggestions, 0, 3, true);
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Merci <?= $prenom ?> ! Votre guide arrive — Eduardo De Sul Immobilier</title>
+<title>Merci <?= $prenom ?> ! Votre guide arrive — <?= htmlspecialchars(_ss('site_name', 'Mon entreprise')) ?></title>
 <meta name="robots" content="noindex, nofollow">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -359,7 +359,7 @@ body {
 
 <!-- Header -->
 <header class="merci-header">
-    <a href="/" class="merci-logo">Eduardo De Sul<span>.</span></a>
+    <a href="/" class="merci-logo"><?= htmlspecialchars(_ss('site_name', 'Mon entreprise')) ?><span>.</span></a>
     <a href="/" style="font-size:13px;color:#64748b;text-decoration:none;font-weight:600;">← Retour au site</a>
 </header>
 
@@ -409,8 +409,9 @@ body {
             <div class="merci-step">
                 <div class="merci-step-num">3</div>
                 <div class="merci-step-content">
-                    <strong>Posez vos questions à Eduardo</strong>
-                    <span>Une question sur votre projet ? Eduardo répond personnellement. Disponible au <a href="tel:0624105816" style="color:<?= $cf ?>;font-weight:600;">06 24 10 58 16</a>.</span>
+                    <strong>Posez vos questions</strong>
+                    <?php $merciPhone = _ss('phone', ''); ?>
+                    <span>Une question sur votre projet ? Nous répondons personnellement.<?php if ($merciPhone): ?> Disponible au <a href="tel:<?= htmlspecialchars(preg_replace('/\s+/', '', $merciPhone)) ?>" style="color:<?= $cf ?>;font-weight:600;"><?= htmlspecialchars($merciPhone) ?></a>.<?php endif; ?></span>
                 </div>
             </div>
         </div>
@@ -419,7 +420,7 @@ body {
     <!-- CTA principal -->
     <div class="merci-cta-block">
         <h3>Votre projet mérite<br>un accompagnement sur-mesure</h3>
-        <p>Eduardo est conseiller immobilier indépendant à Bordeaux et Blanquefort. Prenez rendez-vous pour une consultation gratuite et sans engagement.</p>
+        <p><?= htmlspecialchars(_ss('cta_description', 'Prenez rendez-vous pour une consultation gratuite et sans engagement.')) ?></p>
         <div class="merci-cta-btns">
             <a href="/estimation-gratuite" class="merci-btn merci-btn-primary">
                 🏠 Estimer mon bien gratuitement
@@ -454,7 +455,7 @@ body {
 
 <!-- Footer -->
 <footer class="merci-footer">
-    <p>© <?= date('Y') ?> Eduardo De Sul Immobilier · 12A rue du Commandant Charcot, 33290 Blanquefort</p>
+    <p>© <?= date('Y') ?> <?= htmlspecialchars(_ss('site_name', 'Mon entreprise')) ?></p>
     <p style="margin-top:6px;">
         <a href="/mentions-legales">Mentions légales</a> ·
         <a href="/politique-de-confidentialite">Confidentialité</a> ·

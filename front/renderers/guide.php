@@ -423,7 +423,7 @@ if (!function_exists('buildGuideVarsV3')) {
     {
         $siteUrl  = function_exists('siteUrl')  ? siteUrl()  : (defined('SITE_URL')   ? SITE_URL   : '');
         $siteName = function_exists('siteName') ? siteName() : (defined('SITE_TITLE') ? SITE_TITLE : '');
-        $phone    = function_exists('_ss')      ? _ss('phone', '06 24 10 58 16') : '06 24 10 58 16';
+        $phone    = function_exists('_ss')      ? _ss('phone', '') : '';
         $pubDate  = $guide['date_publication']  ?? $guide['created_at'] ?? '';
         $pubDateFr = '';
         if ($pubDate) {
