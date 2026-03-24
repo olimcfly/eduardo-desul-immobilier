@@ -259,9 +259,33 @@ if ($sourceTable === 'builder_pages') {
 
 } else {
     $editorType = $page['editor_type'] ?? 'sections';
+    $templateData = json_decode((string)($page['template_data'] ?? ''), true);
+    if (!is_array($templateData)) $templateData = [];
+    foreach ($templateData as $k => $v) {
+        if (!is_scalar($v)) continue;
+        $safeKey = preg_replace('/[^a-z0-9_]/i', '', (string)$k);
+        if ($safeKey === '') continue;
+        $vars['{{' . $safeKey . '}}'] = (string)$v;
+    }
 
     if ($editorType === 'builder' && !empty($page['builder_data'])) {
         $html = renderBlocksData($page['builder_data']);
+        $css  = $page['custom_css'] ?? '';
+        $js   = $page['custom_js']  ?? '';
+
+    } elseif (!empty($page['template_config_key'])) {
+        $templateHtml = '';
+        try {
+            $stmt = $db->prepare("SELECT html_template FROM page_templates WHERE template_key = ? AND is_active = 1 LIMIT 1");
+            $stmt->execute([$page['template_config_key']]);
+            $templateHtml = (string)($stmt->fetchColumn() ?: '');
+        } catch (Exception $e) {}
+
+        if (trim($templateHtml) !== '') {
+            $html = str_replace(array_keys($vars), array_values($vars), $templateHtml);
+        } else {
+            $html = str_replace(array_keys($vars), array_values($vars), $page['content'] ?? '');
+        }
         $css  = $page['custom_css'] ?? '';
         $js   = $page['custom_js']  ?? '';
 

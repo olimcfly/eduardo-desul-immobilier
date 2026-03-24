@@ -48,6 +48,41 @@ $hasWordCount   = in_array('word_count',    $availCols);
 $hasSeoScore    = in_array('seo_score',     $availCols);
 $hasSemanticScore = in_array('semantic_score', $availCols);
 
+// ─── Templates de pages (gérés dans Settings) ───
+try {
+    $pdo->exec("CREATE TABLE IF NOT EXISTS page_templates (
+        id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+        template_key VARCHAR(120) NOT NULL UNIQUE,
+        name VARCHAR(180) NOT NULL,
+        description VARCHAR(255) DEFAULT NULL,
+        fields_json LONGTEXT DEFAULT NULL,
+        html_template LONGTEXT DEFAULT NULL,
+        is_active TINYINT(1) UNSIGNED DEFAULT 1,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+} catch (PDOException $e) {}
+
+foreach ([
+    'template_config_key' => "VARCHAR(120) DEFAULT NULL AFTER `template`",
+    'template_data'       => "LONGTEXT DEFAULT NULL AFTER `template_config_key`",
+] as $col => $sqlDef) {
+    if (!in_array($col, $availCols, true)) {
+        try {
+            $pdo->exec("ALTER TABLE pages ADD COLUMN `{$col}` {$sqlDef}");
+            $availCols[] = $col;
+        } catch (PDOException $e) {}
+    }
+}
+
+$hasTemplateConfigKey = in_array('template_config_key', $availCols, true);
+$hasTemplateData      = in_array('template_data', $availCols, true);
+
+$pageTemplates = [];
+try {
+    $pageTemplates = $pdo->query("SELECT * FROM page_templates WHERE is_active = 1 ORDER BY name ASC")->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {}
+
 // ─── Chargement si édition ───
 if (!$isCreate) {
     try {
@@ -103,6 +138,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['_save_page'])) {
         if ($hasCustomCss)  $fields['custom_css']    = $_POST['custom_css']  ?? '';
         if ($hasCustomJs)   $fields['custom_js']     = $_POST['custom_js']   ?? '';
         if ($hasWordCount)  $fields['word_count']    = (int)($_POST['word_count'] ?? 0);
+        if ($hasTemplateConfigKey) $fields['template_config_key'] = trim($_POST['template_config_key'] ?? '');
+        if ($hasTemplateData) {
+            $templateData = $_POST['template_data'] ?? [];
+            if (!is_array($templateData)) $templateData = [];
+            $cleanTemplateData = [];
+            foreach ($templateData as $k => $v) {
+                $key = preg_replace('/[^a-z0-9_]/i', '', (string)$k);
+                if ($key === '') continue;
+                $cleanTemplateData[$key] = is_string($v) ? trim($v) : $v;
+            }
+            $fields['template_data'] = !empty($cleanTemplateData)
+                ? json_encode($cleanTemplateData, JSON_UNESCAPED_UNICODE)
+                : null;
+        }
 
         if ($statusVal === 'published' && $hasPublishedAt) {
             if ($isCreate || ($page['status'] ?? '') !== 'published') {
@@ -144,6 +193,21 @@ $val = fn(string $k, string $d='') => htmlspecialchars((string)(($page[$k] ?? nu
 $currentStatus = $page['status'] ?? 'draft';
 $currentVis    = $page['visibility'] ?? 'public';
 $pageLabel     = $isCreate ? 'Nouvelle page' : htmlspecialchars($page['title'] ?? 'Page');
+$selectedTemplateKey = $page['template_config_key'] ?? '';
+$templateData = json_decode((string)($page['template_data'] ?? ''), true);
+if (!is_array($templateData)) $templateData = [];
+$activeTemplate = null;
+foreach ($pageTemplates as $tplRow) {
+    if (($tplRow['template_key'] ?? '') === $selectedTemplateKey) {
+        $activeTemplate = $tplRow;
+        break;
+    }
+}
+$activeTemplateFields = [];
+if ($activeTemplate && !empty($activeTemplate['fields_json'])) {
+    $decodedFields = json_decode((string)$activeTemplate['fields_json'], true);
+    if (is_array($decodedFields)) $activeTemplateFields = $decodedFields;
+}
 
 // ─── CSRF ───
 if (!isset($_SESSION['csrf_token'])) $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -355,9 +419,6 @@ if (!isset($_SESSION['csrf_token'])) $_SESSION['csrf_token'] = bin2hex(random_by
         <a href="/<?= htmlspecialchars($page['slug']??'') ?>" target="_blank" class="pga-btn pga-btn-outline">
             <i class="fas fa-external-link-alt"></i> Voir
         </a>
-        <a href="/admin/modules/builder/builder/editor.php?context=landing&entity_id=<?= $id ?>" class="pga-btn pga-btn-outline">
-            <i class="fas fa-magic"></i> Builder
-        </a>
         <?php endif; ?>
         <a href="?page=pages" class="pga-btn pga-btn-ghost"><i class="fas fa-arrow-left"></i> Retour</a>
         <button type="submit" onclick="PGA.setStatus('draft')" class="pga-btn pga-btn-outline">
@@ -406,7 +467,7 @@ if (!isset($_SESSION['csrf_token'])) $_SESSION['csrf_token'] = bin2hex(random_by
 
             <?php if ($hasTemplate): ?>
             <div class="pga-field">
-                <label>Template</label>
+                <label>Template de page</label>
                 <select name="template">
                     <option value="default"  <?= ($page['template']??'default')==='default' ?'selected':'' ?>>Par défaut</option>
                     <option value="landing"  <?= ($page['template']??'')==='landing'  ?'selected':'' ?>>Landing page</option>
@@ -414,6 +475,22 @@ if (!isset($_SESSION['csrf_token'])) $_SESSION['csrf_token'] = bin2hex(random_by
                     <option value="legal"    <?= ($page['template']??'')==='legal'    ?'selected':'' ?>>Page légale</option>
                     <option value="contact"  <?= ($page['template']??'')==='contact'  ?'selected':'' ?>>Contact</option>
                 </select>
+            </div>
+            <?php endif; ?>
+
+            <?php if ($hasTemplateConfigKey): ?>
+            <div class="pga-field">
+                <label>Structure éditoriale (Settings → Templates)</label>
+                <select name="template_config_key" id="pgaTemplateConfig">
+                    <option value="">Aucun modèle structuré</option>
+                    <?php foreach ($pageTemplates as $tpl): ?>
+                    <option value="<?= htmlspecialchars($tpl['template_key']) ?>"
+                        <?= ($selectedTemplateKey === $tpl['template_key']) ? 'selected' : '' ?>>
+                        <?= htmlspecialchars($tpl['name']) ?>
+                    </option>
+                    <?php endforeach; ?>
+                </select>
+                <div class="hint">Chaque page peut utiliser son propre modèle de champs sans éditeur typographique.</div>
             </div>
             <?php endif; ?>
 
@@ -441,12 +518,41 @@ if (!isset($_SESSION['csrf_token'])) $_SESSION['csrf_token'] = bin2hex(random_by
 
             <!-- Tab : Contenu -->
             <div class="pga-tab-panel active" id="tab-content">
+                <?php if (!empty($activeTemplateFields)): ?>
+                <div class="pga-card" style="margin-bottom:16px">
+                    <div class="pga-card-head"><h3><i class="fas fa-list-check"></i> Champs du modèle</h3></div>
+                    <div class="pga-card-body">
+                        <?php foreach ($activeTemplateFields as $field):
+                            $fKey = preg_replace('/[^a-z0-9_]/i', '', (string)($field['key'] ?? ''));
+                            if ($fKey === '') continue;
+                            $fLabel = $field['label'] ?? $fKey;
+                            $fType = $field['type'] ?? 'text';
+                            $fPlaceholder = $field['placeholder'] ?? '';
+                            $fValue = $templateData[$fKey] ?? '';
+                        ?>
+                        <div class="pga-field">
+                            <label><?= htmlspecialchars($fLabel) ?></label>
+                            <?php if ($fType === 'textarea'): ?>
+                                <textarea name="template_data[<?= htmlspecialchars($fKey) ?>]" rows="4"
+                                          placeholder="<?= htmlspecialchars($fPlaceholder) ?>"><?= htmlspecialchars((string)$fValue) ?></textarea>
+                            <?php else: ?>
+                                <input type="<?= $fType === 'url' ? 'url' : 'text' ?>"
+                                       name="template_data[<?= htmlspecialchars($fKey) ?>]"
+                                       value="<?= htmlspecialchars((string)$fValue) ?>"
+                                       placeholder="<?= htmlspecialchars($fPlaceholder) ?>">
+                            <?php endif; ?>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+                <?php endif; ?>
+
                 <div class="pga-field" style="margin-bottom:0">
-                    <label>Contenu HTML / Texte</label>
+                    <label>Contenu HTML / Texte (sans éditeur typographique)</label>
                     <textarea name="content" id="pgaContent" rows="20"
                               style="font-family:monospace;font-size:.82rem;line-height:1.6"
                               placeholder="Contenu de votre page...&#10;&#10;Vous pouvez utiliser du HTML ou du texte simple.&#10;Pour un design avancé, utilisez le Builder Pro (bouton en haut à droite)."><?= htmlspecialchars($page['content'] ?? '') ?></textarea>
-                    <div class="hint">Pour un design avancé, utilisez le <strong>Builder Pro</strong> via le bouton en haut.</div>
+                    <div class="hint">Saisie structurée avec champs + HTML libre, sans éditeur de mise en forme visuelle.</div>
                 </div>
             </div>
 
