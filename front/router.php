@@ -371,7 +371,7 @@ $GLOBALS['sidebar'] = $sidebarData;
 // ========================================
 
 // Déterminer le template à utiliser
-$layout = $page['layout'] ?? $page['type'] ?? 'page';
+$layout = $page['template'] ?? 'default';
 $templatePath = __DIR__ . '/templates/' . $layout . '.php';
 
 // Fallback sur le template par défaut

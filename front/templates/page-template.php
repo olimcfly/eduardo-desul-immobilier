@@ -10,12 +10,15 @@
  * - $pdo (connexion DB)
  */
  
- require_once ROOT_PATH . '/front/rende-sections.php';
+$renderSectionsPath = ROOT_PATH . '/front/rende-sections.php';
+if (file_exists($renderSectionsPath)) {
+    require_once $renderSectionsPath;
 
-// Si tu as des sections en DB:
-if (!empty($page_content)) {
-    $sections = json_decode($page_content, true);
-    renderSections($sections, $pdo);
+    // Si tu as des sections en DB:
+    if (!empty($page_content)) {
+        $sections = json_decode($page_content, true);
+        renderSections($sections, $pdo);
+    }
 }
 ?>
 <!DOCTYPE html>
