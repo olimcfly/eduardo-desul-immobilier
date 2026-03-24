@@ -429,6 +429,38 @@ const API_URL = 'modules/immobilier/market-analyzer/api.php';
 const allCities = <?= json_encode(array_values($suggestedCities)) ?>;
 let selectedCity = '';
 
+async function fetchMarketAnalyzer(action, payload = {}) {
+    const resp = await fetch(`${API_URL}?action=${encodeURIComponent(action)}`, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify(payload)
+    });
+
+    let data = {};
+    try {
+        data = await resp.json();
+    } catch (e) {
+        throw new Error('Réponse invalide du serveur.');
+    }
+
+    if (resp.status === 401) {
+        const message = data.message || data.error || 'Session expirée';
+        throw new Error(message);
+    }
+
+    if (!resp.ok) {
+        throw new Error(data.error || `HTTP ${resp.status}`);
+    }
+
+    return data;
+}
+
+
 // ── City selection ────────────────────────────
 function selectCity(city) {
     selectedCity = city;
@@ -503,13 +535,7 @@ async function launchAnalysis() {
     document.getElementById('loadingText').textContent = `Analyse du marché de ${city} en cours...`;
 
     try {
-        const resp = await fetch(`${API_URL}?action=analyze`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ city: city })
-        });
-
-        const data = await resp.json();
+        const data = await fetchMarketAnalyzer('analyze', { city: city });
 
         document.getElementById('loadingState').style.display = 'none';
 
@@ -528,7 +554,12 @@ async function launchAnalysis() {
         }
     } catch (err) {
         document.getElementById('loadingState').style.display = 'none';
-        showError('Erreur réseau : ' + err.message);
+        if (err.message.toLowerCase().includes('session')) {
+            showError('Session expirée. Veuillez vous reconnecter.');
+            setTimeout(() => { window.location.href = '/admin/login.php'; }, 1200);
+        } else {
+            showError('Erreur réseau : ' + err.message);
+        }
     }
 
     btn.classList.remove('loading');
@@ -556,12 +587,7 @@ async function forceRefresh(city) {
     document.getElementById('loadingText').textContent = `Actualisation de l'analyse pour ${city}...`;
 
     try {
-        const resp = await fetch(`${API_URL}?action=analyze`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ city: city, force: true })
-        });
-        const data = await resp.json();
+        const data = await fetchMarketAnalyzer('analyze', { city: city, force: true });
         document.getElementById('loadingState').style.display = 'none';
 
         if (data.success && data.analysis) {
@@ -572,7 +598,12 @@ async function forceRefresh(city) {
         }
     } catch (err) {
         document.getElementById('loadingState').style.display = 'none';
-        showError('Erreur réseau : ' + err.message);
+        if (err.message.toLowerCase().includes('session')) {
+            showError('Session expirée. Veuillez vous reconnecter.');
+            setTimeout(() => { window.location.href = '/admin/login.php'; }, 1200);
+        } else {
+            showError('Erreur réseau : ' + err.message);
+        }
     }
 
     btn.classList.remove('loading');
@@ -584,11 +615,10 @@ async function removeCity(city) {
     if (!confirm(`Retirer "${city}" de votre liste ?`)) return;
 
     try {
-        await fetch(`${API_URL}?action=remove-city`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ city: city })
-        });
+        const data = await fetchMarketAnalyzer('remove-city', { city: city });
+        if (!data.success) {
+            throw new Error(data.error || 'Suppression impossible');
+        }
         // Remove tag from DOM
         document.querySelectorAll('.ma-city-tag').forEach(t => {
             if (t.dataset.city === city) t.remove();
