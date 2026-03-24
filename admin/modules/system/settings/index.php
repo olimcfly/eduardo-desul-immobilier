@@ -53,6 +53,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $port = (int)($_POST['smtp_port'] ?? 587);
             $user = trim($_POST['smtp_user'] ?? '');
             $pass = trim($_POST['smtp_pass'] ?? '');
+            $fromName = trim($_POST['smtp_from_name'] ?? 'IMMO LOCAL+');
+            $fromEmail = trim($_POST['smtp_from_email'] ?? $user);
+            $notifyEmail = trim($_POST['notify_email'] ?? $fromEmail);
             if (!$to || !$host) {
                 $flashMsg = 'Email de test et hôte SMTP requis.'; $flashType = 'err';
             } else {
@@ -62,13 +65,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                         $mail = new PHPMailer\PHPMailer\PHPMailer(true);
                         $mail->isSMTP(); $mail->Host = $host; $mail->Port = $port;
                         $mail->SMTPAuth = true; $mail->Username = $user; $mail->Password = $pass;
+                        $mail->Timeout = 12;
                         $mail->SMTPSecure = $port === 465 ? 'ssl' : 'tls';
-                        $mail->setFrom($user, 'IMMO LOCAL+ Test');
+                        $mail->setFrom($fromEmail ?: $user, $fromName ?: 'IMMO LOCAL+ Test');
+
+                        if (!$mail->smtpConnect()) {
+                            throw new Exception('Connexion SMTP impossible (hôte/port/identifiants).');
+                        }
+                        $mail->smtpClose();
+
                         $mail->addAddress($to);
-                        $mail->Subject = 'Test SMTP — IMMO LOCAL+';
-                        $mail->Body    = 'Cet email confirme que votre SMTP est bien configuré.';
+                        $mail->Subject = 'Test SMTP réussi — IMMO LOCAL+';
+                        $mail->Body    = "Connexion SMTP validée avec succès.\n\nHôte: {$host}\nPort: {$port}\nDate: " . date('Y-m-d H:i:s');
                         $mail->send();
-                        $flashMsg = '✅ Email de test envoyé à ' . htmlspecialchars($to);
+
+                        if (filter_var($notifyEmail, FILTER_VALIDATE_EMAIL)) {
+                            $mail->clearAddresses();
+                            $mail->addAddress($notifyEmail);
+                            $mail->Subject = 'Notification: test SMTP validé';
+                            $mail->Body = "Le test de connexion SMTP a réussi.\n\nUn email de test a été envoyé à: {$to}\nHôte: {$host}\nPort: {$port}\nDate: " . date('Y-m-d H:i:s');
+                            $mail->send();
+                        }
+
+                        $flashMsg = '✅ Connexion SMTP réussie. Email de test envoyé et notification confirmée.';
                     } catch (Exception $e) {
                         $flashMsg = '❌ Erreur SMTP : ' . htmlspecialchars($e->getMessage()); $flashType = 'err';
                     }
@@ -144,7 +163,81 @@ function hasApi($svc) {
     return isset($apiKeys[$svc]) || isset($settings['api_key_' . $svc]);
 }
 
+function emailDomainFromValue($emailOrDomain) {
+    $value = trim((string)$emailOrDomain);
+    if ($value === '') return '';
+    if (strpos($value, '@') !== false) {
+        $parts = explode('@', $value);
+        return strtolower(trim(end($parts)));
+    }
+    return strtolower($value);
+}
+
+function getTxtRecordsForDomain($domain) {
+    if ($domain === '') return [];
+    $records = @dns_get_record($domain, DNS_TXT);
+    if (!is_array($records)) return [];
+
+    $txt = [];
+    foreach ($records as $record) {
+        $value = $record['txt'] ?? ($record['entries'][0] ?? '');
+        if ($value !== '') $txt[] = trim((string)$value);
+    }
+    return $txt;
+}
+
+function buildEmailAuthDiagnostics($settings) {
+    $fromEmail = trim((string)($settings['smtp_from_email'] ?? ''));
+    $domain = emailDomainFromValue($fromEmail);
+
+    if ($domain === '') {
+        $siteUrl = trim((string)($settings['site_url'] ?? ''));
+        $host = $siteUrl ? (parse_url($siteUrl, PHP_URL_HOST) ?: '') : '';
+        $domain = strtolower(preg_replace('/^www\./i', '', $host));
+    }
+
+    if ($domain === '') {
+        return [
+            'domain' => '',
+            'spf' => ['status' => 'missing', 'message' => 'Renseignez un email expéditeur pour lancer l’analyse SPF.'],
+            'dmarc' => ['status' => 'missing', 'message' => 'Renseignez un email expéditeur pour lancer l’analyse DMARC.'],
+        ];
+    }
+
+    $txtRecords = getTxtRecordsForDomain($domain);
+    $spf = '';
+    foreach ($txtRecords as $txt) {
+        if (stripos($txt, 'v=spf1') !== false) {
+            $spf = $txt;
+            break;
+        }
+    }
+
+    $dmarcDomain = '_dmarc.' . $domain;
+    $dmarcRecords = getTxtRecordsForDomain($dmarcDomain);
+    $dmarc = '';
+    foreach ($dmarcRecords as $txt) {
+        if (stripos($txt, 'v=DMARC1') !== false) {
+            $dmarc = $txt;
+            break;
+        }
+    }
+
+    return [
+        'domain' => $domain,
+        'spf' => [
+            'status' => $spf ? 'ok' : 'missing',
+            'message' => $spf ?: 'Aucun enregistrement SPF détecté (TXT avec v=spf1).',
+        ],
+        'dmarc' => [
+            'status' => $dmarc ? 'ok' : 'missing',
+            'message' => $dmarc ?: 'Aucun enregistrement DMARC détecté (_dmarc.' . $domain . ').',
+        ],
+    ];
+}
+
 $csrf = $_SESSION['csrf_token'];
+$emailDiagnostics = buildEmailAuthDiagnostics($settings);
 
 // ─── Advisor Context ───
 $advisorCtx = [];
@@ -219,6 +312,14 @@ if ($pdo) {
 .flash.ok { background: var(--green-bg); color: var(--green); border: 1px solid rgba(5,150,105,.15); }
 .flash.err { background: var(--red-bg); color: var(--red); border: 1px solid rgba(220,38,38,.15); }
 
+.email-auth-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.email-auth-card { border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; background: var(--surface); }
+.email-auth-status { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 999px; }
+.email-auth-status.ok { background: var(--green-bg); color: var(--green); }
+.email-auth-status.missing { background: var(--amber-bg); color: var(--amber); }
+.email-auth-record { margin-top: 10px; font-family: var(--mono); font-size: 11px; color: var(--text-2); word-break: break-word; }
+.email-help-list { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+
 
 .flash-toast {
     position: fixed;
@@ -274,6 +375,7 @@ if ($pdo) {
 @media (max-width: 700px) {
     .set-grid, .set-grid-3 { grid-template-columns: 1fr; }
     .set-full { grid-column: 1; }
+    .email-auth-grid { grid-template-columns: 1fr; }
 }
 </style>
 
@@ -414,7 +516,7 @@ if ($pdo) {
 </div>
 
 <div class="set-section anim d1">
-    <div class="set-section-hd"><i class="fas fa-envelope-circle-check"></i><h3>Tester la configuration SMTP</h3></div>
+    <div class="set-section-hd"><i class="fas fa-envelope-circle-check"></i><h3>Tester la configuration SMTP</h3><p><a href="https://www.mail-tester.com/" target="_blank" rel="noopener">Ouvrir Mail-Tester</a></p></div>
     <div class="set-section-body">
         <form method="POST" action="?page=settings&tab=email" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
             <input type="hidden" name="action" value="test_smtp">
@@ -423,16 +525,43 @@ if ($pdo) {
             <input type="hidden" name="smtp_port" value="<?= s('smtp_port','587') ?>">
             <input type="hidden" name="smtp_user" value="<?= s('smtp_user') ?>">
             <input type="hidden" name="smtp_pass" value="<?= s('smtp_pass') ?>">
+            <input type="hidden" name="smtp_from_name" value="<?= s('smtp_from_name', 'Eduardo De Sul') ?>">
+            <input type="hidden" name="smtp_from_email" value="<?= s('smtp_from_email') ?>">
+            <input type="hidden" name="notify_email" value="<?= s('advisor_email', s('smtp_from_email')) ?>">
             <div class="set-field" style="flex:1;min-width:220px">
                 <label>Email de test</label>
                 <input class="set-input" type="email" name="test_email" value="<?= s('advisor_email') ?>" placeholder="votre@email.fr" required>
             </div>
             <button type="submit" class="set-btn set-btn-s"><i class="fas fa-paper-plane"></i> Envoyer un email de test</button>
         </form>
+        <small style="display:block;margin-top:8px;color:var(--text-3)">Le test vérifie d’abord la connexion SMTP puis envoie un email de test + une notification de succès.</small>
     </div>
 </div>
 
 <div class="set-section anim d2">
+    <div class="set-section-hd"><i class="fas fa-shield-check"></i><h3>Tableau de bord délivrabilité (SPF / DMARC)</h3></div>
+    <div class="set-section-body">
+        <p style="margin-bottom:12px;font-size:12px;color:var(--text-2)">Domaine analysé : <strong><?= htmlspecialchars($emailDiagnostics['domain'] ?: 'Non défini') ?></strong></p>
+        <div class="email-auth-grid">
+            <div class="email-auth-card">
+                <div class="email-auth-status <?= $emailDiagnostics['spf']['status'] ?>">
+                    <i class="fas <?= $emailDiagnostics['spf']['status'] === 'ok' ? 'fa-check-circle' : 'fa-triangle-exclamation' ?>"></i>
+                    SPF <?= $emailDiagnostics['spf']['status'] === 'ok' ? 'OK' : 'À configurer' ?>
+                </div>
+                <div class="email-auth-record"><?= htmlspecialchars($emailDiagnostics['spf']['message']) ?></div>
+            </div>
+            <div class="email-auth-card">
+                <div class="email-auth-status <?= $emailDiagnostics['dmarc']['status'] ?>">
+                    <i class="fas <?= $emailDiagnostics['dmarc']['status'] === 'ok' ? 'fa-check-circle' : 'fa-triangle-exclamation' ?>"></i>
+                    DMARC <?= $emailDiagnostics['dmarc']['status'] === 'ok' ? 'OK' : 'À configurer' ?>
+                </div>
+                <div class="email-auth-record"><?= htmlspecialchars($emailDiagnostics['dmarc']['message']) ?></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="set-section anim d3">
     <div class="set-section-hd"><i class="fas fa-robot"></i><h3>SMTP secondaire (Estimations IA)</h3><p>Pour les réponses automatiques</p></div>
     <div class="set-section-body">
         <div class="set-grid">
@@ -441,6 +570,18 @@ if ($pdo) {
             <div class="set-field"><label>Utilisateur</label><input class="set-input mono" type="text" name="settings[smtp2_user]" value="<?= s('smtp2_user') ?>"></div>
             <div class="set-field"><label>Mot de passe</label><input class="set-input mono" type="password" name="settings[smtp2_pass]" value="<?= s('smtp2_pass') ? '••••••••' : '' ?>" autocomplete="new-password"></div>
         </div>
+    </div>
+</div>
+
+<div class="set-section anim d4" id="email-help-module">
+    <div class="set-section-hd"><i class="fas fa-circle-question"></i><h3>Aide — Configurer SPF / DMARC</h3></div>
+    <div class="set-section-body">
+        <ul class="email-help-list">
+            <li>Ajoutez un enregistrement TXT SPF sur votre domaine principal (ex: <code>v=spf1 include:_spf.votresmtp.com ~all</code>).</li>
+            <li>Ajoutez un enregistrement TXT DMARC sur <code>_dmarc.votredomaine.fr</code> (ex: <code>v=DMARC1; p=none; rua=mailto:postmaster@votredomaine.fr</code>).</li>
+            <li>Après propagation DNS (jusqu’à 24-48h), revenez sur cet écran pour relancer l’analyse.</li>
+            <li>Validez ensuite votre délivrabilité avec <a href="https://www.mail-tester.com/" target="_blank" rel="noopener">mail-tester.com</a>.</li>
+        </ul>
     </div>
 </div>
 
