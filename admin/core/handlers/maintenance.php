@@ -47,7 +47,6 @@ switch ($action) {
             $message = $input['message'] ?? 'Site en maintenance. Revenez bientot.';
             $allowedIps = $input['allowed_ips'] ?? '';
             if ($maintenanceTableExists) {
-                $pdo->query("UPDATE maintenance SET is_active = 1, message = " . $pdo->quote($message) . ", allowed_ips = " . $pdo->quote($allowedIps));
                 if ($pdo->query("SELECT COUNT(*) FROM maintenance")->fetchColumn() == 0) {
                     $pdo->prepare("INSERT INTO maintenance (is_active, message, allowed_ips) VALUES (1, ?, ?)")->execute([$message, $allowedIps]);
                 } else {
