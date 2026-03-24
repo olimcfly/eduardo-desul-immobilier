@@ -117,7 +117,7 @@ switch ($action) {
             $id = (int)($input['id'] ?? 0);
             if (!$id) { echo json_encode(['success' => false, 'message' => 'ID requis']); break; }
             // Check if leads are in this stage
-            $leadsInStage = (int)$pdo->prepare("SELECT COUNT(*) FROM leads WHERE pipeline_stage_id = ?");
+            $leadsInStage = $pdo->prepare("SELECT COUNT(*) FROM leads WHERE pipeline_stage_id = ?");
             $leadsInStage->execute([$id]);
             $count = (int)$leadsInStage->fetchColumn();
             if ($count > 0) {

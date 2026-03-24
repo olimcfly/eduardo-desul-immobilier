@@ -254,6 +254,12 @@ if (file_exists($msFile)) {
     $moduleStates = json_decode(file_get_contents($msFile), true) ?: [];
 }
 
+// ── AJAX : inclure le module directement sans layout ─────────
+if (isset($_GET['ajax']) && $_GET['ajax'] == '1' && $module_file) {
+    include $module_file;
+    exit;
+}
+
 // ══════════════════════════════════════════════════════════════
 //  RENDU
 // ══════════════════════════════════════════════════════════════
