@@ -137,6 +137,135 @@ if (isset($_GET['ajax']) || (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolo
             }
             exit;
 
+        // ── Email templates (bibliothèque) ────────────────────────────────────
+        case 'get_email_templates':
+            try {
+                $search_tpl = trim($_POST['search'] ?? $_GET['search'] ?? '');
+                $cat_filter = trim($_POST['category'] ?? $_GET['category'] ?? '');
+                $sql_tpl = "SELECT id, name, category, subject, body_html, variables, usage_count FROM email_templates WHERE status='active'";
+                $p_tpl = [];
+                if ($search_tpl) { $sql_tpl .= " AND (name LIKE ? OR subject LIKE ? OR category LIKE ?)"; $t = "%{$search_tpl}%"; $p_tpl = [$t,$t,$t]; }
+                if ($cat_filter) { $sql_tpl .= " AND category = ?"; $p_tpl[] = $cat_filter; }
+                $sql_tpl .= " ORDER BY usage_count DESC, created_at DESC LIMIT 50";
+                $st = $pdo->prepare($sql_tpl); $st->execute($p_tpl);
+                $templates = $st->fetchAll();
+                // Get distinct categories
+                $cats = $pdo->query("SELECT DISTINCT category FROM email_templates WHERE status='active' ORDER BY category")->fetchAll(PDO::FETCH_COLUMN);
+                echo json_encode(['success' => true, 'templates' => $templates, 'categories' => $cats]);
+            } catch (Exception $e) {
+                echo json_encode(['success' => true, 'templates' => [], 'categories' => []]);
+            }
+            exit;
+
+        // ── Seed default templates (one-time) ────────────────────────────────
+        case 'seed_email_templates':
+            try {
+                $count = (int)$pdo->query("SELECT COUNT(*) FROM email_templates")->fetchColumn();
+                if ($count > 0) { echo json_encode(['success' => true, 'message' => 'Templates déjà présents', 'count' => $count]); exit; }
+                $defaults = [
+                    ['Premier contact', 'premier-contact', 'prospection', 'Bonjour {{prenom}} — Votre projet immobilier à {{ville}}',
+                     '<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px"><h2 style="color:#1e3a5f">Bonjour {{prenom}},</h2><p>Je me permets de vous contacter suite à votre intérêt pour un projet immobilier à <strong>{{ville}}</strong>.</p><p>Je suis Eduardo De Sul, conseiller immobilier indépendant avec eXp France, spécialisé dans la région bordelaise.</p><p>Je serais ravi d\'échanger avec vous pour :</p><ul><li>Comprendre votre projet et vos critères</li><li>Vous présenter les opportunités du marché</li><li>Vous accompagner dans toutes les étapes</li></ul><p>Seriez-vous disponible pour un échange téléphonique cette semaine ?</p><p>Bien cordialement,<br><strong>Eduardo De Sul</strong><br>Conseiller Immobilier — eXp France<br>{{email_agent}}</p></div>',
+                     '["prenom","nom","ville","email_agent"]'],
+                    ['Suivi après appel', 'suivi-apres-appel', 'suivi', 'Suite à notre échange — {{prenom}}',
+                     '<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px"><h2 style="color:#1e3a5f">Bonjour {{prenom}},</h2><p>Je vous remercie pour notre échange téléphonique de tout à l\'heure.</p><p>Comme convenu, je vous confirme les points suivants :</p><ul><li>Votre recherche : {{notes}}</li><li>Budget envisagé : à définir ensemble</li><li>Secteur privilégié : {{ville}}</li></ul><p>Je me mets en recherche active dès maintenant et je reviens vers vous rapidement avec des biens correspondant à vos critères.</p><p>N\'hésitez pas à me contacter si vous avez des questions.</p><p>Bien cordialement,<br><strong>Eduardo De Sul</strong><br>Conseiller Immobilier — eXp France</p></div>',
+                     '["prenom","nom","ville","notes"]'],
+                    ['Proposition de biens', 'proposition-biens', 'proposition', '{{prenom}}, des biens sélectionnés pour vous à {{ville}}',
+                     '<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px"><h2 style="color:#1e3a5f">Bonjour {{prenom}},</h2><p>Suite à notre échange, j\'ai sélectionné plusieurs biens qui pourraient correspondre à votre projet à <strong>{{ville}}</strong>.</p><p>Je vous invite à consulter ces propositions et me faire part de votre intérêt. Je peux organiser des visites dès que vous le souhaitez.</p><p>N\'hésitez pas à me contacter pour en discuter :</p><ul><li>Par téléphone</li><li>Par email</li><li>En prenant rendez-vous directement</li></ul><p>Bien cordialement,<br><strong>Eduardo De Sul</strong><br>Conseiller Immobilier — eXp France</p></div>',
+                     '["prenom","nom","ville"]'],
+                    ['Relance douce', 'relance-douce', 'relance', '{{prenom}}, où en est votre projet immobilier ?',
+                     '<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px"><h2 style="color:#1e3a5f">Bonjour {{prenom}},</h2><p>J\'espère que vous allez bien !</p><p>Je me permets de revenir vers vous concernant votre projet immobilier à <strong>{{ville}}</strong>.</p><p>Le marché évolue constamment et de nouvelles opportunités apparaissent régulièrement. Je serais ravi de faire le point avec vous sur :</p><ul><li>L\'évolution de votre projet</li><li>Les nouvelles opportunités disponibles</li><li>Les tendances du marché bordelais</li></ul><p>Êtes-vous toujours dans cette démarche ? Un simple appel suffit pour reprendre contact.</p><p>Au plaisir d\'échanger,<br><strong>Eduardo De Sul</strong><br>Conseiller Immobilier — eXp France</p></div>',
+                     '["prenom","nom","ville"]'],
+                    ['Invitation estimation gratuite', 'invitation-estimation', 'estimation', '{{prenom}}, estimez votre bien gratuitement',
+                     '<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px"><h2 style="color:#1e3a5f">Bonjour {{prenom}},</h2><p>Vous souhaitez connaître la valeur de votre bien à <strong>{{ville}}</strong> ?</p><p>Je vous propose une <strong>estimation gratuite et sans engagement</strong>, basée sur :</p><ul><li>L\'analyse des ventes récentes dans votre quartier</li><li>Les caractéristiques de votre bien</li><li>Les tendances actuelles du marché</li></ul><p>Cette estimation vous donnera une vision claire de la valeur de votre patrimoine, que vous ayez un projet de vente ou simplement par curiosité.</p><p>Contactez-moi pour planifier un rendez-vous à votre convenance.</p><p>Bien cordialement,<br><strong>Eduardo De Sul</strong><br>Conseiller Immobilier — eXp France</p></div>',
+                     '["prenom","nom","ville"]'],
+                    ['Confirmation RDV', 'confirmation-rdv', 'rdv', 'Confirmation de votre rendez-vous — {{prenom}}',
+                     '<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px"><h2 style="color:#1e3a5f">Bonjour {{prenom}},</h2><p>Je vous confirme notre rendez-vous :</p><div style="background:#f0f4ff;border-radius:8px;padding:15px;margin:15px 0;border-left:4px solid #4f46e5"><p style="margin:0"><strong>Date :</strong> À confirmer</p><p style="margin:5px 0 0"><strong>Lieu :</strong> {{ville}}</p><p style="margin:5px 0 0"><strong>Objet :</strong> {{notes}}</p></div><p>Si vous avez besoin de modifier l\'horaire ou avez des questions, n\'hésitez pas à me contacter.</p><p>À très bientôt,<br><strong>Eduardo De Sul</strong><br>Conseiller Immobilier — eXp France</p></div>',
+                     '["prenom","nom","ville","notes"]'],
+                    ['Remerciement après visite', 'remerciement-visite', 'suivi', 'Merci pour votre visite — {{prenom}}',
+                     '<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px"><h2 style="color:#1e3a5f">Bonjour {{prenom}},</h2><p>Je tenais à vous remercier pour la visite d\'aujourd\'hui.</p><p>J\'espère que le bien a retenu votre attention. N\'hésitez pas à me faire part de vos impressions, questions ou réserves — je suis là pour vous accompagner.</p><p>Si ce bien ne correspond pas tout à fait à vos attentes, je continue mes recherches pour vous trouver la perle rare.</p><p>À très bientôt,<br><strong>Eduardo De Sul</strong><br>Conseiller Immobilier — eXp France</p></div>',
+                     '["prenom","nom"]'],
+                    ['Mandat — documents nécessaires', 'mandat-documents', 'transaction', '{{prenom}}, documents nécessaires pour votre dossier',
+                     '<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px"><h2 style="color:#1e3a5f">Bonjour {{prenom}},</h2><p>Dans le cadre de votre projet immobilier, voici la liste des documents nécessaires :</p><ul><li>Pièce d\'identité en cours de validité</li><li>Justificatif de domicile récent</li><li>3 derniers bulletins de salaire</li><li>Dernier avis d\'imposition</li><li>Relevés bancaires des 3 derniers mois</li></ul><p>N\'hésitez pas à me les transmettre par email ou lors de notre prochain rendez-vous.</p><p>Je reste à votre disposition pour toute question.</p><p>Bien cordialement,<br><strong>Eduardo De Sul</strong><br>Conseiller Immobilier — eXp France</p></div>',
+                     '["prenom","nom"]'],
+                ];
+                $stmt = $pdo->prepare("INSERT INTO email_templates (name,slug,category,subject,body_html,body_text,variables,status,usage_count,created_at,updated_at) VALUES (?,?,?,?,?,?,?,'active',0,NOW(),NOW())");
+                foreach ($defaults as $t) {
+                    $stmt->execute([$t[0], $t[1], $t[2], $t[3], $t[4], strip_tags($t[4]), $t[5]]);
+                }
+                echo json_encode(['success' => true, 'message' => count($defaults) . ' templates créés', 'count' => count($defaults)]);
+            } catch (Exception $e) {
+                echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            }
+            exit;
+
+        // ── Envoyer un email depuis la fiche lead ─────────────────────────────
+        case 'send_email':
+            $to   = trim($_POST['to'] ?? '');
+            $subj = trim($_POST['subject'] ?? '');
+            $body = $_POST['body'] ?? '';
+            $lid  = (int)($_POST['lead_id'] ?? 0);
+            $tplId = (int)($_POST['template_id'] ?? 0);
+            if (!$to || !$subj) { echo json_encode(['success'=>false,'error'=>'Destinataire et sujet requis']); exit; }
+            try {
+                // Use the marketing emails API send logic
+                $emailApiPath = __DIR__ . '/../../api/marketing/emails.php';
+                $sent = false; $error = '';
+                $phpmailer = dirname(__DIR__, 2) . '/vendor/phpmailer/phpmailer/src/PHPMailer.php';
+                if (file_exists($phpmailer)) {
+                    require_once $phpmailer;
+                    require_once dirname(__DIR__, 2) . '/vendor/phpmailer/phpmailer/src/SMTP.php';
+                    require_once dirname(__DIR__, 2) . '/vendor/phpmailer/phpmailer/src/Exception.php';
+                    try {
+                        $mail = new PHPMailer\PHPMailer\PHPMailer(true);
+                        // Load SMTP config from settings
+                        $cfg = [];
+                        try { $sc=$pdo->query("SELECT setting_key,setting_value FROM settings WHERE setting_key LIKE 'smtp%' OR setting_key LIKE 'email%'"); while($r=$sc->fetch()) $cfg[$r['setting_key']]=$r['setting_value']; } catch(Exception $e2){}
+                        $smtpFile = dirname(__DIR__, 2) . '/config/smtp.php';
+                        if (file_exists($smtpFile)) { $fc = include $smtpFile; if (is_array($fc)) $cfg = array_merge($cfg, $fc); }
+                        $host = $cfg['smtp_host'] ?? $cfg['SMTP_HOST'] ?? '';
+                        if ($host) {
+                            $mail->isSMTP();
+                            $mail->Host       = $host;
+                            $mail->SMTPAuth   = true;
+                            $mail->Username   = $cfg['smtp_user'] ?? $cfg['SMTP_USER'] ?? '';
+                            $mail->Password   = $cfg['smtp_pass'] ?? $cfg['SMTP_PASS'] ?? '';
+                            $mail->SMTPSecure = $cfg['smtp_secure'] ?? 'tls';
+                            $mail->Port       = (int)($cfg['smtp_port'] ?? $cfg['SMTP_PORT'] ?? 587);
+                        }
+                        $from     = $cfg['smtp_from'] ?? $cfg['SMTP_FROM'] ?? $cfg['email_from'] ?? ADMIN_EMAIL;
+                        $fromName = $cfg['smtp_from_name'] ?? $cfg['SMTP_FROM_NAME'] ?? SITE_TITLE;
+                        $mail->setFrom($from, $fromName);
+                        $mail->addAddress($to);
+                        $mail->isHTML(true); $mail->CharSet = 'UTF-8';
+                        $mail->Subject = $subj; $mail->Body = $body; $mail->AltBody = strip_tags($body);
+                        $mail->send(); $sent = true;
+                    } catch (Exception $e) { $error = $e->getMessage(); }
+                } elseif (function_exists('mail')) {
+                    $h = "MIME-Version: 1.0\r\nContent-Type: text/html; charset=UTF-8\r\n";
+                    $sent = @mail($to, $subj, $body, $h);
+                    if (!$sent) $error = 'mail() returned false';
+                } else {
+                    $error = 'Aucun moteur email disponible';
+                }
+                // Log as interaction
+                if ($lid > 0) {
+                    try { $pdo->prepare("INSERT INTO lead_interactions (lead_id,type,subject,content,interaction_date,outcome) VALUES (?,'email',?,?,NOW(),'positif')")
+                        ->execute([$lid, $subj, strip_tags($body)]); } catch(Exception $e2){}
+                    try { $pdo->prepare("UPDATE leads SET updated_at=NOW() WHERE id=?")->execute([$lid]); } catch(Exception $e2){}
+                }
+                // Log in crm_emails
+                try { $pdo->prepare("INSERT INTO crm_emails (lead_id,direction,to_email,subject,body_html,folder,sent_at,created_at) VALUES (?,'outbound',?,?,?,'sent',NOW(),NOW())")
+                    ->execute([$lid, $to, $subj, $body]); } catch(Exception $e2){}
+                // Update template usage
+                if ($tplId > 0) {
+                    try { $pdo->prepare("UPDATE email_templates SET usage_count=usage_count+1 WHERE id=?")->execute([$tplId]); } catch(Exception $e2){}
+                }
+                echo json_encode($sent ? ['success'=>true,'message'=>"Email envoyé à {$to}"] : ['success'=>false,'error'=>"Échec: {$error}"]);
+            } catch (Exception $e) {
+                echo json_encode(['success'=>false,'error'=>$e->getMessage()]);
+            }
+            exit;
+
         // ── Interactions ──────────────────────────────────────────────────────
         case 'get_interactions':
             $lid = (int)($_POST['lead_id'] ?? 0);
@@ -489,7 +618,39 @@ $tempLabels=['cold'=>['label'=>'Froid','c'=>'#0369a1','bg'=>'#e0f2fe','icon'=>'s
 .lv-em-row label{font-size:.74rem;color:#94a3b8;min-width:38px;font-weight:500}
 .lv-em-row input{flex:1;border:none;outline:none;font-size:.81rem;color:#374151;background:none}
 .lv-em-body{min-height:120px;padding:11px 14px;font-size:.81rem;color:#374151;outline:none;line-height:1.6}
-.lv-em-footer{display:flex;justify-content:flex-end;padding:8px 14px;border-top:1px solid #f1f5f9;background:#f8fafc}
+.lv-em-footer{display:flex;justify-content:flex-end;padding:8px 14px;border-top:1px solid #f1f5f9;background:#f8fafc;gap:8px;align-items:center}
+/* Template library */
+.lv-tpl-lib{margin-bottom:16px}
+.lv-tpl-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;gap:8px;flex-wrap:wrap}
+.lv-tpl-header h4{font-size:.82rem;font-weight:700;color:#1e293b;margin:0;display:flex;align-items:center;gap:6px}
+.lv-tpl-header h4 i{color:#6366f1}
+.lv-tpl-filters{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.lv-tpl-search{padding:6px 10px;border:1px solid #e2e8f0;border-radius:7px;font-size:.76rem;outline:none;width:160px;transition:.15s}
+.lv-tpl-search:focus{border-color:#6366f1;box-shadow:0 0 0 2px rgba(99,102,241,.1)}
+.lv-tpl-cat{padding:5px 10px;border:1px solid #e2e8f0;border-radius:7px;font-size:.73rem;background:#fff;cursor:pointer;transition:.15s;color:#64748b;font-weight:500}
+.lv-tpl-cat:hover{background:#f8fafc;border-color:#c7d2fe}
+.lv-tpl-cat.on{background:#eff6ff;border-color:#6366f1;color:#4f46e5;font-weight:600}
+.lv-tpl-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-height:260px;overflow-y:auto;padding-right:4px}
+@media(max-width:600px){.lv-tpl-grid{grid-template-columns:1fr}}
+.lv-tpl-card{border:1.5px solid #e2e8f0;border-radius:9px;padding:10px 12px;cursor:pointer;transition:all .18s;background:#fff;position:relative}
+.lv-tpl-card:hover{border-color:#818cf8;background:#fafaff;transform:translateY(-1px);box-shadow:0 3px 10px rgba(99,102,241,.08)}
+.lv-tpl-card.on{border-color:#6366f1;background:#eff6ff;box-shadow:0 0 0 2px rgba(99,102,241,.15)}
+.lv-tpl-card-name{font-size:.78rem;font-weight:700;color:#1e293b;margin-bottom:3px;display:flex;align-items:center;gap:5px}
+.lv-tpl-card-subj{font-size:.71rem;color:#6b7280;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lv-tpl-card-meta{display:flex;justify-content:space-between;align-items:center}
+.lv-tpl-card-cat{font-size:.63rem;font-weight:600;padding:2px 6px;border-radius:4px;background:#f1f5f9;color:#64748b;text-transform:uppercase;letter-spacing:.03em}
+.lv-tpl-card-uses{font-size:.63rem;color:#94a3b8}
+.lv-tpl-preview{background:#fff;border:1px solid #e2e8f0;border-radius:9px;padding:14px;margin-top:10px;display:none}
+.lv-tpl-preview.on{display:block}
+.lv-tpl-preview-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.lv-tpl-preview-title{font-size:.79rem;font-weight:700;color:#1e293b}
+.lv-tpl-preview-body{font-size:.77rem;color:#475569;max-height:200px;overflow-y:auto;border:1px solid #f1f5f9;border-radius:6px;padding:10px;background:#fafbfc}
+.lv-tpl-empty{text-align:center;padding:24px 12px;color:#94a3b8;font-size:.79rem}
+.lv-tpl-empty i{font-size:1.4rem;display:block;margin-bottom:6px;opacity:.3}
+.lv-tpl-vars{display:flex;gap:4px;flex-wrap:wrap;margin-top:8px}
+.lv-tpl-var{font-size:.65rem;padding:2px 6px;border-radius:4px;background:#fef3c7;color:#92400e;font-weight:500;cursor:default}
+.lv-em-tpl-btn{padding:5px 10px;border:1px solid #e2e8f0;border-radius:7px;font-size:.73rem;background:#fff;cursor:pointer;transition:.15s;color:#6366f1;font-weight:600;display:flex;align-items:center;gap:4px}
+.lv-em-tpl-btn:hover{background:#eff6ff;border-color:#c7d2fe}
 </style>
 
 <div class="lv">
@@ -703,12 +864,41 @@ $tempLabels=['cold'=>['label'=>'Froid','c'=>'#0369a1','bg'=>'#e0f2fe','icon'=>'s
 
         <!-- ── Onglet EMAIL ── -->
         <div id="tab-email" style="display:none">
+            <!-- Template library -->
+            <div class="lv-tpl-lib" id="tplLib">
+                <div class="lv-tpl-header">
+                    <h4><i class="fas fa-layer-group"></i> Bibliothèque de templates</h4>
+                    <div class="lv-tpl-filters">
+                        <input type="text" class="lv-tpl-search" id="tplSearch" placeholder="Rechercher..." oninput="lvSearchTpl()">
+                        <div id="tplCats" style="display:flex;gap:4px;flex-wrap:wrap">
+                            <button class="lv-tpl-cat on" data-cat="" onclick="lvFilterTplCat('',this)">Tous</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="lv-tpl-grid" id="tplGrid">
+                    <div class="lv-tpl-empty"><i class="fas fa-spinner fa-spin"></i>Chargement des templates...</div>
+                </div>
+                <!-- Preview -->
+                <div class="lv-tpl-preview" id="tplPreview">
+                    <div class="lv-tpl-preview-head">
+                        <span class="lv-tpl-preview-title" id="tplPreviewTitle">—</span>
+                        <div style="display:flex;gap:5px">
+                            <button class="lv-btn lv-btn-primary lv-btn-sm" onclick="lvUseTpl()"><i class="fas fa-check"></i> Utiliser</button>
+                            <button class="lv-btn lv-btn-outline lv-btn-sm" onclick="lvCloseTplPreview()"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>
+                    <div class="lv-tpl-preview-body" id="tplPreviewBody"></div>
+                    <div class="lv-tpl-vars" id="tplPreviewVars"></div>
+                </div>
+            </div>
+            <!-- Email composer -->
             <div class="lv-em-wrap">
-                <div class="lv-em-head"><i class="fas fa-envelope" style="color:#6366f1"></i> Nouveau message</div>
+                <div class="lv-em-head"><i class="fas fa-envelope" style="color:#6366f1"></i> Nouveau message <span id="emTplName" style="margin-left:auto;font-size:.68rem;color:#6366f1;font-weight:500"></span></div>
                 <div class="lv-em-row"><label>À :</label><input type="email" id="emTo" style="font-weight:500"></div>
                 <div class="lv-em-row"><label>Objet :</label><input type="text" id="emSubj" placeholder="Objet..."></div>
-                <div id="emBody" class="lv-em-body" contenteditable="true" data-placeholder="Votre message..."></div>
+                <div id="emBody" class="lv-em-body" contenteditable="true" data-placeholder="Votre message..." style="min-height:160px"></div>
                 <div class="lv-em-footer">
+                    <button class="lv-em-tpl-btn" onclick="lvToggleTplLib()" title="Bibliothèque de templates"><i class="fas fa-layer-group"></i> Templates</button>
                     <button id="emBtn" onclick="lvSendEmail()" class="lv-btn lv-btn-primary lv-btn-sm"><i class="fas fa-paper-plane"></i> Envoyer</button>
                 </div>
             </div>
@@ -1132,7 +1322,179 @@ async function lvSaveLog() {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Email
+// Email Templates Library
+// ─────────────────────────────────────────────────────────────────────────────
+let tplCache = [];       // cached templates
+let tplSelected = null;  // currently selected template
+let tplCatFilter = '';   // current category filter
+let tplSeeded = false;   // whether seed was attempted
+
+// Get lead variables for merge tags
+function lvGetLeadVars() {
+    if (!shData) return {};
+    const l = shData;
+    let fn='',ln='',email='',phone='',city='',notes='';
+    if (shTbl==='leads') {
+        fn=l.firstname||(l.full_name?l.full_name.split(' ')[0]:''); ln=l.lastname||(l.full_name?l.full_name.split(' ').slice(1).join(' '):'');
+        email=l.email||''; phone=l.phone||''; city=l.city||''; notes=l.notes||'';
+    } else if (shTbl==='capture_leads') {
+        fn=l.prenom||''; ln=l.nom||''; email=l.email||''; phone=l.tel||''; notes=l.message||'';
+    } else if (shTbl==='demandes_estimation') {
+        ln=(l.type_bien||''); email=l.email||''; phone=l.telephone||''; city=l.ville||'';
+        notes=[l.type_bien,l.surface?l.surface+'m²':'',l.estimation_moyenne?'~'+Number(l.estimation_moyenne).toLocaleString('fr-FR')+'€':''].filter(Boolean).join(' — ');
+    } else if (shTbl==='contacts') {
+        fn=l.firstname||l.prenom||''; ln=l.lastname||l.nom||''; email=l.email||''; phone=l.phone||l.telephone||''; city=l.city||''; notes=l.notes||'';
+    } else if (shTbl==='financement_leads') {
+        fn=l.prenom||''; ln=l.nom||''; email=l.email||''; phone=l.telephone||'';
+        notes=[l.type_projet||'Projet',l.montant_projet?Number(l.montant_projet).toLocaleString('fr-FR')+'€':'',l.notes||''].filter(Boolean).join(' — ');
+    }
+    return {
+        prenom: fn, nom: ln, email: email, telephone: phone, ville: city, notes: notes,
+        firstName: fn, lastName: ln, // alias anglais
+        email_agent: '<?=htmlspecialchars(ADMIN_EMAIL)?>',
+        site_url: '<?=htmlspecialchars(SITE_URL)?>',
+        nom_agent: '<?=htmlspecialchars(SITE_TITLE)?>',
+    };
+}
+
+// Replace merge tags in text
+function lvMergeTags(text, vars) {
+    if (!text) return '';
+    return text.replace(/\{\{(\w+)\}\}/g, (match, key) => vars[key] !== undefined && vars[key] !== '' ? vars[key] : match);
+}
+
+// Load templates from server
+async function lvLoadTemplates(search) {
+    try {
+        const params = { action: 'get_email_templates' };
+        if (search) params.search = search;
+        if (tplCatFilter) params.category = tplCatFilter;
+        const res = await lvApi(params);
+        if (!res.success) return;
+        tplCache = res.templates || [];
+        // Render categories (only on first load)
+        if (res.categories && res.categories.length > 0) {
+            const catsEl = document.getElementById('tplCats');
+            let html = '<button class="lv-tpl-cat ' + (!tplCatFilter?'on':'') + '" data-cat="" onclick="lvFilterTplCat(\'\',this)">Tous</button>';
+            const catLabels = {prospection:'Prospection',suivi:'Suivi',proposition:'Proposition',relance:'Relance',estimation:'Estimation',rdv:'RDV',transaction:'Transaction',custom:'Personnalisé'};
+            res.categories.forEach(c => {
+                html += `<button class="lv-tpl-cat ${tplCatFilter===c?'on':''}" data-cat="${c}" onclick="lvFilterTplCat('${c}',this)">${catLabels[c]||c}</button>`;
+            });
+            catsEl.innerHTML = html;
+        }
+        lvRenderTplGrid();
+    } catch(e) {
+        console.error('Template load error:', e);
+    }
+}
+
+// Render template grid
+function lvRenderTplGrid() {
+    const grid = document.getElementById('tplGrid');
+    if (!tplCache.length) {
+        grid.innerHTML = '<div class="lv-tpl-empty" style="grid-column:1/-1"><i class="fas fa-envelope-open-text"></i>Aucun template trouvé<br><button class="lv-btn lv-btn-primary lv-btn-sm" style="margin-top:8px" onclick="lvSeedTemplates()"><i class="fas fa-magic"></i> Créer les templates par défaut</button></div>';
+        return;
+    }
+    const catIcons = {prospection:'paper-plane',suivi:'redo',proposition:'home',relance:'bell',estimation:'chart-line',rdv:'calendar-check',transaction:'file-contract',custom:'paint-brush'};
+    grid.innerHTML = tplCache.map(t => {
+        const icon = catIcons[t.category] || 'envelope';
+        return `<div class="lv-tpl-card ${tplSelected&&tplSelected.id==t.id?'on':''}" onclick="lvSelectTpl(${t.id})" title="${lvEsc(t.name)}">
+            <div class="lv-tpl-card-name"><i class="fas fa-${icon}" style="color:#6366f1;font-size:.7rem"></i> ${lvEsc(t.name)}</div>
+            <div class="lv-tpl-card-subj">${lvEsc(t.subject)}</div>
+            <div class="lv-tpl-card-meta">
+                <span class="lv-tpl-card-cat">${lvEsc(t.category)}</span>
+                <span class="lv-tpl-card-uses"><i class="fas fa-paper-plane" style="font-size:.55rem"></i> ${t.usage_count||0}</span>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+// Seed default templates
+async function lvSeedTemplates() {
+    if (tplSeeded) return;
+    tplSeeded = true;
+    try {
+        const res = await lvApi({ action: 'seed_email_templates' });
+        if (res.success) {
+            lvToast(res.message || 'Templates créés', 'success');
+            await lvLoadTemplates();
+        } else {
+            lvToast(res.error || 'Erreur', 'error');
+        }
+    } catch(e) { lvToast('Erreur: '+e.message, 'error'); }
+}
+
+// Select a template
+function lvSelectTpl(id) {
+    tplSelected = tplCache.find(t => t.id == id);
+    if (!tplSelected) return;
+    // Highlight in grid
+    document.querySelectorAll('.lv-tpl-card').forEach(c => c.classList.remove('on'));
+    event.currentTarget.classList.add('on');
+    // Show preview with merged variables
+    const vars = lvGetLeadVars();
+    const preview = document.getElementById('tplPreview');
+    document.getElementById('tplPreviewTitle').textContent = tplSelected.name;
+    document.getElementById('tplPreviewBody').innerHTML = lvMergeTags(tplSelected.body_html, vars);
+    // Show variables
+    let varsArr = [];
+    try { varsArr = JSON.parse(tplSelected.variables || '[]'); } catch(e) {}
+    const varsEl = document.getElementById('tplPreviewVars');
+    if (varsArr.length) {
+        varsEl.innerHTML = varsArr.map(v => {
+            const val = vars[v];
+            const filled = val && val !== '';
+            return `<span class="lv-tpl-var" style="${filled?'background:#d1fae5;color:#065f46':''}"><i class="fas fa-${filled?'check':'exclamation-circle'}" style="font-size:.55rem"></i> {{${v}}} ${filled?'= '+lvEsc(val):''}</span>`;
+        }).join('');
+    } else {
+        varsEl.innerHTML = '';
+    }
+    preview.classList.add('on');
+}
+
+// Use selected template (populate composer)
+function lvUseTpl() {
+    if (!tplSelected) return;
+    const vars = lvGetLeadVars();
+    document.getElementById('emSubj').value = lvMergeTags(tplSelected.subject, vars);
+    document.getElementById('emBody').innerHTML = lvMergeTags(tplSelected.body_html, vars);
+    document.getElementById('emTplName').innerHTML = '<i class="fas fa-check-circle"></i> ' + lvEsc(tplSelected.name);
+    lvCloseTplPreview();
+    lvToast('Template appliqué — données client auto-remplies', 'success');
+}
+
+function lvCloseTplPreview() {
+    document.getElementById('tplPreview').classList.remove('on');
+}
+
+// Search templates
+let tplSearchTimer;
+function lvSearchTpl() {
+    clearTimeout(tplSearchTimer);
+    tplSearchTimer = setTimeout(() => {
+        const q = document.getElementById('tplSearch').value.trim();
+        lvLoadTemplates(q);
+    }, 300);
+}
+
+// Filter by category
+function lvFilterTplCat(cat, btn) {
+    tplCatFilter = cat;
+    document.querySelectorAll('.lv-tpl-cat').forEach(b => b.classList.remove('on'));
+    if (btn) btn.classList.add('on');
+    lvLoadTemplates(document.getElementById('tplSearch').value.trim());
+}
+
+// Toggle template library visibility
+function lvToggleTplLib() {
+    const lib = document.getElementById('tplLib');
+    const visible = lib.style.display !== 'none';
+    lib.style.display = visible ? 'none' : '';
+    if (!visible && !tplCache.length) lvLoadTemplates();
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Email — send
 // ─────────────────────────────────────────────────────────────────────────────
 async function lvSendEmail() {
     const to   = document.getElementById('emTo').value.trim();
@@ -1140,12 +1502,17 @@ async function lvSendEmail() {
     const body = document.getElementById('emBody').innerHTML.trim();
     if (!to||!subj||!body) { lvToast('Remplissez tous les champs','warning'); return; }
     const btn = document.getElementById('emBtn');
-    btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i>';
+    btn.disabled=true; btn.innerHTML='<i class="fas fa-spinner fa-spin"></i> Envoi...';
     try {
-        const res = await lvApi({ action:'send_email', lead_id:shId, to, subject:subj, body });
+        const params = { action:'send_email', lead_id:shId, to, subject:subj, body };
+        if (tplSelected) params.template_id = tplSelected.id;
+        const res = await lvApi(params);
         if (res.success) {
             lvToast('Email envoyé ✓');
-            document.getElementById('emSubj').value=''; document.getElementById('emBody').innerHTML='';
+            document.getElementById('emSubj').value='';
+            document.getElementById('emBody').innerHTML='';
+            document.getElementById('emTplName').innerHTML='';
+            tplSelected = null;
             await lvLoadHistory();
         } else lvToast(res.error||'Erreur envoi','error');
     } catch(e) { lvToast('Erreur: '+e.message,'error'); }
@@ -1161,6 +1528,10 @@ function lvShTab(name) {
         const el = document.getElementById('tab-'+t);
         if (el) el.style.display = (t===name) ? '' : 'none';
     });
+    // Auto-load templates when email tab is opened
+    if (name === 'email' && !tplCache.length) {
+        lvLoadTemplates();
+    }
 }
 
 function lvSetLT(t, btn) {

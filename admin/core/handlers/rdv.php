@@ -8,6 +8,11 @@
 $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
 $action = CURRENT_ACTION;
 
+// Normalize empty numeric fields to null
+foreach (['lead_id', 'contact_id', 'property_id'] as $f) {
+    if (isset($input[$f]) && $input[$f] === '') $input[$f] = null;
+}
+
 // Helper: build start_datetime/end_datetime from separate date + time fields
 if (isset($input['date']) && isset($input['start_time'])) {
     $input['start_datetime'] = $input['date'] . ' ' . $input['start_time'] . ':00';

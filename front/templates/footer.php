@@ -69,7 +69,7 @@ if ($template) {
     }
     </style>
     <footer class="footer-fallback">
-        <p style="margin-bottom: 10px;"><strong>Eduardo De Sul</strong> - Conseiller Immobilier</p>
+        <p style="margin-bottom: 10px;"><strong><?= htmlspecialchars(_ss('site_name', 'Mon entreprise')) ?></strong></p>
         <p style="opacity: 0.7; font-size: 0.9rem;">© <?= date('Y') ?> Tous droits réservés</p>
     </footer>
     <?php

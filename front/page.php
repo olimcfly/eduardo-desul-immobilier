@@ -145,7 +145,7 @@ if (!function_exists('renderHeader')) {
               <img src="'.htmlspecialchars($header['logo_url']).'" alt="'.htmlspecialchars($header['logo_alt'] ?? '').'" style="height:'.min($ht-20,52).'px;width:auto;max-width:'.$lw.'px">
             </a>';
         } else {
-            $lt = htmlspecialchars($header['logo_text'] ?? ($header['name'] ?? 'Eduardo Desul'));
+            $lt = htmlspecialchars($header['logo_text'] ?? ($header['name'] ?? _ss('site_name', 'Mon entreprise')));
             $logoHtml = '<a href="'.$logoLink.'" style="flex-shrink:0;font-family:\'Playfair Display\',serif;font-size:22px;font-weight:800;color:#1a4d7a;text-decoration:none;white-space:nowrap">'.$lt.'</a>';
         }
 
@@ -162,14 +162,8 @@ if (!function_exists('renderHeader')) {
         }
         if (empty($menuItems)) {
             $menuItems = [
-                ['label'=>'Accueil',     'url'=>'/'],
-                ['label'=>'Acheter',     'url'=>'/acheter'],
-                ['label'=>'Vendre',      'url'=>'/vendre'],
-                ['label'=>'Nos biens',   'url'=>'/biens-immobiliers'],
-                ['label'=>'Estimer',     'url'=>'/estimation'],
-                ['label'=>'Secteurs',    'url'=>'/secteurs'],
-                ['label'=>'Financement', 'url'=>'/financer'],
-                ['label'=>'Blog',        'url'=>'/blog'],
+                ['label'=>'Accueil', 'url'=>'/'],
+                ['label'=>'Contact', 'url'=>'/contact'],
             ];
         }
 
@@ -381,9 +375,9 @@ if (!function_exists('renderFooter')) {
             $colsHtml .= '</div>';
         }
 
-        $phone   = htmlspecialchars($footer['phone']   ?? _ss('phone',   '06 24 10 58 16'));
-        $email   = htmlspecialchars($footer['email']   ?? _ss('email',   'contact@eduardo-desul-immobilier.fr'));
-        $address = htmlspecialchars($footer['address'] ?? _ss('address', '12A rue du Commandant Charcot, 33290 Blanquefort'));
+        $phone   = htmlspecialchars($footer['phone']   ?? _ss('phone',   ''));
+        $email   = htmlspecialchars($footer['email']   ?? _ss('email',   ''));
+        $address = htmlspecialchars($footer['address'] ?? _ss('address', ''));
 
         $contactHtml = '<div style="min-width:180px">
           <div style="color:#fff;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px">Contact</div>
@@ -401,8 +395,8 @@ if (!function_exists('renderFooter')) {
             $socHtml .= '<a href="'.htmlspecialchars($sl['url']).'" target="_blank" rel="noopener" style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.08);display:inline-flex;align-items:center;justify-content:center;color:'.$tc.';text-decoration:none;transition:.2s;margin-right:6px" onmouseover="this.style.background=\''.$ac.'\';this.style.color=\'#fff\'" onmouseout="this.style.background=\'rgba(255,255,255,.08)\';this.style.color=\''.$tc.'\'"><i class="'.$ico.'" style="font-size:13px"></i></a>';
         }
 
-        $copy  = htmlspecialchars($footer['copyright_text'] ?? '© '.date('Y').' Eduardo Desul Immobilier. Tous droits réservés.');
-        $badge = htmlspecialchars($footer['badge_text']     ?? 'CPI 7501 2021 000 000 444');
+        $copy  = htmlspecialchars($footer['copyright_text'] ?? '© '.date('Y').' ' . _ss('site_name', 'Mon entreprise') . '. Tous droits réservés.');
+        $badge = htmlspecialchars($footer['badge_text']     ?? _ss('badge_text', ''));
 
         $colsSection = $colsHtml
             ? '<div style="display:flex;gap:32px;flex-wrap:wrap;margin-bottom:32px">'.$colsHtml.$contactHtml.'</div>'
@@ -466,6 +460,10 @@ if ($uri === 'secteurs') { require_once $renderers . 'secteur-listing.php'; exit
 
 if ($uri === 'biens-immobiliers' || $uri === 'biens') {
     require_once $renderers . 'properties-listing.php'; exit;
+}
+
+if ($uri === 'politique-confidentialite') {
+    require_once $renderers . 'politique-confidentialite.php'; exit;
 }
 
 if ($parts[0] === 'biens' && !empty($parts[1])) {

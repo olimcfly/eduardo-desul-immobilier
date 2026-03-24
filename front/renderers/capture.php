@@ -366,11 +366,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title><?= htmlspecialchars($guide['name']) ?> — Guide Gratuit | Eduardo De Sul Immobilier</title>
+<title><?= htmlspecialchars($guide['name']) ?> — Guide Gratuit | <?= htmlspecialchars(_ss('site_name', 'Mon entreprise')) ?></title>
 <meta name="description" content="<?= htmlspecialchars($guide['description']) ?> Téléchargez gratuitement ce guide PDF de <?= $guide['pages'] ?>.">
 <meta name="robots" content="noindex, nofollow">
 
-<!-- Fonts Eduardo -->
+<!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -666,10 +666,12 @@ body {
 
 <!-- Header -->
 <header class="cap-header">
-    <a href="/" class="cap-logo">Eduardo De Sul<span>.</span></a>
+    <a href="/" class="cap-logo"><?= htmlspecialchars(_ss('site_name', 'Mon entreprise')) ?><span>.</span></a>
+    <?php $capPhone = _ss('phone', ''); if ($capPhone): ?>
     <div class="cap-header-cta">
-        Questions ? <a href="tel:0624105816">06 24 10 58 16</a>
+        Questions ? <a href="tel:<?= htmlspecialchars(preg_replace('/\s+/', '', $capPhone)) ?>"><?= htmlspecialchars($capPhone) ?></a>
     </div>
+    <?php endif; ?>
 </header>
 
 <!-- Main -->
@@ -787,7 +789,7 @@ body {
                 </div>
                 <div class="cap-garantie">
                     <span class="cap-garantie-icon">🎯</span>
-                    <span>Rédigé par Eduardo De Sul, expert immobilier Bordeaux</span>
+                    <span>Rédigé par <?= htmlspecialchars(_ss('agent_name', _ss('site_name', 'nos experts'))) ?></span>
                 </div>
             </div>
         </div>
@@ -797,7 +799,7 @@ body {
 
 <!-- Footer -->
 <footer class="cap-footer">
-    <p>© <?= date('Y') ?> Eduardo De Sul Immobilier · Blanquefort / Bordeaux</p>
+    <p>© <?= date('Y') ?> <?= htmlspecialchars(_ss('site_name', 'Mon entreprise')) ?></p>
     <p style="margin-top:6px;">
         <a href="/mentions-legales">Mentions légales</a> ·
         <a href="/politique-de-confidentialite">Confidentialité</a> ·

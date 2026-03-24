@@ -1006,7 +1006,8 @@ $upcomingApts = array_slice($upcomingApts, 0, 5);
 </div>
 
 <script>
-const API_URL = '/admin/modules/rdv/api.php';
+const API_URL = '/admin/api/router.php?module=rdv';
+const CSRF_TOKEN = '<?php echo $_SESSION['csrf_token'] ?? ''; ?>';
 let currentRdvId = null;
 
 const rdvTypes = <?php echo json_encode($rdvTypes); ?>;
@@ -1053,7 +1054,7 @@ function closeModal() {
 function openViewModal(rdvId) {
     currentRdvId = rdvId;
     
-    fetch(API_URL + '?action=get_rdv&rdv_id=' + rdvId)
+    fetch(API_URL + '&action=get_rdv&rdv_id=' + rdvId)
     .then(r => r.json())
     .then(data => {
         if (data.success && data.rdv) {
@@ -1124,7 +1125,7 @@ function closeViewModal() {
 function editRdv() {
     if (!currentRdvId) return;
     
-    fetch(API_URL + '?action=get_rdv&rdv_id=' + currentRdvId)
+    fetch(API_URL + '&action=get_rdv&rdv_id=' + currentRdvId)
     .then(r => r.json())
     .then(data => {
         if (data.success && data.rdv) {
@@ -1159,7 +1160,8 @@ function deleteRdv() {
     const formData = new FormData();
     formData.append('action', 'delete_rdv');
     formData.append('rdv_id', currentRdvId);
-    
+    formData.append('csrf_token', CSRF_TOKEN);
+
     fetch(API_URL, { method: 'POST', body: formData })
     .then(r => r.json())
     .then(data => {
@@ -1179,7 +1181,8 @@ function updateStatus(rdvId, status) {
     formData.append('action', 'update_status');
     formData.append('rdv_id', rdvId);
     formData.append('status', status);
-    
+    formData.append('csrf_token', CSRF_TOKEN);
+
     fetch(API_URL, { method: 'POST', body: formData })
     .then(r => r.json())
     .then(data => {
@@ -1196,7 +1199,8 @@ document.getElementById('rdvForm').addEventListener('submit', function(e) {
     const rdvId = document.getElementById('rdvId').value;
     const formData = new FormData(this);
     formData.append('action', rdvId ? 'update_rdv' : 'add_rdv');
-    
+    formData.append('csrf_token', CSRF_TOKEN);
+
     fetch(API_URL, { method: 'POST', body: formData })
     .then(r => r.json())
     .then(data => {

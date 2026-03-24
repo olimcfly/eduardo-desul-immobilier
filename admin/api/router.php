@@ -61,17 +61,19 @@ $moduleMap = [
     'secteurs'    => $handlersDir . 'secteurs.php',
 
     // ── IMMOBILIER ───────────────────────
-    'biens'            => $handlersDir . 'biens.php',
-    'market-analyzer'  => dirname(__DIR__) . '/modules/immobilier/market-analyzer/api.php',
+    'biens'       => $handlersDir . 'biens.php',
+    'rdv'         => $handlersDir . 'rdv.php',
 
     // ── MARKETING / CRM ──────────────────
     'leads'       => $handlersDir . 'leads.php',
 
     // ── SEO ──────────────────────────────
-    'seo'         => $handlersDir . 'seo.php',
+    'seo'              => $handlersDir . 'seo.php',
+    'seo-semantic'     => $handlersDir . 'seo-semantic.php',
 
     // ── SOCIAL / GMB ─────────────────────
     'gmb'         => $handlersDir . 'gmb.php',
+    'gmb-posts'   => $handlersDir . 'gmb-posts.php',
 
     // ── SYSTEM ───────────────────────────
     'media'       => $handlersDir . 'media.php',

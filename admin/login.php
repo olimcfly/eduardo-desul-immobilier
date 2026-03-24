@@ -92,13 +92,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         } else {
 
-            $stmt = $db->prepare("SELECT id,email FROM admins WHERE email=? LIMIT 1");
+            $stmt = $db->prepare("SELECT id, email, role, name, is_active FROM admins WHERE email=? LIMIT 1");
             $stmt->execute([$email]);
             $admin = $stmt->fetch();
 
             if (!$admin) {
 
                 $error = "Email non autorisé";
+
+            } elseif (isset($admin['is_active']) && !$admin['is_active']) {
+
+                $error = "Compte désactivé. Contactez le Super Administrateur.";
 
             } else {
 
@@ -146,14 +150,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         else {
 
-            $stmt=$db->prepare("SELECT id,email FROM admins WHERE email=? LIMIT 1");
+            $stmt=$db->prepare("SELECT id, email, role, name FROM admins WHERE email=? LIMIT 1");
             $stmt->execute([$_SESSION['otp_email']]);
             $admin=$stmt->fetch();
 
             $_SESSION['admin_id']=$admin['id'];
             $_SESSION['admin_email']=$admin['email'];
+            $_SESSION['admin_role']=$admin['role'] ?? 'admin';
+            $_SESSION['admin_name']=$admin['name'] ?? '';
             $_SESSION['admin_logged_in']=true;
             $_SESSION['admin_login_time']=time();
+
+            // Mettre à jour last_login
+            $db->prepare("UPDATE admins SET last_login = NOW() WHERE id = ?")->execute([$admin['id']]);
 
             unset($_SESSION['otp']);
             unset($_SESSION['otp_email']);

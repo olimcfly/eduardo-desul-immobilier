@@ -14,7 +14,7 @@ if (isset($pdo) && !isset($db)) $db  = $pdo;
 
 // ─── Onglet actif ───
 $tab = preg_replace('/[^a-z]/', '', $_GET['subpage'] ?? $_GET['tab'] ?? 'general');
-$validTabs = ['general','email','appearance','security','api','ai'];
+$validTabs = ['general','email','appearance','security','api','ai','templates'];
 if (!in_array($tab, $validTabs)) $tab = 'general';
 
 // ─── Messages flash ───
@@ -53,6 +53,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $port = (int)($_POST['smtp_port'] ?? 587);
             $user = trim($_POST['smtp_user'] ?? '');
             $pass = trim($_POST['smtp_pass'] ?? '');
+            $fromName = trim($_POST['smtp_from_name'] ?? 'IMMO LOCAL+');
+            $fromEmail = trim($_POST['smtp_from_email'] ?? $user);
+            $notifyEmail = trim($_POST['notify_email'] ?? $fromEmail);
             if (!$to || !$host) {
                 $flashMsg = 'Email de test et hôte SMTP requis.'; $flashType = 'err';
             } else {
@@ -62,13 +65,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                         $mail = new PHPMailer\PHPMailer\PHPMailer(true);
                         $mail->isSMTP(); $mail->Host = $host; $mail->Port = $port;
                         $mail->SMTPAuth = true; $mail->Username = $user; $mail->Password = $pass;
+                        $mail->Timeout = 12;
                         $mail->SMTPSecure = $port === 465 ? 'ssl' : 'tls';
-                        $mail->setFrom($user, 'IMMO LOCAL+ Test');
+                        $mail->setFrom($fromEmail ?: $user, $fromName ?: 'IMMO LOCAL+ Test');
+
+                        if (!$mail->smtpConnect()) {
+                            throw new Exception('Connexion SMTP impossible (hôte/port/identifiants).');
+                        }
+                        $mail->smtpClose();
+
                         $mail->addAddress($to);
-                        $mail->Subject = 'Test SMTP — IMMO LOCAL+';
-                        $mail->Body    = 'Cet email confirme que votre SMTP est bien configuré.';
+                        $mail->Subject = 'Test SMTP réussi — IMMO LOCAL+';
+                        $mail->Body    = "Connexion SMTP validée avec succès.\n\nHôte: {$host}\nPort: {$port}\nDate: " . date('Y-m-d H:i:s');
                         $mail->send();
-                        $flashMsg = '✅ Email de test envoyé à ' . htmlspecialchars($to);
+
+                        if (filter_var($notifyEmail, FILTER_VALIDATE_EMAIL)) {
+                            $mail->clearAddresses();
+                            $mail->addAddress($notifyEmail);
+                            $mail->Subject = 'Notification: test SMTP validé';
+                            $mail->Body = "Le test de connexion SMTP a réussi.\n\nUn email de test a été envoyé à: {$to}\nHôte: {$host}\nPort: {$port}\nDate: " . date('Y-m-d H:i:s');
+                            $mail->send();
+                        }
+
+                        $flashMsg = '✅ Connexion SMTP réussie. Email de test envoyé et notification confirmée.';
                     } catch (Exception $e) {
                         $flashMsg = '❌ Erreur SMTP : ' . htmlspecialchars($e->getMessage()); $flashType = 'err';
                     }
@@ -101,6 +120,66 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                         $flashMsg = 'Erreur : ' . htmlspecialchars($e2->getMessage()); $flashType = 'err';
                     }
                 }
+            }
+        }
+
+        if ($action_post === 'save_page_template' && $pdo) {
+            try {
+                $pdo->exec("CREATE TABLE IF NOT EXISTS page_templates (
+                    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                    template_key VARCHAR(120) NOT NULL UNIQUE,
+                    name VARCHAR(180) NOT NULL,
+                    description VARCHAR(255) DEFAULT NULL,
+                    fields_json LONGTEXT DEFAULT NULL,
+                    html_template LONGTEXT DEFAULT NULL,
+                    is_active TINYINT(1) UNSIGNED DEFAULT 1,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+                $id = (int)($_POST['template_id'] ?? 0);
+                $templateKey = preg_replace('/[^a-z0-9_\\-]/', '', strtolower(trim($_POST['template_key'] ?? '')));
+                $name = trim($_POST['name'] ?? '');
+                $description = trim($_POST['description'] ?? '');
+                $fieldsJson = trim($_POST['fields_json'] ?? '[]');
+                $htmlTemplate = $_POST['html_template'] ?? '';
+                $isActive = isset($_POST['is_active']) ? 1 : 0;
+
+                if ($templateKey === '' || $name === '') {
+                    throw new Exception('Nom et clé template requis.');
+                }
+                json_decode($fieldsJson, true);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    throw new Exception('fields_json doit être un JSON valide.');
+                }
+
+                if ($id > 0) {
+                    $stmt = $pdo->prepare("UPDATE page_templates
+                        SET template_key=?, name=?, description=?, fields_json=?, html_template=?, is_active=?, updated_at=NOW()
+                        WHERE id=?");
+                    $stmt->execute([$templateKey, $name, $description, $fieldsJson, $htmlTemplate, $isActive, $id]);
+                } else {
+                    $stmt = $pdo->prepare("INSERT INTO page_templates
+                        (template_key, name, description, fields_json, html_template, is_active)
+                        VALUES (?, ?, ?, ?, ?, ?)");
+                    $stmt->execute([$templateKey, $name, $description, $fieldsJson, $htmlTemplate, $isActive]);
+                }
+                $flashMsg = 'Template de page sauvegardé.';
+            } catch (Throwable $e) {
+                $flashMsg = 'Erreur template : ' . htmlspecialchars($e->getMessage());
+                $flashType = 'err';
+            }
+        }
+
+        if ($action_post === 'delete_page_template' && $pdo) {
+            try {
+                $id = (int)($_POST['template_id'] ?? 0);
+                if ($id <= 0) throw new Exception('Template invalide.');
+                $pdo->prepare("DELETE FROM page_templates WHERE id = ?")->execute([$id]);
+                $flashMsg = 'Template supprimé.';
+            } catch (Throwable $e) {
+                $flashMsg = 'Suppression impossible : ' . htmlspecialchars($e->getMessage());
+                $flashType = 'err';
             }
         }
     }
@@ -144,7 +223,81 @@ function hasApi($svc) {
     return isset($apiKeys[$svc]) || isset($settings['api_key_' . $svc]);
 }
 
+function emailDomainFromValue($emailOrDomain) {
+    $value = trim((string)$emailOrDomain);
+    if ($value === '') return '';
+    if (strpos($value, '@') !== false) {
+        $parts = explode('@', $value);
+        return strtolower(trim(end($parts)));
+    }
+    return strtolower($value);
+}
+
+function getTxtRecordsForDomain($domain) {
+    if ($domain === '') return [];
+    $records = @dns_get_record($domain, DNS_TXT);
+    if (!is_array($records)) return [];
+
+    $txt = [];
+    foreach ($records as $record) {
+        $value = $record['txt'] ?? ($record['entries'][0] ?? '');
+        if ($value !== '') $txt[] = trim((string)$value);
+    }
+    return $txt;
+}
+
+function buildEmailAuthDiagnostics($settings) {
+    $fromEmail = trim((string)($settings['smtp_from_email'] ?? ''));
+    $domain = emailDomainFromValue($fromEmail);
+
+    if ($domain === '') {
+        $siteUrl = trim((string)($settings['site_url'] ?? ''));
+        $host = $siteUrl ? (parse_url($siteUrl, PHP_URL_HOST) ?: '') : '';
+        $domain = strtolower(preg_replace('/^www\./i', '', $host));
+    }
+
+    if ($domain === '') {
+        return [
+            'domain' => '',
+            'spf' => ['status' => 'missing', 'message' => 'Renseignez un email expéditeur pour lancer l’analyse SPF.'],
+            'dmarc' => ['status' => 'missing', 'message' => 'Renseignez un email expéditeur pour lancer l’analyse DMARC.'],
+        ];
+    }
+
+    $txtRecords = getTxtRecordsForDomain($domain);
+    $spf = '';
+    foreach ($txtRecords as $txt) {
+        if (stripos($txt, 'v=spf1') !== false) {
+            $spf = $txt;
+            break;
+        }
+    }
+
+    $dmarcDomain = '_dmarc.' . $domain;
+    $dmarcRecords = getTxtRecordsForDomain($dmarcDomain);
+    $dmarc = '';
+    foreach ($dmarcRecords as $txt) {
+        if (stripos($txt, 'v=DMARC1') !== false) {
+            $dmarc = $txt;
+            break;
+        }
+    }
+
+    return [
+        'domain' => $domain,
+        'spf' => [
+            'status' => $spf ? 'ok' : 'missing',
+            'message' => $spf ?: 'Aucun enregistrement SPF détecté (TXT avec v=spf1).',
+        ],
+        'dmarc' => [
+            'status' => $dmarc ? 'ok' : 'missing',
+            'message' => $dmarc ?: 'Aucun enregistrement DMARC détecté (_dmarc.' . $domain . ').',
+        ],
+    ];
+}
+
 $csrf = $_SESSION['csrf_token'];
+$emailDiagnostics = buildEmailAuthDiagnostics($settings);
 
 // ─── Advisor Context ───
 $advisorCtx = [];
@@ -153,6 +306,24 @@ if ($pdo) {
         $r = $pdo->query("SELECT * FROM advisor_context LIMIT 1")->fetch();
         if ($r) $advisorCtx = $r;
     } catch (PDOException $e) {}
+}
+
+$pageTemplates = [];
+if ($pdo) {
+    try {
+        $pdo->exec("CREATE TABLE IF NOT EXISTS page_templates (
+            id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            template_key VARCHAR(120) NOT NULL UNIQUE,
+            name VARCHAR(180) NOT NULL,
+            description VARCHAR(255) DEFAULT NULL,
+            fields_json LONGTEXT DEFAULT NULL,
+            html_template LONGTEXT DEFAULT NULL,
+            is_active TINYINT(1) UNSIGNED DEFAULT 1,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+        $pageTemplates = $pdo->query("SELECT * FROM page_templates ORDER BY updated_at DESC")->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Throwable $e) {}
 }
 ?>
 <style>
@@ -219,6 +390,33 @@ if ($pdo) {
 .flash.ok { background: var(--green-bg); color: var(--green); border: 1px solid rgba(5,150,105,.15); }
 .flash.err { background: var(--red-bg); color: var(--red); border: 1px solid rgba(220,38,38,.15); }
 
+.email-auth-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.email-auth-card { border: 1px solid var(--border); border-radius: var(--radius); padding: 12px; background: var(--surface); }
+.email-auth-status { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 999px; }
+.email-auth-status.ok { background: var(--green-bg); color: var(--green); }
+.email-auth-status.missing { background: var(--amber-bg); color: var(--amber); }
+.email-auth-record { margin-top: 10px; font-family: var(--mono); font-size: 11px; color: var(--text-2); word-break: break-word; }
+.email-help-list { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+
+
+.flash-toast {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 1200;
+    min-width: 280px;
+    max-width: min(460px, calc(100vw - 24px));
+    box-shadow: 0 10px 30px rgba(0,0,0,.16);
+    opacity: 0;
+    transform: translateY(10px);
+    pointer-events: none;
+    transition: opacity .2s ease, transform .2s ease;
+}
+.flash-toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 .api-service {
     display: flex; align-items: center; gap: 14px; padding: 12px 16px;
     background: var(--surface-2); border-radius: var(--radius); margin-bottom: 8px; border: 1px solid var(--border);
@@ -255,6 +453,7 @@ if ($pdo) {
 @media (max-width: 700px) {
     .set-grid, .set-grid-3 { grid-template-columns: 1fr; }
     .set-full { grid-column: 1; }
+    .email-auth-grid { grid-template-columns: 1fr; }
 }
 </style>
 
@@ -262,6 +461,22 @@ if ($pdo) {
 
 <?php if ($flashMsg): ?>
 <div class="flash <?= $flashType ?> anim"><i class="fas fa-<?= $flashType==='ok'?'check-circle':'exclamation-circle' ?>"></i> <?= $flashMsg ?></div>
+<?php endif; ?>
+
+
+<?php if ($flashMsg): ?>
+<div class="flash <?= $flashType ?> flash-toast" id="settings-toast" role="status" aria-live="polite">
+    <i class="fas fa-<?= $flashType==='ok'?'check-circle':'exclamation-circle' ?>"></i>
+    <span><?= $flashMsg ?></span>
+</div>
+<script>
+(() => {
+    const toast = document.getElementById('settings-toast');
+    if (!toast) return;
+    window.requestAnimationFrame(() => toast.classList.add('show'));
+    window.setTimeout(() => toast.classList.remove('show'), 5000);
+})();
+</script>
 <?php endif; ?>
 
 <!-- ONGLETS -->
@@ -272,6 +487,7 @@ if ($pdo) {
         'email'      => ['icon' => 'fa-envelope',          'label' => 'Email / SMTP'],
         'appearance' => ['icon' => 'fa-palette',           'label' => 'Apparence'],
         'security'   => ['icon' => 'fa-shield-halved',     'label' => 'Sécurité'],
+        'templates'  => ['icon' => 'fa-layer-group',       'label' => 'Templates pages'],
         'api'        => ['icon' => 'fa-plug',              'label' => 'API & Intégrations'],
         'ai'         => ['icon' => 'fa-wand-magic-sparkles','label' => 'Configuration IA'],
     ];
@@ -379,7 +595,7 @@ if ($pdo) {
 </div>
 
 <div class="set-section anim d1">
-    <div class="set-section-hd"><i class="fas fa-envelope-circle-check"></i><h3>Tester la configuration SMTP</h3></div>
+    <div class="set-section-hd"><i class="fas fa-envelope-circle-check"></i><h3>Tester la configuration SMTP</h3><p><a href="https://www.mail-tester.com/" target="_blank" rel="noopener">Ouvrir Mail-Tester</a></p></div>
     <div class="set-section-body">
         <form method="POST" action="?page=settings&tab=email" style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap">
             <input type="hidden" name="action" value="test_smtp">
@@ -388,16 +604,43 @@ if ($pdo) {
             <input type="hidden" name="smtp_port" value="<?= s('smtp_port','587') ?>">
             <input type="hidden" name="smtp_user" value="<?= s('smtp_user') ?>">
             <input type="hidden" name="smtp_pass" value="<?= s('smtp_pass') ?>">
+            <input type="hidden" name="smtp_from_name" value="<?= s('smtp_from_name', 'Eduardo De Sul') ?>">
+            <input type="hidden" name="smtp_from_email" value="<?= s('smtp_from_email') ?>">
+            <input type="hidden" name="notify_email" value="<?= s('advisor_email', s('smtp_from_email')) ?>">
             <div class="set-field" style="flex:1;min-width:220px">
                 <label>Email de test</label>
                 <input class="set-input" type="email" name="test_email" value="<?= s('advisor_email') ?>" placeholder="votre@email.fr" required>
             </div>
             <button type="submit" class="set-btn set-btn-s"><i class="fas fa-paper-plane"></i> Envoyer un email de test</button>
         </form>
+        <small style="display:block;margin-top:8px;color:var(--text-3)">Le test vérifie d’abord la connexion SMTP puis envoie un email de test + une notification de succès.</small>
     </div>
 </div>
 
 <div class="set-section anim d2">
+    <div class="set-section-hd"><i class="fas fa-shield-check"></i><h3>Tableau de bord délivrabilité (SPF / DMARC)</h3></div>
+    <div class="set-section-body">
+        <p style="margin-bottom:12px;font-size:12px;color:var(--text-2)">Domaine analysé : <strong><?= htmlspecialchars($emailDiagnostics['domain'] ?: 'Non défini') ?></strong></p>
+        <div class="email-auth-grid">
+            <div class="email-auth-card">
+                <div class="email-auth-status <?= $emailDiagnostics['spf']['status'] ?>">
+                    <i class="fas <?= $emailDiagnostics['spf']['status'] === 'ok' ? 'fa-check-circle' : 'fa-triangle-exclamation' ?>"></i>
+                    SPF <?= $emailDiagnostics['spf']['status'] === 'ok' ? 'OK' : 'À configurer' ?>
+                </div>
+                <div class="email-auth-record"><?= htmlspecialchars($emailDiagnostics['spf']['message']) ?></div>
+            </div>
+            <div class="email-auth-card">
+                <div class="email-auth-status <?= $emailDiagnostics['dmarc']['status'] ?>">
+                    <i class="fas <?= $emailDiagnostics['dmarc']['status'] === 'ok' ? 'fa-check-circle' : 'fa-triangle-exclamation' ?>"></i>
+                    DMARC <?= $emailDiagnostics['dmarc']['status'] === 'ok' ? 'OK' : 'À configurer' ?>
+                </div>
+                <div class="email-auth-record"><?= htmlspecialchars($emailDiagnostics['dmarc']['message']) ?></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="set-section anim d3">
     <div class="set-section-hd"><i class="fas fa-robot"></i><h3>SMTP secondaire (Estimations IA)</h3><p>Pour les réponses automatiques</p></div>
     <div class="set-section-body">
         <div class="set-grid">
@@ -406,6 +649,18 @@ if ($pdo) {
             <div class="set-field"><label>Utilisateur</label><input class="set-input mono" type="text" name="settings[smtp2_user]" value="<?= s('smtp2_user') ?>"></div>
             <div class="set-field"><label>Mot de passe</label><input class="set-input mono" type="password" name="settings[smtp2_pass]" value="<?= s('smtp2_pass') ? '••••••••' : '' ?>" autocomplete="new-password"></div>
         </div>
+    </div>
+</div>
+
+<div class="set-section anim d4" id="email-help-module">
+    <div class="set-section-hd"><i class="fas fa-circle-question"></i><h3>Aide — Configurer SPF / DMARC</h3></div>
+    <div class="set-section-body">
+        <ul class="email-help-list">
+            <li>Ajoutez un enregistrement TXT SPF sur votre domaine principal (ex: <code>v=spf1 include:_spf.votresmtp.com ~all</code>).</li>
+            <li>Ajoutez un enregistrement TXT DMARC sur <code>_dmarc.votredomaine.fr</code> (ex: <code>v=DMARC1; p=none; rua=mailto:postmaster@votredomaine.fr</code>).</li>
+            <li>Après propagation DNS (jusqu’à 24-48h), revenez sur cet écran pour relancer l’analyse.</li>
+            <li>Validez ensuite votre délivrabilité avec <a href="https://www.mail-tester.com/" target="_blank" rel="noopener">mail-tester.com</a>.</li>
+        </ul>
     </div>
 </div>
 
@@ -540,6 +795,73 @@ if ($pdo) {
 
 <div class="set-actions"><button type="submit" class="set-btn set-btn-p"><i class="fas fa-save"></i> Enregistrer la sécurité</button></div>
 </form>
+</div>
+
+<!-- ══════════════════════════════════════
+     ONGLET TEMPLATES DE PAGES
+══════════════════════════════════════ -->
+<div class="set-panel<?= $tab==='templates'?' active':'' ?>" id="tab-templates">
+
+<div class="set-section anim">
+    <div class="set-section-hd"><i class="fas fa-layer-group"></i><h3>Créer / modifier un template de page</h3><p>Structure de champs + HTML de rendu (optionnel)</p></div>
+    <div class="set-section-body">
+        <form method="POST" action="?page=settings&tab=templates">
+            <input type="hidden" name="action" value="save_page_template">
+            <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
+            <div class="set-grid">
+                <div class="set-field"><label>ID template (édition)</label><input class="set-input mono" type="number" name="template_id" placeholder="Laisser vide pour créer"></div>
+                <div class="set-field"><label>Clé template</label><input class="set-input mono" type="text" name="template_key" placeholder="ex: estimation_locale" required></div>
+                <div class="set-field"><label>Nom affiché</label><input class="set-input" type="text" name="name" placeholder="Template Estimation locale" required></div>
+                <div class="set-field"><label>Description</label><input class="set-input" type="text" name="description" placeholder="Utilisé pour les pages d'estimation"></div>
+                <div class="set-field set-full">
+                    <label>JSON des champs</label>
+                    <textarea class="set-input set-textarea mono" name="fields_json" rows="6" placeholder='[{"key":"hero_title","label":"Titre Hero","type":"text"},{"key":"intro","label":"Introduction","type":"textarea"}]'>[]</textarea>
+                    <small>Types supportés: text, textarea, url.</small>
+                </div>
+                <div class="set-field set-full">
+                    <label>Template HTML (optionnel)</label>
+                    <textarea class="set-input set-textarea mono" name="html_template" rows="8" placeholder="<section><h1>{{hero_title}}</h1><div>{{content}}</div></section>"></textarea>
+                    <small>Variables disponibles: {{title}}, {{content}}, {{slug}}, {{meta_title}}, {{meta_description}} + champs personnalisés (ex: {{hero_title}}).</small>
+                </div>
+                <div class="set-field">
+                    <label style="display:flex;align-items:center;gap:8px">
+                        <input type="checkbox" name="is_active" value="1" checked> Template actif
+                    </label>
+                </div>
+            </div>
+            <div class="set-actions"><button type="submit" class="set-btn set-btn-p"><i class="fas fa-save"></i> Sauvegarder le template</button></div>
+        </form>
+    </div>
+</div>
+
+<div class="set-section anim d1">
+    <div class="set-section-hd"><i class="fas fa-list"></i><h3>Templates existants</h3></div>
+    <div class="set-section-body">
+        <?php if (empty($pageTemplates)): ?>
+            <p style="color:var(--text-3);font-size:12px">Aucun template enregistré pour le moment.</p>
+        <?php else: ?>
+            <div style="display:grid;gap:10px">
+                <?php foreach ($pageTemplates as $tpl): ?>
+                <div style="border:1px solid var(--border);border-radius:10px;padding:12px;background:var(--surface-2)">
+                    <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
+                        <div>
+                            <strong><?= htmlspecialchars($tpl['name']) ?></strong>
+                            <div class="mono" style="font-size:11px;color:var(--text-3)">key: <?= htmlspecialchars($tpl['template_key']) ?> · id: <?= (int)$tpl['id'] ?></div>
+                            <div style="font-size:12px;color:var(--text-2);margin-top:4px"><?= htmlspecialchars($tpl['description'] ?? '') ?></div>
+                        </div>
+                        <form method="POST" action="?page=settings&tab=templates" onsubmit="return confirm('Supprimer ce template ?');">
+                            <input type="hidden" name="action" value="delete_page_template">
+                            <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
+                            <input type="hidden" name="template_id" value="<?= (int)$tpl['id'] ?>">
+                            <button type="submit" class="set-btn set-btn-s" style="background:#fee2e2;color:#991b1b"><i class="fas fa-trash"></i> Supprimer</button>
+                        </form>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
 </div>
 
 <!-- ══════════════════════════════════════

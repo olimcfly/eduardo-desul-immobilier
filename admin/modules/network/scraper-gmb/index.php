@@ -397,6 +397,29 @@ $apiBase = '/admin/api/gmb/gmb.php';
     </div>
 </div>
 
+<!-- Modal : Erreur / Popup centré -->
+<div id="modal-error" class="gmb-modal" style="display:none">
+    <div class="gmb-modal-box gmb-modal-sm">
+        <div class="gmb-modal-header gmb-modal-header-error">
+            <h4><i class="fas fa-exclamation-triangle"></i> <span id="modal-error-title">Erreur</span></h4>
+            <button onclick="gmbCloseModal('modal-error')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="gmb-modal-body" style="text-align:center; padding:28px 24px;">
+            <div id="modal-error-icon" style="font-size:48px; margin-bottom:16px; color:var(--gmb-red);">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <p id="modal-error-message" style="font-size:15px; color:#333; margin:0 0 12px; line-height:1.5;"></p>
+            <div id="modal-error-extra" style="display:none;"></div>
+        </div>
+        <div class="gmb-modal-footer" style="justify-content:center;">
+            <button class="gmb-btn-ghost" onclick="gmbCloseModal('modal-error')">Fermer</button>
+            <a id="modal-error-action-btn" href="#" class="gmb-btn-primary" style="display:none; text-decoration:none; padding:9px 20px; border-radius:8px; font-size:14px;">
+                <i class="fas fa-cog"></i> <span id="modal-error-action-label">Configurer</span>
+            </a>
+        </div>
+    </div>
+</div>
+
 <!-- Toast notifications -->
 
 <div id="gmb-toasts" class="gmb-toasts"></div>
@@ -557,6 +580,8 @@ $apiBase = '/admin/api/gmb/gmb.php';
 .gmb-modal-info { background:var(--gmb-bg); border-radius:8px; padding:8px 12px; font-size:13px; color:#555; margin:0; }
 .gmb-email-status-block { background:var(--gmb-bg); border-radius:8px; padding:10px 12px; font-size:13px; }
 
+.gmb-modal-header-error h4 { color:var(--gmb-red); }
+.gmb-modal-sm .gmb-modal-box { width:420px; }
 .gmb-modal-lg .gmb-modal-box { width: 680px; }
 .gmb-template-btns { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:4px; }
 .gmb-tpl-btn { padding:7px 14px; border:2px solid var(--gmb-border); border-radius:8px; background:#fff; cursor:pointer; font-size:13px; font-weight:500; transition:.2s; }
@@ -737,6 +762,44 @@ function gmbToast(msg, type = 'success', dur = 3500) {
     el.innerHTML = `<i class="fas ${icons[type]||'fa-info-circle'}"></i> ${msg}`;
     document.getElementById('gmb-toasts').appendChild(el);
     setTimeout(() => el.remove(), dur);
+}
+
+/**
+ * Affiche un popup d'erreur centré au milieu de l'écran.
+ * Si le message concerne l'API Google non configurée, propose un lien vers la config.
+ */
+function gmbErrorPopup(msg, title) {
+    const modal   = document.getElementById('modal-error');
+    const msgEl   = document.getElementById('modal-error-message');
+    const titleEl = document.getElementById('modal-error-title');
+    const iconEl  = document.getElementById('modal-error-icon');
+    const extraEl = document.getElementById('modal-error-extra');
+    const actionBtn  = document.getElementById('modal-error-action-btn');
+    const actionLbl  = document.getElementById('modal-error-action-label');
+
+    titleEl.textContent = title || 'Erreur';
+    msgEl.textContent   = msg;
+    extraEl.style.display    = 'none';
+    extraEl.innerHTML        = '';
+    actionBtn.style.display  = 'none';
+
+    // Détection erreur API Google non configurée
+    const isApiError = /cl[eé].*api.*non.*config|api.*google.*non.*config|google.*api.*non|api.*key.*not.*config|REQUEST_DENIED|API.*not.*enabled/i.test(msg);
+
+    if (isApiError) {
+        titleEl.textContent = title || 'Google API non connectée';
+        iconEl.innerHTML = '<i class="fas fa-key" style="color:var(--gmb-gold);"></i>';
+        msgEl.textContent = 'La clé API Google Places n\'est pas configurée ou est invalide.';
+        extraEl.style.display = 'block';
+        extraEl.innerHTML = '<p style="font-size:13px; color:#666; margin:8px 0 0;">Configurez votre clé API Google Places pour utiliser le scraper GMB.</p>';
+        actionBtn.style.display = 'inline-flex';
+        actionBtn.href = '?page=api-keys';
+        actionLbl.textContent = 'Configurer la clé API';
+    } else {
+        iconEl.innerHTML = '<i class="fas fa-exclamation-circle"></i>';
+    }
+
+    modal.style.display = 'flex';
 }
 
 function gmbConfirm(msg) { return window.confirm(msg); }
@@ -976,7 +1039,7 @@ async function gmbSearch(reuseSearchId = null) {
 
     try {
         const data = await gmbApi(payload);
-        if (!data.success) { gmbToast(data.error || 'Erreur recherche', 'error'); return; }
+        if (!data.success) { gmbErrorPopup(data.error || 'Erreur recherche'); return; }
 
         gmbResults = data.results || [];
         gmbCurrentSearchId = data.search_id || null;
@@ -995,7 +1058,7 @@ async function gmbSearch(reuseSearchId = null) {
         gmbLoadHistory();
         gmbToast(`${gmbResults.length} entreprises trouvées`);
     } catch(e) {
-        gmbToast('Erreur réseau : ' + e.message, 'error');
+        gmbErrorPopup('Erreur réseau : ' + e.message);
     } finally {
         document.getElementById('gmb-loading').style.display = 'none';
         document.getElementById('btn-search').disabled = false;
@@ -1126,7 +1189,7 @@ async function gmbRelaunchSearch(searchId) {
     document.getElementById('gmb-loading').style.display = '';
     try {
         const data = await gmbApi({ action: 'search', reuse_search_id: searchId });
-        if (!data.success) { gmbToast(data.error || 'Erreur', 'error'); return; }
+        if (!data.success) { gmbErrorPopup(data.error || 'Erreur'); return; }
         gmbResults = data.results || [];
         gmbCurrentSearchId = searchId;
         gmbRenderList(gmbResults);
@@ -1143,7 +1206,7 @@ async function gmbRelaunchSearch(searchId) {
 
 async function gmbLoadSearchResults(searchId) {
     const data = await gmbApi({ action: 'get', search_id: searchId });
-    if (!data.success) { gmbToast('Erreur chargement', 'error'); return; }
+    if (!data.success) { gmbErrorPopup('Erreur chargement'); return; }
     gmbResults = data.results || [];
     gmbCurrentSearchId = searchId;
     gmbRenderList(gmbResults);
@@ -1158,7 +1221,7 @@ async function gmbDeleteSearch(id) {
     if (!gmbConfirm('Supprimer cette recherche et ses résultats ?')) return;
     const data = await gmbApi({ action: 'delete_search', id });
     if (data.success) { gmbToast('Recherche supprimée'); gmbLoadHistory(); }
-    else gmbToast(data.error, 'error');
+    else gmbErrorPopup(data.error);
 }
 
 // ── Email : scraping auto ─────────────────────────────────────────────────────
@@ -1194,7 +1257,7 @@ async function gmbBulkScrapeEmails() {
     if (data.success) {
         gmbToast(`${data.found} emails trouvés sur ${ids.length}`, 'success');
         await gmbLoadSearchResults(gmbCurrentSearchId);
-    } else gmbToast(data.error || 'Erreur', 'error');
+    } else gmbErrorPopup(data.error || 'Erreur');
 }
 
 // ── Email : vérification ──────────────────────────────────────────────────────
@@ -1215,7 +1278,7 @@ async function gmbVerifyEmailRow(id, email) {
         // Refresh cellule
         const tr = document.getElementById(`row-${id}`);
         if (tr && r) { const tds = tr.querySelectorAll('td'); if (tds[5]) tds[5].innerHTML = gmbEmailCell(r); }
-    } else gmbToast(data.error || 'Erreur vérification', 'error');
+    } else gmbErrorPopup(data.error || 'Erreur vérification');
 }
 
 async function gmbBulkVerifyEmails() {
@@ -1226,7 +1289,7 @@ async function gmbBulkVerifyEmails() {
     if (data.success) {
         gmbToast(`${data.valid} valides, ${data.invalid} invalides, ${data.generic} génériques`, 'success');
         await gmbLoadSearchResults(gmbCurrentSearchId);
-    } else gmbToast(data.error || 'Erreur', 'error');
+    } else gmbErrorPopup(data.error || 'Erreur');
 }
 
 // ── Email : modal saisie manuelle ─────────────────────────────────────────────
@@ -1274,7 +1337,7 @@ async function gmbConvert(id) {
         const r = gmbResults.find(x => x.id === id);
         if (r) r.is_converted = 1;
         gmbRenderList(gmbResults);
-    } else gmbToast(data.error || 'Erreur', 'error');
+    } else gmbErrorPopup(data.error || 'Erreur');
 }
 
 async function gmbDeleteResult(id) {
@@ -1285,7 +1348,7 @@ async function gmbDeleteResult(id) {
         gmbRenderList(gmbResults);
         gmbRenderGrid(gmbResults);
         gmbToast('Résultat supprimé');
-    } else gmbToast(data.error, 'error');
+    } else gmbErrorPopup(data.error);
 }
 
 async function gmbBulkDelete() {
@@ -1300,7 +1363,7 @@ async function gmbBulkDelete() {
         gmbRenderGrid(gmbResults);
         gmbUpdateBulkBar();
         gmbToast(`${ids.length} résultats supprimés`);
-    } else gmbToast(data.error, 'error');
+    } else gmbErrorPopup(data.error);
 }
 
 // ── Campagnes ─────────────────────────────────────────────────────────────────
@@ -1396,7 +1459,7 @@ async function gmbBulkVerifyInCampaign() {
     if (data.success) {
         gmbToast(`${data.valid} valides, ${data.invalid} invalides`, 'success');
         gmbOpenCampaign(gmbCurrentCampaignId);
-    } else gmbToast(data.error, 'error');
+    } else gmbErrorPopup(data.error);
 }
 
 async function gmbConvertCampaignToLeads() {
@@ -1407,13 +1470,13 @@ async function gmbConvertCampaignToLeads() {
     if (data.success) {
         gmbToast(`${ids.length} leads CRM créés`, 'success');
         gmbOpenCampaign(gmbCurrentCampaignId);
-    } else gmbToast(data.error, 'error');
+    } else gmbErrorPopup(data.error);
 }
 
 async function gmbRemoveFromCampaign(resultId) {
     const data = await gmbApi({ action: 'remove_from_campaign', result_id: resultId, campaign_id: gmbCurrentCampaignId });
     if (data.success) { gmbToast('Contact retiré'); gmbOpenCampaign(gmbCurrentCampaignId); }
-    else gmbToast(data.error, 'error');
+    else gmbErrorPopup(data.error);
 }
 
 // ── Ajouter à campagne ────────────────────────────────────────────────────────
@@ -1442,7 +1505,7 @@ async function gmbConfirmAddToCampaign() {
 
     if (!campId && newName) {
         const created = await gmbApi({ action: 'create_campaign', name: newName, city: newCity });
-        if (!created.success) { gmbToast(created.error || 'Erreur création campagne', 'error'); return; }
+        if (!created.success) { gmbErrorPopup(created.error || 'Erreur création campagne'); return; }
         campId = created.id;
         await gmbLoadCampaigns();
     }
@@ -1461,7 +1524,7 @@ async function gmbConfirmAddToCampaign() {
         gmbRenderGrid(gmbResults);
         gmbCloseModal('modal-add-campaign');
         gmbLoadCampaigns();
-    } else gmbToast(data.error || 'Erreur', 'error');
+    } else gmbErrorPopup(data.error || 'Erreur');
 }
 
 // ── CRUD Campagnes ────────────────────────────────────────────────────────────
@@ -1487,7 +1550,7 @@ async function gmbCreateCampaign() {
         gmbToast('Campagne créée !', 'success');
         gmbCloseModal('modal-create-campaign');
         gmbLoadCampaigns();
-    } else gmbToast(data.error || 'Erreur', 'error');
+    } else gmbErrorPopup(data.error || 'Erreur');
 }
 
 async function gmbDeleteCampaign(id, event) {
@@ -1495,7 +1558,7 @@ async function gmbDeleteCampaign(id, event) {
     if (!gmbConfirm('Supprimer cette campagne et tous ses contacts ?')) return;
     const data = await gmbApi({ action: 'delete_campaign', id });
     if (data.success) { gmbToast('Campagne supprimée'); gmbLoadCampaigns(); }
-    else gmbToast(data.error, 'error');
+    else gmbErrorPopup(data.error);
 }
 
 function gmbEditCampaign(id, event) {
@@ -1513,7 +1576,7 @@ async function gmbOpenSendEmail(resultId) {
         const data = await gmbApi({ action: 'get_result', id: resultId });
         contact = data.result || null;
     }
-    if (!contact || !contact.email) { gmbToast('Email introuvable', 'error'); return; }
+    if (!contact || !contact.email) { gmbErrorPopup('Email introuvable'); return; }
 
     gmbCurrentEmailSendId = resultId;
     gmbCurrentEmailSendData = contact;
@@ -1631,7 +1694,7 @@ async function gmbSendEmail(fromPreview = false) {
         gmbCloseModal('modal-send-email');
         gmbCloseModal('modal-preview-email');
     } else {
-        gmbToast(data.error || 'Erreur lors de l\'envoi', 'error');
+        gmbErrorPopup(data.error || 'Erreur lors de l\'envoi');
         if (fromPreview) {
             document.getElementById('modal-preview-email').style.display  = 'none';
             document.getElementById('modal-send-email').style.display = 'flex';
@@ -1654,5 +1717,13 @@ document.querySelectorAll('.gmb-modal').forEach(m => {
     gmbSetView(gmbView);
     await Promise.all([gmbLoadCampaigns(), gmbLoadSecteurs()]);
     gmbLoadHistory();
+
+    // Vérifier si la clé API Google est configurée
+    try {
+        const keyData = await gmbApi({ action: 'get_api_key' });
+        if (!keyData.api_key) {
+            gmbErrorPopup('Clé API Google non configurée', 'Google API non connectée');
+        }
+    } catch(e) {}
 })();
 </script>

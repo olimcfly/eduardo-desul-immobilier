@@ -247,7 +247,7 @@ $_siteUrl  = function_exists('siteUrl')  ? siteUrl()  : (defined('SITE_URL')  ? 
 $_siteName = function_exists('siteName') ? siteName() : (defined('SITE_TITLE') ? SITE_TITLE : '');
 $metaTitle = $hubPage['meta_title'] ?? ($catFilter ? 'Guides · ' . $catFilter : 'Guides immobiliers Bordeaux');
 $metaTitle = htmlspecialchars($metaTitle . ' | ' . $_siteName);
-$metaDesc  = htmlspecialchars($hubPage['meta_description'] ?? 'Guides pratiques pour acheter, vendre et investir à Bordeaux par Eduardo De Sul, conseiller immobilier indépendant eXp France.');
+$metaDesc  = htmlspecialchars($hubPage['meta_description'] ?? 'Guides pratiques pour acheter, vendre et investir dans l\'immobilier. Retrouvez nos conseils et analyses.');
 $canonical = $_siteUrl . '/guide-local' . ($catFilter ? '?categorie=' . urlencode($catFilter) : '') . ($page > 1 ? ($catFilter ? '&' : '?') . 'page=' . $page : '');
 
 // ── Extraire CSS embarqués dans header/footer HTML ───────
