@@ -376,6 +376,19 @@ $availableSuggestions = array_filter($suggestedCities, function($c) use ($existi
         <?php endif; ?>
     </div>
 
+    <!-- Cluster Actions -->
+    <div class="ma-city-selector" style="padding:16px 24px;">
+        <h3><i class="fas fa-diagram-project"></i> Cluster & Jobs</h3>
+        <div class="ma-city-input-row" style="margin-bottom:8px; flex-wrap:wrap;">
+            <button class="ma-analyze-btn" type="button" onclick="createClusterPlan()"><i class="fas fa-sitemap"></i> Plan clusters</button>
+            <button class="ma-analyze-btn" type="button" onclick="generateClusterArticles()"><i class="fas fa-file-lines"></i> Générer articles</button>
+            <button class="ma-analyze-btn" type="button" onclick="retryFailedClusterItems()"><i class="fas fa-rotate-right"></i> Retry failed</button>
+            <button class="ma-analyze-btn" type="button" onclick="generateLinkPlan()"><i class="fas fa-link"></i> Générer maillage</button>
+        </div>
+        <div id="clusterStatus" style="font-size:12px;color:#6b7280;">Aucun plan actif.</div>
+    </div>
+
+
     <!-- Results -->
     <div class="ma-results" id="resultsArea">
         <div class="ma-empty" id="emptyState">
@@ -426,6 +439,7 @@ $availableSuggestions = array_filter($suggestedCities, function($c) use ($existi
 // ═══════════════════════════════════════════════
 
 const API_URL = 'modules/immobilier/market-analyzer/api.php';
+const CSRF_TOKEN = <?= json_encode($_SESSION['csrf_token'] ?? '') ?>;
 const allCities = <?= json_encode(array_values($suggestedCities)) ?>;
 let selectedCity = '';
 
@@ -438,7 +452,7 @@ async function fetchMarketAnalyzer(action, payload = {}) {
             'Accept': 'application/json',
             'X-Requested-With': 'XMLHttpRequest'
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({ ...payload, csrf_token: CSRF_TOKEN })
     });
 
     let data = {};
@@ -627,4 +641,88 @@ async function removeCity(city) {
         console.error('Erreur suppression ville:', err);
     }
 }
+
+let currentPlanId = null;
+let statusPolling = null;
+
+async function createClusterPlan() {
+    const city = (document.getElementById('cityInput').value || selectedCity).trim();
+    if (!city) {
+        showError('Sélectionnez une ville avant de planifier les clusters.');
+        return;
+    }
+
+    const data = await fetchMarketAnalyzer('cluster.plan', {
+        city,
+        options: { cluster_count: 3, items_per_cluster: 2 }
+    });
+
+    if (!data.success || !data.plan) {
+        throw new Error(data.error || 'Planification impossible');
+    }
+
+    currentPlanId = Number(data.plan.id);
+    renderClusterStatus(`Plan #${currentPlanId} créé (${(data.clusters || []).length} clusters).`);
+    startStatusPolling();
+}
+
+async function generateClusterArticles() {
+    if (!currentPlanId) {
+        showError('Créez ou chargez un plan cluster avant la génération.');
+        return;
+    }
+    const data = await fetchMarketAnalyzer('cluster.generate_articles', { plan_id: currentPlanId });
+    renderClusterStatus(`Jobs en file: ${data.enqueued || 0}/${data.items || 0}.`);
+    startStatusPolling();
+}
+
+async function retryFailedClusterItems() {
+    if (!currentPlanId) {
+        showError('Aucun plan actif pour le retry.');
+        return;
+    }
+    const data = await fetchMarketAnalyzer('cluster.retry_failed', { plan_id: currentPlanId });
+    renderClusterStatus(`Retry lancé: ${data.retried || 0} item(s).`);
+}
+
+async function generateLinkPlan() {
+    if (!currentPlanId) {
+        showError('Aucun plan actif pour le maillage.');
+        return;
+    }
+    const data = await fetchMarketAnalyzer('cluster.link_plan', { plan_id: currentPlanId });
+    renderClusterStatus(`Plan de maillage généré (${data.generated_count || 0} liens).`);
+}
+
+async function refreshJobsStatus() {
+    if (!currentPlanId) return;
+    try {
+        const data = await fetchMarketAnalyzer('jobs.status', { plan_id: currentPlanId });
+        const jobsTxt = (data.jobs || []).map(j => `${j.status}:${j.total}`).join(' · ') || 'no-jobs';
+        const itemsTxt = (data.items || []).map(i => `${i.status}:${i.total}`).join(' · ') || 'no-items';
+        renderClusterStatus(`Plan #${currentPlanId} — Jobs [${jobsTxt}] — Items [${itemsTxt}]`);
+    } catch (e) {
+        console.warn('Impossible de rafraîchir le statut jobs', e);
+    }
+}
+
+function startStatusPolling() {
+    if (statusPolling) clearInterval(statusPolling);
+    refreshJobsStatus();
+    statusPolling = setInterval(refreshJobsStatus, 7000);
+}
+
+function renderClusterStatus(message) {
+    const el = document.getElementById('clusterStatus');
+    if (el) el.textContent = message;
+}
+
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden' && statusPolling) {
+        clearInterval(statusPolling);
+    } else if (document.visibilityState === 'visible' && currentPlanId) {
+        startStatusPolling();
+    }
+});
+
 </script>
