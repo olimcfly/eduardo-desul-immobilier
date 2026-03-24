@@ -47,6 +47,71 @@ class MarketAnalyzer {
             `added_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
             UNIQUE KEY `uk_user_city` (`user_id`, `city`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+        $this->pdo->exec("CREATE TABLE IF NOT EXISTS `market_cluster_plans` (
+            `id` INT AUTO_INCREMENT PRIMARY KEY,
+            `user_id` INT NOT NULL,
+            `city` VARCHAR(120) NOT NULL,
+            `status` VARCHAR(20) NOT NULL DEFAULT 'planned',
+            `input_hash` VARCHAR(64) NOT NULL,
+            `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+            `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            UNIQUE KEY `uk_user_hash` (`user_id`, `input_hash`),
+            INDEX `idx_user_city` (`user_id`, `city`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+        $this->pdo->exec("CREATE TABLE IF NOT EXISTS `market_clusters` (
+            `id` INT AUTO_INCREMENT PRIMARY KEY,
+            `plan_id` INT NOT NULL,
+            `keyword` VARCHAR(255) NOT NULL,
+            `intent` VARCHAR(50) DEFAULT NULL,
+            `score` TINYINT UNSIGNED DEFAULT 0,
+            `status` VARCHAR(20) NOT NULL DEFAULT 'planned',
+            `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+            `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            INDEX `idx_plan` (`plan_id`),
+            CONSTRAINT `fk_market_cluster_plan` FOREIGN KEY (`plan_id`) REFERENCES `market_cluster_plans`(`id`) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+        $this->pdo->exec("CREATE TABLE IF NOT EXISTS `market_cluster_items` (
+            `id` INT AUTO_INCREMENT PRIMARY KEY,
+            `cluster_id` INT NOT NULL,
+            `title` VARCHAR(255) NOT NULL,
+            `outline_json` JSON DEFAULT NULL,
+            `article_id` INT DEFAULT NULL,
+            `status` VARCHAR(20) NOT NULL DEFAULT 'planned',
+            `error_message` TEXT DEFAULT NULL,
+            `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+            `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            INDEX `idx_cluster` (`cluster_id`),
+            INDEX `idx_article` (`article_id`),
+            CONSTRAINT `fk_market_cluster_items_cluster` FOREIGN KEY (`cluster_id`) REFERENCES `market_clusters`(`id`) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+        $this->pdo->exec("CREATE TABLE IF NOT EXISTS `market_cluster_jobs` (
+            `id` INT AUTO_INCREMENT PRIMARY KEY,
+            `type` VARCHAR(80) NOT NULL,
+            `payload_json` JSON DEFAULT NULL,
+            `dedupe_key` VARCHAR(190) NOT NULL,
+            `status` VARCHAR(20) NOT NULL DEFAULT 'pending',
+            `attempts` INT NOT NULL DEFAULT 0,
+            `max_attempts` INT NOT NULL DEFAULT 3,
+            `next_run_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+            `locked_at` DATETIME DEFAULT NULL,
+            `last_error` TEXT DEFAULT NULL,
+            `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+            `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            UNIQUE KEY `uk_dedupe` (`dedupe_key`),
+            INDEX `idx_status_run` (`status`, `next_run_at`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+        $this->pdo->exec("CREATE TABLE IF NOT EXISTS `market_cluster_link_plans` (
+            `plan_id` INT PRIMARY KEY,
+            `link_json` JSON DEFAULT NULL,
+            `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+            `updated_at` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            CONSTRAINT `fk_market_link_plan` FOREIGN KEY (`plan_id`) REFERENCES `market_cluster_plans`(`id`) ON DELETE CASCADE
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
     }
 
     /**
