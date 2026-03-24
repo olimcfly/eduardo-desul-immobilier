@@ -19,7 +19,7 @@ RewriteRule ^uploads(/.*)?$ - [L]
 RewriteRule ^(config|logs|vendor)(/.*)?$ - [F,L]
 
 # Router front
-RewriteRule ^(.*)$ /front/router.php?_uri=$1 [L,QSA]
+RewriteRule ^(.*)$ /front/page.php?slug=$1 [L,QSA]
 
 # Cache
 <IfModule mod_expires.c>
@@ -36,5 +36,5 @@ RewriteRule ^(.*)$ /front/router.php?_uri=$1 [L,QSA]
 </IfModule>
 
 # Erreurs
-ErrorDocument 404 /front/router.php
+ErrorDocument 404 /front/page.php
 ErrorDocument 500 /front/500.php
