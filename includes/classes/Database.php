@@ -15,6 +15,7 @@ class Database {
      * Database credentials - lues depuis les constantes config.php / .env
      */
     private $host;
+    private $port;
     private $dbname;
     private $user;
     private $password;
@@ -24,14 +25,17 @@ class Database {
      * Private constructor (singleton pattern)
      */
     private function __construct() {
-        $this->host     = defined('DB_HOST')    ? DB_HOST    : env('DB_HOST', 'localhost');
-        $this->dbname   = defined('DB_NAME')    ? DB_NAME    : env('DB_NAME', '');
-        $this->user     = defined('DB_USER')    ? DB_USER    : env('DB_USER', '');
-        $this->password = defined('DB_PASS')    ? DB_PASS    : env('DB_PASS', '');
-        $this->charset  = defined('DB_CHARSET') ? DB_CHARSET : 'utf8mb4';
+        $this->bootEnvIfNeeded();
+
+        $this->host     = $this->configValue('DB_HOST', 'DB_HOST', 'localhost');
+        $this->port     = $this->configValue('DB_PORT', 'DB_PORT', '3306');
+        $this->dbname   = $this->configValue('DB_NAME', 'DB_NAME', '');
+        $this->user     = $this->configValue('DB_USER', 'DB_USER', '');
+        $this->password = $this->configValue('DB_PASS', 'DB_PASS', '');
+        $this->charset  = $this->configValue('DB_CHARSET', 'DB_CHARSET', 'utf8mb4');
 
         try {
-            $dsn = "mysql:host={$this->host};dbname={$this->dbname};charset={$this->charset}";
+            $dsn = "mysql:host={$this->host};port={$this->port};dbname={$this->dbname};charset={$this->charset}";
             
             $this->connection = new PDO(
                 $dsn,
@@ -53,6 +57,47 @@ class Database {
         }
     }
     
+
+    /**
+     * Charge le .env si le helper env() n'est pas encore disponible.
+     */
+    private function bootEnvIfNeeded(): void {
+        if (function_exists('env')) {
+            return;
+        }
+
+        $root = dirname(__DIR__, 2);
+        $envFile = $root . '/core/env.php';
+        if (is_file($envFile)) {
+            require_once $envFile;
+            if (function_exists('loadEnv')) {
+                loadEnv($root . '/.env');
+            }
+        }
+    }
+
+    /**
+     * Lit une valeur de config depuis constante -> env() -> getenv() -> défaut.
+     */
+    private function configValue(string $constant, string $envKey, string $default = ''): string {
+        if (defined($constant)) {
+            $v = constant($constant);
+            return is_string($v) ? $v : (string) $v;
+        }
+
+        if (function_exists('env')) {
+            $v = env($envKey, $default);
+            return is_string($v) ? $v : (string) $v;
+        }
+
+        $v = getenv($envKey);
+        if ($v === false || $v === '') {
+            return $default;
+        }
+
+        return (string) $v;
+    }
+
     /**
      * Get singleton instance (returns PDO connection)
      */
@@ -181,7 +226,9 @@ class Database {
     /**
      * Prevent unserializing
      */
-    private function __wakeup() {}
+    public function __wakeup() {
+        throw new Exception('Cannot unserialize singleton');
+    }
 }
 
 ?>
