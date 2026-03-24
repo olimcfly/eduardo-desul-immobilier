@@ -590,7 +590,7 @@ input:checked + .tg-sl:before { transform:translateX(14px); background:#fff; }
         </div>
         <table class="tbl">
             <?php foreach ($dbHealth as $row): ?>
-            <tr>
+            <tr class="db-health-row" data-status="<?= $row['status'] ?>">
                 <td style="width:20px"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:<?= $row['status']==='ok'?'var(--green)':($row['status']==='warning'?'var(--amber)':'var(--red)') ?>"></span></td>
                 <td style="font-weight:600;font-size:11px"><?= htmlspecialchars($row['check']) ?></td>
                 <?php if (isset($tableDescriptions[$row['check'] ?? '']) || (strpos($row['check']??'','Table') === 0)): ?>
@@ -1067,6 +1067,15 @@ function applyFilter(f, btn) {
     document.querySelectorAll('#view-grid .mod-card').forEach(card => {
         card.style.display = (f === 'all' || card.dataset.status === f) ? '' : 'none';
     });
+    // DB health rows
+    let dbVisible = 0;
+    document.querySelectorAll('.db-health-row').forEach(row => {
+        const show = (f === 'all' || row.dataset.status === f);
+        row.style.display = show ? '' : 'none';
+        if (show) dbVisible++;
+    });
+    const dbCard = document.querySelector('.db-health-card');
+    if (dbCard) dbCard.style.display = dbVisible > 0 ? '' : 'none';
     syncChecks(); syncCats();
 }
 
@@ -1078,13 +1087,29 @@ function modSearch(q) {
     document.querySelectorAll('#view-grid .mod-card').forEach(card => {
         card.style.display = (!q || (card.dataset.name||'').includes(q)) ? '' : 'none';
     });
+    // DB health rows
+    let dbVisible = 0;
+    document.querySelectorAll('.db-health-row').forEach(row => {
+        const txt = row.textContent.toLowerCase();
+        const show = !q || txt.includes(q);
+        row.style.display = show ? '' : 'none';
+        if (show) dbVisible++;
+    });
+    const dbCard = document.querySelector('.db-health-card');
+    if (dbCard) dbCard.style.display = dbVisible > 0 ? '' : 'none';
     syncChecks(); syncCats();
 }
 
 function syncChecks() {
     document.querySelectorAll('.mod-row-checks').forEach(el => {
         const row = el.previousElementSibling;
-        if (row && row.style.display === 'none') el.style.display = 'none';
+        if (!row) return;
+        if (row.style.display === 'none') {
+            el.style.display = 'none';
+        } else {
+            // Restore: let CSS rule (.mod-row.open + .mod-row-checks) control visibility
+            el.style.removeProperty('display');
+        }
     });
 }
 function syncCats() {
