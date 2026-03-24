@@ -271,7 +271,7 @@ require_once __DIR__ . '/layout/sidebar.php';
     $stats = ['articles'=>0,'pages'=>0,'leads'=>0,'properties'=>0,'estimations'=>0,'captures'=>0];
     if ($pdo) {
         $tbls = ['articles'=>'articles','pages'=>'pages','leads'=>'leads',
-                 'properties'=>'properties','estimations'=>'estimations','captures'=>'capture_pages'];
+                 'properties'=>'properties','estimations'=>'estimations','captures'=>'captures'];
         foreach ($tbls as $key => $tbl) {
             try { $stats[$key] = (int)$pdo->query("SELECT COUNT(*) FROM `$tbl`")->fetchColumn(); }
             catch (Exception $e) {}

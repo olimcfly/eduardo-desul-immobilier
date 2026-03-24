@@ -172,7 +172,7 @@ class ModuleDiagnostic
             'label' => 'Pages de Capture', 'category' => 'CMS', 'icon' => 'fas fa-magnet',
             'files' => ['index.php'],
             'optional_files' => ['create.php', 'edit.php', 'delete.php', 'form.php', 'save.php', 'stats.php'],
-            'tables' => ['capture_pages'],
+            'tables' => ['captures'],
             'api_endpoints' => ['captures-actions.php'],
             'depends_on' => [],
         ],
@@ -908,7 +908,7 @@ class ModuleDiagnostic
 
             $coreTables = [
                 'leads', 'builder_pages', 'builder_sections', 'builder_templates',
-                'properties', 'capture_pages', 'articles', 'secteurs',
+                'properties', 'captures', 'articles', 'secteurs',
                 'settings', 'admins', 'api_keys', 'gmb_contacts', 'gmb_sequences',
             ];
             foreach ($coreTables as $ct) {
