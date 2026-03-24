@@ -62,6 +62,7 @@ $moduleMap = [
 
     // ── IMMOBILIER ───────────────────────
     'biens'       => $handlersDir . 'biens.php',
+    'rdv'         => $handlersDir . 'rdv.php',
 
     // ── MARKETING / CRM ──────────────────
     'leads'       => $handlersDir . 'leads.php',
