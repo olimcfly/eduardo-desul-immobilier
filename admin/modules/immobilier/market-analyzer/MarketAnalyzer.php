@@ -2,7 +2,7 @@
 /**
  * MarketAnalyzer.php
  * Classe d'analyse du marché immobilier par ville
- * Utilise l'API Claude/OpenAI pour générer des analyses data-driven
+ * Utilise Perplexity/Claude/OpenAI pour générer des analyses data-driven
  */
 
 class MarketAnalyzer {
@@ -240,7 +240,7 @@ class MarketAnalyzer {
     }
 
     /**
-     * Appel à l'API Claude pour l'analyse
+     * Appel IA pour l'analyse
      */
     private function callAIForAnalysis($city) {
         $currentDate = date('F Y');
@@ -248,14 +248,78 @@ class MarketAnalyzer {
 
         $prompt = $this->buildAnalysisPrompt($city, $currentDate, $currentMonth);
 
-        // Tenter Claude d'abord, fallback OpenAI
-        if (defined('ANTHROPIC_API_KEY') && !empty(ANTHROPIC_API_KEY)) {
+        // Priorité Perplexity (données web/citations), fallback Claude puis OpenAI
+        if (defined('PERPLEXITY_API_KEY') && !empty(PERPLEXITY_API_KEY)) {
+            return $this->callPerplexity($prompt, $city);
+        } elseif (defined('ANTHROPIC_API_KEY') && !empty(ANTHROPIC_API_KEY)) {
             return $this->callClaude($prompt, $city);
         } elseif (defined('OPENAI_API_KEY') && !empty(OPENAI_API_KEY)) {
             return $this->callOpenAI($prompt, $city);
         }
 
-        throw new Exception('Aucune clé API IA configurée (Claude ou OpenAI requis)');
+        throw new Exception('Aucune clé API IA configurée (Perplexity, Claude ou OpenAI requis)');
+    }
+
+    /**
+     * Appel API Perplexity
+     */
+    private function callPerplexity($prompt, $city) {
+        $endpoint = defined('PERPLEXITY_ENDPOINT') && !empty(PERPLEXITY_ENDPOINT)
+            ? PERPLEXITY_ENDPOINT
+            : 'https://api.perplexity.ai/chat/completions';
+
+        $model = defined('PERPLEXITY_MODEL') && !empty(PERPLEXITY_MODEL)
+            ? PERPLEXITY_MODEL
+            : 'sonar-pro';
+
+        $payload = json_encode([
+            'model' => $model,
+            'messages' => [
+                [
+                    'role' => 'system',
+                    'content' => 'Tu es un expert du marché immobilier français. Réponds uniquement en JSON valide, sans markdown.'
+                ],
+                ['role' => 'user', 'content' => $prompt]
+            ],
+            'temperature' => 0.2,
+            'max_tokens' => 4000
+        ]);
+
+        $ch = curl_init($endpoint);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => $payload,
+            CURLOPT_HTTPHEADER => [
+                'Content-Type: application/json',
+                'Authorization: Bearer ' . PERPLEXITY_API_KEY
+            ],
+            CURLOPT_TIMEOUT => 60,
+            CURLOPT_CONNECTTIMEOUT => 10,
+        ]);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $error = curl_error($ch);
+        curl_close($ch);
+
+        if ($error) {
+            throw new Exception("Erreur réseau Perplexity: $error");
+        }
+        if ($httpCode !== 200) {
+            throw new Exception("Erreur API Perplexity (HTTP $httpCode): " . substr((string)$response, 0, 300));
+        }
+
+        $result = json_decode((string)$response, true);
+        $text = $result['choices'][0]['message']['content'] ?? '';
+
+        $parsed = $this->parseAIResponse($text, $city);
+        $citations = $result['citations'] ?? [];
+        if (!empty($citations) && is_array($citations)) {
+            $parsed['sources'] = array_values(array_unique(array_merge($parsed['sources'] ?? [], $citations)));
+        }
+
+        return $parsed;
     }
 
     /**
