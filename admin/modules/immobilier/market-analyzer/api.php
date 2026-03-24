@@ -6,36 +6,13 @@
  * Actions: analyze, add-city, remove-city, history
  */
 
+require_once __DIR__ . '/../../../includes/init.php';
+
 header('Content-Type: application/json; charset=utf-8');
-
-// Session
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-if (empty($_SESSION['admin_id'])) {
-    http_response_code(401);
-    echo json_encode(['success' => false, 'error' => 'Non authentifié']);
-    exit;
-}
-
-// Config & DB
-require_once __DIR__ . '/../../../../config/config.php';
-
-try {
-    $pdo = new PDO(
-        'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4',
-        DB_USER, DB_PASS,
-        [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
-    );
-} catch (Exception $e) {
-    echo json_encode(['success' => false, 'error' => 'Erreur DB']);
-    exit;
-}
 
 require_once __DIR__ . '/MarketAnalyzer.php';
 
-$analyzer = new MarketAnalyzer($pdo, $_SESSION['admin_id']);
+$analyzer = new MarketAnalyzer($pdo, (int) $_SESSION['admin_id']);
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 $input = json_decode(file_get_contents('php://input'), true) ?? [];
 
