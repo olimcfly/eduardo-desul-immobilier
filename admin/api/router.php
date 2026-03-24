@@ -61,7 +61,8 @@ $moduleMap = [
     'secteurs'    => $handlersDir . 'secteurs.php',
 
     // ── IMMOBILIER ───────────────────────
-    'biens'       => $handlersDir . 'biens.php',
+    'biens'            => $handlersDir . 'biens.php',
+    'market-analyzer'  => dirname(__DIR__) . '/modules/immobilier/market-analyzer/api.php',
 
     // ── MARKETING / CRM ──────────────────
     'leads'       => $handlersDir . 'leads.php',

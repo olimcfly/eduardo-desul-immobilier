@@ -62,12 +62,13 @@ $sidebarGroups = [
     [
         'id' => 'grp-immo', 'label' => 'Mes Biens',
         'icon' => 'fa-house', 'color' => '#c9913b',
-        'slugs' => ['properties','estimation','rdv','financement'],
+        'slugs' => ['properties','estimation','rdv','financement','market-analyzer'],
         'children' => [
-            ['slug'=>'properties', 'icon'=>'fa-house',          'label'=>'Mes biens'],
-            ['slug'=>'estimation', 'icon'=>'fa-calculator',     'label'=>'Estimations re&ccedil;ues'],
-            ['slug'=>'rdv',        'icon'=>'fa-calendar-check', 'label'=>'Mes rendez-vous'],
-            ['slug'=>'financement','icon'=>'fa-piggy-bank',     'label'=>'Financement'],
+            ['slug'=>'properties',      'icon'=>'fa-house',          'label'=>'Mes biens'],
+            ['slug'=>'estimation',      'icon'=>'fa-calculator',     'label'=>'Estimations re&ccedil;ues'],
+            ['slug'=>'rdv',             'icon'=>'fa-calendar-check', 'label'=>'Mes rendez-vous'],
+            ['slug'=>'financement',     'icon'=>'fa-piggy-bank',     'label'=>'Financement'],
+            ['slug'=>'market-analyzer', 'icon'=>'fa-chart-line',     'label'=>'Analyseur March&eacute;', 'badge'=>'NEW'],
         ],
     ],
     [
