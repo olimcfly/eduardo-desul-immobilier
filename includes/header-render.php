@@ -9,8 +9,8 @@
  * Usage: include ce fichier dans header.php ou directement dans les pages
  */
 
-require_once __DIR__ . '/../../includes/Database.php';
-require_once __DIR__ . '/../../includes/site-identity.php';
+require_once __DIR__ . '/classes/Database.php';
+require_once __DIR__ . '/site-identity.php';
 
 /**
  * Charge les données du header depuis la base de données
