@@ -101,11 +101,4 @@ function checkMobile() {
 }
 checkMobile();
 window.addEventListener('resize', checkMobile);
-document.addEventListener('click', function(e) {
-    const sb  = document.getElementById('sidebar');
-    const btn = document.getElementById('menuToggle');
-    if (sb && sb.classList.contains('open') && !sb.contains(e.target) && e.target !== btn) {
-        sb.classList.remove('open');
-    }
-});
 </script>
