@@ -14,6 +14,9 @@ if (!function_exists('env')) {
     $envHelper = dirname(dirname(__FILE__)) . '/core/env.php';
     if (is_file($envHelper)) {
         require_once $envHelper;
+        if (function_exists('loadEnv')) {
+            loadEnv(dirname(dirname(__FILE__)) . '/.env');
+        }
     }
 }
 

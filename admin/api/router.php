@@ -70,6 +70,7 @@ $moduleMap = [
     // ── SEO ──────────────────────────────
     'seo'              => $handlersDir . 'seo.php',
     'seo-semantic'     => $handlersDir . 'seo-semantic.php',
+    'local-onboarding' => $handlersDir . 'local-onboarding.php',
 
     // ── SOCIAL / GMB ─────────────────────
     'gmb'         => $handlersDir . 'gmb.php',
