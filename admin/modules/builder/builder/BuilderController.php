@@ -417,7 +417,7 @@ class BuilderController
             'article' => ['articles', 'blog_articles'],
             'landing' => ['pages'],
             'secteur' => ['secteurs'],
-            'capture' => ['captures', 'capture_pages'],
+            'capture' => ['captures'],
             'header'  => ['headers'],
             'footer'  => ['footers'],
             'header'  => ['headers'],
@@ -427,7 +427,7 @@ class BuilderController
         $candidates = $tables[$context] ?? [];
         foreach ($candidates as $table) {
             try {
-                $col = ($table === 'captures' || $table === 'capture_pages') ? 'name' : 'title';
+                $col = ($table === 'captures') ? 'titre' : 'title';
                 $stmt = $this->db->prepare("SELECT `$col` FROM `$table` WHERE id = ?");
                 $stmt->execute([$entityId]);
                 $title = $stmt->fetchColumn();

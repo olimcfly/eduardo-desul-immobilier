@@ -15,7 +15,7 @@ if (!isset($_SESSION['admin_id'])) {
 }
 
 require_once __DIR__ . '/../../../../config/config.php';
-require_once __DIR__ . '/../../modules/launchpad/LaunchpadManager.php';
+require_once __DIR__ . '/LaunchpadManager.php';
 
 try {
     $pdo = new PDO(

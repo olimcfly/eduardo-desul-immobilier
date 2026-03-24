@@ -36,7 +36,7 @@ try {
 }
 
 // ── Charger la page ──
-$stmt = $pdo->prepare("SELECT * FROM capture_pages WHERE slug = ? AND status = 'publie'");
+$stmt = $pdo->prepare("SELECT * FROM captures WHERE slug = ? AND status = 'active'");
 $stmt->execute([$slug]);
 $page = $stmt->fetch();
 
@@ -47,7 +47,7 @@ if (!$page) {
 }
 
 // ── Incrémenter les vues ──
-$pdo->prepare("UPDATE capture_pages SET views_count = views_count + 1 WHERE id = ?")->execute([$page['id']]);
+$pdo->prepare("UPDATE captures SET vues = vues + 1 WHERE id = ?")->execute([$page['id']]);
 
 // ══════════════════════════════════════════════════════════
 // TRAITEMENT DU FORMULAIRE (POST)
@@ -164,9 +164,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['capture_submit'])) {
             }
 
             // ── Incrémenter le compteur de soumissions ──
-            $pdo->prepare("UPDATE capture_pages SET 
-                submissions_count = submissions_count + 1,
-                conversion_rate = ROUND((submissions_count + 1) / GREATEST(views_count, 1) * 100, 2)
+            $pdo->prepare("UPDATE captures SET
+                conversions = conversions + 1,
+                taux_conversion = ROUND((conversions + 1) / GREATEST(vues, 1) * 100, 2)
                 WHERE id = ?")->execute([$page['id']]);
 
             $showMerci = true;

@@ -31,7 +31,7 @@ try {
         case 'list':
             $pages = $pdo->query(
                 "SELECT id, titre, slug, statut, conversions, views, created_at
-                 FROM capture_pages ORDER BY created_at DESC"
+                 FROM captures ORDER BY created_at DESC"
             )->fetchAll(PDO::FETCH_ASSOC);
             echo json_encode(['success' => true, 'data' => $pages]);
             break;
@@ -39,8 +39,8 @@ try {
         case 'get':
             $id = (int)($input['id'] ?? $_GET['id'] ?? 0);
             if (!$id) { echo json_encode(['success' => false, 'error' => 'ID manquant']); break; }
-            $page = $pdo->prepare("SELECT * FROM capture_pages WHERE id=?")->execute([$id]);
-            $page = $pdo->prepare("SELECT * FROM capture_pages WHERE id=?");
+            $page = $pdo->prepare("SELECT * FROM captures WHERE id=?")->execute([$id]);
+            $page = $pdo->prepare("SELECT * FROM captures WHERE id=?");
             $page->execute([$id]);
             $data = $page->fetch(PDO::FETCH_ASSOC);
             echo json_encode(['success' => (bool)$data, 'data' => $data]);
@@ -49,18 +49,18 @@ try {
         case 'toggle_statut':
             $id = (int)($input['id'] ?? 0);
             if (!$id) { echo json_encode(['success' => false, 'error' => 'ID manquant']); break; }
-            $current = $pdo->prepare("SELECT statut FROM capture_pages WHERE id=?");
+            $current = $pdo->prepare("SELECT statut FROM captures WHERE id=?");
             $current->execute([$id]);
             $row = $current->fetch(PDO::FETCH_ASSOC);
             $new = ($row['statut'] ?? 'inactif') === 'actif' ? 'inactif' : 'actif';
-            $pdo->prepare("UPDATE capture_pages SET statut=? WHERE id=?")->execute([$new, $id]);
+            $pdo->prepare("UPDATE captures SET statut=? WHERE id=?")->execute([$new, $id]);
             echo json_encode(['success' => true, 'statut' => $new]);
             break;
 
         case 'delete':
             $id = (int)($input['id'] ?? 0);
             if (!$id) { echo json_encode(['success' => false, 'error' => 'ID manquant']); break; }
-            $pdo->prepare("DELETE FROM capture_pages WHERE id=?")->execute([$id]);
+            $pdo->prepare("DELETE FROM captures WHERE id=?")->execute([$id]);
             echo json_encode(['success' => true]);
             break;
 
@@ -70,7 +70,7 @@ try {
             $stmt = $pdo->prepare(
                 "SELECT views, conversions,
                         ROUND(IF(views>0, conversions/views*100, 0), 1) AS taux_conversion
-                 FROM capture_pages WHERE id=?"
+                 FROM captures WHERE id=?"
             );
             $stmt->execute([$id]);
             echo json_encode(['success' => true, 'data' => $stmt->fetch(PDO::FETCH_ASSOC)]);
@@ -79,14 +79,14 @@ try {
         case 'increment_view':
             $id = (int)($input['id'] ?? 0);
             if (!$id) { echo json_encode(['success' => false]); break; }
-            $pdo->prepare("UPDATE capture_pages SET views = views+1 WHERE id=?")->execute([$id]);
+            $pdo->prepare("UPDATE captures SET views = views+1 WHERE id=?")->execute([$id]);
             echo json_encode(['success' => true]);
             break;
 
         case 'increment_conversion':
             $id = (int)($input['id'] ?? 0);
             if (!$id) { echo json_encode(['success' => false]); break; }
-            $pdo->prepare("UPDATE capture_pages SET conversions = conversions+1 WHERE id=?")->execute([$id]);
+            $pdo->prepare("UPDATE captures SET conversions = conversions+1 WHERE id=?")->execute([$id]);
             echo json_encode(['success' => true]);
             break;
 

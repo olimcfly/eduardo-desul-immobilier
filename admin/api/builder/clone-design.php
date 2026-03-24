@@ -119,7 +119,7 @@ $INTERNAL_MAP = [
     'guide'   => ['table'=>'guide_local',  'col_id'=>'id','col_title'=>'titre',  'col_html'=>'contenu',    'col_css'=>'custom_css','col_js'=>'custom_js','col_slug'=>'slug','col_status'=>'statut'],
     'header'  => ['table'=>'headers',      'col_id'=>'id','col_title'=>'name',   'col_html'=>'custom_html','col_css'=>'custom_css','col_js'=>'custom_js','col_slug'=>'name','col_status'=>'status'],
     'footer'  => ['table'=>'footers',      'col_id'=>'id','col_title'=>'name',   'col_html'=>'custom_html','col_css'=>'custom_css','col_js'=>'custom_js','col_slug'=>'name','col_status'=>'status'],
-    'capture' => ['table'=>'capture_pages','col_id'=>'id','col_title'=>'name',   'col_html'=>'content',    'col_css'=>'custom_css','col_js'=>'custom_js','col_slug'=>'slug','col_status'=>'status'],
+    'capture' => ['table'=>'captures','col_id'=>'id','col_title'=>'titre',   'col_html'=>'contenu',    'col_css'=>'custom_css','col_js'=>'custom_js','col_slug'=>'slug','col_status'=>'status'],
 ];
 
 // ── ACTION : LIST (GET ?action=list) ─────────────────────────────────────────

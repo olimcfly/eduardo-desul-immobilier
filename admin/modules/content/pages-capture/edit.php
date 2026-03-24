@@ -80,11 +80,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_edit_submit'] ?? '') === 
                     cta_text=:cta_text, page_merci_url=:page_merci_url,
                     status=:status, active=:active, actif=:actif
                     WHERE id=:id");
-                $d[':id'] = $captureId;
-                $stmt->execute(array_merge($d, ['id' => $captureId]));
+                $d['id'] = $captureId;
+                $stmt->execute($d);
                 // Recharger
-                $capture = $pdo->prepare("SELECT * FROM captures WHERE id = ?")->execute([$captureId])
-                    ? $pdo->prepare("SELECT * FROM captures WHERE id = ?")->execute([$captureId]) && false ?: null : null;
                 $stmt2 = $pdo->prepare("SELECT * FROM captures WHERE id = ?");
                 $stmt2->execute([$captureId]);
                 $capture = $stmt2->fetch(PDO::FETCH_ASSOC) ?: $d;

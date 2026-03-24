@@ -39,7 +39,7 @@ $CTX = [
     'guide'   => ['table'=>'guide_local',  'col_title'=>'titre', 'col_content'=>'contenu',    'col_css'=>'custom_css','col_js'=>'custom_js','col_slug'=>'slug','col_status'=>'statut','col_php'=>'php_content','list'=>'dashboard.php?page=guide-local'],
     'header'  => ['table'=>'headers',      'col_title'=>'name',  'col_content'=>'custom_html','col_css'=>'custom_css','col_js'=>'custom_js','col_slug'=>'name','col_status'=>'status','col_php'=>null,         'list'=>'dashboard.php?page=builder&sub=headers'],
     'footer'  => ['table'=>'footers',      'col_title'=>'name',  'col_content'=>'custom_html','col_css'=>'custom_css','col_js'=>'custom_js','col_slug'=>'name','col_status'=>'status','col_php'=>null,         'list'=>'dashboard.php?page=builder&sub=footers'],
-    'capture' => ['table'=>'capture_pages','col_title'=>'name',  'col_content'=>'content',    'col_css'=>'custom_css','col_js'=>'custom_js','col_slug'=>'slug','col_status'=>'status','col_php'=>'php_content','list'=>'dashboard.php?page=captures'],
+    'capture' => ['table'=>'captures','col_title'=>'titre',  'col_content'=>'contenu',    'col_css'=>'custom_css','col_js'=>'custom_js','col_slug'=>'slug','col_status'=>'status','col_php'=>'php_content','list'=>'dashboard.php?page=captures'],
 ];
 
 if (!isset($CTX[$context])) $context = 'page';
@@ -90,7 +90,7 @@ if ($isDynamic) {
                 $connectorData=$rs?$rs->fetchAll(PDO::FETCH_ASSOC):[];
                 $connectorLabel='Guides';$connectorIcon='fa-book';$connectorEditBase='/admin/modules/content/guide-local/edit.php?id='; break;
             case 'capture':
-                $rs = $pdo->query("SELECT id, name, slug, status FROM capture_pages ORDER BY created_at DESC LIMIT 60");
+                $rs = $pdo->query("SELECT id, titre as name, slug, status FROM captures ORDER BY created_at DESC LIMIT 60");
                 $connectorData=$rs?$rs->fetchAll(PDO::FETCH_ASSOC):[];
                 $connectorLabel='Ressources';$connectorIcon='fa-magnet';$connectorEditBase='/admin/modules/content/pages-capture/edit.php?id='; break;
         }
@@ -147,7 +147,7 @@ try {
             ],'loop'=>'<?php foreach($guides as $g): ?>'."\n".'<div class="guide-card">'."\n".'  <a href="/guide/<?= $g[\'slug\'] ?>">'."\n".'    <h3><?= htmlspecialchars($g[\'titre\']) ?></h3>'."\n".'    <p><?= htmlspecialchars($g[\'ville\']??\'\')?></p>'."\n".'  </a>'."\n".'</div>'."\n".'<?php endforeach; ?>','table'=>'guide_local'];
             break;
         case 'capture':
-            $r=$pdo->query("SELECT COUNT(*) FROM capture_pages"); $dbStats=['Pages capture'=>$r?(int)$r->fetchColumn():0];
+            $r=$pdo->query("SELECT COUNT(*) FROM captures"); $dbStats=['Pages capture'=>$r?(int)$r->fetchColumn():0];
             try{$r2=$pdo->query("SELECT COUNT(*) FROM leads");$dbStats['Total leads']=$r2?(int)$r2->fetchColumn():0;
                 $r3=$pdo->query("SELECT COUNT(*) FROM leads WHERE DATE(created_at)=CURDATE()");$dbStats["Leads auj."]=$r3?(int)$r3->fetchColumn():0;}catch(Exception $e){}
             $dbData=['vars'=>[
