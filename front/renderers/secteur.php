@@ -176,9 +176,9 @@ if (function_exists('getHeaderFooter')) {
 // 5. Métadonnées
 // ─────────────────────────────────────────────────
 $_siteUrl  = function_exists('siteUrl')  ? siteUrl()  : ((!empty($_SERVER['HTTPS'])&&$_SERVER['HTTPS']!=='off')?'https':'http').'://'.$_SERVER['HTTP_HOST'];
-$_siteName = function_exists('siteName') ? siteName() : 'Eduardo De Sul Immobilier';
+$_siteName = function_exists('siteName') ? siteName() : _ss('site_name', 'Mon entreprise');
 $metaTitle = htmlspecialchars($secteur['meta_title'] ?: 'Immobilier ' . $sectName . ' | ' . $_siteName);
-$metaDesc  = htmlspecialchars($secteur['meta_description'] ?? 'Découvrez le marché immobilier à ' . $sectName . '. Acheter, vendre ou estimer votre bien avec Eduardo De Sul.');
+$metaDesc  = htmlspecialchars($secteur['meta_description'] ?? 'Découvrez le marché immobilier à ' . $sectName . '. Acheter, vendre ou estimer votre bien.');
 $canonical = $_siteUrl . '/' . $sectSlug;
 $ogImage   = $secteur['hero_image'] ?? $secteur['image'] ?? '';
 
@@ -187,7 +187,7 @@ $prixMoyen = $secteur['prix_moyen']    ?? '';
 $prixM2    = $secteur['prix_moyen_m2'] ?? $secteur['prix_m2'] ?? '';
 if ($prixM2) $prixM2 = number_format((int)$prixM2, 0, ',', ' ');
 $population  = $secteur['population']  ?? '';
-$phone       = function_exists('_ss') ? _ss('phone', '06 24 10 58 16') : '06 24 10 58 16';
+$phone       = function_exists('_ss') ? _ss('phone', '') : '';
 $phoneclean  = preg_replace('/\s+/', '', $phone);
 
 $transports = _jsonDecode($secteur['transport'] ?? $secteur['transports'] ?? '');
@@ -245,7 +245,7 @@ $faq        = _jsonDecode($secteur['faq']       ?? '');
 
 <?php else: ?>
 
-    <!-- ══ Template par défaut Eduardo ══ -->
+    <!-- ══ Template par défaut ══ -->
     <style>
     :root{--ed-primary:#1a4d7a;--ed-primary-dk:#0e3a5c;--ed-accent:#d4a574;--ed-accent-lt:#e8c49a;--ed-text:#2d3748;--ed-text-light:#718096;--ed-card-bg:#f9f6f3;--ed-border:#e2d9ce;--ed-border-lt:#ece8e2;--ff-heading:"Playfair Display",serif;--ff-body:"DM Sans",sans-serif;--ed-radius:8px;--ed-radius-lg:12px;--ed-shadow:0 2px 8px rgba(0,0,0,.07);--ed-shadow-lg:0 8px 30px rgba(0,0,0,.12);--ed-transition:all .2s ease}
     .sec-hero{position:relative;overflow:hidden;min-height:420px;display:flex;align-items:flex-end;background:linear-gradient(135deg,var(--ed-primary-dk),var(--ed-primary))}
@@ -440,8 +440,10 @@ $faq        = _jsonDecode($secteur['faq']       ?? '');
         <aside class="sec-sidebar">
             <div class="sec-widget sec-cta-widget">
                 <div class="sec-widget__title"><i class="fas fa-map-marker-alt" style="margin-right:8px"></i> Votre projet à <?= htmlspecialchars($sectName) ?></div>
-                <p>Eduardo connaît parfaitement ce secteur. Estimation gratuite ou recherche sur mesure.</p>
+                <p><?= htmlspecialchars(_ss('secteur_cta_text', 'Estimation gratuite ou recherche sur mesure dans ce secteur.')) ?></p>
+                <?php if ($phone): ?>
                 <a href="tel:<?= $phoneclean ?>" class="ed-btn ed-btn--primary" style="width:100%;justify-content:center;margin-bottom:10px"><i class="fas fa-phone-alt"></i> <?= htmlspecialchars($phone) ?></a>
+                <?php endif; ?>
                 <a href="/estimation" class="ed-btn ed-btn--ghost" style="width:100%;justify-content:center"><i class="fas fa-calculator"></i> Estimer mon bien</a>
             </div>
 
@@ -484,8 +486,8 @@ $faq        = _jsonDecode($secteur['faq']       ?? '');
 if (!function_exists('buildSecteurVars')) {
 function buildSecteurVars(array $secteur, PDO $db): array {
     $siteUrl  = function_exists('siteUrl')  ? siteUrl()  : 'https://' . ($_SERVER['HTTP_HOST'] ?? '');
-    $siteName = function_exists('siteName') ? siteName() : 'Eduardo De Sul Immobilier';
-    $phone    = function_exists('_ss')      ? _ss('phone', '06 24 10 58 16') : '06 24 10 58 16';
+    $siteName = function_exists('siteName') ? siteName() : _ss('site_name', 'Mon entreprise');
+    $phone    = function_exists('_ss')      ? _ss('phone', '') : '';
     $name     = $secteur['nom'] ?? $secteur['name'] ?? $secteur['title'] ?? '';
 
     return [

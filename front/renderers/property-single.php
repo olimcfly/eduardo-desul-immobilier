@@ -87,9 +87,11 @@ $lng         = $colLng ? ($property[$colLng] ?? null) : null;
 $priceFormatted = $prix > 0 ? number_format($prix, 0, ',', ' ') . ($transaction === 'location' ? ' €/mois' : ' €') : 'Prix sur demande';
 
 // ─── SEO ───
-$metaTitle = $property['meta_title'] ?? "{$titre} – Eduardo De Sul Immobilier";
-$metaDesc  = $property['meta_description'] ?? ($description ? mb_substr(strip_tags($description), 0, 155) . '…' : "Découvrez {$titre} à {$ville}. Contactez Eduardo De Sul pour plus d'informations.");
-$canonUrl  = "https://eduardo-desul-immobilier.fr/biens/{$slug}";
+$_siteName = function_exists('siteName') ? siteName() : _ss('site_name', 'Mon entreprise');
+$_siteUrl  = function_exists('siteUrl')  ? siteUrl()  : _ss('site_url', '');
+$metaTitle = $property['meta_title'] ?? "{$titre} – {$_siteName}";
+$metaDesc  = $property['meta_description'] ?? ($description ? mb_substr(strip_tags($description), 0, 155) . '…' : "Découvrez {$titre} à {$ville}. Contactez-nous pour plus d'informations.");
+$canonUrl  = rtrim($_siteUrl, '/') . "/biens/{$slug}";
 
 function dpeColor(string $d): array {
     $map = [
@@ -560,13 +562,13 @@ function dpeColor(string $d): array {
             <div class="ps-sidebar-top">
                 <div class="ps-advisor-photo">
                     <?php
-                    $photoAdvisor = '/front/assets/images/eduardo-desul.jpg';
-                    if (file_exists(dirname(dirname(__DIR__)) . '/assets/images/eduardo-desul.jpg')): ?>
-                    <img src="<?= $photoAdvisor ?>" alt="Eduardo De Sul">
+                    $photoAdvisor = _ss('agent_photo', '');
+                    if ($photoAdvisor && file_exists(dirname(dirname(__DIR__)) . parse_url($photoAdvisor, PHP_URL_PATH))): ?>
+                    <img src="<?= htmlspecialchars($photoAdvisor) ?>" alt="<?= htmlspecialchars(_ss('agent_name', '')) ?>">
                     <?php else: ?><i class="fas fa-user"></i><?php endif; ?>
                 </div>
-                <h3>Eduardo De Sul</h3>
-                <p>Conseiller Immobilier eXp France · Bordeaux</p>
+                <h3><?= htmlspecialchars(_ss('agent_name', _ss('site_name', 'Mon entreprise'))) ?></h3>
+                <p><?= htmlspecialchars(_ss('agent_title', 'Conseiller immobilier')) ?></p>
             </div>
             <div class="ps-sidebar-body">
                 <div class="ps-sidebar-price"><?= $priceFormatted ?></div>
@@ -590,12 +592,17 @@ function dpeColor(string $d): array {
                     </button>
                 </form>
                 <p style="font-size:.65rem;color:var(--text3);text-align:center;margin:8px 0 12px">Réponse sous 24h ouvrées · Données protégées</p>
-                <a href="tel:+33624105816" class="ps-sidebar-tel">
-                    <i class="fas fa-phone"></i> 06 24 10 58 16
+                <?php $agentPhone = _ss('phone', ''); $agentWhatsapp = _ss('whatsapp', ''); ?>
+                <?php if ($agentPhone): ?>
+                <a href="tel:<?= htmlspecialchars(preg_replace('/\s+/', '', $agentPhone)) ?>" class="ps-sidebar-tel">
+                    <i class="fas fa-phone"></i> <?= htmlspecialchars($agentPhone) ?>
                 </a>
-                <a href="https://wa.me/33624105816" target="_blank" class="ps-sidebar-tel" style="margin-top:6px;background:rgba(37,211,102,.08);border-color:rgba(37,211,102,.2);color:#25d366">
+                <?php endif; ?>
+                <?php if ($agentWhatsapp): ?>
+                <a href="https://wa.me/<?= htmlspecialchars(preg_replace('/\s+/', '', $agentWhatsapp)) ?>" target="_blank" class="ps-sidebar-tel" style="margin-top:6px;background:rgba(37,211,102,.08);border-color:rgba(37,211,102,.2);color:#25d366">
                     <i class="fab fa-whatsapp"></i> WhatsApp
                 </a>
+                <?php endif; ?>
             </div>
         </div>
     </div><!-- /sidebar -->
@@ -691,7 +698,7 @@ document.getElementById('psContactForm')?.addEventListener('submit', async e => 
         const r = await fetch('/front/capture/index.php', {method:'POST', body:fd});
         const d = await r.json().catch(() => ({success: false}));
         if (d.success !== false) {
-            e.target.innerHTML = `<div style="text-align:center;padding:20px;color:#059669"><i class="fas fa-check-circle" style="font-size:2rem;margin-bottom:10px;display:block"></i><strong>Message envoyé !</strong><br><span style="font-size:.8rem;opacity:.8">Eduardo vous contactera rapidement.</span></div>`;
+            e.target.innerHTML = `<div style="text-align:center;padding:20px;color:#059669"><i class="fas fa-check-circle" style="font-size:2rem;margin-bottom:10px;display:block"></i><strong>Message envoyé !</strong><br><span style="font-size:.8rem;opacity:.8">Nous vous contacterons rapidement.</span></div>`;
         } else {
             btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i> Renvoyer';
             alert('Erreur lors de l\'envoi. Veuillez appeler directement.');

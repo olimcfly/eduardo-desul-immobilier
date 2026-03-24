@@ -924,7 +924,7 @@ foreach ($typeConfig as $t => $cfg) {
  * JS MODULE SÉMANTIQUE UNIFIÉ v4.0
  * ════════════════════════════════════════
  */
-const SA = '<?= $adminUrl ?>/modules/seo-semantic/api.php';
+const SA = '<?= $adminUrl ?>/api/router.php?module=seo-semantic';
 
 // ═══ ANALYSE INDIVIDUELLE ═══
 function sAn(type, id, btn) {
@@ -932,7 +932,7 @@ function sAn(type, id, btn) {
     btn.classList.add('run');
     document.getElementById('r-' + uid)?.classList.add('anim');
     
-    fetch(SA + '?action=analyze&content_type=' + type + '&id=' + id)
+    fetch(SA + '&action=analyze&content_type=' + type + '&id=' + id)
         .then(r => r.text())
         .then(text => {
             let d;
@@ -997,7 +997,7 @@ function sBatch(onlyMissing) {
         const btn = document.getElementById('b-' + q[i].uid);
         if (btn) btn.classList.add('run');
         
-        fetch(SA + '?action=analyze&content_type=' + q[i].type + '&id=' + q[i].id)
+        fetch(SA + '&action=analyze&content_type=' + q[i].type + '&id=' + q[i].id)
             .then(r => r.json())
             .then(d => {
                 if (btn) btn.classList.remove('run');
@@ -1018,7 +1018,7 @@ function sDetail(type, id) {
     const uid = type + '-' + id;
     sShowL('Chargement...');
     
-    fetch(SA + '?action=details&content_type=' + type + '&id=' + id)
+    fetch(SA + '&action=details&content_type=' + type + '&id=' + id)
         .then(r => r.json())
         .then(d => {
             sHideL();

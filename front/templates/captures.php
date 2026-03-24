@@ -308,7 +308,7 @@
         <div class="header-content">
             <a href="/" class="logo">
                 <span>🏠</span>
-                <span>Eduardo De Sul</span>
+                <span><?php echo htmlspecialchars(_ss('site_name', 'Mon entreprise')); ?></span>
             </a>
             <nav>
                 <a href="/">Home</a>
@@ -326,8 +326,8 @@
 
     <!-- FOOTER -->
     <footer>
-        <p>&copy; <?php echo date('Y'); ?> Eduardo De Sul - Conseiller Immobilier eXp France</p>
-        <p>Bordeaux Métropole · SIRET · Assurance RC Professionnelle</p>
+        <p>&copy; <?php echo date('Y'); ?> <?php echo htmlspecialchars(_ss('site_name', 'Mon entreprise')); ?></p>
+        <p><?php echo htmlspecialchars(_ss('footer_legal_line', '')); ?></p>
         <p><a href="#mentions">Mentions légales</a> · <a href="#rgpd">Politique de confidentialité</a></p>
     </footer>
 
@@ -340,7 +340,7 @@
       "description": "<?php echo addslashes(htmlspecialchars($meta_description ?? '')); ?>",
       "publisher": {
         "@type": "Organization",
-        "name": "Eduardo De Sul"
+        "name": "<?php echo addslashes(_ss('site_name', 'Mon entreprise')); ?>"
       }
     }
     </script>

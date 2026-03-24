@@ -8,8 +8,8 @@
  *
  * CHANGELOG v3.1 (depuis v3.0) :
  *  ✅ Style v3.0 conservé intégralement (CSS/tableau/badges/stats/toolbar)
- *  ✅ Bouton "Nouvelle page" → modal (titre) → crée en DB → redirige Builder Pro
- *  ✅ Lien "Éditer" → /admin/modules/builder/builder/editor.php?context=landing&entity_id=X
+ *  ✅ Bouton "Nouvelle page" → modal (titre) → crée en DB → éditeur structuré
+ *  ✅ Lien "Éditer" → ?page=pages&action=edit&id=X
  *  ✅ Actions delete/toggleStatus/duplicate restent en AJAX vers l'API
  *  ✅ Action create_page en POST natif (pas d'API externe, slug auto, redirect)
  *  ✅ init.php cherché à 2/3/4 niveaux pour portabilité
@@ -26,6 +26,13 @@ if (!isset($pdo) && !isset($db)) {
 }
 if (isset($db)  && !isset($pdo)) $pdo = $db;
 if (isset($pdo) && !isset($db))  $db  = $pdo;
+
+// ─── Mode éditeur structuré (comme les articles) ───
+$requestedAction = $_GET['action'] ?? '';
+if (in_array($requestedAction, ['create', 'edit'], true)) {
+    require __DIR__ . '/action.php';
+    return;
+}
 
 // ─── Créer table si absente ───
 try {
@@ -141,8 +148,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_action'] ?? '') === 'crea
                 "INSERT INTO pages (`".implode('`,`',array_keys($fv))."`) VALUES (".implode(',',array_fill(0,count($fv),'?')).")"
             )->execute(array_values($fv));
             $newId = (int)$pdo->lastInsertId();
-            // ✅ Redirection directe vers Builder Pro
-            header("Location: /admin/modules/builder/builder/editor.php?context=landing&entity_id={$newId}");
+            // Redirection vers éditeur structuré
+            header("Location: ?page=pages&action=edit&id={$newId}");
             exit;
         } catch (PDOException $e) {
             header("Location: ?page=pages&msg=error"); exit;
@@ -540,8 +547,7 @@ $flash = $_GET['msg'] ?? '';
                 $modDate  = !empty($pg['updated_at'])
                     ? date('d/m/Y',strtotime($pg['updated_at']))
                     : (!empty($pg['created_at']) ? date('d/m/Y',strtotime($pg['created_at'])) : '—');
-                // ✅ v3.1 : édition → Builder Pro directement
-                $editUrl = "/admin/modules/builder/builder/editor.php?context=landing&entity_id={$pg['id']}";
+                $editUrl = "?page=pages&action=edit&id={$pg['id']}";
                 $viewUrl = "/{$pg['slug']}";
                 $idxMap  = [
                     'yes'     => ['fa-check-circle',  'Indexée',    'yes'],
@@ -589,8 +595,7 @@ $flash = $_GET['msg'] ?? '';
                 <td><span class="pgm-date"><?= $modDate ?></span></td>
                 <td>
                     <div class="pgm-actions">
-                        <!-- ✅ Éditer → Builder Pro -->
-                        <a href="<?= htmlspecialchars($editUrl) ?>" title="Éditer dans le Builder">
+                        <a href="<?= htmlspecialchars($editUrl) ?>" title="Éditer la page">
                             <i class="fas fa-edit"></i>
                         </a>
                         <!-- Dupliquer (AJAX) -->

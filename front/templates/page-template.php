@@ -223,7 +223,7 @@ if (!empty($page_content)) {
         <div class="header-content">
             <a href="/" class="logo">
                 <span>🏠</span>
-                <span>Eduardo De Sul</span>
+                <span><?php echo htmlspecialchars(_ss('site_name', 'Mon entreprise')); ?></span>
             </a>
             <nav>
                 <a href="/" <?php echo ($current_slug === 'home') ? 'class="active"' : ''; ?>>Home</a>
@@ -248,8 +248,8 @@ if (!empty($page_content)) {
 
     <!-- FOOTER -->
     <footer>
-        <p>&copy; <?php echo date('Y'); ?> Eduardo De Sul - Conseiller Immobilier eXp France</p>
-        <p>Bordeaux Métropole · SIRET · Assurance RC Professionnelle</p>
+        <p>&copy; <?php echo date('Y'); ?> <?php echo htmlspecialchars(_ss('site_name', 'Mon entreprise')); ?></p>
+        <p><?php echo htmlspecialchars(_ss('footer_legal_line', '')); ?></p>
         <p><a href="#mentions">Mentions légales</a> · <a href="#rgpd">Politique de confidentialité</a></p>
     </footer>
 
@@ -258,12 +258,12 @@ if (!empty($page_content)) {
     {
       "@context": "https://schema.org",
       "@type": "LocalBusiness",
-      "name": "Eduardo De Sul - Conseiller Immobilier",
-      "description": "Conseiller immobilier indépendant eXp France à Bordeaux Métropole",
+      "name": "<?php echo addslashes(_ss('site_name', 'Mon entreprise')); ?>",
+      "description": "<?php echo addslashes(_ss('site_description', '')); ?>",
       "address": {
         "@type": "PostalAddress",
-        "addressLocality": "Bordeaux",
-        "addressRegion": "Nouvelle-Aquitaine",
+        "addressLocality": "<?php echo addslashes(_ss('city', '')); ?>",
+        "addressRegion": "<?php echo addslashes(_ss('region', '')); ?>",
         "addressCountry": "FR"
       }
     }

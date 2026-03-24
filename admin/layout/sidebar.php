@@ -94,7 +94,7 @@ $sidebarGroups = [
     [
         'id' => 'grp-social', 'label' => 'Mes R&eacute;seaux',
         'icon' => 'fa-share-nodes', 'color' => '#db2777',
-        'slugs' => ['reseaux-sociaux','facebook','instagram','linkedin','tiktok','gmb','scraper-gmb'],
+        'slugs' => ['reseaux-sociaux','facebook','instagram','linkedin','tiktok','gmb','image-editor','scraper-gmb'],
         'children' => [
             ['slug'=>'reseaux-sociaux','icon'=>'fa-share-nodes',  'label'=>"Vue d'ensemble"],
             ['slug'=>'facebook',       'icon'=>'fab fa-facebook', 'label'=>'Facebook'],
@@ -102,16 +102,19 @@ $sidebarGroups = [
             ['slug'=>'linkedin',       'icon'=>'fab fa-linkedin', 'label'=>'LinkedIn'],
             ['slug'=>'tiktok',         'icon'=>'fab fa-tiktok',   'label'=>'TikTok'],
             ['slug'=>'gmb',            'icon'=>'fab fa-google',   'label'=>'Google My Business'],
+            ['slug'=>'image-editor',   'icon'=>'fa-image',        'label'=>"Éditeur d'images IA", 'badge'=>'NEW'],
             ['slug'=>'scraper-gmb',    'icon'=>'fa-binoculars',   'label'=>'Trouver des partenaires'],
         ],
     ],
     [
         'id' => 'grp-plan', 'label' => 'Strat&eacute;gie',
         'icon' => 'fa-rocket', 'color' => '#ea580c',
-        'slugs' => ['launchpad','neuropersona','strategy-module'],
+        'slugs' => ['launchpad','neuropersona','strategy-module','seo-strategie','analyse-marche'],
         'children' => [
             ['slug'=>'launchpad',    'icon'=>'fa-rocket', 'label'=>'Plan de lancement'],
             ['slug'=>'neuropersona', 'icon'=>'fa-brain',  'label'=>'Mon client id&eacute;al'],
+            ['slug'=>'seo-strategie','icon'=>'fa-bullhorn','label'=>'SEO strat&eacute;gie', 'badge'=>'SOON'],
+            ['slug'=>'analyse-marche','icon'=>'fa-chart-pie','label'=>'Analyse de march&eacute;', 'badge'=>'SOON'],
         ],
     ],
     [
@@ -128,15 +131,18 @@ $sidebarGroups = [
     [
         'id' => 'grp-systeme', 'label' => 'R&eacute;glages',
         'icon' => 'fa-gear', 'color' => '#64748b',
-        'slugs' => ['modules','settings','maintenance','license','api-keys','ai-settings'],
-        'children' => [
-            ['slug'=>'modules',     'icon'=>'fa-puzzle-piece', 'label'=>'Modules &amp; sant&eacute;'],
-            ['slug'=>'settings',    'icon'=>'fa-sliders',      'label'=>'Configuration'],
-            ['slug'=>'api-keys',    'icon'=>'fa-key',          'label'=>'Cl&eacute;s API'],
-            ['slug'=>'ai-settings', 'icon'=>'fa-robot',        'label'=>'Param&egrave;tres AI'],
-            ['slug'=>'maintenance', 'icon'=>'fa-wrench',       'label'=>'Maintenance'],
-            ['slug'=>'license',     'icon'=>'fa-shield-check', 'label'=>'Ma licence'],
-        ],
+        'slugs' => ['modules','settings','maintenance','license','api-keys','ai-settings','users'],
+        'children' => array_merge(
+            isSuperUser() ? [['slug'=>'users', 'icon'=>'fa-users-gear', 'label'=>'Utilisateurs', 'badge'=>'SU']] : [],
+            [
+                ['slug'=>'modules',     'icon'=>'fa-puzzle-piece', 'label'=>'Modules &amp; sant&eacute;'],
+                ['slug'=>'settings',    'icon'=>'fa-sliders',      'label'=>'Configuration'],
+                ['slug'=>'api-keys',    'icon'=>'fa-key',          'label'=>'Cl&eacute;s API'],
+                ['slug'=>'ai-settings', 'icon'=>'fa-robot',        'label'=>'Param&egrave;tres AI'],
+                ['slug'=>'maintenance', 'icon'=>'fa-wrench',       'label'=>'Maintenance'],
+                ['slug'=>'license',     'icon'=>'fa-shield-check', 'label'=>'Ma licence'],
+            ]
+        ),
     ],
 ];
 
@@ -152,7 +158,7 @@ foreach ($sidebarGroups as $grp) {
 
 <style>
 /* ===============================================
-   SIDEBAR — hover-open + sections distinctes
+   SIDEBAR — clic fixe + sections distinctes
 =============================================== */
 
 .sb-group-wrap .sb-children {
@@ -162,13 +168,13 @@ foreach ($sidebarGroups as $grp) {
     opacity: 0;
 }
 
-.sb-group-wrap:hover .sb-children,
+.sb-group-wrap.open .sb-children,
 .sb-group-wrap.active-group .sb-children {
     max-height: 600px;
     opacity: 1;
 }
 
-.sb-group-wrap:hover .sb-group-chevron,
+.sb-group-wrap.open .sb-group-chevron,
 .sb-group-wrap.active-group .sb-group-chevron {
     transform: rotate(90deg);
 }
@@ -190,13 +196,14 @@ foreach ($sidebarGroups as $grp) {
     padding: 7px 12px 7px 10px;
     border-radius: 8px;
     transition: background .18s;
-    color: var(--text-1, #e2e8f0);
+    color: var(--text-1, #f1f5f9);
 }
 .sb-group-btn:hover {
-    background: rgba(255,255,255,.05);
+    background: rgba(255,255,255,.07);
 }
 .sb-group-btn.has-active {
     color: #fff;
+    background: rgba(255,255,255,.06);
 }
 
 .sb-group-icon {
@@ -208,8 +215,8 @@ foreach ($sidebarGroups as $grp) {
 }
 
 .sb-group-label {
-    font-size: 11.5px;
-    font-weight: 600;
+    font-size: 12px;
+    font-weight: 700;
     letter-spacing: .3px;
     text-transform: uppercase;
     opacity: .75;
@@ -257,21 +264,22 @@ foreach ($sidebarGroups as $grp) {
     gap: 9px;
     padding: 6px 10px;
     border-radius: 7px;
-    font-size: 12.5px;
-    color: var(--text-2, #94a3b8);
+    font-size: 13px;
+    font-weight: 600;
+    color: #dbe4f2;
     text-decoration: none;
     transition: background .15s, color .15s;
     white-space: nowrap;
     overflow: hidden;
 }
 .sb-item:hover {
-    background: rgba(255,255,255,.06);
+    background: rgba(255,255,255,.1);
     color: #fff;
 }
 .sb-item.active {
-    background: rgba(255,255,255,.1);
+    background: rgba(99,102,241,.26);
     color: #fff;
-    font-weight: 600;
+    font-weight: 700;
 }
 .sb-item i {
     font-size: 13px;
@@ -302,6 +310,8 @@ foreach ($sidebarGroups as $grp) {
 }
 .sb-badge.new  { background: rgba(101,163,13,.25); color: #86efac; }
 .sb-badge.pro  { background: rgba(201,145,59,.25); color: #fcd34d; }
+.sb-badge.soon { background: rgba(100,116,139,.25); color: #cbd5e1; }
+.sb-badge.su   { background: rgba(99,102,241,.3); color: #a5b4fc; }
 </style>
 
 <aside class="sb" id="sidebar">
@@ -330,6 +340,16 @@ foreach ($sidebarGroups as $grp) {
         $sepGroups = ['grp-acquisition', 'grp-immo', 'grp-seo', 'grp-plan', 'grp-ia', 'grp-systeme'];
 
         foreach ($sidebarGroups as $grp):
+            // Filtrer les enfants selon les permissions de l'admin
+            $visibleChildren = [];
+            foreach ($grp['children'] as $item) {
+                if (function_exists('isModuleAllowed') && isModuleAllowed($item['slug'])) {
+                    $visibleChildren[] = $item;
+                }
+            }
+            // Si aucun enfant visible, masquer tout le groupe
+            if (empty($visibleChildren)) continue;
+
             $isGroupActive = in_array($activeModule, $grp['slugs']);
             $sepClass = in_array($grp['id'], $sepGroups) ? ' grp-sep-top' : '';
         ?>
@@ -348,7 +368,7 @@ foreach ($sidebarGroups as $grp) {
             </button>
 
             <div class="sb-children">
-                <?php foreach ($grp['children'] as $item):
+                <?php foreach ($visibleChildren as $item):
                     $isActive  = ($activeModule === $item['slug']);
                     $iconCls   = str_starts_with($item['icon'], 'fab ') ? $item['icon'] : 'fas '.$item['icon'];
                     $sepCls    = !empty($item['sep']) ? ' sep-before' : '';
@@ -374,18 +394,48 @@ foreach ($sidebarGroups as $grp) {
     <!-- Footer -->
     <div class="sb-footer">
         <a href="?page=advisor-context" class="sb-user">
-            <div class="sb-user-avatar"><?= strtoupper(mb_substr($advisorName, 0, 1)) ?></div>
+            <div class="sb-user-avatar" style="<?= isSuperUser() ? 'background:linear-gradient(135deg,#6366f1,#8b5cf6)' : '' ?>"><?= strtoupper(mb_substr($advisorName, 0, 1)) ?></div>
             <div>
                 <div class="sb-user-name"><?= htmlspecialchars($advisorName) ?></div>
-                <div class="sb-user-role">Administrateur</div>
+                <div class="sb-user-role"><?= getRoleLabel() ?></div>
             </div>
-            <i class="fas fa-gear sb-user-icon"></i>
+            <i class="fas fa-<?= isSuperUser() ? 'crown' : 'gear' ?> sb-user-icon"></i>
         </a>
     </div>
 
 </aside>
 
 <script>
+const sidebarGroups = document.querySelectorAll('.sb-group-wrap');
+const sidebarOpenKey = 'admin_sidebar_open_groups';
+let persistedOpenGroups = [];
+
+try {
+    persistedOpenGroups = JSON.parse(localStorage.getItem(sidebarOpenKey) || '[]');
+    if (!Array.isArray(persistedOpenGroups)) persistedOpenGroups = [];
+} catch (e) {
+    persistedOpenGroups = [];
+}
+
+sidebarGroups.forEach(group => {
+    const button = group.querySelector('.sb-group-btn');
+    if (!button) return;
+
+    if (group.classList.contains('active-group') || persistedOpenGroups.includes(group.id)) {
+        group.classList.add('open');
+    }
+
+    button.addEventListener('click', function() {
+        group.classList.toggle('open');
+
+        const openIds = Array.from(sidebarGroups)
+            .filter(wrap => wrap.classList.contains('open'))
+            .map(wrap => wrap.id);
+
+        localStorage.setItem(sidebarOpenKey, JSON.stringify(openIds));
+    });
+});
+
 const searchInput = document.getElementById('globalSearch');
 if (searchInput) {
     let timer;

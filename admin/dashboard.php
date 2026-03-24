@@ -18,6 +18,8 @@ if (session_status() === PHP_SESSION_NONE) {
 if (empty($_SESSION['admin_id'])) {
     $_SESSION['admin_id'] = 1;
     $_SESSION['user'] = 'admin@test.local';
+    $_SESSION['admin_email'] = 'admin@test.local';
+    $_SESSION['admin_role'] = 'superuser';
     $_SESSION['advisor_name'] = 'Administrateur';
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
@@ -115,10 +117,13 @@ $subRoutes = [
     'linkedin'            => ['file' => 'social/linkedin/index.php'],
     'tiktok'              => ['file' => 'social/tiktok/index.php'],
     'gmb'                 => ['file' => 'social/gmb/index.php'],
+    'image-editor'        => ['file' => 'social/image-editor/index.php'],
     'scraper-gmb'         => ['file' => 'network/scraper-gmb/index.php'],
     'websites'            => ['file' => 'network/websites/index.php'],
     'launchpad'           => ['file' => 'strategy/launchpad/index.php'],
     'strategy-module'     => ['file' => 'strategy/strategy/index.php'],
+    'seo-strategie'       => ['file' => 'strategy/strategy/seo-strategie.php'],
+    'analyse-marche'      => ['file' => 'strategy/strategy/analyse-marche.php'],
     'ressources'          => ['file' => 'strategy/strategy/ressources/index.php'],
     'neuropersona'        => ['file' => 'ai/neuropersona/index.php'],
     'ai'                  => ['file' => 'ai/ai/index.php'],
@@ -136,6 +141,7 @@ $subRoutes = [
     'api-keys'            => ['file' => 'system/settings/api/api-keys.php'],
     'ai-settings'         => ['file' => 'system/settings/ai_settings.php'],
     'profile'             => ['file' => 'ai/advisor-context/index.php'],
+    'users'               => ['file' => 'system/users/index.php'],
 ];
 
 // ── Titres ───────────────────────────────────────────────────
@@ -177,8 +183,11 @@ $titles = [
     'linkedin'        => 'LinkedIn',
     'tiktok'          => 'TikTok',
     'gmb'             => 'Google My Business',
+    'image-editor'    => "Éditeur d'images IA",
     'scraper-gmb'     => 'Trouver des partenaires',
     'launchpad'       => 'Plan de lancement',
+    'seo-strategie'   => 'SEO stratégie',
+    'analyse-marche'  => 'Analyse de marché',
     'ressources'      => 'Guides & Ressources',
     'neuropersona'    => 'Mon client idéal',
     'ai'              => 'Assistant IA',
@@ -196,6 +205,7 @@ $titles = [
     'settings-ai'     => 'Config IA',
     'api-keys'        => 'Clés API',
     'ai-settings'     => 'Paramètres AI',
+    'users'           => 'Gestion des utilisateurs',
 ];
 
 $pageTitle = $titles[$module] ?? $titles[$originalModule]
@@ -214,6 +224,7 @@ $highlightMap = [
     'properties-edit' => 'properties',
     'settings-email'  => 'settings', 'settings-api'  => 'settings',
     'settings-ai'     => 'settings', 'profile'       => 'advisor-context',
+    'users'           => 'users',
 ];
 $activeModule = $highlightMap[$module] ?? $highlightMap[$originalModule] ?? $module;
 
@@ -254,10 +265,23 @@ if (file_exists($msFile)) {
     $moduleStates = json_decode(file_get_contents($msFile), true) ?: [];
 }
 
+// ── Vérification des permissions ─────────────────────────────
+if ($module !== 'dashboard' && function_exists('isModuleAllowed') && !isModuleAllowed($module)) {
+    $module_file = null; // Bloquer le chargement
+    $permissionDenied = true;
+}
+
 // ── AJAX : inclure le module directement sans layout ─────────
-if (isset($_GET['ajax']) && $_GET['ajax'] == '1' && $module_file) {
-    include $module_file;
-    exit;
+if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
+    if (!empty($permissionDenied)) {
+        http_response_code(403);
+        echo '<div class="es"><i class="fas fa-lock"></i><h3>Accès restreint</h3><p>Vous n\'avez pas accès à ce module.</p></div>';
+        exit;
+    }
+    if ($module_file) {
+        include $module_file;
+        exit;
+    }
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -375,7 +399,14 @@ require_once __DIR__ . '/layout/sidebar.php';
 <?php else: ?>
 
 <div id="module-content">
-    <?php if ($module_file): ?>
+    <?php if (!empty($permissionDenied)): ?>
+        <div class="es">
+            <i class="fas fa-lock" style="color:#dc2626"></i>
+            <h3>Accès restreint</h3>
+            <p>Vous n'avez pas accès à ce module. Contactez le Super Administrateur pour obtenir l'accès.</p>
+            <a href="?page=dashboard" class="es-btn">&larr; Retour au tableau de bord</a>
+        </div>
+    <?php elseif ($module_file): ?>
         <?php include $module_file; ?>
     <?php else: ?>
         <div class="es">
