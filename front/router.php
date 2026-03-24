@@ -199,6 +199,36 @@ $uri = preg_replace('/\.php$/', '', $uri); // Enlever .php
 $uri = preg_replace('/[^a-z0-9\-\/]/i', '', $uri);
 
 // ========================================
+// ROUTES SPÉCIALES (renderers dédiés)
+// ========================================
+
+if (!defined('FRONT_ROUTER')) define('FRONT_ROUTER', true);
+$db = $pdo; // Les renderers utilisent $db
+
+$renderers = __DIR__ . '/renderers/';
+
+// Secteurs listing
+if ($uri === 'secteurs') {
+    require_once $renderers . 'secteur-listing.php';
+    exit;
+}
+
+// Secteur individuel : vérifier si le slug correspond à un secteur publié
+if ($uri !== '' && strpos($uri, '/') === false) {
+    try {
+        $stSecteur = $pdo->prepare("SELECT id FROM secteurs WHERE slug = ? AND status = 'published' LIMIT 1");
+        $stSecteur->execute([$uri]);
+        if ($stSecteur->fetchColumn()) {
+            $_GET['slug'] = $uri;
+            require_once $renderers . 'secteur.php';
+            exit;
+        }
+    } catch (Exception $e) {
+        // Ignorer et continuer vers le routage normal
+    }
+}
+
+// ========================================
 // ROUTER VERS LA BONNE PAGE
 // ========================================
 
