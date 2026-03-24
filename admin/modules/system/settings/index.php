@@ -14,7 +14,7 @@ if (isset($pdo) && !isset($db)) $db  = $pdo;
 
 // ─── Onglet actif ───
 $tab = preg_replace('/[^a-z]/', '', $_GET['subpage'] ?? $_GET['tab'] ?? 'general');
-$validTabs = ['general','email','appearance','security','api','ai'];
+$validTabs = ['general','email','appearance','security','api','ai','templates'];
 if (!in_array($tab, $validTabs)) $tab = 'general';
 
 // ─── Messages flash ───
@@ -120,6 +120,66 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                         $flashMsg = 'Erreur : ' . htmlspecialchars($e2->getMessage()); $flashType = 'err';
                     }
                 }
+            }
+        }
+
+        if ($action_post === 'save_page_template' && $pdo) {
+            try {
+                $pdo->exec("CREATE TABLE IF NOT EXISTS page_templates (
+                    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                    template_key VARCHAR(120) NOT NULL UNIQUE,
+                    name VARCHAR(180) NOT NULL,
+                    description VARCHAR(255) DEFAULT NULL,
+                    fields_json LONGTEXT DEFAULT NULL,
+                    html_template LONGTEXT DEFAULT NULL,
+                    is_active TINYINT(1) UNSIGNED DEFAULT 1,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+                $id = (int)($_POST['template_id'] ?? 0);
+                $templateKey = preg_replace('/[^a-z0-9_\\-]/', '', strtolower(trim($_POST['template_key'] ?? '')));
+                $name = trim($_POST['name'] ?? '');
+                $description = trim($_POST['description'] ?? '');
+                $fieldsJson = trim($_POST['fields_json'] ?? '[]');
+                $htmlTemplate = $_POST['html_template'] ?? '';
+                $isActive = isset($_POST['is_active']) ? 1 : 0;
+
+                if ($templateKey === '' || $name === '') {
+                    throw new Exception('Nom et clé template requis.');
+                }
+                json_decode($fieldsJson, true);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    throw new Exception('fields_json doit être un JSON valide.');
+                }
+
+                if ($id > 0) {
+                    $stmt = $pdo->prepare("UPDATE page_templates
+                        SET template_key=?, name=?, description=?, fields_json=?, html_template=?, is_active=?, updated_at=NOW()
+                        WHERE id=?");
+                    $stmt->execute([$templateKey, $name, $description, $fieldsJson, $htmlTemplate, $isActive, $id]);
+                } else {
+                    $stmt = $pdo->prepare("INSERT INTO page_templates
+                        (template_key, name, description, fields_json, html_template, is_active)
+                        VALUES (?, ?, ?, ?, ?, ?)");
+                    $stmt->execute([$templateKey, $name, $description, $fieldsJson, $htmlTemplate, $isActive]);
+                }
+                $flashMsg = 'Template de page sauvegardé.';
+            } catch (Throwable $e) {
+                $flashMsg = 'Erreur template : ' . htmlspecialchars($e->getMessage());
+                $flashType = 'err';
+            }
+        }
+
+        if ($action_post === 'delete_page_template' && $pdo) {
+            try {
+                $id = (int)($_POST['template_id'] ?? 0);
+                if ($id <= 0) throw new Exception('Template invalide.');
+                $pdo->prepare("DELETE FROM page_templates WHERE id = ?")->execute([$id]);
+                $flashMsg = 'Template supprimé.';
+            } catch (Throwable $e) {
+                $flashMsg = 'Suppression impossible : ' . htmlspecialchars($e->getMessage());
+                $flashType = 'err';
             }
         }
     }
@@ -246,6 +306,24 @@ if ($pdo) {
         $r = $pdo->query("SELECT * FROM advisor_context LIMIT 1")->fetch();
         if ($r) $advisorCtx = $r;
     } catch (PDOException $e) {}
+}
+
+$pageTemplates = [];
+if ($pdo) {
+    try {
+        $pdo->exec("CREATE TABLE IF NOT EXISTS page_templates (
+            id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            template_key VARCHAR(120) NOT NULL UNIQUE,
+            name VARCHAR(180) NOT NULL,
+            description VARCHAR(255) DEFAULT NULL,
+            fields_json LONGTEXT DEFAULT NULL,
+            html_template LONGTEXT DEFAULT NULL,
+            is_active TINYINT(1) UNSIGNED DEFAULT 1,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+        $pageTemplates = $pdo->query("SELECT * FROM page_templates ORDER BY updated_at DESC")->fetchAll(PDO::FETCH_ASSOC);
+    } catch (Throwable $e) {}
 }
 ?>
 <style>
@@ -409,6 +487,7 @@ if ($pdo) {
         'email'      => ['icon' => 'fa-envelope',          'label' => 'Email / SMTP'],
         'appearance' => ['icon' => 'fa-palette',           'label' => 'Apparence'],
         'security'   => ['icon' => 'fa-shield-halved',     'label' => 'Sécurité'],
+        'templates'  => ['icon' => 'fa-layer-group',       'label' => 'Templates pages'],
         'api'        => ['icon' => 'fa-plug',              'label' => 'API & Intégrations'],
         'ai'         => ['icon' => 'fa-wand-magic-sparkles','label' => 'Configuration IA'],
     ];
@@ -716,6 +795,73 @@ if ($pdo) {
 
 <div class="set-actions"><button type="submit" class="set-btn set-btn-p"><i class="fas fa-save"></i> Enregistrer la sécurité</button></div>
 </form>
+</div>
+
+<!-- ══════════════════════════════════════
+     ONGLET TEMPLATES DE PAGES
+══════════════════════════════════════ -->
+<div class="set-panel<?= $tab==='templates'?' active':'' ?>" id="tab-templates">
+
+<div class="set-section anim">
+    <div class="set-section-hd"><i class="fas fa-layer-group"></i><h3>Créer / modifier un template de page</h3><p>Structure de champs + HTML de rendu (optionnel)</p></div>
+    <div class="set-section-body">
+        <form method="POST" action="?page=settings&tab=templates">
+            <input type="hidden" name="action" value="save_page_template">
+            <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
+            <div class="set-grid">
+                <div class="set-field"><label>ID template (édition)</label><input class="set-input mono" type="number" name="template_id" placeholder="Laisser vide pour créer"></div>
+                <div class="set-field"><label>Clé template</label><input class="set-input mono" type="text" name="template_key" placeholder="ex: estimation_locale" required></div>
+                <div class="set-field"><label>Nom affiché</label><input class="set-input" type="text" name="name" placeholder="Template Estimation locale" required></div>
+                <div class="set-field"><label>Description</label><input class="set-input" type="text" name="description" placeholder="Utilisé pour les pages d'estimation"></div>
+                <div class="set-field set-full">
+                    <label>JSON des champs</label>
+                    <textarea class="set-input set-textarea mono" name="fields_json" rows="6" placeholder='[{"key":"hero_title","label":"Titre Hero","type":"text"},{"key":"intro","label":"Introduction","type":"textarea"}]'>[]</textarea>
+                    <small>Types supportés: text, textarea, url.</small>
+                </div>
+                <div class="set-field set-full">
+                    <label>Template HTML (optionnel)</label>
+                    <textarea class="set-input set-textarea mono" name="html_template" rows="8" placeholder="<section><h1>{{hero_title}}</h1><div>{{content}}</div></section>"></textarea>
+                    <small>Variables disponibles: {{title}}, {{content}}, {{slug}}, {{meta_title}}, {{meta_description}} + champs personnalisés (ex: {{hero_title}}).</small>
+                </div>
+                <div class="set-field">
+                    <label style="display:flex;align-items:center;gap:8px">
+                        <input type="checkbox" name="is_active" value="1" checked> Template actif
+                    </label>
+                </div>
+            </div>
+            <div class="set-actions"><button type="submit" class="set-btn set-btn-p"><i class="fas fa-save"></i> Sauvegarder le template</button></div>
+        </form>
+    </div>
+</div>
+
+<div class="set-section anim d1">
+    <div class="set-section-hd"><i class="fas fa-list"></i><h3>Templates existants</h3></div>
+    <div class="set-section-body">
+        <?php if (empty($pageTemplates)): ?>
+            <p style="color:var(--text-3);font-size:12px">Aucun template enregistré pour le moment.</p>
+        <?php else: ?>
+            <div style="display:grid;gap:10px">
+                <?php foreach ($pageTemplates as $tpl): ?>
+                <div style="border:1px solid var(--border);border-radius:10px;padding:12px;background:var(--surface-2)">
+                    <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
+                        <div>
+                            <strong><?= htmlspecialchars($tpl['name']) ?></strong>
+                            <div class="mono" style="font-size:11px;color:var(--text-3)">key: <?= htmlspecialchars($tpl['template_key']) ?> · id: <?= (int)$tpl['id'] ?></div>
+                            <div style="font-size:12px;color:var(--text-2);margin-top:4px"><?= htmlspecialchars($tpl['description'] ?? '') ?></div>
+                        </div>
+                        <form method="POST" action="?page=settings&tab=templates" onsubmit="return confirm('Supprimer ce template ?');">
+                            <input type="hidden" name="action" value="delete_page_template">
+                            <input type="hidden" name="csrf_token" value="<?= $csrf ?>">
+                            <input type="hidden" name="template_id" value="<?= (int)$tpl['id'] ?>">
+                            <button type="submit" class="set-btn set-btn-s" style="background:#fee2e2;color:#991b1b"><i class="fas fa-trash"></i> Supprimer</button>
+                        </form>
+                    </div>
+                </div>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
 </div>
 
 <!-- ══════════════════════════════════════
