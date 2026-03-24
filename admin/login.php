@@ -73,6 +73,11 @@ function sendOTPEmail($to, $otp) {
                 $subject,
                 nl2br(htmlspecialchars($message, ENT_QUOTES, 'UTF-8')),
                 []
+                [
+                    'from_email' => ADMIN_EMAIL,
+                    'from_name'  => SITE_TITLE,
+                    'reply_to'   => ADMIN_EMAIL,
+                ]
             );
 
             if (!empty($result['success'])) {
@@ -86,6 +91,14 @@ function sendOTPEmail($to, $otp) {
             // IMPORTANT: pas de fallback silencieux ici.
             // Si SMTP échoue, on échoue explicitement pour éviter un faux positif
             // "code envoyé" alors que l'email n'arrive jamais.
+            // Si SMTP échoue, fallback vers mail() + diagnostic
+            $mailFallback = mail($to, $subject, $message, $headers);
+            if ($mailFallback) {
+                writeLog("OTP envoyé via fallback mail() après échec SMTP pour {$to}", 'WARNING');
+                return ['success' => true, 'transport' => 'mail_fallback', 'smtp_error' => $smtpError];
+            }
+
+            writeLog("Échec fallback mail() pour {$to} après erreur SMTP", 'ERROR');
             return ['success' => false, 'transport' => 'smtp', 'error' => $smtpError];
         } catch (Throwable $e) {
             writeLog("Exception SMTP OTP pour {$to}: " . $e->getMessage(), 'ERROR');
@@ -160,6 +173,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $step = "otp";
                 } else {
                     $error = "Impossible d'envoyer le code de connexion. Vérifiez la configuration SMTP/env (outil: /diagnostic-smtp.php).";
+
+                    // Message diagnostic non bloquant si fallback utilisé
+                    if (($sendResult['transport'] ?? '') === 'mail_fallback' && !empty($sendResult['smtp_error'])) {
+                        $success .= " (SMTP en échec, fallback mail() utilisé)";
+                    }
+
+                    $step = "otp";
+                } else {
+                    $error = "Impossible d'envoyer le code de connexion. Vérifiez la configuration SMTP/env.";
                     if (!empty($sendResult['error'])) {
                         $error .= " Détail: " . $sendResult['error'];
                     }
