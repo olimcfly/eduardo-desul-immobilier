@@ -56,18 +56,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <?php if ($success): ?>
-    <div style="background:#d1fae5;border:1px solid #6ee7b7;border-radius:12px;padding:20px 24px;text-align:center;margin-bottom:32px">
-      <i class="fas fa-check-circle" style="color:#059669;font-size:24px;margin-bottom:8px;display:block"></i>
-      <div style="font-weight:700;color:#065f46">Message envoyé !</div>
-      <div style="font-size:13px;color:#047857;margin-top:4px">Nous vous répondrons dans les meilleurs délais.</div>
+    <div class="contact-alert contact-alert--success">
+      <i class="fas fa-check-circle contact-alert__icon"></i>
+      <div class="contact-alert__title">Message envoyé !</div>
+      <div class="contact-alert__text">Nous vous répondrons dans les meilleurs délais.</div>
     </div>
     <?php elseif ($error): ?>
-    <div style="background:#fee2e2;border:1px solid #fca5a5;border-radius:12px;padding:16px 20px;margin-bottom:24px;color:#b91c1c;font-size:14px">
-      <i class="fas fa-exclamation-triangle" style="margin-right:8px"></i><?= htmlspecialchars($error) ?>
+    <div class="contact-alert contact-alert--error">
+      <i class="fas fa-exclamation-triangle contact-alert__icon-inline"></i><?= htmlspecialchars($error) ?>
     </div>
     <?php endif; ?>
 
-    <div class="grid-2" style="gap:40px;align-items:start">
+    <div class="grid-2 contact-layout">
 
       <!-- Formulaire -->
       <div class="card card-body">
@@ -98,10 +98,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label>Message *</label>
             <textarea name="message" placeholder="Décrivez votre projet en quelques mots…" required><?= htmlspecialchars($_POST['message']??'') ?></textarea>
           </div>
-          <button type="submit" class="btn btn-primary" style="width:100%">
+          <button type="submit" class="btn btn-primary contact-submit-btn">
             <i class="fas fa-paper-plane"></i> Envoyer le message
           </button>
-          <p style="font-size:11px;color:var(--text-3);text-align:center;margin-top:12px;margin-bottom:0">
+          <p class="contact-legal-note">
             Vos données sont utilisées uniquement pour traiter votre demande — <a href="/mentions-legales">Mentions légales</a>
           </p>
         </form>
@@ -109,40 +109,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       <!-- Infos contact -->
       <div>
-        <div class="card card-body" style="margin-bottom:20px">
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
-            <div style="width:44px;height:44px;border-radius:10px;background:rgba(26,77,122,.08);color:var(--primary);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <div class="card card-body contact-info-card">
+          <div class="contact-info-row">
+            <div class="contact-info-icon-wrap">
               <i class="fas fa-phone"></i>
             </div>
             <div>
-              <div style="font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px">Téléphone</div>
-              <a href="tel:<?= preg_replace('/\s/','',$phone) ?>" style="font-size:16px;font-weight:700;color:var(--primary)"><?= htmlspecialchars($phone) ?></a>
+              <div class="contact-info-label">Téléphone</div>
+              <a href="tel:<?= preg_replace('/\s/','',$phone) ?>" class="contact-info-value contact-info-value--phone"><?= htmlspecialchars($phone) ?></a>
             </div>
           </div>
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
-            <div style="width:44px;height:44px;border-radius:10px;background:rgba(26,77,122,.08);color:var(--primary);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <div class="contact-info-row">
+            <div class="contact-info-icon-wrap">
               <i class="fas fa-envelope"></i>
             </div>
             <div>
-              <div style="font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px">Email</div>
-              <a href="mailto:<?= htmlspecialchars($email) ?>" style="font-size:14px;font-weight:600;color:var(--primary)"><?= htmlspecialchars($email) ?></a>
+              <div class="contact-info-label">Email</div>
+              <a href="mailto:<?= htmlspecialchars($email) ?>" class="contact-info-value contact-info-value--email"><?= htmlspecialchars($email) ?></a>
             </div>
           </div>
-          <div style="display:flex;align-items:center;gap:12px">
-            <div style="width:44px;height:44px;border-radius:10px;background:rgba(26,77,122,.08);color:var(--primary);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <div class="contact-info-row contact-info-row--last">
+            <div class="contact-info-icon-wrap">
               <i class="fas fa-map-marker-alt"></i>
             </div>
             <div>
-              <div style="font-size:11px;font-weight:600;color:var(--text-3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px">Adresse</div>
-              <div style="font-size:13px;color:var(--text-2)"><?= htmlspecialchars($address) ?></div>
+              <div class="contact-info-label">Adresse</div>
+              <div class="contact-info-address"><?= htmlspecialchars($address) ?></div>
             </div>
           </div>
         </div>
-        <div class="card card-body" style="background:var(--primary);color:#fff">
-          <div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:8px">
-            <i class="fas fa-clock" style="margin-right:6px"></i>Disponibilités
+        <div class="card card-body contact-hours-card">
+          <div class="contact-hours-title">
+            <i class="fas fa-clock contact-hours-title__icon"></i>Disponibilités
           </div>
-          <div style="font-size:13px;opacity:.9;line-height:1.8">
+          <div class="contact-hours-content">
             <?= _ss('business_hours', "Lundi – Vendredi : 9h – 19h<br>Samedi : sur RDV") ?>
           </div>
         </div>

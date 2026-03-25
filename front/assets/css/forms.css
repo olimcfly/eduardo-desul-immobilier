@@ -10,6 +10,42 @@
  * ===================================================
  */
 
+/* ========================================
+   NORMALISATION VARIABLES (legacy <-> --ed-*)
+   ======================================== */
+:root {
+    --ed-primary: var(--ed-primary, #1a4d7a);
+    --ed-primary-dk: var(--ed-primary-dk, #0e3a5c);
+    --ed-primary-lt: var(--ed-primary-lt, #2563a8);
+    --ed-accent: var(--ed-accent, #d4a574);
+    --ed-text: var(--ed-text, #2d3748);
+    --ed-text-light: var(--ed-text-light, #718096);
+    --ed-border: var(--ed-border, #e2d9ce);
+    --ed-card-bg: var(--ed-card-bg, #f9f6f3);
+
+    --primary: var(--primary, var(--ed-primary));
+    --primary-dark: var(--primary-dark, var(--ed-primary-dk));
+    --text-primary: var(--text-primary, var(--ed-text));
+    --text-secondary: var(--text-secondary, var(--ed-text-light));
+    --border-color: var(--border-color, var(--ed-border));
+    --bg-light: var(--bg-light, var(--ed-card-bg));
+    --bg-beige: var(--bg-beige, var(--ed-card-bg));
+    --white: var(--white, #fff);
+    --radius-md: var(--radius-md, 8px);
+    --radius-lg: var(--radius-lg, 12px);
+    --radius-xl: var(--radius-xl, 16px);
+    --shadow-md: var(--shadow-md, 0 2px 8px rgba(0,0,0,.07));
+    --shadow-lg: var(--shadow-lg, 0 8px 30px rgba(0,0,0,.12));
+    --shadow-xl: var(--shadow-xl, 0 12px 34px rgba(0,0,0,.16));
+    --transition-base: var(--transition-base, all .2s ease);
+    --transition-fast: var(--transition-fast, .15s ease);
+    --section-padding: var(--section-padding, 80px);
+    --success: var(--success, #059669);
+    --danger: var(--danger, #dc2626);
+}
+
+
+
 
 /* ========================================
    HERO ESTIMATION / CONTACT

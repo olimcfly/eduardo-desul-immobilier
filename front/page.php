@@ -52,12 +52,21 @@ if (!function_exists('eduardoHead')) {
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
 :root{
-  --ed-primary:#1a4d7a;--ed-primary-dk:#0e3a5c;--ed-accent:#d4a574;--ed-accent-lt:#e8c49a;
+  --ed-primary:#1a4d7a;--ed-primary-dk:#0e3a5c;--ed-primary-lt:#2563a8;--ed-accent:#d4a574;--ed-accent-lt:#e8c49a;
   --ed-text:#2d3748;--ed-text-light:#718096;--ed-card-bg:#f9f6f3;--ed-border:#e2d9ce;
   --ed-border-lt:#ece8e2;--ff-heading:"Playfair Display",serif;--ff-body:"DM Sans",sans-serif;
   --ed-radius:8px;--ed-radius-lg:12px;
   --ed-shadow:0 2px 8px rgba(0,0,0,.07);--ed-shadow-lg:0 8px 30px rgba(0,0,0,.12);
   --ed-transition:all .2s ease;
+
+  /* Variables legacy parallèles */
+  --primary:var(--ed-primary);--primary-dark:var(--ed-primary-dk);--primary-d:var(--ed-primary-dk);--primary-l:var(--ed-primary-lt);
+  --accent:var(--ed-accent);--accent-d:#c49060;--text-primary:var(--ed-text);--text-secondary:var(--ed-text-light);
+  --border-color:var(--ed-border);--bg-light:var(--ed-card-bg);--bg-beige:var(--ed-card-bg);--white:#fff;
+  --radius-md:var(--ed-radius);--radius-lg:var(--ed-radius-lg);--radius-xl:16px;
+  --shadow-md:var(--ed-shadow);--shadow-lg:var(--ed-shadow-lg);--shadow-xl:0 12px 34px rgba(0,0,0,.16);
+  --transition-base:var(--ed-transition);--transition-fast:.15s ease;--section-padding:80px;
+  --success:#059669;--danger:#dc2626;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:var(--ff-body);color:var(--ed-text);background:#fff;line-height:1.6}

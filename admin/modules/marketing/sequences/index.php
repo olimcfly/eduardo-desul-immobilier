@@ -828,6 +828,9 @@ $templateVars = [
             <a href="?page=sequences&action=edit&id=<?= $seq['id'] ?>" class="btn-seq btn-seq-outline btn-seq-sm">
                 <i class="fas fa-edit"></i> Éditer
             </a>
+            <a href="?page=sequences&action=edit&id=<?= $seq['id'] ?>&open_add_step=1&step_type=email" class="btn-seq btn-seq-primary btn-seq-sm">
+                <i class="fas fa-envelope"></i> Créer un email
+            </a>
             <form method="POST" style="display:inline">
                 <input type="hidden" name="action" value="toggle_sequence">
                 <input type="hidden" name="sequence_id" value="<?= $seq['id'] ?>">
@@ -1000,7 +1003,7 @@ $templateVars = [
             <div class="seq-step-preview"><?= htmlspecialchars($step['task_description']) ?></div>
             <?php endif; ?>
             <div class="seq-step-actions">
-                <button class="btn-seq btn-seq-outline btn-seq-sm" onclick="openEditStepModal(<?= htmlspecialchars(json_encode($step)) ?>)">
+                <button type="button" class="btn-seq btn-seq-outline btn-seq-sm" onclick="openEditStepModal(<?= htmlspecialchars(json_encode($step)) ?>)">
                     <i class="fas fa-edit"></i> Modifier
                 </button>
                 <form method="POST" style="display:inline" onsubmit="return confirm('Supprimer cette étape ?')">
@@ -1014,7 +1017,7 @@ $templateVars = [
         <?php endforeach; ?>
     </div>
     <?php endif; ?>
-    <button class="btn-seq btn-seq-primary" onclick="openAddStepModal()" style="margin-top:16px">
+    <button type="button" class="btn-seq btn-seq-primary" onclick="openAddStepModal()" style="margin-top:16px">
         <i class="fas fa-plus"></i> Ajouter une étape
     </button>
 </div>
@@ -1760,6 +1763,23 @@ function openAddStepModal() {
     document.getElementById('addStepModal').classList.add('active');
 }
 
+function maybeOpenStepModalFromQuery() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('open_add_step') !== '1') return;
+
+    openAddStepModal();
+
+    const requestedType = params.get('step_type');
+    if (requestedType && ['email', 'sms', 'wait', 'task'].includes(requestedType)) {
+        document.getElementById('stepType').value = requestedType;
+        toggleStepFields();
+    }
+
+    if (requestedType === 'email') {
+        document.getElementById('stepSubject').focus();
+    }
+}
+
 function openEditStepModal(step) {
     document.getElementById('stepModalTitle').innerHTML = '<i class="fas fa-edit"></i> Modifier l\'etape ' + step.step_order;
     document.getElementById('stepFormAction').value = 'update_step';
@@ -1854,4 +1874,6 @@ document.addEventListener('keydown', e => {
 document.querySelectorAll('.seq-modal-overlay').forEach(o => {
     o.addEventListener('click', e => { if (e.target === o) o.classList.remove('active'); });
 });
+
+maybeOpenStepModalFromQuery();
 </script>

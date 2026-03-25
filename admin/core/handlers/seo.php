@@ -230,13 +230,13 @@ switch ($action) {
 
     /**
      * toggle-noindex
-     * JS: fetch(...&action=toggle-noindex&id=X&noindex=0|1)
+     * JS: POST action=toggle-noindex&id=X&noindex=0|1
      * Expects: {success: true}
      */
     case 'toggle-noindex':
         try {
-            $id = (int)($_GET['id'] ?? 0);
-            $noindex = (int)($_GET['noindex'] ?? 0);
+            $id = (int)($input['id'] ?? 0);
+            $noindex = (int)($input['noindex'] ?? 0);
             if (!$id) { echo json_encode(['success' => false, 'error' => 'ID requis']); break; }
             $pdo->prepare("UPDATE pages SET noindex = ? WHERE id = ?")->execute([$noindex, $id]);
             echo json_encode(['success' => true]);
@@ -247,13 +247,13 @@ switch ($action) {
 
     /**
      * toggle-validation
-     * JS: fetch(...&action=toggle-validation&id=X&validated=0|1)
+     * JS: POST action=toggle-validation&id=X&validated=0|1
      * Expects: {success: true}
      */
     case 'toggle-validation':
         try {
-            $id = (int)($_GET['id'] ?? 0);
-            $validated = (int)($_GET['validated'] ?? 0);
+            $id = (int)($input['id'] ?? 0);
+            $validated = (int)($input['validated'] ?? 0);
             if (!$id) { echo json_encode(['success' => false, 'error' => 'ID requis']); break; }
             if ($validated) {
                 $pdo->prepare("UPDATE pages SET seo_validated = 1, seo_validated_at = NOW() WHERE id = ?")->execute([$id]);
