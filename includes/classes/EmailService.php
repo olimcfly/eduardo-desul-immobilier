@@ -121,8 +121,23 @@ class EmailService
                 return ['success' => false, 'error' => 'Auth SMTP echouee: ' . $response];
             }
 
-            // MAIL FROM
-            $sendCmd("MAIL FROM:<{$fromEmail}>");
+            // MAIL FROM (avec vérification explicite)
+            $response = $sendCmd("MAIL FROM:<{$fromEmail}>");
+            if (substr($response, 0, 3) !== '250') {
+                // Fallback: certains serveurs refusent un From différent du compte SMTP.
+                // On retente avec l'utilisateur SMTP pour maximiser la compatibilité.
+                $response = $sendCmd("RSET");
+                if (substr($response, 0, 3) !== '250') {
+                    fclose($socket);
+                    return ['success' => false, 'error' => 'SMTP RSET rejete: ' . $response];
+                }
+
+                $response = $sendCmd("MAIL FROM:<{$user}>");
+                if (substr($response, 0, 3) !== '250') {
+                    fclose($socket);
+                    return ['success' => false, 'error' => 'Expediteur rejete (MAIL FROM): ' . $response];
+                }
+            }
 
             // RCPT TO
             $response = $sendCmd("RCPT TO:<{$to}>");

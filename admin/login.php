@@ -73,7 +73,6 @@ function sendOTPEmail($to, $otp) {
                 $subject,
                 nl2br(htmlspecialchars($message, ENT_QUOTES, 'UTF-8')),
                 [
-                    'from_email' => ADMIN_EMAIL,
                     'from_name'  => SITE_TITLE,
                     'reply_to'   => ADMIN_EMAIL,
                 ]
@@ -87,17 +86,10 @@ function sendOTPEmail($to, $otp) {
             $smtpError = $result['error'] ?? 'Erreur SMTP inconnue';
             writeLog("Échec SMTP OTP pour {$to}: {$smtpError}", 'ERROR');
 
-            // IMPORTANT: pas de fallback silencieux ici.
-            // Si SMTP échoue, on échoue explicitement pour éviter un faux positif
-            // "code envoyé" alors que l'email n'arrive jamais.
-            // Si SMTP échoue, fallback vers mail() + diagnostic
-            $mailFallback = mail($to, $subject, $message, $headers);
-            if ($mailFallback) {
-                writeLog("OTP envoyé via fallback mail() après échec SMTP pour {$to}", 'WARNING');
-                return ['success' => true, 'transport' => 'mail_fallback', 'smtp_error' => $smtpError];
-            }
-
-            writeLog("Échec fallback mail() pour {$to} après erreur SMTP", 'ERROR');
+            // IMPORTANT: pas de fallback mail() si un SMTP est configuré.
+            // Objectif: éviter le faux positif "code envoyé" alors que
+            // le serveur local accepte mail() sans délivrer réellement.
+            writeLog("OTP non envoyé: fallback mail() désactivé (SMTP configuré)", 'WARNING');
             return ['success' => false, 'transport' => 'smtp', 'error' => $smtpError];
         } catch (Throwable $e) {
             writeLog("Exception SMTP OTP pour {$to}: " . $e->getMessage(), 'ERROR');
@@ -105,15 +97,10 @@ function sendOTPEmail($to, $otp) {
         }
     }
 
-    // 2) Fallback historique mail()
-    $sent = mail($to, $subject, $message, $headers);
-    if ($sent) {
-        writeLog("OTP envoyé via mail() à {$to}", 'INFO');
-        return ['success' => true, 'transport' => 'mail'];
-    }
-
-    writeLog("Échec envoi OTP via mail() pour {$to}", 'ERROR');
-    return ['success' => false, 'transport' => 'mail', 'error' => 'mail() a retourné false'];
+    // 2) Sans SMTP, on refuse l'envoi OTP pour éviter les faux positifs mail().
+    // Le mode OTP email doit s'appuyer sur un SMTP vérifié.
+    writeLog("OTP non envoyé: config SMTP absente", 'ERROR');
+    return ['success' => false, 'transport' => 'none', 'error' => 'Configuration SMTP absente'];
 }
 
 /* ─────────────────────────────────────────
@@ -130,13 +117,11 @@ $step = $_POST['step'] ?? 'email';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    /* Étape 1 : Email + téléphone */
+    /* Étape 1 : Email */
 
     if ($step === 'email') {
 
         $email = sanitize($_POST['email'] ?? '', 'email');
-        $phone = sanitize($_POST['phone'] ?? '');
-
         if (!$email || !isValidEmail($email)) {
 
             $error = "Email invalide";
@@ -161,7 +146,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $_SESSION['otp'] = $otp;
                 $_SESSION['otp_email'] = $email;
-                $_SESSION['otp_phone'] = $phone;
                 $_SESSION['otp_time'] = time();
 
                 $sendResult = sendOTPEmail($email, $otp);
@@ -225,7 +209,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             unset($_SESSION['otp']);
             unset($_SESSION['otp_email']);
-            unset($_SESSION['otp_phone']);
             unset($_SESSION['otp_time']);
 
             header("Location:/admin/dashboard.php");
@@ -357,11 +340,6 @@ name="email"
 placeholder="<?= ADMIN_EMAIL ?>"
 required>
 
-<input type="tel"
-name="phone"
-placeholder="Numéro de téléphone"
-required>
-
 <button>Recevoir le code sécurisé</button>
 
 <p class="info">
@@ -379,11 +357,6 @@ Connexion sécurisée par code OTP
 <p class="info">
 Code envoyé à<br>
 <strong><?= htmlspecialchars($_SESSION['otp_email'] ?? '') ?></strong>
-</p>
-
-<p class="info">
-Téléphone enregistré<br>
-<strong><?= htmlspecialchars($_SESSION['otp_phone'] ?? '') ?></strong>
 </p>
 
 <input type="text"
