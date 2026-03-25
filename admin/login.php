@@ -13,11 +13,7 @@ require_once ROOT_PATH . '/config/config.php';
 require_once ROOT_PATH . '/includes/classes/EmailService.php';
 
 /* Déjà connecté */
-
-if (!empty($_SESSION['admin_id']) && !empty($_SESSION['admin_email']) && !empty($_SESSION['admin_logged_in'])) {
-    header("Location: /admin/dashboard.php");
-    exit;
-}
+$alreadyLoggedIn = !empty($_SESSION['admin_id']) && !empty($_SESSION['admin_email']) && !empty($_SESSION['admin_logged_in']);
 
 /* ─────────────────────────────────────────
    Connexion base
@@ -111,7 +107,7 @@ $step = $_POST['step'] ?? 'email';
    Traitement formulaire
 ───────────────────────────────────────── */
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if (!$alreadyLoggedIn && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
     /* Étape 1 : Email */
 
@@ -283,6 +279,16 @@ button:hover{
 opacity:0.9;
 }
 
+.secondary-btn{
+background:#eef2ff;
+color:#334155;
+margin-top:10px;
+}
+
+.secondary-btn:hover{
+background:#e2e8f0;
+}
+
 .error{
 background:#ffe6e6;
 padding:10px;
@@ -312,10 +318,6 @@ text-align:center;
 
 <div class="box">
 
-<div class="logo">
-<img src="/assets/img/ecosysteme-immo-logo.png" alt="Ecosysteme Immo">
-</div>
-
 <h2>🔐 Administration</h2>
 
 <?php if($error): ?>
@@ -326,7 +328,15 @@ text-align:center;
 <div class="success"><?= $success ?></div>
 <?php endif ?>
 
-<?php if($step==='email'): ?>
+<?php if($alreadyLoggedIn): ?>
+
+<div class="success">Vous êtes déjà connecté.</div>
+
+<a href="/admin/dashboard.php" style="text-decoration:none;">
+<button type="button">Retourner à l'administration</button>
+</a>
+
+<?php elseif($step==='email'): ?>
 
 <form method="POST">
 
@@ -368,6 +378,17 @@ required>
 Code valide pendant 10 minutes
 </p>
 
+<p class="info">
+Vous n'avez rien reçu ? Vérifiez aussi la webmail :<br>
+<strong><?= htmlspecialchars(SITE_DOMAIN, ENT_QUOTES, 'UTF-8') ?>/webmail</strong>
+</p>
+
+</form>
+
+<form method="POST" style="margin-top:8px;">
+<input type="hidden" name="step" value="email">
+<input type="hidden" name="email" value="<?= htmlspecialchars($_SESSION['otp_email'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+<button type="submit" class="secondary-btn">Renvoyer un nouveau code</button>
 </form>
 
 <?php endif ?>
