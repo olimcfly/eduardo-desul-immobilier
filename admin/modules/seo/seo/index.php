@@ -18,6 +18,9 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
 
 // ========================================
 // CONNEXION BASE DE DONNÉES
@@ -48,31 +51,9 @@ try {
 }
 
 // ========================================
-// VÉRIFICATION & MIGRATION AUTO COLONNES SEO
+// VÉRIFICATION COLONNES SEO (SANS AUTO-MIGRATION)
 // ========================================
 
-$existingColumns = $pdo->query("SHOW COLUMNS FROM pages")->fetchAll(PDO::FETCH_COLUMN);
-
-$seoColumns = [
-    'seo_score' => "ALTER TABLE pages ADD COLUMN `seo_score` INT DEFAULT 0",
-    'seo_title' => "ALTER TABLE pages ADD COLUMN `seo_title` VARCHAR(160)",
-    'seo_description' => "ALTER TABLE pages ADD COLUMN `seo_description` VARCHAR(320)",
-    'seo_keywords' => "ALTER TABLE pages ADD COLUMN `seo_keywords` VARCHAR(255)",
-    'seo_analyzed_at' => "ALTER TABLE pages ADD COLUMN `seo_analyzed_at` DATETIME DEFAULT NULL",
-    'seo_issues' => "ALTER TABLE pages ADD COLUMN `seo_issues` TEXT",
-    // NOUVEAU v2.2
-    'noindex' => "ALTER TABLE pages ADD COLUMN `noindex` TINYINT(1) NOT NULL DEFAULT 0",
-    'seo_validated' => "ALTER TABLE pages ADD COLUMN `seo_validated` TINYINT(1) NOT NULL DEFAULT 0",
-    'seo_validated_at' => "ALTER TABLE pages ADD COLUMN `seo_validated_at` DATETIME DEFAULT NULL"
-];
-
-foreach ($seoColumns as $col => $sql) {
-    if (!in_array($col, $existingColumns)) {
-        try { $pdo->exec($sql); } catch (Exception $e) {}
-    }
-}
-
-// Refresh
 $existingColumns = $pdo->query("SHOW COLUMNS FROM pages")->fetchAll(PDO::FETCH_COLUMN);
 
 function hasColumn($col, $existingColumns) {
@@ -198,7 +179,7 @@ foreach ($pages as $p) {
 }
 $avgScore = $analyzedPages > 0 ? round($avgScore / $analyzedPages) : 0;
 
-$apiUrl = 'modules/seo/api.php';
+$apiUrl = '/admin/api/router.php?module=seo';
 ?>
 
 <style>
@@ -1149,8 +1130,21 @@ $apiUrl = 'modules/seo/api.php';
 
 <script>
 const API_URL = '<?php echo $apiUrl; ?>';
+const CSRF_TOKEN = <?= json_encode($_SESSION['csrf_token'] ?? '', JSON_UNESCAPED_UNICODE) ?>;
 let currentPageId = null;
 let pendingAIResult = null;
+
+function postSeoAction(action, payload = {}) {
+    return fetch(API_URL + '?action=' + encodeURIComponent(action), {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+            'X-CSRF-TOKEN': CSRF_TOKEN
+        },
+        body: JSON.stringify({ ...payload, csrf_token: CSRF_TOKEN })
+    }).then(r => r.json());
+}
 
 // ========================================
 // TOGGLE NOINDEX (NOUVEAU v2.2)
@@ -1164,7 +1158,13 @@ function toggleNoindex(pageId, checkbox) {
     
     toggleEl.classList.add('saving');
     
-    fetch(API_URL + '?action=toggle-noindex&id=' + pageId + '&noindex=' + noindexValue)
+    const formData = new FormData();
+    formData.append('action', 'toggle-noindex');
+    formData.append('id', pageId);
+    formData.append('noindex', noindexValue);
+    formData.append('csrf_token', CSRF_TOKEN);
+
+    fetch(API_URL, { method: 'POST', body: formData })
         .then(r => r.json())
         .then(data => {
             toggleEl.classList.remove('saving');
@@ -1195,7 +1195,13 @@ function toggleValidation(pageId, btn) {
     
     btn.classList.add('saving');
     
-    fetch(API_URL + '?action=toggle-validation&id=' + pageId + '&validated=' + newValue)
+    const formData = new FormData();
+    formData.append('action', 'toggle-validation');
+    formData.append('id', pageId);
+    formData.append('validated', newValue);
+    formData.append('csrf_token', CSRF_TOKEN);
+
+    fetch(API_URL, { method: 'POST', body: formData })
         .then(r => r.json())
         .then(data => {
             btn.classList.remove('saving');
@@ -1229,8 +1235,7 @@ function toggleValidation(pageId, btn) {
 
 function analyzePage(pageId) {
     showLoading('Analyse en cours...');
-    fetch(API_URL + '?action=analyze&id=' + pageId)
-        .then(r => r.json())
+    postSeoAction('analyze', { id: pageId })
         .then(data => {
             hideLoading();
             if (data.success) {
@@ -1249,8 +1254,7 @@ function analyzePage(pageId) {
 function analyzeAllPages() {
     if (!confirm('Analyser toutes les pages ?')) return;
     showLoading('Analyse de toutes les pages...');
-    fetch(API_URL + '?action=analyze-all')
-        .then(r => r.json())
+    postSeoAction('analyze-all')
         .then(data => {
             hideLoading();
             if (data.success) {
@@ -1341,8 +1345,7 @@ function applyAISuggestions() {
     closeModal('aiPreviewModal');
     showLoading('Application des modifications...');
     
-    fetch(API_URL + '?action=generate-seo&id=' + currentPageId)
-        .then(r => r.json())
+    postSeoAction('generate-seo', { id: currentPageId })
         .then(data => {
             hideLoading();
             if (data.success) {
@@ -1400,8 +1403,7 @@ function optimizeAllWithAI() {
         
         document.getElementById('loadingText').textContent = `🤖 Optimisation ${processed + 1}/${toOptimize.length}...`;
         
-        fetch(API_URL + '?action=generate-seo&id=' + toOptimize[processed])
-            .then(r => r.json())
+        postSeoAction('generate-seo', { id: toOptimize[processed] })
             .then(data => {
                 if (data.success) {
                     updatePageRow(toOptimize[processed], data.new_analysis);

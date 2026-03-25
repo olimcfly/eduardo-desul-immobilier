@@ -12,6 +12,19 @@ if (!defined('ADMIN_ROUTER')) {
 $page_title = "Séquences Email";
 $current_module = "sequences";
 
+if (!function_exists('seq_log_sql_error')) {
+    function seq_log_sql_error(string $context, PDOException $e): void
+    {
+        error_log(sprintf(
+            '[sequences][%s] SQLSTATE=%s CODE=%s MESSAGE=%s',
+            $context,
+            (string) $e->getCode(),
+            isset($e->errorInfo[1]) ? (string) $e->errorInfo[1] : 'n/a',
+            $e->getMessage()
+        ));
+    }
+}
+
 // ====================================================
 // INIT DB — pattern standard IMMO LOCAL+
 // ====================================================
@@ -24,7 +37,8 @@ if (!isset($pdo) && !isset($db)) {
              PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
         );
     } catch (PDOException $e) {
-        echo '<div style="padding:20px;color:#ef4444">Erreur DB: '.htmlspecialchars($e->getMessage()).'</div>';
+        seq_log_sql_error('db_init', $e);
+        echo '<div style="padding:20px;color:#ef4444">Connexion base de données impossible. Vérifiez la configuration puis réessayez.</div>';
         return;
     }
 }
@@ -148,7 +162,8 @@ if (!$tablesExist) {
         ");
         $tablesExist = true;
     } catch (PDOException $e) {
-        echo '<div style="padding:20px;color:#ef4444">Erreur création tables : ' . htmlspecialchars($e->getMessage()) . '</div>';
+        seq_log_sql_error('schema_bootstrap', $e);
+        echo '<div style="padding:20px;color:#ef4444">Impossible d’initialiser les tables CRM. Contactez un administrateur.</div>';
         return;
     }
 }
@@ -158,13 +173,15 @@ if (!$tablesExist) {
 // ====================================================
 $action = $_GET['action'] ?? 'list';
 $sequenceId = (int)($_GET['id'] ?? $_POST['sequence_id'] ?? 0);
-$message = '';
-$messageType = 'success';
+$message = isset($_GET['flash']) ? (string) $_GET['flash'] : '';
+$messageType = isset($_GET['flash_type']) ? (string) $_GET['flash_type'] : 'success';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $postAction = $_POST['action'] ?? '';
 
     try {
+        $redirectTo = '';
+
         switch ($postAction) {
             case 'create_sequence':
                 $stmt = $db->prepare("
@@ -186,8 +203,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ]);
                 $newId = $db->lastInsertId();
                 $message = 'Séquence créée avec succès.';
-                $action = 'edit';
-                $sequenceId = $newId;
+                $redirectTo = '?page=sequences&action=edit&id=' . (int) $newId . '&flash=' . rawurlencode($message) . '&flash_type=success';
                 break;
 
             case 'update_sequence':
@@ -214,24 +230,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ]);
                 $message = 'Séquence mise à jour.';
                 $sequenceId = (int)$_POST['sequence_id'];
-                $action = 'edit';
+                $redirectTo = '?page=sequences&action=edit&id=' . $sequenceId . '&flash=' . rawurlencode($message) . '&flash_type=success';
                 break;
 
             case 'toggle_sequence':
                 $stmt = $db->prepare("UPDATE crm_sequences SET is_active = NOT is_active WHERE id = ?");
-                $stmt->execute([(int)$_POST['sequence_id']]);
+                $sequenceId = (int)$_POST['sequence_id'];
+                $stmt->execute([$sequenceId]);
                 $message = 'Statut modifié.';
+                if ($action === 'edit') {
+                    $redirectTo = '?page=sequences&action=edit&id=' . $sequenceId . '&flash=' . rawurlencode($message) . '&flash_type=success';
+                } else {
+                    $redirectTo = '?page=sequences&flash=' . rawurlencode($message) . '&flash_type=success';
+                }
                 break;
 
             case 'delete_sequence':
                 $stmt = $db->prepare("DELETE FROM crm_sequences WHERE id = ?");
                 $stmt->execute([(int)$_POST['sequence_id']]);
                 $message = 'Séquence supprimée.';
-                $action = 'list';
+                $redirectTo = '?page=sequences&flash=' . rawurlencode($message) . '&flash_type=success';
                 break;
 
             case 'add_step':
                 $seqId = (int)$_POST['sequence_id'];
+                $stepType = (string)($_POST['step_type'] ?? 'email');
+                $subject = trim((string)($_POST['subject'] ?? ''));
+                $bodyHtml = trim((string)($_POST['body_html'] ?? ''));
+                if ($stepType === 'email') {
+                    if ($subject === '') {
+                        throw new InvalidArgumentException('Le sujet est obligatoire pour une étape email.');
+                    }
+                    if ($bodyHtml === '') {
+                        throw new InvalidArgumentException('Le corps du message est obligatoire pour une étape email.');
+                    }
+                }
                 $maxOrder = $db->prepare("SELECT COALESCE(MAX(step_order), 0) + 1 FROM crm_sequence_steps WHERE sequence_id = ?");
                 $maxOrder->execute([$seqId]);
                 $nextOrder = $maxOrder->fetchColumn();
@@ -242,20 +275,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->execute([
                     $seqId,
                     $nextOrder,
-                    $_POST['step_type'] ?? 'email',
+                    $stepType,
                     (int)($_POST['delay_days'] ?? 0),
                     (int)($_POST['delay_hours'] ?? 0),
-                    trim($_POST['subject'] ?? ''),
+                    $subject,
                     $_POST['body_html'] ?? '',
                     trim($_POST['sms_text'] ?? ''),
                     trim($_POST['task_description'] ?? ''),
                 ]);
                 $message = 'Étape ajoutée.';
-                $action = 'edit';
-                $sequenceId = $seqId;
+                $redirectTo = '?page=sequences&action=edit&id=' . $seqId . '&flash=' . rawurlencode($message) . '&flash_type=success';
                 break;
 
             case 'update_step':
+                $stepType = (string)($_POST['step_type'] ?? 'email');
+                $subject = trim((string)($_POST['subject'] ?? ''));
+                $bodyHtml = trim((string)($_POST['body_html'] ?? ''));
+                if ($stepType === 'email') {
+                    if ($subject === '') {
+                        throw new InvalidArgumentException('Le sujet est obligatoire pour une étape email.');
+                    }
+                    if ($bodyHtml === '') {
+                        throw new InvalidArgumentException('Le corps du message est obligatoire pour une étape email.');
+                    }
+                }
                 $stmt = $db->prepare("
                     UPDATE crm_sequence_steps SET
                         step_type = ?, delay_days = ?, delay_hours = ?,
@@ -263,10 +306,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     WHERE id = ? AND sequence_id = ?
                 ");
                 $stmt->execute([
-                    $_POST['step_type'] ?? 'email',
+                    $stepType,
                     (int)($_POST['delay_days'] ?? 0),
                     (int)($_POST['delay_hours'] ?? 0),
-                    trim($_POST['subject'] ?? ''),
+                    $subject,
                     $_POST['body_html'] ?? '',
                     trim($_POST['sms_text'] ?? ''),
                     trim($_POST['task_description'] ?? ''),
@@ -275,8 +318,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     (int)$_POST['sequence_id'],
                 ]);
                 $message = 'Étape mise à jour.';
-                $action = 'edit';
                 $sequenceId = (int)$_POST['sequence_id'];
+                $redirectTo = '?page=sequences&action=edit&id=' . $sequenceId . '&flash=' . rawurlencode($message) . '&flash_type=success';
                 break;
 
             case 'delete_step':
@@ -290,8 +333,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $upd->execute([$order++, $row['id']]);
                 }
                 $message = 'Étape supprimée.';
-                $action = 'edit';
                 $sequenceId = (int)$_POST['sequence_id'];
+                $redirectTo = '?page=sequences&action=edit&id=' . $sequenceId . '&flash=' . rawurlencode($message) . '&flash_type=success';
                 break;
 
             case 'enroll_leads':
@@ -308,12 +351,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 $db->prepare("UPDATE crm_sequences SET total_enrolled = total_enrolled + ? WHERE id = ?")->execute([$enrolled, $seqId]);
                 $message = "$enrolled lead(s) inscrit(s) dans la séquence.";
-                $action = 'edit';
-                $sequenceId = $seqId;
+                $redirectTo = '?page=sequences&action=edit&id=' . $seqId . '&flash=' . rawurlencode($message) . '&flash_type=success';
                 break;
         }
+
+        if ($redirectTo !== '' && !headers_sent()) {
+            header('Location: ' . $redirectTo);
+            exit;
+        }
     } catch (PDOException $e) {
-        $message = 'Erreur : ' . $e->getMessage();
+        seq_log_sql_error('post_action:' . ($postAction !== '' ? $postAction : 'unknown'), $e);
+        $message = 'Une erreur technique est survenue lors de l’enregistrement. Merci de réessayer dans quelques instants.';
         $messageType = 'danger';
     }
 }
@@ -828,6 +876,9 @@ $templateVars = [
             <a href="?page=sequences&action=edit&id=<?= $seq['id'] ?>" class="btn-seq btn-seq-outline btn-seq-sm">
                 <i class="fas fa-edit"></i> Éditer
             </a>
+            <a href="?page=sequences&action=edit&id=<?= $seq['id'] ?>&open_add_step=1&step_type=email" class="btn-seq btn-seq-primary btn-seq-sm">
+                <i class="fas fa-envelope"></i> Créer un email
+            </a>
             <form method="POST" style="display:inline">
                 <input type="hidden" name="action" value="toggle_sequence">
                 <input type="hidden" name="sequence_id" value="<?= $seq['id'] ?>">
@@ -1000,7 +1051,7 @@ $templateVars = [
             <div class="seq-step-preview"><?= htmlspecialchars($step['task_description']) ?></div>
             <?php endif; ?>
             <div class="seq-step-actions">
-                <button class="btn-seq btn-seq-outline btn-seq-sm" onclick="openEditStepModal(<?= htmlspecialchars(json_encode($step)) ?>)">
+                <button type="button" class="btn-seq btn-seq-outline btn-seq-sm" onclick="openEditStepModal(<?= htmlspecialchars(json_encode($step)) ?>)">
                     <i class="fas fa-edit"></i> Modifier
                 </button>
                 <form method="POST" style="display:inline" onsubmit="return confirm('Supprimer cette étape ?')">
@@ -1014,7 +1065,7 @@ $templateVars = [
         <?php endforeach; ?>
     </div>
     <?php endif; ?>
-    <button class="btn-seq btn-seq-primary" onclick="openAddStepModal()" style="margin-top:16px">
+    <button type="button" class="btn-seq btn-seq-primary" onclick="openAddStepModal()" style="margin-top:16px">
         <i class="fas fa-plus"></i> Ajouter une étape
     </button>
 </div>
@@ -1265,7 +1316,7 @@ $templateVars = [
                     </div>
                     <div style="margin-top:8px">
                         <label style="font-size:.75rem;color:var(--text-3);margin-bottom:4px">Objectif de l'email</label>
-                        <input type="text" id="aiObjective" placeholder="Ex: obtenir une réponse et planifier un appel">
+                        <input type="text" id="aiObjective" placeholder="Ex: obtenir une réponse et planifier un appel" data-user-edited="0">
                     </div>
                     <div style="display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap">
                         <button type="button" class="btn-seq btn-seq-outline btn-seq-sm" onclick="generateAiEmailDraft()">
@@ -1675,6 +1726,70 @@ const emailTemplates = {
     }
 };
 
+
+const sequenceContext = {
+    targetSegment: <?= json_encode($sequence['target_segment'] ?? '') ?>,
+    totalSteps: <?= json_encode(count($steps)) ?>
+};
+
+const aiObjectivePresets = {
+    acheteur: {
+        early: 'Qualifier les critères de recherche et proposer un premier échange téléphonique.',
+        mid: 'Partager une sélection ciblée de biens et obtenir une réponse sur les préférences.',
+        late: 'Lever les derniers freins et planifier une visite ou une offre.'
+    },
+    vendeur: {
+        early: 'Cadrer le projet de vente et proposer un rendez-vous estimation.',
+        mid: 'Présenter la stratégie de mise en vente et valider les prochaines actions.',
+        late: 'Accélérer la décision de mandat avec un plan de commercialisation concret.'
+    },
+    investisseur: {
+        early: 'Qualifier les objectifs de rendement et le niveau de risque accepté.',
+        mid: 'Proposer des opportunités alignées et obtenir un retour sur les critères financiers.',
+        late: 'Faire avancer la décision avec un plan d’action chiffré.'
+    },
+    locataire: {
+        early: 'Comprendre le besoin logement et cadrer les critères prioritaires.',
+        mid: 'Proposer des options adaptées et confirmer les disponibilités de visite.',
+        late: 'Faciliter la prise de décision et sécuriser les prochaines démarches.'
+    }
+};
+
+let aiObjectiveTouchedByUser = false;
+
+function resolveLeadTypeFromSequence(defaultType = 'acheteur') {
+    const candidate = String(sequenceContext.targetSegment || '').toLowerCase();
+    return ['acheteur', 'vendeur', 'investisseur', 'locataire'].includes(candidate) ? candidate : defaultType;
+}
+
+function resolvePresetObjective(leadType, position) {
+    const profile = aiObjectivePresets[leadType] || aiObjectivePresets.acheteur;
+    if (position <= 1) return profile.early;
+    if (position <= 3) return profile.mid;
+    return profile.late;
+}
+
+function autoPrefillAiAssistant(options = {}) {
+    const { forceObjective = false, stepOrder = null } = options;
+    const leadTypeInput = document.getElementById('aiLeadType');
+    const positionInput = document.getElementById('aiSequencePosition');
+    const objectiveInput = document.getElementById('aiObjective');
+    if (!leadTypeInput || !positionInput || !objectiveInput) return;
+
+    const resolvedLeadType = resolveLeadTypeFromSequence(leadTypeInput.value || 'acheteur');
+    leadTypeInput.value = resolvedLeadType;
+
+    const computedPosition = Math.max(1, parseInt(stepOrder || (sequenceContext.totalSteps + 1), 10) || 1);
+    positionInput.value = computedPosition;
+
+    const shouldFillObjective = forceObjective || !aiObjectiveTouchedByUser || !objectiveInput.value.trim();
+    if (shouldFillObjective) {
+        objectiveInput.value = resolvePresetObjective(resolvedLeadType, computedPosition);
+        objectiveInput.dataset.userEdited = '0';
+        aiObjectiveTouchedByUser = false;
+    }
+}
+
 function loadEmailTemplate() {
     const sel = document.getElementById('emailTemplateSelect');
     const key = sel.value;
@@ -1755,9 +1870,28 @@ function openAddStepModal() {
     document.getElementById('stepTaskDesc').value = '';
     document.getElementById('emailTemplateSelect').selectedIndex = 0;
     document.getElementById('stepSubmitBtn').innerHTML = '<i class="fas fa-save"></i> Ajouter l\'etape';
+    aiObjectiveTouchedByUser = false;
     toggleStepFields();
+    autoPrefillAiAssistant({ forceObjective: true, stepOrder: sequenceContext.totalSteps + 1 });
     switchEditorMode('edit', document.querySelector('.seq-editor-tab'));
     document.getElementById('addStepModal').classList.add('active');
+}
+
+function maybeOpenStepModalFromQuery() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('open_add_step') !== '1') return;
+
+    openAddStepModal();
+
+    const requestedType = params.get('step_type');
+    if (requestedType && ['email', 'sms', 'wait', 'task'].includes(requestedType)) {
+        document.getElementById('stepType').value = requestedType;
+        toggleStepFields();
+    }
+
+    if (requestedType === 'email') {
+        document.getElementById('stepSubject').focus();
+    }
 }
 
 function openEditStepModal(step) {
@@ -1774,7 +1908,9 @@ function openEditStepModal(step) {
     document.getElementById('stepTaskDesc').value = step.task_description || '';
     document.getElementById('emailTemplateSelect').selectedIndex = 0;
     document.getElementById('stepSubmitBtn').innerHTML = '<i class="fas fa-save"></i> Mettre a jour';
+    aiObjectiveTouchedByUser = false;
     toggleStepFields();
+    autoPrefillAiAssistant({ forceObjective: true, stepOrder: step.step_order || 1 });
     switchEditorMode('edit', document.querySelector('.seq-editor-tab'));
     document.getElementById('addStepModal').classList.add('active');
 }
@@ -1789,6 +1925,23 @@ function toggleStepFields() {
     document.getElementById('smsFields').style.display  = type === 'sms'   ? 'block' : 'none';
     document.getElementById('taskFields').style.display = type === 'task'  ? 'block' : 'none';
 }
+
+
+(function initAiAutofillBindings() {
+    const leadTypeInput = document.getElementById('aiLeadType');
+    const positionInput = document.getElementById('aiSequencePosition');
+    const objectiveInput = document.getElementById('aiObjective');
+    if (!leadTypeInput || !positionInput || !objectiveInput) return;
+
+    leadTypeInput.addEventListener('change', () => autoPrefillAiAssistant({ forceObjective: true, stepOrder: parseInt(positionInput.value || '1', 10) || 1 }));
+    positionInput.addEventListener('change', () => autoPrefillAiAssistant({ forceObjective: true, stepOrder: parseInt(positionInput.value || '1', 10) || 1 }));
+    objectiveInput.addEventListener('input', () => {
+        aiObjectiveTouchedByUser = true;
+        objectiveInput.dataset.userEdited = '1';
+    });
+
+    autoPrefillAiAssistant({ forceObjective: true, stepOrder: sequenceContext.totalSteps + 1 });
+})();
 
 // ====================================================
 // Variable Insertion
@@ -1854,4 +2007,6 @@ document.addEventListener('keydown', e => {
 document.querySelectorAll('.seq-modal-overlay').forEach(o => {
     o.addEventListener('click', e => { if (e.target === o) o.classList.remove('active'); });
 });
+
+maybeOpenStepModalFromQuery();
 </script>
