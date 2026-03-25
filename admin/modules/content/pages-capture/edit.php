@@ -48,8 +48,14 @@ $offerObjectives = [
     'estimation'   => 'Estimation',
     'rdv'          => 'Prise de RDV',
 ];
+$acquisitionChannels = [
+    'organique'    => ['label' => '🌱 Organique'],
+    'mailing'      => ['label' => '📧 Mailing'],
+    'google_ads'   => ['label' => '🔍 Google Ads'],
+    'facebook_ads' => ['label' => '📱 Facebook/Meta Ads'],
+];
 
-function buildCaptureFormPreset(string $format, string $objective, string $crmSource): array {
+function buildCaptureFormPreset(string $format, string $objective, string $crmSource, string $channel): array {
     $base = [
         ['name' => 'prenom', 'label' => 'Prénom', 'type' => 'text',  'required' => true,  'placeholder' => 'Votre prénom'],
         ['name' => 'email',  'label' => 'Email',  'type' => 'email', 'required' => true,  'placeholder' => 'vous@email.com'],
@@ -68,6 +74,9 @@ function buildCaptureFormPreset(string $format, string $objective, string $crmSo
     $base[] = ['name' => 'capture_format', 'label' => 'Format', 'type' => 'hidden', 'placeholder' => $format];
     $base[] = ['name' => 'capture_objectif', 'label' => 'Objectif', 'type' => 'hidden', 'placeholder' => $objective];
     $base[] = ['name' => 'capture_source', 'label' => 'Source', 'type' => 'hidden', 'placeholder' => $crmSource];
+    $base[] = ['name' => 'capture_channel', 'label' => 'Canal', 'type' => 'hidden', 'placeholder' => $channel];
+    $base[] = ['name' => 'utm_source', 'label' => 'UTM Source', 'type' => 'hidden', 'placeholder' => $channel];
+    $base[] = ['name' => 'utm_medium', 'label' => 'UTM Medium', 'type' => 'hidden', 'placeholder' => in_array($channel, ['google_ads','facebook_ads']) ? 'paid' : ($channel === 'mailing' ? 'email' : 'organic')];
 
     return $base;
 }
@@ -90,6 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_edit_submit'] ?? '') === 
         'template'     => $_POST['template']          ?? 'split',
         'offer_format' => $_POST['offer_format']      ?? 'pdf',
         'objective'    => $_POST['objective']         ?? 'vendeur',
+        'acquisition_channel' => $_POST['acquisition_channel'] ?? 'organique',
         'headline'     => trim($_POST['headline']     ?? ''),
         'sous_titre'   => trim($_POST['sous_titre']   ?? ''),
         'description'  => trim($_POST['description']  ?? ''),
@@ -105,9 +115,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_edit_submit'] ?? '') === 
         $d['slug'] = strtolower(trim(preg_replace('/[^a-z0-9]+/', '-', iconv('UTF-8','ASCII//TRANSLIT', $d['titre'])), '-'));
     }
     $d['slug'] = preg_replace('/[^a-z0-9-]/', '', strtolower($d['slug']));
-    $d['crm_source'] = trim($_POST['lead_source'] ?? ('capture_' . $d['offer_format'] . '_' . $d['objective'] . '_' . $d['slug']));
-    $d['lead_tags']  = trim($_POST['lead_tags'] ?? ('capture,' . $d['offer_format'] . ',' . $d['objective']));
-    $formPreset      = buildCaptureFormPreset($d['offer_format'], $d['objective'], $d['crm_source']);
+    if (!isset($acquisitionChannels[$d['acquisition_channel']])) $d['acquisition_channel'] = 'organique';
+    $d['crm_source'] = trim($_POST['lead_source'] ?? ('capture_' . $d['acquisition_channel'] . '_' . $d['offer_format'] . '_' . $d['objective'] . '_' . $d['slug']));
+    $d['lead_tags']  = trim($_POST['lead_tags'] ?? ('capture,' . $d['acquisition_channel'] . ',' . $d['offer_format'] . ',' . $d['objective']));
+    $formPreset      = buildCaptureFormPreset($d['offer_format'], $d['objective'], $d['crm_source'], $d['acquisition_channel']);
     $formTitle       = $offerFormats[$d['offer_format']]['form_title'] ?? 'Demandez votre ressource';
     $buttonText      = $d['cta_text'] ?: 'Recevoir maintenant';
 
@@ -183,7 +194,12 @@ if (is_array($existingFormConfig)) {
 $existingObjective = 'vendeur';
 if (!empty($capture['lead_source'])) {
     $parts = explode('_', (string)$capture['lead_source']);
-    if (!empty($parts[2])) $existingObjective = $parts[2];
+    if (!empty($parts[3])) $existingObjective = $parts[3];
+}
+$existingChannel = 'organique';
+if (!empty($capture['lead_source'])) {
+    $parts = explode('_', (string)$capture['lead_source']);
+    if (!empty($parts[1]) && isset($acquisitionChannels[$parts[1]])) $existingChannel = $parts[1];
 }
 
 $v = [
@@ -193,6 +209,7 @@ $v = [
     'template'      => $_POST['template']      ?? ($capture['template']      ?? 'split'),
     'offer_format'  => $_POST['offer_format']  ?? $existingFormat,
     'objective'     => $_POST['objective']     ?? $existingObjective,
+    'acquisition_channel' => $_POST['acquisition_channel'] ?? $existingChannel,
     'headline'      => $_POST['headline']      ?? ($capture['headline']      ?? ''),
     'sous_titre'    => $_POST['sous_titre']    ?? ($capture['sous_titre']    ?? ''),
     'description'   => $_POST['description']  ?? ($capture['description']   ?? ''),
@@ -418,17 +435,33 @@ $capUrl = '/capture/' . ($v['slug'] ?: 'draft');
                 </div>
                 <div class="capedit-row">
                     <div class="capedit-field">
+                        <label class="capedit-label">Canal d'acquisition</label>
+                        <select name="acquisition_channel" class="capedit-select" id="capeditChannel">
+                            <?php foreach ($acquisitionChannels as $key => $channel): ?>
+                            <option value="<?= $key ?>" <?= $v['acquisition_channel'] === $key ? 'selected' : '' ?>><?= $channel['label'] ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                        <div class="capedit-hint">Le canal sert à segmenter le hub (mailing, ads, organique) et à générer les UTM.</div>
+                    </div>
+                    <div class="capedit-field">
                         <label class="capedit-label">Source CRM (tracking)</label>
                         <input type="text" name="lead_source" id="capeditLeadSource" class="capedit-input"
                                value="<?= htmlspecialchars($v['lead_source']) ?>"
-                               placeholder="capture_pdf_vendeur_guide-vente-prix">
+                               placeholder="capture_google_ads_pdf_vendeur_guide-vente-prix">
                         <div class="capedit-hint">Permet d’identifier précisément la source dans le CRM</div>
                     </div>
+                </div>
+                <div class="capedit-row">
                     <div class="capedit-field">
                         <label class="capedit-label">Tags CRM</label>
                         <input type="text" name="lead_tags" class="capedit-input"
                                value="<?= htmlspecialchars($v['lead_tags']) ?>"
-                               placeholder="capture,pdf,vendeur">
+                               placeholder="capture,google_ads,pdf,vendeur">
+                    </div>
+                    <div class="capedit-field">
+                        <label class="capedit-label">UTM auto-générées</label>
+                        <input type="text" id="capeditUtmPreview" class="capedit-input" value="" readonly>
+                        <div class="capedit-hint">Exemple: utm_source=google_ads&utm_medium=paid&utm_campaign=capture-...</div>
                     </div>
                 </div>
             </div>
@@ -633,23 +666,33 @@ document.getElementById('capeditSlug').addEventListener('input', function() {
     const v = this.value.toLowerCase().replace(/[^a-z0-9-]/g, '');
     this.value = v;
     document.getElementById('capeditSlugPreview').textContent = v || '…';
+    capeditBuildLeadSource();
 });
 
 function capeditBuildLeadSource() {
     const slug = document.getElementById('capeditSlug').value || 'draft';
     const fmt = document.getElementById('capeditOfferFormat')?.value || 'pdf';
     const obj = document.getElementById('capeditObjective')?.value || 'vendeur';
+    const chn = document.getElementById('capeditChannel')?.value || 'organique';
     const sourceEl = document.getElementById('capeditLeadSource');
+    const utmEl = document.getElementById('capeditUtmPreview');
     if (!sourceEl) return;
-    if (!sourceEl.dataset.manual) sourceEl.value = `capture_${fmt}_${obj}_${slug}`;
+    if (!sourceEl.dataset.manual) sourceEl.value = `capture_${chn}_${fmt}_${obj}_${slug}`;
+    if (utmEl) {
+        const mediumMap = { mailing: 'email', google_ads: 'paid', facebook_ads: 'paid_social', organique: 'organic' };
+        const utmCampaign = `capture-${chn}-${fmt}-${obj}-${slug}`.replace(/_+/g, '-');
+        utmEl.value = `utm_source=${chn}&utm_medium=${mediumMap[chn] || 'organic'}&utm_campaign=${utmCampaign}`;
+    }
 }
 const leadSourceEl = document.getElementById('capeditLeadSource');
 if (leadSourceEl) {
     leadSourceEl.addEventListener('input', () => { leadSourceEl.dataset.manual = '1'; });
 }
-['capeditOfferFormat','capeditObjective','capeditSlug'].forEach(id => {
+['capeditOfferFormat','capeditObjective','capeditSlug','capeditChannel'].forEach(id => {
     const el = document.getElementById(id);
-    if (el) el.addEventListener('change', capeditBuildLeadSource);
+    if (!el) return;
+    el.addEventListener('change', capeditBuildLeadSource);
+    el.addEventListener('input', capeditBuildLeadSource);
 });
 capeditBuildLeadSource();
 

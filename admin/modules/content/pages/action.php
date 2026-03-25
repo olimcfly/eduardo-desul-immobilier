@@ -217,7 +217,11 @@ if (!isset($_SESSION['csrf_token'])) $_SESSION['csrf_token'] = bin2hex(random_by
 /* ══════════════════════════════════════════
    PAGES ACTION — Création / Édition  v1.0
 ══════════════════════════════════════════ */
-.pga-wrap { font-family: var(--font,'Inter',sans-serif); max-width: 1160px; }
+.pga-wrap {
+    font-family: var(--font,'Inter',sans-serif);
+    width: 100%;
+    max-width: none;
+}
 
 .pga-bc {
     display: flex; align-items: center; gap: 8px;
