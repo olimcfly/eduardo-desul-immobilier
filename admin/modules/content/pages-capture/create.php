@@ -143,6 +143,7 @@ $captureTemplates = [
     'hero'    => ['label' => 'Hero',     'desc' => 'Visuel plein écran + form'],
     'split'   => ['label' => 'Split',    'desc' => 'Texte gauche, form droite'],
     'minimal' => ['label' => 'Minimal',  'desc' => 'Minimaliste, focus CTA'],
+    'editor'  => ['label' => 'Éditeur',  'desc' => 'Interface carte premium inspirée du back-office'],
 ];
 ?>
 <style>
