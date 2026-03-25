@@ -75,6 +75,7 @@ return [
     'tiktok'          => ['file'=>'social/tiktok/index.php',          'category'=>'social', 'label'=>'TikTok',           'icon'=>'fab fa-tiktok',     'order'=>44, 'enabled'=>true],
     'gmb'             => ['file'=>'social/gmb/index.php',             'category'=>'social', 'label'=>'Prospection GMB',  'icon'=>'fab fa-google',     'order'=>45, 'enabled'=>true],
     'image-editor'    => ['file'=>'social/image-editor/index.php',    'category'=>'social', 'label'=>"Éditeur d'images", 'icon'=>'fa-image',          'order'=>46, 'enabled'=>true],
+    'visual-studio'   => ['file'=>'social/visual-studio/index.php',   'category'=>'social', 'label'=>'Studio Visuel IA',   'icon'=>'fa-wand-magic-sparkles','order'=>47, 'enabled'=>true],
 
     // ═══════════════════════════════════════════
     //  IMMOBILIER — immobilier/

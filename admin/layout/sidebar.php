@@ -68,7 +68,7 @@ $sidebarGroups = [
     [
         'id' => 'grp-social', 'label' => 'Mes R&eacute;seaux',
         'icon' => 'fa-share-nodes', 'color' => '#db2777',
-        'slugs' => ['reseaux-sociaux','facebook','instagram','linkedin','tiktok','gmb','image-editor','scraper-gmb'],
+        'slugs' => ['reseaux-sociaux','facebook','instagram','linkedin','tiktok','gmb','image-editor','visual-studio','scraper-gmb'],
         'children' => [
             ['slug'=>'reseaux-sociaux','icon'=>'fa-share-nodes',  'label'=>"Vue d'ensemble"],
             ['slug'=>'facebook',       'icon'=>'fab fa-facebook', 'label'=>'Facebook'],
@@ -77,6 +77,7 @@ $sidebarGroups = [
             ['slug'=>'tiktok',         'icon'=>'fab fa-tiktok',   'label'=>'TikTok'],
             ['slug'=>'gmb',            'icon'=>'fab fa-google',   'label'=>'Google My Business'],
             ['slug'=>'image-editor',   'icon'=>'fa-image',        'label'=>"Éditeur d'images IA", 'badge'=>'NEW'],
+            ['slug'=>'visual-studio',  'icon'=>'fa-wand-magic-sparkles', 'label'=>'Studio Visuel IA', 'badge'=>'NEW'],
             ['slug'=>'scraper-gmb',    'icon'=>'fa-binoculars',   'label'=>'Trouver des partenaires'],
         ],
     ],
