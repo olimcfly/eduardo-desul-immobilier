@@ -18,6 +18,14 @@ $action = $ctx['action'];
 $method = $ctx['method'];
 $p      = $ctx['params'];
 
+if (!function_exists('isSuperUser') || !isSuperUser()) {
+    return [
+        'success' => false,
+        'error' => 'Accès refusé: super administrateur requis',
+        '_http_code' => 403,
+    ];
+}
+
 // ────────────────────────────────────────────
 // list — Liste tous les modules + état
 // ────────────────────────────────────────────

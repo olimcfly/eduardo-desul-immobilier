@@ -11,16 +11,14 @@ ob_start();
 
 $rootPath = dirname(__DIR__, 3);
 
-// Bootstrap minimal
-if (!defined('DB_HOST')) {
-    @require_once $rootPath . '/config/config.php';
-}
-if (!class_exists('Database')) {
-    @require_once $rootPath . '/includes/classes/Database.php';
-}
+// Bootstrap admin sécurisé (session + contrôle d'accès)
+require_once $rootPath . '/admin/includes/init.php';
 
-// Reprendre la session existante du dashboard
-if (session_status() === PHP_SESSION_NONE) session_start();
+if (!isSuperUser()) {
+    http_response_code(403);
+    echo json_encode(['error' => 'Accès refusé: super administrateur requis']);
+    exit;
+}
 
 // Lire le body JSON ou POST classique
 $rawBody  = file_get_contents('php://input');
@@ -59,7 +57,7 @@ if ($action === 'ai_proxy') {
 
     // 1. Chercher en DB
     try {
-        $db = Database::getInstance();
+        $db = getDB();
         $r  = $db->query("SELECT setting_value FROM settings WHERE setting_key='anthropic_api_key' LIMIT 1")
                  ->fetch(PDO::FETCH_ASSOC);
         if (!empty($r['setting_value'])) {
