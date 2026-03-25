@@ -153,6 +153,110 @@ p  { color: var(--text-2); margin-bottom: 1em; }
 }
 .form-group textarea { min-height: 120px; resize: vertical; }
 
+/* ── Contact page components ─────────────────────────────────────────── */
+.contact-layout { gap: 40px; align-items: start; }
+.contact-submit-btn { width: 100%; }
+.contact-legal-note {
+  font-size: 11px;
+  color: var(--text-3);
+  text-align: center;
+  margin-top: 12px;
+  margin-bottom: 0;
+}
+
+.contact-alert {
+  border-radius: var(--radius);
+  margin-bottom: 24px;
+}
+.contact-alert--success {
+  background: #d1fae5;
+  border: 1px solid #6ee7b7;
+  padding: 20px 24px;
+  text-align: center;
+  margin-bottom: 32px;
+}
+.contact-alert--error {
+  background: #fee2e2;
+  border: 1px solid #fca5a5;
+  padding: 16px 20px;
+  color: #b91c1c;
+  font-size: 14px;
+}
+.contact-alert__icon {
+  color: #059669;
+  font-size: 24px;
+  margin-bottom: 8px;
+  display: block;
+}
+.contact-alert__icon-inline { margin-right: 8px; }
+.contact-alert__title {
+  font-weight: 700;
+  color: #065f46;
+}
+.contact-alert__text {
+  font-size: 13px;
+  color: #047857;
+  margin-top: 4px;
+}
+
+.contact-info-card { margin-bottom: 20px; }
+.contact-info-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.contact-info-row--last { margin-bottom: 0; }
+.contact-info-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  background: rgba(26,77,122,.08);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.contact-info-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  margin-bottom: 2px;
+}
+.contact-info-value { color: var(--primary); }
+.contact-info-value--phone {
+  font-size: 16px;
+  font-weight: 700;
+}
+.contact-info-value--email {
+  font-size: 14px;
+  font-weight: 600;
+}
+.contact-info-address {
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.contact-hours-card {
+  background: var(--primary);
+  color: #fff;
+}
+.contact-hours-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.contact-hours-title__icon { margin-right: 6px; }
+.contact-hours-content {
+  font-size: 13px;
+  opacity: .9;
+  line-height: 1.8;
+}
+
 /* ── Badges / Tags ────────────────────────────────────────────────────── */
 .badge { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
 .badge-primary { background: rgba(26,77,122,.1);  color: var(--primary); }
