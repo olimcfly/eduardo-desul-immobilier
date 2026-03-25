@@ -44,6 +44,7 @@ $CTX = [
     'header'  => ['table'=>'headers',      'col_title'=>'name',  'col_content'=>'custom_html', 'col_css'=>'custom_css', 'col_js'=>'custom_js', 'col_slug'=>'name',  'col_status'=>'status'],
     'footer'  => ['table'=>'footers',      'col_title'=>'name',  'col_content'=>'custom_html', 'col_css'=>'custom_css', 'col_js'=>'custom_js', 'col_slug'=>'name',  'col_status'=>'status'],
     'capture' => ['table'=>'captures','col_title'=>'titre',  'col_content'=>'contenu',     'col_css'=>'custom_css', 'col_js'=>'custom_js', 'col_slug'=>'slug',  'col_status'=>'status'],
+    'capture_thankyou' => ['table'=>'captures','col_title'=>'titre',  'col_content'=>'html_merci',  'col_css'=>'custom_css', 'col_js'=>'custom_js', 'col_slug'=>'slug',  'col_status'=>'status'],
     'landing' => ['table'=>'pages',        'col_title'=>'title', 'col_content'=>'content',     'col_css'=>'custom_css', 'col_js'=>'custom_js', 'col_slug'=>'slug',  'col_status'=>'status'],
 ];
 
