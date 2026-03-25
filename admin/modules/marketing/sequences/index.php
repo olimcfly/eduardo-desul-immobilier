@@ -12,6 +12,19 @@ if (!defined('ADMIN_ROUTER')) {
 $page_title = "Séquences Email";
 $current_module = "sequences";
 
+if (!function_exists('seq_log_sql_error')) {
+    function seq_log_sql_error(string $context, PDOException $e): void
+    {
+        error_log(sprintf(
+            '[sequences][%s] SQLSTATE=%s CODE=%s MESSAGE=%s',
+            $context,
+            (string) $e->getCode(),
+            isset($e->errorInfo[1]) ? (string) $e->errorInfo[1] : 'n/a',
+            $e->getMessage()
+        ));
+    }
+}
+
 // ====================================================
 // INIT DB — pattern standard IMMO LOCAL+
 // ====================================================
@@ -24,7 +37,8 @@ if (!isset($pdo) && !isset($db)) {
              PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
         );
     } catch (PDOException $e) {
-        echo '<div style="padding:20px;color:#ef4444">Erreur DB: '.htmlspecialchars($e->getMessage()).'</div>';
+        seq_log_sql_error('db_init', $e);
+        echo '<div style="padding:20px;color:#ef4444">Connexion base de données impossible. Vérifiez la configuration puis réessayez.</div>';
         return;
     }
 }
@@ -148,7 +162,8 @@ if (!$tablesExist) {
         ");
         $tablesExist = true;
     } catch (PDOException $e) {
-        echo '<div style="padding:20px;color:#ef4444">Erreur création tables : ' . htmlspecialchars($e->getMessage()) . '</div>';
+        seq_log_sql_error('schema_bootstrap', $e);
+        echo '<div style="padding:20px;color:#ef4444">Impossible d’initialiser les tables CRM. Contactez un administrateur.</div>';
         return;
     }
 }
@@ -232,6 +247,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             case 'add_step':
                 $seqId = (int)$_POST['sequence_id'];
+                $stepType = (string)($_POST['step_type'] ?? 'email');
+                $subject = trim((string)($_POST['subject'] ?? ''));
+                $bodyHtml = trim((string)($_POST['body_html'] ?? ''));
+                if ($stepType === 'email') {
+                    if ($subject === '') {
+                        throw new InvalidArgumentException('Le sujet est obligatoire pour une étape email.');
+                    }
+                    if ($bodyHtml === '') {
+                        throw new InvalidArgumentException('Le corps du message est obligatoire pour une étape email.');
+                    }
+                }
                 $maxOrder = $db->prepare("SELECT COALESCE(MAX(step_order), 0) + 1 FROM crm_sequence_steps WHERE sequence_id = ?");
                 $maxOrder->execute([$seqId]);
                 $nextOrder = $maxOrder->fetchColumn();
@@ -242,10 +268,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->execute([
                     $seqId,
                     $nextOrder,
-                    $_POST['step_type'] ?? 'email',
+                    $stepType,
                     (int)($_POST['delay_days'] ?? 0),
                     (int)($_POST['delay_hours'] ?? 0),
-                    trim($_POST['subject'] ?? ''),
+                    $subject,
                     $_POST['body_html'] ?? '',
                     trim($_POST['sms_text'] ?? ''),
                     trim($_POST['task_description'] ?? ''),
@@ -256,6 +282,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 break;
 
             case 'update_step':
+                $stepType = (string)($_POST['step_type'] ?? 'email');
+                $subject = trim((string)($_POST['subject'] ?? ''));
+                $bodyHtml = trim((string)($_POST['body_html'] ?? ''));
+                if ($stepType === 'email') {
+                    if ($subject === '') {
+                        throw new InvalidArgumentException('Le sujet est obligatoire pour une étape email.');
+                    }
+                    if ($bodyHtml === '') {
+                        throw new InvalidArgumentException('Le corps du message est obligatoire pour une étape email.');
+                    }
+                }
                 $stmt = $db->prepare("
                     UPDATE crm_sequence_steps SET
                         step_type = ?, delay_days = ?, delay_hours = ?,
@@ -263,10 +300,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     WHERE id = ? AND sequence_id = ?
                 ");
                 $stmt->execute([
-                    $_POST['step_type'] ?? 'email',
+                    $stepType,
                     (int)($_POST['delay_days'] ?? 0),
                     (int)($_POST['delay_hours'] ?? 0),
-                    trim($_POST['subject'] ?? ''),
+                    $subject,
                     $_POST['body_html'] ?? '',
                     trim($_POST['sms_text'] ?? ''),
                     trim($_POST['task_description'] ?? ''),
@@ -312,8 +349,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $sequenceId = $seqId;
                 break;
         }
+    } catch (InvalidArgumentException $e) {
+        $message = $e->getMessage();
+        $messageType = 'danger';
     } catch (PDOException $e) {
-        $message = 'Erreur : ' . $e->getMessage();
+        seq_log_sql_error('post_action:' . ($postAction !== '' ? $postAction : 'unknown'), $e);
+        $message = 'Une erreur technique est survenue lors de l’enregistrement. Merci de réessayer dans quelques instants.';
         $messageType = 'danger';
     }
 }
