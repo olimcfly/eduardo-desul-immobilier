@@ -1059,8 +1059,25 @@ async function saveContent(statusParam) {
   fd.append('title', title); fd.append('slug', slug); fd.append('status', status);
   setSaveStatus('saving');
   try {
-    const r = await fetch(BP.saveUrl, {method:'POST', body:fd});
-    const d = await r.json();
+    const r = await fetch(BP.saveUrl, {
+      method:'POST',
+      body:fd,
+      headers: {
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    });
+    const raw = await r.text();
+    let d = null;
+    try {
+      d = JSON.parse(raw);
+    } catch (_parseErr) {
+      if (r.status === 401 || r.status === 403) {
+        throw new Error('Session expirée. Rechargez la page puis reconnectez-vous.');
+      }
+      const snippet = (raw || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 120);
+      throw new Error(snippet ? `Réponse invalide du serveur (${r.status}) : ${snippet}` : `Réponse invalide du serveur (${r.status})`);
+    }
     if (d.success) {
       markClean(); saveHistory(html, css, js);
       BP.status = status; updateStatusBadge(status);
