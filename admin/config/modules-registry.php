@@ -85,6 +85,7 @@ return [
     'estimation'  => ['file'=>'immobilier/estimation/index.php',  'category'=>'immobilier', 'label'=>'Estimations',  'icon'=>'fa-calculator',       'order'=>52, 'enabled'=>true],
     'financement' => ['file'=>'immobilier/financement/index.php', 'category'=>'immobilier', 'label'=>'Financement',  'icon'=>'fa-hand-holding-usd', 'order'=>53, 'enabled'=>true],
     'rdv'         => ['file'=>'immobilier/rdv/index.php',         'category'=>'immobilier', 'label'=>'Rendez-vous',  'icon'=>'fa-calendar-check',   'order'=>54, 'enabled'=>true],
+    'market-analysis' => ['file'=>'immobilier/market-analysis/index.php', 'category'=>'immobilier', 'label'=>'Analyse de Marché', 'icon'=>'fa-chart-area', 'order'=>55, 'enabled'=>true],
 
     // ═══════════════════════════════════════════
     //  SEO & ANALYTICS — seo/
