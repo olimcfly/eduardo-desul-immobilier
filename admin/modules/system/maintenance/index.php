@@ -155,6 +155,51 @@ $apiUrl = '/admin/api/system/maintenance/save.php';
 </div>
 
 <!-- ═══════════════════════════════════════════════
+     ZONE DANGEREUSE (RESET)
+════════════════════════════════════════════════ -->
+<div class="mod-form-panel" style="border:1px solid #7f1d1d;background:linear-gradient(180deg,#fff5f5 0%,#ffe4e6 100%);">
+    <h2 style="color:#7f1d1d;"><i class="fa fa-radiation"></i> Zone dangereuse</h2>
+    <p style="margin-top:0;color:#7f1d1d;font-weight:600;">
+        Actions irréversibles réservées à l'administration. Accès volontairement difficile.
+    </p>
+    <details style="margin-top:12px;">
+        <summary style="cursor:pointer;color:#991b1b;font-weight:700;">Afficher les actions destructives</summary>
+        <div style="margin-top:14px;">
+            <div class="mod-flash mod-flash-error" style="margin:0 0 14px 0;">
+                <i class="fa fa-exclamation-triangle"></i>
+                Ces actions suppriment définitivement des données. Aucun retour arrière possible.
+            </div>
+            <div class="mod-form-group full">
+                <label for="danger-confirm-text">Confirmation manuelle</label>
+                <input
+                    type="text"
+                    id="danger-confirm-text"
+                    class="mod-input"
+                    placeholder="Tapez: SUPPRIMER DEFINITIVEMENT"
+                    autocomplete="off">
+                <small>La phrase exacte est exigée avant l'exécution.</small>
+            </div>
+            <div class="mod-grid mod-grid-2">
+                <button
+                    type="button"
+                    class="mod-btn"
+                    style="background:#dc2626;color:#fff;border-color:#b91c1c;"
+                    onclick="maintDangerReset('stats')">
+                    <i class="fa fa-chart-line"></i> Réinitialiser uniquement les statistiques
+                </button>
+                <button
+                    type="button"
+                    class="mod-btn"
+                    style="background:#991b1b;color:#fff;border-color:#7f1d1d;"
+                    onclick="maintDangerReset('all')">
+                    <i class="fa fa-skull-crossbones"></i> Effacer toutes les données métier
+                </button>
+            </div>
+        </div>
+    </details>
+</div>
+
+<!-- ═══════════════════════════════════════════════
      JAVASCRIPT (logique inchangée)
 ════════════════════════════════════════════════ -->
 <script>
@@ -264,6 +309,35 @@ $apiUrl = '/admin/api/system/maintenance/save.php';
         ips.push(MY_IP);
         ta.value = ips.join(', ');
         showToast("IP ajoutée ! N'oubliez pas de sauvegarder.");
+    };
+
+    window.maintDangerReset = async function(scope) {
+        const input  = document.getElementById('danger-confirm-text');
+        const typed  = (input?.value || '').trim();
+        const phrase = 'SUPPRIMER DEFINITIVEMENT';
+
+        if (typed !== phrase) {
+            showToast(`Phrase invalide. Tapez exactement: ${phrase}`, 'error');
+            return;
+        }
+
+        const label = scope === 'all'
+            ? 'EFFACER TOUTES LES DONNÉES MÉTIER'
+            : 'EFFACER TOUTES LES STATISTIQUES';
+
+        const secondCheck = prompt(`Dernière validation.\\nTapez exactement:\\n${label}`);
+        if (secondCheck !== label) {
+            showToast('Confirmation annulée (texte incorrect).', 'error');
+            return;
+        }
+
+        const result = await apiCall('danger_reset', { scope, confirmation: typed, double_confirmation: secondCheck });
+        if (result.success) {
+            input.value = '';
+            showToast(result.message || 'Reset terminé.');
+        } else {
+            showToast(result.message || 'Échec du reset.', 'error');
+        }
     };
 })();
 </script>

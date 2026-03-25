@@ -17,10 +17,11 @@ $sidebarGroups = [
     [
         'id' => 'grp-activity', 'label' => 'Mon activit&eacute;',
         'icon' => 'fa-briefcase', 'color' => '#c9913b',
-        'slugs' => ['properties','estimation','rdv','financement','crm','leads','scoring','messagerie','emails'],
+        'slugs' => ['properties','estimation','estimateur','rdv','financement','crm','leads','scoring','messagerie','emails'],
         'children' => [
             ['slug'=>'properties',  'icon'=>'fa-house',          'label'=>'Mes biens'],
             ['slug'=>'estimation',  'icon'=>'fa-calculator',     'label'=>'Estimations re&ccedil;ues'],
+            ['slug'=>'estimateur',  'icon'=>'fa-sliders',        'label'=>'Estimateur (config)'],
             ['slug'=>'rdv',         'icon'=>'fa-calendar-check', 'label'=>'Mes rendez-vous'],
             ['slug'=>'financement', 'icon'=>'fa-piggy-bank',     'label'=>'Financement'],
             ['slug'=>'crm',         'icon'=>'fa-address-book',   'label'=>'Mes clients'],
