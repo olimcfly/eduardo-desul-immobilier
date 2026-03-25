@@ -39,13 +39,6 @@ $captureTypes = [
     'newsletter' => ['icon' => 'fa-newspaper',  'label' => 'Newsletter',          'color' => '#ec4899'],
     'guide'      => ['icon' => 'fa-book-open',  'label' => 'Guide / Lead Magnet', 'color' => '#8b5cf6'],
 ];
-$captureTemplates = [
-    'simple'  => ['label' => 'Simple',  'desc' => 'Formulaire centré épuré'],
-    'hero'    => ['label' => 'Hero',    'desc' => 'Grande image + formulaire'],
-    'split'   => ['label' => 'Split',   'desc' => 'Contenu gauche + formulaire droite (recommandé pour guides)'],
-    'minimal' => ['label' => 'Minimal', 'desc' => 'Ultra-compact, sans distraction'],
-    'editor'  => ['label' => 'Éditeur', 'desc' => 'Style interface moderne inspiré de l’éditeur d’admin'],
-];
 $offerFormats = [
     'pdf'   => ['label' => 'Guide PDF',      'form_title' => 'Recevez votre guide PDF'],
     'video' => ['label' => 'Vidéo / Replay', 'form_title' => 'Recevez le lien vidéo'],
@@ -106,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_edit_submit'] ?? '') === 
         'titre'        => trim($_POST['titre']        ?? ''),
         'slug'         => trim($_POST['slug']         ?? ''),
         'type'         => $_POST['type']              ?? 'guide',
-        'template'     => $_POST['template']          ?? 'split',
+        'template'     => 'editor',
         'offer_format' => $_POST['offer_format']      ?? 'pdf',
         'objective'    => $_POST['objective']         ?? 'vendeur',
         'acquisition_channel' => $_POST['acquisition_channel'] ?? 'organique',
@@ -126,6 +119,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_edit_submit'] ?? '') === 
         $d['slug'] = strtolower(trim(preg_replace('/[^a-z0-9]+/', '-', iconv('UTF-8','ASCII//TRANSLIT', $d['titre'])), '-'));
     }
     $d['slug'] = preg_replace('/[^a-z0-9-]/', '', strtolower($d['slug']));
+    if ($d['html_capture'] !== '' && strpos($d['html_capture'], '{{FORMULAIRE}}') === false) {
+        $d['html_capture'] .= "\n\n<section class=\"capture-form-wrap\">{{FORMULAIRE}}</section>";
+    }
     if (!isset($acquisitionChannels[$d['acquisition_channel']])) $d['acquisition_channel'] = 'organique';
     $d['crm_source'] = trim($_POST['lead_source'] ?? ('capture_' . $d['acquisition_channel'] . '_' . $d['offer_format'] . '_' . $d['objective'] . '_' . $d['slug']));
     $d['lead_tags']  = trim($_POST['lead_tags'] ?? ('capture,' . $d['acquisition_channel'] . ',' . $d['offer_format'] . ',' . $d['objective']));
@@ -151,6 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_edit_submit'] ?? '') === 
                 if ($hasCol('form_titre'))       { $insertCols[] = 'form_titre';       $insertData['form_titre'] = $formTitle; }
                 if ($hasCol('form_button_text')) { $insertCols[] = 'form_button_text'; $insertData['form_button_text'] = $buttonText; }
                 if ($hasCol('html_capture'))     { $insertCols[] = 'html_capture';     $insertData['html_capture'] = $d['html_capture']; }
+                elseif ($hasCol('contenu'))      { $insertCols[] = 'contenu';          $insertData['contenu'] = $d['html_capture']; }
 
                 $sql = "INSERT INTO captures (" . implode(',', $insertCols) . ")
                         VALUES (:" . implode(',:', array_keys($insertData)) . ")";
@@ -178,6 +175,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_edit_submit'] ?? '') === 
                 if ($hasCol('form_titre'))       { $setClauses[] = 'form_titre=:form_titre';               $updateData['form_titre'] = $formTitle; }
                 if ($hasCol('form_button_text')) { $setClauses[] = 'form_button_text=:form_button_text';   $updateData['form_button_text'] = $buttonText; }
                 if ($hasCol('html_capture'))     { $setClauses[] = 'html_capture=:html_capture';           $updateData['html_capture'] = $d['html_capture']; }
+                elseif ($hasCol('contenu'))      { $setClauses[] = 'contenu=:contenu';                     $updateData['contenu'] = $d['html_capture']; }
 
                 $stmt = $pdo->prepare("UPDATE captures SET " . implode(', ', $setClauses) . " WHERE id=:id");
                 $stmt->execute($updateData);
@@ -219,7 +217,7 @@ $v = [
     'titre'         => $_POST['titre']         ?? ($capture['titre']         ?? ''),
     'slug'          => $_POST['slug']          ?? ($capture['slug']          ?? ''),
     'type'          => $_POST['type']          ?? ($capture['type']          ?? 'guide'),
-    'template'      => $_POST['template']      ?? ($capture['template']      ?? 'split'),
+    'template'      => $_POST['template']      ?? ($capture['template']      ?? 'editor'),
     'offer_format'  => $_POST['offer_format']  ?? $existingFormat,
     'objective'     => $_POST['objective']     ?? $existingObjective,
     'acquisition_channel' => $_POST['acquisition_channel'] ?? $existingChannel,
@@ -227,7 +225,7 @@ $v = [
     'sous_titre'    => $_POST['sous_titre']    ?? ($capture['sous_titre']    ?? ''),
     'description'   => $_POST['description']  ?? ($capture['description']   ?? ''),
     'cta_text'      => $_POST['cta_text']      ?? ($capture['cta_text']      ?? '📥 Recevoir mon guide gratuitement'),
-    'html_capture'  => $_POST['html_capture']  ?? ($capture['html_capture']  ?? ''),
+    'html_capture'  => $_POST['html_capture']  ?? ($capture['html_capture']  ?? ($capture['contenu'] ?? '')),
     'page_merci_url'=> $_POST['page_merci_url']?? ($capture['page_merci_url']?? '/merci'),
     'lead_source'   => $_POST['lead_source']   ?? ($capture['lead_source']   ?? ''),
     'lead_tags'     => $_POST['lead_tags']     ?? ($capture['lead_tags']     ?? ''),
@@ -399,6 +397,7 @@ $csrfToken = $_SESSION['csrf_token'] ?? '';
 
 <form id="capeditForm" method="POST">
 <input type="hidden" name="_edit_submit" value="1">
+<input type="hidden" name="template" value="editor">
 
 <div class="capedit-grid">
 
@@ -529,22 +528,23 @@ $csrfToken = $_SESSION['csrf_token'] ?? '';
             </div>
         </div>
 
-        <!-- Template -->
+        <!-- Éditeur HTML -->
         <div class="capedit-card">
-            <div class="capedit-card-hd"><i class="fas fa-layout"></i><h3>Template d'affichage</h3></div>
+            <div class="capedit-card-hd"><i class="fas fa-code"></i><h3>Éditeur HTML (copier/coller)</h3></div>
             <div class="capedit-card-body">
-                <div class="capedit-tpl-grid">
-                    <?php foreach ($captureTemplates as $key => $tpl): ?>
-                    <label class="capedit-tpl-item <?= $v['template'] === $key ? 'selected' : '' ?>"
-                           onclick="document.querySelectorAll('.capedit-tpl-item').forEach(e=>e.classList.remove('selected'));this.classList.add('selected')">
-                        <input type="radio" name="template" value="<?= $key ?>" <?= $v['template'] === $key ? 'checked' : '' ?>>
-                        <div class="capedit-tpl-name"><?= $tpl['label'] ?></div>
-                        <div class="capedit-tpl-desc"><?= $tpl['desc'] ?></div>
-                        <?php if ($key === 'split'): ?>
-                        <span class="capedit-tpl-badge">★ Recommandé guides</span>
-                        <?php endif; ?>
-                    </label>
-                    <?php endforeach; ?>
+                <div class="capedit-ai-actions">
+                    <button type="button" class="capedit-btn capedit-btn-ai" onclick="capeditGenerateHtmlSkeleton(event)">
+                        <i class="fas fa-wand-magic-sparkles"></i> Générer HTML capture (orange)
+                    </button>
+                </div>
+                <textarea name="html_capture" id="capeditHtmlCapture" class="capedit-textarea capedit-code"
+                          placeholder="Collez ici votre code HTML généré (Claude, autre IA, etc.)..."><?= htmlspecialchars($v['html_capture']) ?></textarea>
+                <div class="capedit-hint">
+                    Important : laissez <code>{{FORMULAIRE}}</code> dans votre HTML. Ce placeholder garde la connexion du formulaire au CRM, aux emails et à la liste de contacts.
+                </div>
+                <div id="capeditAiStatus" class="capedit-ai-status"></div>
+                <div class="capedit-ai-help">
+                    Si erreur token/API : <a href="#" onclick="capeditVerifyAiConfig();return false;">Vérifier la configuration IA</a> (clé, quota, crédit, compte).
                 </div>
             </div>
         </div>

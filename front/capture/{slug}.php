@@ -471,7 +471,8 @@ if ($showMerci) {
         </style></head><body><div class="card"><div class="icon">🎉</div><h1>Merci !</h1><p>Votre demande a bien été envoyée. Nous vous recontacterons très vite.</p></div></body></html>';
     }
 } else {
-    $displayHtml = $page['html_capture'] ?? '';
+    $storedCaptureHtml = (string)($page['html_capture'] ?? ($page['contenu'] ?? ''));
+    $displayHtml = $storedCaptureHtml;
     if (trim($displayHtml) === '') {
         $displayHtml = buildDefaultCaptureTemplate($page);
     }
@@ -486,7 +487,7 @@ if ($showMerci) {
     $displayHtml = str_replace('{{FORMULAIRE}}', $formHtml, $displayHtml);
     
     // Si pas de {{FORMULAIRE}} trouvé, ajouter à la fin
-    if (strpos($page['html_capture'] ?? '', '{{FORMULAIRE}}') === false) {
+    if (strpos($storedCaptureHtml, '{{FORMULAIRE}}') === false) {
         $displayHtml .= '<div style="padding:40px 20px;">' . $formHtml . '</div>';
     }
 }
