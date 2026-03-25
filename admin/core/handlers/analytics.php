@@ -8,6 +8,20 @@
 $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
 $action = CURRENT_ACTION;
 
+/**
+ * Retourne le nom de colonne date utilisable pour page_views.
+ * Compatibilité ascendante: certaines installations utilisent `viewed_at`.
+ */
+$dateCol = 'created_at';
+try {
+    $cols = $pdo->query("SHOW COLUMNS FROM page_views")->fetchAll(PDO::FETCH_COLUMN);
+    if (is_array($cols) && in_array('viewed_at', $cols, true)) {
+        $dateCol = 'viewed_at';
+    }
+} catch (Throwable $e) {
+    // Table absente ou inaccessible: on garde `created_at` par défaut.
+}
+
 switch ($action) {
     case 'overview':
     case 'list':
@@ -15,8 +29,8 @@ switch ($action) {
             $period = $input['period'] ?? $_GET['period'] ?? '30';
             $days = max(1, (int)$period);
             $stats = [
-                'total_views' => (int)$pdo->prepare("SELECT COUNT(*) FROM page_views WHERE viewed_at >= DATE_SUB(NOW(), INTERVAL ? DAY)")->execute([$days]) ? $pdo->query("SELECT COUNT(*) FROM page_views WHERE viewed_at >= DATE_SUB(NOW(), INTERVAL {$days} DAY)")->fetchColumn() : 0,
-                'unique_sessions' => (int)$pdo->query("SELECT COUNT(DISTINCT session_id) FROM page_views WHERE viewed_at >= DATE_SUB(NOW(), INTERVAL {$days} DAY)")->fetchColumn(),
+                'total_views' => (int)$pdo->query("SELECT COUNT(*) FROM page_views WHERE {$dateCol} >= DATE_SUB(NOW(), INTERVAL {$days} DAY)")->fetchColumn(),
+                'unique_sessions' => (int)$pdo->query("SELECT COUNT(DISTINCT session_id) FROM page_views WHERE {$dateCol} >= DATE_SUB(NOW(), INTERVAL {$days} DAY)")->fetchColumn(),
                 'total_conversions' => (int)$pdo->query("SELECT COUNT(*) FROM conversion_events WHERE created_at >= DATE_SUB(NOW(), INTERVAL {$days} DAY)")->fetchColumn(),
                 'conversion_value' => (float)$pdo->query("SELECT COALESCE(SUM(value), 0) FROM conversion_events WHERE created_at >= DATE_SUB(NOW(), INTERVAL {$days} DAY)")->fetchColumn(),
             ];
@@ -30,7 +44,7 @@ switch ($action) {
         try {
             $days = max(1, (int)($input['days'] ?? $_GET['days'] ?? 30));
             $limit = max(1, (int)($input['limit'] ?? $_GET['limit'] ?? 20));
-            $stmt = $pdo->prepare("SELECT page_url, page_title, COUNT(*) as views, COUNT(DISTINCT session_id) as unique_views FROM page_views WHERE viewed_at >= DATE_SUB(NOW(), INTERVAL ? DAY) GROUP BY page_url, page_title ORDER BY views DESC LIMIT ?");
+            $stmt = $pdo->prepare("SELECT page_url, page_title, COUNT(*) as views, COUNT(DISTINCT session_id) as unique_views FROM page_views WHERE {$dateCol} >= DATE_SUB(NOW(), INTERVAL ? DAY) GROUP BY page_url, page_title ORDER BY views DESC LIMIT ?");
             $stmt->execute([$days, $limit]);
             echo json_encode(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
         } catch (PDOException $e) {
@@ -41,7 +55,7 @@ switch ($action) {
     case 'traffic_sources':
         try {
             $days = max(1, (int)($input['days'] ?? $_GET['days'] ?? 30));
-            $stmt = $pdo->prepare("SELECT source, medium, COUNT(*) as visits FROM page_views WHERE viewed_at >= DATE_SUB(NOW(), INTERVAL ? DAY) GROUP BY source, medium ORDER BY visits DESC");
+            $stmt = $pdo->prepare("SELECT source, medium, COUNT(*) as visits FROM page_views WHERE {$dateCol} >= DATE_SUB(NOW(), INTERVAL ? DAY) GROUP BY source, medium ORDER BY visits DESC");
             $stmt->execute([$days]);
             echo json_encode(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
         } catch (PDOException $e) {
@@ -52,7 +66,7 @@ switch ($action) {
     case 'devices':
         try {
             $days = max(1, (int)($input['days'] ?? $_GET['days'] ?? 30));
-            $stmt = $pdo->prepare("SELECT device, COUNT(*) as count FROM page_views WHERE viewed_at >= DATE_SUB(NOW(), INTERVAL ? DAY) GROUP BY device ORDER BY count DESC");
+            $stmt = $pdo->prepare("SELECT device, COUNT(*) as count FROM page_views WHERE {$dateCol} >= DATE_SUB(NOW(), INTERVAL ? DAY) GROUP BY device ORDER BY count DESC");
             $stmt->execute([$days]);
             echo json_encode(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
         } catch (PDOException $e) {
@@ -74,7 +88,7 @@ switch ($action) {
     case 'timeline':
         try {
             $days = max(1, (int)($input['days'] ?? $_GET['days'] ?? 30));
-            $stmt = $pdo->prepare("SELECT DATE(viewed_at) as date, COUNT(*) as views, COUNT(DISTINCT session_id) as sessions FROM page_views WHERE viewed_at >= DATE_SUB(NOW(), INTERVAL ? DAY) GROUP BY DATE(viewed_at) ORDER BY date ASC");
+            $stmt = $pdo->prepare("SELECT DATE({$dateCol}) as date, COUNT(*) as views, COUNT(DISTINCT session_id) as sessions FROM page_views WHERE {$dateCol} >= DATE_SUB(NOW(), INTERVAL ? DAY) GROUP BY DATE({$dateCol}) ORDER BY date ASC");
             $stmt->execute([$days]);
             echo json_encode(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
         } catch (PDOException $e) {
@@ -84,12 +98,21 @@ switch ($action) {
 
     case 'track_view':
         try {
-            $stmt = $pdo->prepare("INSERT INTO page_views (page_url, page_title, referrer, source, medium, device, session_id, ip_address, user_agent) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            $cols = $pdo->query("SHOW COLUMNS FROM page_views")->fetchAll(PDO::FETCH_COLUMN);
+            $hasLegacy = in_array('ip_address', $cols, true) && in_array('user_agent', $cols, true);
+            if ($hasLegacy) {
+                $stmt = $pdo->prepare("INSERT INTO page_views (page_url, page_title, referrer, source, medium, device, session_id, ip_address, user_agent) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            } else {
+                $stmt = $pdo->prepare("INSERT INTO page_views (page_url, page_title, referrer, source, medium, device, browser, session_id, user_ip) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            }
+            $ip = $input['ip_address'] ?? $_SERVER['REMOTE_ADDR'] ?? '';
+            $ua = $input['user_agent'] ?? $_SERVER['HTTP_USER_AGENT'] ?? '';
             $stmt->execute([
                 $input['page_url'] ?? '', $input['page_title'] ?? '', $input['referrer'] ?? '',
                 $input['source'] ?? 'direct', $input['medium'] ?? '', $input['device'] ?? 'desktop',
-                $input['session_id'] ?? '', $input['ip_address'] ?? $_SERVER['REMOTE_ADDR'] ?? '',
-                $input['user_agent'] ?? $_SERVER['HTTP_USER_AGENT'] ?? ''
+                $hasLegacy ? ($input['session_id'] ?? '') : substr($ua, 0, 100),
+                $hasLegacy ? $ip : ($input['session_id'] ?? ''),
+                $hasLegacy ? $ua : $ip
             ]);
             echo json_encode(['success' => true]);
         } catch (PDOException $e) {
