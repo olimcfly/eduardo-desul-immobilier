@@ -35,6 +35,7 @@ $captureTemplates = [
     'hero'    => ['label' => 'Hero',    'desc' => 'Grande image + formulaire'],
     'split'   => ['label' => 'Split',   'desc' => 'Contenu gauche + formulaire droite (recommandé pour guides)'],
     'minimal' => ['label' => 'Minimal', 'desc' => 'Ultra-compact, sans distraction'],
+    'editor'  => ['label' => 'Éditeur', 'desc' => 'Style interface moderne inspiré de l’éditeur d’admin'],
 ];
 $offerFormats = [
     'pdf'   => ['label' => 'Guide PDF',      'form_title' => 'Recevez votre guide PDF'],
