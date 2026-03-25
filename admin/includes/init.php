@@ -86,6 +86,16 @@ if (!function_exists('isModuleAllowed')) {
             $permissions = [];
             try {
                 $db = getDB();
+                $countStmt = $db->prepare("SELECT COUNT(*) FROM admin_module_permissions WHERE admin_id = ?");
+                $countStmt->execute([$_SESSION['admin_id']]);
+                $hasCustomPermissions = (int)$countStmt->fetchColumn() > 0;
+
+                if (!$hasCustomPermissions) {
+                    // Compatibilité comptes existants : si aucune permission n'est encore définie,
+                    // on autorise tous les modules (comportement historique).
+                    return true;
+                }
+
                 $stmt = $db->prepare("SELECT module_slug FROM admin_module_permissions WHERE admin_id = ? AND is_allowed = 1");
                 $stmt->execute([$_SESSION['admin_id']]);
                 $permissions = $stmt->fetchAll(PDO::FETCH_COLUMN);
