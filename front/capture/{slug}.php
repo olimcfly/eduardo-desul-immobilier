@@ -170,6 +170,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['capture_submit'])) {
                 $leadId = $pdo->lastInsertId();
             }
 
+            // ── Trigger system : assignation automatique de séquence ──
+            try {
+                require_once $rootPath . '/includes/classes/SequenceTriggerService.php';
+                $triggerService = new SequenceTriggerService($pdo);
+                $triggerService->processLeadEvent('capture_submitted', (int)$leadId, [
+                    'capture_page_id' => (int)($page['id'] ?? 0),
+                    'capture_slug' => (string)($page['slug'] ?? ''),
+                    'source' => (string)($page['lead_source'] ?? ''),
+                ]);
+            } catch (Throwable $e) {
+                error_log('Trigger system error: ' . $e->getMessage());
+            }
+
             // ── Log d'interaction ──
             try {
                 $logStmt = $pdo->prepare("INSERT INTO lead_interactions 
