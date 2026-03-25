@@ -53,7 +53,7 @@ PROMPT;
 
 $typePromptTemplates = [
     'article' => "{$basePromptTemplate}\n\nSPÉCIFIQUE ARTICLE\n- Prévoir H1, H2, H3, FAQ et méta-description.",
-    'secteur' => "{$basePromptTemplate}\n\nSPÉCIFIQUE PAGE SECTEUR\n- Inclure analyse quartier, profil acheteurs/vendeurs et CTA estimation.",
+    'secteur' => "{$basePromptTemplate}\n\nSPÉCIFIQUE PAGE SECTEUR\n- Objectif : créer une page secteur immobilière locale destinée à des lecteurs humains et au référencement local Google.\n- Ne jamais inventer de données.\n- Ne jamais donner de chiffres précis non confirmés.\n- Style naturel, professionnel, humain. Éviter le ton robotique et le bourrage SEO.\n- Mettre en valeur la ville et le secteur de façon crédible.\n- Aider à la fois les vendeurs et les acheteurs selon l'intention de la page.\n- Le contenu doit être différencié selon la ville, le secteur, l'intention de la page et les données de recherche locales fournies.\n- Respecter exactement cette structure :\n  1. Hero\n  2. Vue d’ensemble du secteur\n  3. Pourquoi ce secteur attire\n  4. Marché immobilier local\n  5. À qui s’adresse ce secteur\n  6. Vendre dans ce secteur\n  7. Acheter dans ce secteur\n  8. Regard d’expert\n  9. FAQ\n  10. CTA final.",
     'reseaux' => "{$basePromptTemplate}\n\nSPÉCIFIQUE RÉSEAUX SOCIAUX\n- Prévoir hook fort, format court et appel à interaction.",
     'image' => "{$basePromptTemplate}\n\nSPÉCIFIQUE IMAGE IA\n- Détailler cadrage, ambiance, style visuel, palette couleur et ratio.",
     'email' => "{$basePromptTemplate}\n\nSPÉCIFIQUE EMAIL\n- Prévoir objet + pré-header + corps + CTA unique.",
