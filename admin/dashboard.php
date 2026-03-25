@@ -143,6 +143,7 @@ $subRoutes = [
     'ai-settings'         => ['file' => 'system/settings/ai_settings.php'],
     'profile'             => ['file' => 'ai/advisor-context/index.php'],
     'users'               => ['file' => 'system/users/index.php'],
+    'instance-generator'  => ['file' => 'system/instance-generator/index.php'],
 ];
 
 // ── Titres ───────────────────────────────────────────────────
@@ -208,6 +209,7 @@ $titles = [
     'api-keys'        => 'Clés API',
     'ai-settings'     => 'Paramètres AI',
     'users'           => 'Gestion des utilisateurs',
+    'instance-generator' => 'Générateur d’instance client',
 ];
 
 $pageTitle = $titles[$module] ?? $titles[$originalModule]

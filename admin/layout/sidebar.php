@@ -105,12 +105,13 @@ $sidebarGroups = [
     [
         'id' => 'grp-systeme', 'label' => 'Param&egrave;tres / Configuration',
         'icon' => 'fa-gear', 'color' => '#64748b',
-        'slugs' => ['modules','settings','maintenance','license','api-keys','ai-settings','users'],
+        'slugs' => ['modules','settings','maintenance','license','api-keys','ai-settings','users','instance-generator'],
         'children' => array_merge(
             isSuperUser() ? [['slug'=>'users', 'icon'=>'fa-users-gear', 'label'=>'Utilisateurs', 'badge'=>'SU']] : [],
             [
                 ['slug'=>'modules',     'icon'=>'fa-puzzle-piece', 'label'=>'Modules &amp; sant&eacute;'],
                 ['slug'=>'settings',    'icon'=>'fa-sliders',      'label'=>'Configuration'],
+                ['slug'=>'instance-generator', 'icon'=>'fa-boxes-stacked', 'label'=>'G&eacute;n&eacute;rateur d’instance client', 'badge'=>'NEW'],
                 ['slug'=>'api-keys',    'icon'=>'fa-key',          'label'=>'Cl&eacute;s API'],
                 ['slug'=>'ai-settings', 'icon'=>'fa-robot',        'label'=>'Param&egrave;tres AI'],
                 ['slug'=>'maintenance', 'icon'=>'fa-wrench',       'label'=>'Maintenance'],
