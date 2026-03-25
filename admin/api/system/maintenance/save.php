@@ -41,6 +41,41 @@ if (!is_array($jsonInput)) {
 $input = array_merge($jsonInput, $_POST);
 $action = trim((string)($input['action'] ?? ''));
 
+/**
+ * Nettoyage SQL minimal pour les noms de table/colonne.
+ */
+function qident(string $name): string
+{
+    return '`' . str_replace('`', '``', $name) . '`';
+}
+
+/**
+ * Retourne la liste des tables de la base courante.
+ *
+ * @return string[]
+ */
+function listTables(PDO $pdo): array
+{
+    $rows = $pdo->query("SHOW TABLES")->fetchAll(PDO::FETCH_NUM) ?: [];
+    $tables = [];
+    foreach ($rows as $r) {
+        if (!empty($r[0]) && is_string($r[0])) {
+            $tables[] = $r[0];
+        }
+    }
+    return $tables;
+}
+
+/**
+ * Vérifie la présence d'une colonne.
+ */
+function hasColumn(PDO $pdo, string $table, string $column): bool
+{
+    $stmt = $pdo->prepare("SHOW COLUMNS FROM " . qident($table) . " LIKE ?");
+    $stmt->execute([$column]);
+    return (bool)$stmt->fetch(PDO::FETCH_ASSOC);
+}
+
 try {
     // Créer la table si absente
     $pdo->exec("CREATE TABLE IF NOT EXISTS maintenance (
@@ -103,12 +138,108 @@ try {
             echo json_encode(['success' => true]);
             break;
 
+        case 'danger_reset':
+            $scope = trim((string)($input['scope'] ?? ''));
+            $confirmation = trim((string)($input['confirmation'] ?? ''));
+            $doubleConfirmation = trim((string)($input['double_confirmation'] ?? ''));
+
+            if ($confirmation !== 'SUPPRIMER DEFINITIVEMENT') {
+                http_response_code(422);
+                echo json_encode(['success' => false, 'message' => 'Confirmation manuelle invalide.']);
+                break;
+            }
+
+            if ($scope === 'all' && $doubleConfirmation !== 'EFFACER TOUTES LES DONNÉES MÉTIER') {
+                http_response_code(422);
+                echo json_encode(['success' => false, 'message' => 'Double confirmation invalide (données métier).']);
+                break;
+            }
+            if ($scope === 'stats' && $doubleConfirmation !== 'EFFACER TOUTES LES STATISTIQUES') {
+                http_response_code(422);
+                echo json_encode(['success' => false, 'message' => 'Double confirmation invalide (statistiques).']);
+                break;
+            }
+
+            if (!in_array($scope, ['all', 'stats'], true)) {
+                http_response_code(400);
+                echo json_encode(['success' => false, 'message' => 'Scope invalide.']);
+                break;
+            }
+
+            $tables = listTables($pdo);
+            $excluded = [
+                'admins', 'admin_logs', 'admin_sessions', 'admin_tenant_memberships',
+                'tenants', 'tenant_context', 'tenant_settings',
+                'settings', 'setting', 'module_settings', 'modules',
+                'migrations', 'maintenance', 'licenses', 'license_keys',
+                'api_keys', 'roles', 'role_permissions', 'permissions'
+            ];
+
+            $statsDeleteTables = [
+                'analytics', 'analytics_events', 'page_views', 'visits', 'visitor_logs',
+                'statistics', 'stats', 'tracking_events', 'event_logs', 'lead_events'
+            ];
+            $statsResetColumns = ['vues', 'views', 'impressions', 'conversions', 'clicks', 'visits_count', 'score'];
+
+            $pdo->beginTransaction();
+            $pdo->exec("SET FOREIGN_KEY_CHECKS = 0");
+
+            $affected = [];
+            if ($scope === 'all') {
+                foreach ($tables as $table) {
+                    if (in_array($table, $excluded, true)) {
+                        continue;
+                    }
+                    $pdo->exec("TRUNCATE TABLE " . qident($table));
+                    $affected[] = $table;
+                }
+            } else {
+                foreach ($tables as $table) {
+                    if (in_array($table, $excluded, true)) {
+                        continue;
+                    }
+
+                    if (in_array($table, $statsDeleteTables, true)) {
+                        $pdo->exec("TRUNCATE TABLE " . qident($table));
+                        $affected[] = $table . ' (truncate)';
+                        continue;
+                    }
+
+                    $setParts = [];
+                    foreach ($statsResetColumns as $col) {
+                        if (hasColumn($pdo, $table, $col)) {
+                            $setParts[] = qident($col) . " = 0";
+                        }
+                    }
+                    if ($setParts) {
+                        $pdo->exec("UPDATE " . qident($table) . " SET " . implode(', ', $setParts));
+                        $affected[] = $table . ' (reset compteurs)';
+                    }
+                }
+            }
+
+            $pdo->exec("SET FOREIGN_KEY_CHECKS = 1");
+            $pdo->commit();
+
+            echo json_encode([
+                'success' => true,
+                'message' => $scope === 'all'
+                    ? 'Toutes les données métier ont été effacées.'
+                    : 'Les statistiques ont été réinitialisées.',
+                'affected_count' => count($affected)
+            ]);
+            break;
+
         default:
             http_response_code(400);
             echo json_encode(['success' => false, 'message' => 'Action inconnue : ' . $action]);
     }
 
 } catch (Exception $e) {
+    if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {
+        $pdo->rollBack();
+        try { $pdo->exec("SET FOREIGN_KEY_CHECKS = 1"); } catch (Exception $ignored) {}
+    }
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 }
