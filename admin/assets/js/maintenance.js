@@ -10,7 +10,7 @@
 
 const MaintenanceModule = (() => {
 
-    const API = '/admin/api/system/maintenance-save.php';
+    const API = '/admin/api/system/maintenance/save.php';
 
     // ── Toggle on/off ─────────────────────────────────────────────────
     function bindToggle() {
@@ -26,6 +26,7 @@ const MaintenanceModule = (() => {
                 const res  = await fetch(API, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
                     body: JSON.stringify({ action: 'toggle', is_active: isActive }),
                 });
                 const data = await res.json();
@@ -54,12 +55,12 @@ const MaintenanceModule = (() => {
 
     // ── Sauvegarde paramètres ─────────────────────────────────────────
     function bindSave() {
-        const btn = document.getElementById('maintenanceSaveBtn');
+        const btn = document.getElementById('maintenanceSaveBtn') || document.getElementById('btn-save-msg');
         if (!btn) return;
 
         btn.addEventListener('click', async () => {
-            const message     = document.getElementById('maintenanceMessage')?.value ?? '';
-            const allowed_ips = document.getElementById('maintenanceIps')?.value ?? '';
+            const message     = document.getElementById('maintenanceMessage')?.value ?? document.getElementById('maint-message')?.value ?? '';
+            const allowed_ips = document.getElementById('maintenanceIps')?.value ?? document.getElementById('maint-whitelist')?.value ?? '';
             const end_date    = document.getElementById('maintenanceEndDate')?.value ?? '';
 
             btn.disabled = true;
@@ -69,6 +70,7 @@ const MaintenanceModule = (() => {
                 const res  = await fetch(API, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
+                    credentials: 'same-origin',
                     body: JSON.stringify({ action: 'save', message, allowed_ips, end_date }),
                 });
                 const data = await res.json();
@@ -84,7 +86,7 @@ const MaintenanceModule = (() => {
 
     // ── Gestion IPs ───────────────────────────────────────────────────
     function bindIpManager() {
-        const addBtn = document.getElementById('addIpBtn');
+        const addBtn = document.getElementById('addIpBtn') || document.querySelector('[onclick="maintAddMyIp()"]');
         const list   = document.getElementById('ipList');
         if (!addBtn || !list) return;
 
