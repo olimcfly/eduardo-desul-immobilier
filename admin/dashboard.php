@@ -6,28 +6,11 @@ ini_set('display_errors', '1');
  * DASHBOARD — IMMO LOCAL+
  */
 
-// Charger config UNE SEULE FOIS
-require_once __DIR__ . '/../config/config.php';
+// Initialisation admin sécurisée (session + redirection login si nécessaire)
+require_once __DIR__ . '/includes/init.php';
 
-// Démarrer session
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// ✅ BYPASS TEMPORAIRE : forcer la session admin pour tester
-if (empty($_SESSION['admin_id'])) {
-    $_SESSION['admin_id'] = 1;
-    $_SESSION['user'] = 'admin@test.local';
-    $_SESSION['admin_email'] = 'admin@test.local';
-    $_SESSION['admin_role'] = 'superuser';
-    $_SESSION['advisor_name'] = 'Administrateur';
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
-
-// CSRF token
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-}
+// Alias historique utilisé dans plusieurs vues/layouts
+$advisorName = $_SESSION['advisor_name'] ?? $_SESSION['admin_name'] ?? $_SESSION['admin_email'] ?? 'Administrateur';
 
 // Bootstrap
 if (!class_exists('Database')) {
@@ -68,6 +51,23 @@ $aliases = [
     'properties'      => 'properties',
 ];
 $module = $aliases[$originalModule] ?? $originalModule;
+
+
+// Modules sensibles réservés au rôle superuser
+$sensitiveModules = [
+    'users',
+    'modules',
+    'settings',
+    'settings-email',
+    'settings-api',
+    'settings-ai',
+    'api-keys',
+    'ai-settings',
+    'maintenance',
+    'license',
+    'instance-generator',
+];
+$requiresSuperUser = in_array($module, $sensitiveModules, true) || in_array($originalModule, $sensitiveModules, true);
 
 // ── Fichiers modules ─────────────────────────────────────────
 $subRoutes = [
@@ -270,9 +270,14 @@ if (file_exists($msFile)) {
 }
 
 // ── Vérification des permissions ─────────────────────────────
-if ($module !== 'dashboard' && function_exists('isModuleAllowed') && !isModuleAllowed($module)) {
+if ($requiresSuperUser && !isSuperUser()) {
+    $module_file = null;
+    $permissionDenied = true;
+    $permissionDeniedReason = 'superuser_required';
+} elseif ($module !== 'dashboard' && function_exists('isModuleAllowed') && !isModuleAllowed($module)) {
     $module_file = null; // Bloquer le chargement
     $permissionDenied = true;
+    $permissionDeniedReason = 'module_permission';
 }
 
 // ── AJAX : inclure le module directement sans layout ─────────
@@ -407,7 +412,7 @@ require_once __DIR__ . '/layout/sidebar.php';
         <div class="es">
             <i class="fas fa-lock" style="color:#dc2626"></i>
             <h3>Accès restreint</h3>
-            <p>Vous n'avez pas accès à ce module. Contactez le Super Administrateur pour obtenir l'accès.</p>
+            <p><?= !empty($permissionDeniedReason) && $permissionDeniedReason === 'superuser_required' ? 'Ce module est réservé au Super Administrateur.' : "Vous n'avez pas accès à ce module. Contactez le Super Administrateur pour obtenir l'accès." ?></p>
             <a href="?page=dashboard" class="es-btn">&larr; Retour au tableau de bord</a>
         </div>
     <?php elseif ($module_file): ?>
