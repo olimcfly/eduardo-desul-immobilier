@@ -35,6 +35,7 @@ $captureTemplates = [
     'hero'    => ['label' => 'Hero',    'desc' => 'Grande image + formulaire'],
     'split'   => ['label' => 'Split',   'desc' => 'Contenu gauche + formulaire droite (recommandé pour guides)'],
     'minimal' => ['label' => 'Minimal', 'desc' => 'Ultra-compact, sans distraction'],
+    'editor'  => ['label' => 'Éditeur', 'desc' => 'Style interface moderne inspiré de l’éditeur d’admin'],
 ];
 $offerFormats = [
     'pdf'   => ['label' => 'Guide PDF',      'form_title' => 'Recevez votre guide PDF'],
@@ -104,6 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_edit_submit'] ?? '') === 
         'sous_titre'   => trim($_POST['sous_titre']   ?? ''),
         'description'  => trim($_POST['description']  ?? ''),
         'cta_text'     => trim($_POST['cta_text']     ?? ''),
+        'html_capture' => trim($_POST['html_capture'] ?? ''),
         'page_merci_url'=> trim($_POST['page_merci_url'] ?? '/merci'),
         'status'       => ($_POST['status'] ?? 'inactive') === 'active' ? 'active' : 'inactive',
         'active'       => ($_POST['status'] ?? 'inactive') === 'active' ? 1 : 0,
@@ -139,6 +141,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_edit_submit'] ?? '') === 
                 if ($hasCol('form_config'))      { $insertCols[] = 'form_config';      $insertData['form_config'] = json_encode($formPreset, JSON_UNESCAPED_UNICODE); }
                 if ($hasCol('form_titre'))       { $insertCols[] = 'form_titre';       $insertData['form_titre'] = $formTitle; }
                 if ($hasCol('form_button_text')) { $insertCols[] = 'form_button_text'; $insertData['form_button_text'] = $buttonText; }
+                if ($hasCol('html_capture'))     { $insertCols[] = 'html_capture';     $insertData['html_capture'] = $d['html_capture']; }
 
                 $sql = "INSERT INTO captures (" . implode(',', $insertCols) . ")
                         VALUES (:" . implode(',:', array_keys($insertData)) . ")";
@@ -165,6 +168,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_edit_submit'] ?? '') === 
                 if ($hasCol('form_config'))      { $setClauses[] = 'form_config=:form_config';             $updateData['form_config'] = json_encode($formPreset, JSON_UNESCAPED_UNICODE); }
                 if ($hasCol('form_titre'))       { $setClauses[] = 'form_titre=:form_titre';               $updateData['form_titre'] = $formTitle; }
                 if ($hasCol('form_button_text')) { $setClauses[] = 'form_button_text=:form_button_text';   $updateData['form_button_text'] = $buttonText; }
+                if ($hasCol('html_capture'))     { $setClauses[] = 'html_capture=:html_capture';           $updateData['html_capture'] = $d['html_capture']; }
 
                 $stmt = $pdo->prepare("UPDATE captures SET " . implode(', ', $setClauses) . " WHERE id=:id");
                 $stmt->execute($updateData);
@@ -214,6 +218,7 @@ $v = [
     'sous_titre'    => $_POST['sous_titre']    ?? ($capture['sous_titre']    ?? ''),
     'description'   => $_POST['description']  ?? ($capture['description']   ?? ''),
     'cta_text'      => $_POST['cta_text']      ?? ($capture['cta_text']      ?? '📥 Recevoir mon guide gratuitement'),
+    'html_capture'  => $_POST['html_capture']  ?? ($capture['html_capture']  ?? ''),
     'page_merci_url'=> $_POST['page_merci_url']?? ($capture['page_merci_url']?? '/merci'),
     'lead_source'   => $_POST['lead_source']   ?? ($capture['lead_source']   ?? ''),
     'lead_tags'     => $_POST['lead_tags']     ?? ($capture['lead_tags']     ?? ''),
@@ -224,6 +229,7 @@ $v = [
 ];
 
 $capUrl = '/capture/' . ($v['slug'] ?: 'draft');
+$csrfToken = $_SESSION['csrf_token'] ?? '';
 ?>
 
 <style>
@@ -271,9 +277,17 @@ $capUrl = '/capture/' . ($v['slug'] ?: 'draft');
     outline:none; border-color:#8b5cf6; box-shadow:0 0 0 3px rgba(139,92,246,.1);
 }
 .capedit-textarea { resize:vertical; min-height:80px; }
+.capedit-code { min-height:320px; font-family:var(--mono, ui-monospace, SFMono-Regular, Menlo, monospace); font-size:.78rem; line-height:1.5; background:#0f172a; color:#e2e8f0; border-color:#1e293b; }
 .capedit-input::placeholder, .capedit-textarea::placeholder { color:var(--text-3); }
 .capedit-hint { font-size:.7rem; color:var(--text-3); margin-top:4px; }
 .capedit-slug-preview { display:inline-flex; align-items:center; gap:5px; background:var(--surface-2); border:1px solid var(--border); border-radius:6px; padding:4px 10px; font-size:.72rem; color:var(--text-2); font-family:var(--mono); margin-top:5px; }
+.capedit-ai-actions { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+.capedit-btn-ai { background:linear-gradient(135deg,#f97316,#ea580c); color:#fff; border:none; }
+.capedit-btn-ai:hover { transform:translateY(-1px); color:#fff; box-shadow:0 8px 18px rgba(234,88,12,.28); }
+.capedit-ai-status { margin-top:8px; font-size:.75rem; border-radius:8px; padding:8px 10px; display:none; }
+.capedit-ai-status.ok { display:block; background:#dcfce7; border:1px solid #86efac; color:#166534; }
+.capedit-ai-status.err { display:block; background:#fef2f2; border:1px solid #fecaca; color:#b91c1c; }
+.capedit-ai-help { margin-top:8px; font-size:.72rem; color:var(--text-3); }
 
 /* Template selector */
 .capedit-tpl-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
@@ -520,6 +534,27 @@ $capUrl = '/capture/' . ($v['slug'] ?: 'draft');
             </div>
         </div>
 
+        <!-- Éditeur HTML -->
+        <div class="capedit-card">
+            <div class="capedit-card-hd"><i class="fas fa-code"></i><h3>Éditeur HTML (copier/coller)</h3></div>
+            <div class="capedit-card-body">
+                <div class="capedit-ai-actions">
+                    <button type="button" class="capedit-btn capedit-btn-ai" onclick="capeditGenerateHtmlSkeleton(event)">
+                        <i class="fas fa-wand-magic-sparkles"></i> Générer HTML capture (orange)
+                    </button>
+                </div>
+                <textarea name="html_capture" id="capeditHtmlCapture" class="capedit-textarea capedit-code"
+                          placeholder="Collez ici votre code HTML généré (Claude, autre IA, etc.)..."><?= htmlspecialchars($v['html_capture']) ?></textarea>
+                <div class="capedit-hint">
+                    Important : laissez <code>{{FORMULAIRE}}</code> dans votre HTML. Ce placeholder garde la connexion du formulaire au CRM, aux emails et à la liste de contacts.
+                </div>
+                <div id="capeditAiStatus" class="capedit-ai-status"></div>
+                <div class="capedit-ai-help">
+                    Si erreur token/API : <a href="#" onclick="capeditVerifyAiConfig();return false;">Vérifier la configuration IA</a> (clé, quota, crédit, compte).
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- ══ COLONNE LATÉRALE ══ -->
@@ -708,6 +743,239 @@ function capeditToggleStatus(checkbox) {
         row.classList.remove('active-bg');
         label.textContent   = '🔴 Inactive — page masquée';
         label.className = 'capedit-status-label off';
+    }
+}
+
+const CAPEDIT_CSRF = <?= json_encode($csrfToken, JSON_UNESCAPED_UNICODE) ?>;
+
+function capeditSetAiStatus(message, ok = false) {
+    const box = document.getElementById('capeditAiStatus');
+    if (!box) return;
+    box.className = 'capedit-ai-status ' + (ok ? 'ok' : 'err');
+    box.textContent = message;
+}
+
+function capeditEnsureFormPlaceholder(html) {
+    if (html.includes('{{FORMULAIRE}}')) return html;
+    return `${html}\n\n<section class="capture-form-wrap">{{FORMULAIRE}}</section>`;
+}
+
+function capeditBuildPrompt() {
+    const titre = document.querySelector('input[name="titre"]')?.value?.trim() || '';
+    const headline = document.querySelector('input[name="headline"]')?.value?.trim() || '';
+    const sousTitre = document.querySelector('textarea[name="sous_titre"]')?.value?.trim() || '';
+    const objectif = document.getElementById('capeditObjective')?.value || 'vendeur';
+    const format = document.getElementById('capeditOfferFormat')?.value || 'pdf';
+    return `Tu es un expert senior en conversion, UX/UI, copywriting immobilier, intégration HTML/CSS et cohérence visuelle de marque.
+Attention :
+La version actuelle paraît vide, déséquilibrée et inachevée.
+Je ne veux pas d’un simple grand vide avec un bouton.
+Je veux une vraie composition visuelle équilibrée, avec une colonne texte convaincante et une colonne formulaire bien présentée.
+Le formulaire doit être intégré dans une carte élégante, immédiatement compréhensible, et la page doit sembler terminée, crédible et professionnelle.
+Je veux que tu rédiges et structures une page de capture HTML simple, professionnelle, élégante et orientée conversion pour un site immobilier français.
+
+CONTEXTE
+- Cette page sert à proposer une ressource gratuite en échange des coordonnées du visiteur.
+- Le but principal est la conversion, pas la décoration.
+- Le rendu doit être sobre, premium, rassurant, lisible et crédible.
+- Le design doit rester en harmonie avec le site existant.
+- Avant de proposer le design, analyse le style visuel du site et son CSS existant pour t’aligner sur :
+  - les couleurs principales
+  - les espacements
+  - la hiérarchie typographique
+  - le style des boutons
+  - les bordures, ombres, rayons
+  - le ton visuel général
+- Tu dois reprendre l’esprit du site, pas inventer une autre identité graphique.
+
+OBJECTIF
+Créer une page de capture optimisée marketing pour télécharger une ressource gratuite, avec :
+- une promesse claire
+- un titre fort
+- un sous-titre utile
+- quelques bénéfices concrets
+- un formulaire visuellement bien intégré
+- des éléments de réassurance
+- une structure simple
+- un HTML propre, prêt à coller dans mon éditeur
+- le placeholder {{FORMULAIRE}} conservé exactement tel quel
+
+RÈGLES MARKETING À RESPECTER
+La page doit respecter les bonnes pratiques de landing page :
+- une seule action principale : remplir le formulaire
+- pas de navigation inutile dans le contenu
+- pas de surcharge visuelle
+- message immédiatement compréhensible en moins de 5 secondes
+- titre orienté bénéfice utilisateur
+- texte concret, pas vague
+- bénéfices courts et faciles à scanner
+- formulaire visible rapidement sans scroll sur desktop
+- design rassurant, pas agressif
+- CTA clair
+- prévoir une bonne version mobile
+
+RÈGLES SEO À RESPECTER
+Même si l’objectif principal est la conversion, applique un minimum de bonnes pratiques SEO propres :
+- une balise <title> pertinente
+- une meta description concise
+- une structure sémantique propre
+- un seul vrai H1
+- sous-sections en H2 si utile
+- contenu lisible, naturel, sans bourrage de mots-clés
+- vocabulaire immobilier local professionnel
+- HTML propre et accessible
+
+STYLE VISUEL ATTENDU
+Je veux un design :
+- simple
+- pro
+- moderne
+- crédible
+- aéré
+- élégant
+- cohérent avec le CSS du site existant
+- sans effets gadgets
+- sans style “template cheap”
+- sans look SaaS trop froid
+- sans visuel trop chargé
+
+CONTRAINTES DE DESIGN
+- Layout conseillé : section gauche = contenu, section droite = formulaire
+- Sur mobile, tout doit passer en une seule colonne propre
+- Utiliser des espacements généreux
+- Contraste lisible
+- Bouton CTA bien visible
+- Carte formulaire propre et bien encadrée
+- Ajouter un petit texte de réassurance sous le formulaire
+- Ajouter si pertinent un badge du type “Guide gratuit” ou “Checklist gratuite”
+- Ne pas dupliquer le formulaire plusieurs fois
+- Éviter tout bloc inutile
+
+STRUCTURE ATTENDUE
+Propose une structure du type :
+1. badge / micro-label
+2. gros titre
+3. sous-titre ou phrase d’accroche
+4. courte liste de bénéfices
+5. bloc formulaire avec {{FORMULAIRE}}
+6. phrase de réassurance
+7. éventuellement une mini section “ce que vous allez découvrir”
+
+COPYWRITING
+Rédige dans un français naturel, fluide, professionnel et humain.
+Le ton doit inspirer confiance.
+Évite :
+- les promesses exagérées
+- les phrases creuses
+- le jargon marketing visible
+- les formulations trop génériques
+- les blocs de texte trop longs
+
+IMPORTANT
+- Garde exactement le placeholder {{FORMULAIRE}} sans le modifier
+- Retourne un code HTML complet prêt à coller
+- Intègre le CSS dans une balise <style> si nécessaire, mais reste léger
+- Le HTML doit être propre, lisible, bien indenté
+- Ne mets aucun script JavaScript inutile
+- Adapte les couleurs et styles au site existant après avoir observé son CSS
+- Si certaines infos visuelles du CSS ne sont pas disponibles, fais une proposition sobre cohérente avec un site immobilier premium français
+
+CONTENU À UTILISER
+Type de ressource : guide / checklist
+Titre de la ressource : Préparer son bien avant la vente
+Promesse : Checklist home staging, petits travaux à réaliser et pièges à éviter avant les premières visites
+Cible : propriétaires vendeurs
+Contexte métier : conseiller immobilier local
+
+LIVRABLE ATTENDU
+Je veux dans l’ordre :
+1. une très courte analyse des choix UX/UI et conversion
+2. la structure recommandée
+3. le HTML final complet prêt à coller
+4. un mini rappel des points forts conversion de la page
+
+DONNÉES PAGE COURANTES (prioritaires si remplies)
+- Titre admin : ${titre}
+- Headline : ${headline}
+- Accroche : ${sousTitre}
+- Objectif CRM : ${objectif}
+- Format de l'offre : ${format}`;
+}
+
+async function capeditGenerateHtmlSkeleton(ev) {
+    const btn = ev?.currentTarget;
+    const htmlField = document.getElementById('capeditHtmlCapture');
+    if (!htmlField) return;
+    if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Génération…'; }
+
+    try {
+        const pageTitle = document.querySelector('input[name="headline"]')?.value?.trim()
+            || document.querySelector('input[name="titre"]')?.value?.trim()
+            || 'Page de capture';
+
+        const res = await fetch('/admin/api/ai/generate.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                module: 'builder',
+                action: 'generate',
+                csrf_token: CAPEDIT_CSRF,
+                page_type: 'capture',
+                page_title: pageTitle,
+                prompt: capeditBuildPrompt()
+            })
+        });
+        const data = await res.json();
+        if (!data.success || !data.template?.html) {
+            throw new Error(data.error || 'Génération IA impossible.');
+        }
+
+        htmlField.value = capeditEnsureFormPlaceholder(data.template.html);
+
+        const descEl = document.querySelector('textarea[name="description"]');
+        if (descEl && !descEl.value.trim()) {
+            const autoDesc = `Page de capture "${pageTitle}" générée automatiquement à partir du titre et de l'accroche.`;
+            descEl.value = autoDesc;
+        }
+        capeditSetAiStatus('HTML généré avec succès. Vérifiez puis enregistrez la capture.', true);
+    } catch (e) {
+        const msg = String(e?.message || e);
+        if (msg.toLowerCase().includes('csrf')) {
+            capeditSetAiStatus('Token CSRF invalide. Rechargez la page admin puis réessayez.');
+        } else if (msg.match(/429|quota|limit|credit|billing/i)) {
+            capeditSetAiStatus('Limite API atteinte (quota/crédit). Vérifiez facturation ou passez sur OpenAI.');
+        } else if (msg.match(/401|403|api key|clé/i)) {
+            capeditSetAiStatus('Clé API invalide/non configurée. Vérifiez les clés IA (Claude/OpenAI).');
+        } else {
+            capeditSetAiStatus(`Erreur IA: ${msg} — si Claude échoue, le fallback OpenAI sera utilisé si configuré.`);
+        }
+    } finally {
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-wand-magic-sparkles"></i> Générer HTML capture (orange)'; }
+    }
+}
+
+async function capeditVerifyAiConfig() {
+    capeditSetAiStatus('Vérification IA en cours…', true);
+    try {
+        const res = await fetch('/admin/api/ai/generate.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                module: 'builder',
+                action: 'section',
+                csrf_token: CAPEDIT_CSRF,
+                section_type: 'cta',
+                prompt: 'Test rapide de disponibilité API'
+            })
+        });
+        const data = await res.json();
+        if (data.success) {
+            capeditSetAiStatus('API IA opérationnelle ✅', true);
+            return;
+        }
+        throw new Error(data.error || 'Test API non concluant');
+    } catch (e) {
+        capeditSetAiStatus(`Vérification API échouée: ${String(e.message || e)}.`);
     }
 }
 
