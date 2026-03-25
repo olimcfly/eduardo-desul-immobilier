@@ -198,7 +198,7 @@ foreach ($pages as $p) {
 }
 $avgScore = $analyzedPages > 0 ? round($avgScore / $analyzedPages) : 0;
 
-$apiUrl = 'modules/seo/api.php';
+$apiUrl = '/admin/api/router.php?module=seo';
 ?>
 
 <style>
@@ -1149,6 +1149,7 @@ $apiUrl = 'modules/seo/api.php';
 
 <script>
 const API_URL = '<?php echo $apiUrl; ?>';
+const CSRF_TOKEN = <?php echo json_encode($_SESSION['csrf_token'] ?? ''); ?>;
 let currentPageId = null;
 let pendingAIResult = null;
 
@@ -1164,7 +1165,13 @@ function toggleNoindex(pageId, checkbox) {
     
     toggleEl.classList.add('saving');
     
-    fetch(API_URL + '?action=toggle-noindex&id=' + pageId + '&noindex=' + noindexValue)
+    const formData = new FormData();
+    formData.append('action', 'toggle-noindex');
+    formData.append('id', pageId);
+    formData.append('noindex', noindexValue);
+    formData.append('csrf_token', CSRF_TOKEN);
+
+    fetch(API_URL, { method: 'POST', body: formData })
         .then(r => r.json())
         .then(data => {
             toggleEl.classList.remove('saving');
@@ -1195,7 +1202,13 @@ function toggleValidation(pageId, btn) {
     
     btn.classList.add('saving');
     
-    fetch(API_URL + '?action=toggle-validation&id=' + pageId + '&validated=' + newValue)
+    const formData = new FormData();
+    formData.append('action', 'toggle-validation');
+    formData.append('id', pageId);
+    formData.append('validated', newValue);
+    formData.append('csrf_token', CSRF_TOKEN);
+
+    fetch(API_URL, { method: 'POST', body: formData })
         .then(r => r.json())
         .then(data => {
             btn.classList.remove('saving');
