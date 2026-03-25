@@ -158,13 +158,15 @@ if (!$tablesExist) {
 // ====================================================
 $action = $_GET['action'] ?? 'list';
 $sequenceId = (int)($_GET['id'] ?? $_POST['sequence_id'] ?? 0);
-$message = '';
-$messageType = 'success';
+$message = isset($_GET['flash']) ? (string) $_GET['flash'] : '';
+$messageType = isset($_GET['flash_type']) ? (string) $_GET['flash_type'] : 'success';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $postAction = $_POST['action'] ?? '';
 
     try {
+        $redirectTo = '';
+
         switch ($postAction) {
             case 'create_sequence':
                 $stmt = $db->prepare("
@@ -186,8 +188,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ]);
                 $newId = $db->lastInsertId();
                 $message = 'Séquence créée avec succès.';
-                $action = 'edit';
-                $sequenceId = $newId;
+                $redirectTo = '?page=sequences&action=edit&id=' . (int) $newId . '&flash=' . rawurlencode($message) . '&flash_type=success';
                 break;
 
             case 'update_sequence':
@@ -214,20 +215,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ]);
                 $message = 'Séquence mise à jour.';
                 $sequenceId = (int)$_POST['sequence_id'];
-                $action = 'edit';
+                $redirectTo = '?page=sequences&action=edit&id=' . $sequenceId . '&flash=' . rawurlencode($message) . '&flash_type=success';
                 break;
 
             case 'toggle_sequence':
                 $stmt = $db->prepare("UPDATE crm_sequences SET is_active = NOT is_active WHERE id = ?");
-                $stmt->execute([(int)$_POST['sequence_id']]);
+                $sequenceId = (int)$_POST['sequence_id'];
+                $stmt->execute([$sequenceId]);
                 $message = 'Statut modifié.';
+                if ($action === 'edit') {
+                    $redirectTo = '?page=sequences&action=edit&id=' . $sequenceId . '&flash=' . rawurlencode($message) . '&flash_type=success';
+                } else {
+                    $redirectTo = '?page=sequences&flash=' . rawurlencode($message) . '&flash_type=success';
+                }
                 break;
 
             case 'delete_sequence':
                 $stmt = $db->prepare("DELETE FROM crm_sequences WHERE id = ?");
                 $stmt->execute([(int)$_POST['sequence_id']]);
                 $message = 'Séquence supprimée.';
-                $action = 'list';
+                $redirectTo = '?page=sequences&flash=' . rawurlencode($message) . '&flash_type=success';
                 break;
 
             case 'add_step':
@@ -251,8 +258,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     trim($_POST['task_description'] ?? ''),
                 ]);
                 $message = 'Étape ajoutée.';
-                $action = 'edit';
-                $sequenceId = $seqId;
+                $redirectTo = '?page=sequences&action=edit&id=' . $seqId . '&flash=' . rawurlencode($message) . '&flash_type=success';
                 break;
 
             case 'update_step':
@@ -275,8 +281,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     (int)$_POST['sequence_id'],
                 ]);
                 $message = 'Étape mise à jour.';
-                $action = 'edit';
                 $sequenceId = (int)$_POST['sequence_id'];
+                $redirectTo = '?page=sequences&action=edit&id=' . $sequenceId . '&flash=' . rawurlencode($message) . '&flash_type=success';
                 break;
 
             case 'delete_step':
@@ -290,8 +296,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $upd->execute([$order++, $row['id']]);
                 }
                 $message = 'Étape supprimée.';
-                $action = 'edit';
                 $sequenceId = (int)$_POST['sequence_id'];
+                $redirectTo = '?page=sequences&action=edit&id=' . $sequenceId . '&flash=' . rawurlencode($message) . '&flash_type=success';
                 break;
 
             case 'enroll_leads':
@@ -308,9 +314,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 $db->prepare("UPDATE crm_sequences SET total_enrolled = total_enrolled + ? WHERE id = ?")->execute([$enrolled, $seqId]);
                 $message = "$enrolled lead(s) inscrit(s) dans la séquence.";
-                $action = 'edit';
-                $sequenceId = $seqId;
+                $redirectTo = '?page=sequences&action=edit&id=' . $seqId . '&flash=' . rawurlencode($message) . '&flash_type=success';
                 break;
+        }
+
+        if ($redirectTo !== '' && !headers_sent()) {
+            header('Location: ' . $redirectTo);
+            exit;
         }
     } catch (PDOException $e) {
         $message = 'Erreur : ' . $e->getMessage();
