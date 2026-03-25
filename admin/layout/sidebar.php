@@ -33,6 +33,10 @@ $sidebarGroups = [
     [
         'id' => 'grp-site', 'label' => 'Mon Site',
         'icon' => 'fa-globe', 'color' => '#6366f1',
+        'slugs' => ['pages','menus'],
+        'children' => [
+            ['slug'=>'pages',     'icon'=>'fa-file-lines',       'label'=>'Mes pages'],
+            ['slug'=>'menus',     'icon'=>'fa-bars',             'label'=>'Menus'],
         'slugs' => ['pages','menus','headers','footers','sections','templates','builder'],
         'children' => [
             ['slug'=>'pages',     'icon'=>'fa-file-lines',       'label'=>'Mes pages'],
@@ -47,6 +51,7 @@ $sidebarGroups = [
     [
         'id' => 'grp-seo-content', 'label' => 'SEO local &amp; contenu',
         'icon' => 'fa-magnifying-glass', 'color' => '#65a30d',
+        'slugs' => ['secteurs','guide-local','articles','ressources','seo-semantic','seo','local-seo','analytics','market-analyzer'],
         'slugs' => ['secteurs','guide-local','articles','journal','ressources','seo-semantic','seo','local-seo','analytics','market-analyzer'],
         'children' => [
             ['slug'=>'secteurs',     'icon'=>'fa-map-pin',          'label'=>'Mes quartiers'],
