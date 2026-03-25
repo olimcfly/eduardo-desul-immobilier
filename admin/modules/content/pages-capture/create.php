@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $cta_text       = trim($_POST['cta_text']      ?? '');
     $page_merci_url = trim($_POST['page_merci_url']?? '');
     $type           = $_POST['type']     ?? 'contact';
-    $template       = $_POST['template'] ?? 'simple';
+    $template       = 'editor';
     $status_val     = $_POST['status']   ?? 'active';
     $active         = ($status_val === 'active') ? 1 : 0;
     $actif          = $active;
@@ -137,12 +137,6 @@ $captureTypes = [
     'contact'    => ['icon' => 'fa-envelope',   'label' => 'Contact'],
     'newsletter' => ['icon' => 'fa-newspaper',  'label' => 'Newsletter'],
     'guide'      => ['icon' => 'fa-book-open',  'label' => 'Guide / Lead Magnet'],
-];
-$captureTemplates = [
-    'simple'  => ['label' => 'Simple',   'desc' => 'Formulaire épuré, 1 colonne'],
-    'hero'    => ['label' => 'Hero',     'desc' => 'Visuel plein écran + form'],
-    'split'   => ['label' => 'Split',    'desc' => 'Texte gauche, form droite'],
-    'minimal' => ['label' => 'Minimal',  'desc' => 'Minimaliste, focus CTA'],
 ];
 ?>
 <style>
@@ -286,6 +280,7 @@ $captureTemplates = [
 <?php endif; ?>
 
 <form method="POST" id="capForm">
+    <input type="hidden" name="template" value="editor">
 <div class="cap-grid">
 
     <!-- ════ GAUCHE ════ -->
@@ -420,28 +415,6 @@ $captureTemplates = [
                                value="<?= $key ?>" <?= ($rec['type']??'contact')===$key?'checked':'' ?>>
                         <label class="cap-type-lbl" for="t_<?= $key ?>">
                             <i class="fas <?= $ct['icon'] ?>"></i> <?= $ct['label'] ?>
-                        </label>
-                    </div>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-        </div>
-
-        <!-- Template -->
-        <div class="cap-card">
-            <div class="cap-card-hd">
-                <div class="cap-card-ico" style="background:#8b5cf6"><i class="fas fa-palette"></i></div>
-                <div><h3>Template visuel</h3></div>
-            </div>
-            <div class="cap-card-body">
-                <div class="cap-tpl-grid">
-                    <?php foreach ($captureTemplates as $key => $tpl): ?>
-                    <div>
-                        <input type="radio" class="cap-tpl-opt" name="template" id="tpl_<?= $key ?>"
-                               value="<?= $key ?>" <?= ($rec['template']??'simple')===$key?'checked':'' ?>>
-                        <label class="cap-tpl-lbl" for="tpl_<?= $key ?>">
-                            <span class="cap-tpl-name"><?= $tpl['label'] ?></span>
-                            <span class="cap-tpl-desc"><?= $tpl['desc'] ?></span>
                         </label>
                     </div>
                     <?php endforeach; ?>

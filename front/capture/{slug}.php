@@ -390,6 +390,53 @@ function buildDefaultCaptureTemplate(array $page): string {
         </section>';
     }
 
+    if ($template === 'editor') {
+        return '<section class="capture-editor-template" style="min-height:100vh;background:#eef1f7;padding:40px 16px">
+            <div style="max-width:1180px;margin:0 auto">
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px">
+                    <div style="font-size:13px;color:#64748b">Page de capture</div>
+                    <div style="display:flex;gap:8px;align-items:center">
+                        <span style="padding:7px 12px;border-radius:10px;background:#fff;border:1px solid #dbe2ef;font-size:12px;color:#475569">Sécurisé SSL</span>
+                        <span style="padding:7px 12px;border-radius:10px;background:#e0e7ff;color:#4338ca;font-size:12px;font-weight:700">Accès instantané</span>
+                    </div>
+                </div>
+
+                <div style="display:grid;grid-template-columns:minmax(0,1.05fr) minmax(320px,.95fr);gap:20px;align-items:start">
+                    <article style="background:#fff;border:1px solid #dbe2ef;border-radius:18px;padding:28px;box-shadow:0 18px 40px rgba(15,23,42,.07)">
+                        ' . $leftContent . '
+                        <div style="margin-top:22px;display:grid;gap:10px">
+                            <div style="display:flex;gap:9px;align-items:flex-start">
+                                <span style="margin-top:3px;color:' . $bg . '">✔</span>
+                                <span style="font-size:14px;color:#475569;line-height:1.6">Conseils actionnables à appliquer immédiatement.</span>
+                            </div>
+                            <div style="display:flex;gap:9px;align-items:flex-start">
+                                <span style="margin-top:3px;color:' . $bg . '">✔</span>
+                                <span style="font-size:14px;color:#475569;line-height:1.6">Méthode claire utilisée sur le terrain immobilier.</span>
+                            </div>
+                            <div style="display:flex;gap:9px;align-items:flex-start">
+                                <span style="margin-top:3px;color:' . $bg . '">✔</span>
+                                <span style="font-size:14px;color:#475569;line-height:1.6">Format court, lisible et prêt à l’emploi.</span>
+                            </div>
+                        </div>
+                    </article>
+
+                    <aside style="position:sticky;top:18px">
+                        <div style="background:#fff;border:1px solid #dbe2ef;border-radius:18px;padding:18px;box-shadow:0 12px 30px rgba(15,23,42,.08)">
+                            <div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">Votre ressource</div>
+                            ' . $formBlock . '
+                        </div>
+                    </aside>
+                </div>
+            </div>
+            <style>
+                @media (max-width: 920px) {
+                    .capture-editor-template > div > div:nth-child(2) { grid-template-columns: 1fr !important; }
+                    .capture-editor-template aside { position: static !important; }
+                }
+            </style>
+        </section>';
+    }
+
     // split (défaut)
     return '<section style="background:#f8fafc;padding:70px 20px">
         <div style="max-width:1150px;margin:0 auto;display:grid;grid-template-columns:1.1fr .9fr;gap:34px;align-items:start">
@@ -411,7 +458,8 @@ if ($showMerci) {
         </style></head><body><div class="card"><div class="icon">🎉</div><h1>Merci !</h1><p>Votre demande a bien été envoyée. Nous vous recontacterons très vite.</p></div></body></html>';
     }
 } else {
-    $displayHtml = $page['html_capture'] ?? '';
+    $storedCaptureHtml = (string)($page['html_capture'] ?? ($page['contenu'] ?? ''));
+    $displayHtml = $storedCaptureHtml;
     if (trim($displayHtml) === '') {
         $displayHtml = buildDefaultCaptureTemplate($page);
     }
@@ -426,7 +474,7 @@ if ($showMerci) {
     $displayHtml = str_replace('{{FORMULAIRE}}', $formHtml, $displayHtml);
     
     // Si pas de {{FORMULAIRE}} trouvé, ajouter à la fin
-    if (strpos($page['html_capture'] ?? '', '{{FORMULAIRE}}') === false) {
+    if (strpos($storedCaptureHtml, '{{FORMULAIRE}}') === false) {
         $displayHtml .= '<div style="padding:40px 20px;">' . $formHtml . '</div>';
     }
 }
