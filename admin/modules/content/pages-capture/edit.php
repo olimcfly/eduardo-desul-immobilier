@@ -108,6 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_edit_submit'] ?? '') === 
         'description'  => trim($_POST['description']  ?? ''),
         'cta_text'     => trim($_POST['cta_text']     ?? ''),
         'html_capture' => trim($_POST['html_capture'] ?? ''),
+        'html_merci'   => trim($_POST['html_merci'] ?? ''),
         'page_merci_url'=> trim($_POST['page_merci_url'] ?? '/merci'),
         'status'       => ($_POST['status'] ?? 'inactive') === 'active' ? 'active' : 'inactive',
         'active'       => ($_POST['status'] ?? 'inactive') === 'active' ? 1 : 0,
@@ -148,6 +149,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_edit_submit'] ?? '') === 
                 if ($hasCol('form_button_text')) { $insertCols[] = 'form_button_text'; $insertData['form_button_text'] = $buttonText; }
                 if ($hasCol('html_capture'))     { $insertCols[] = 'html_capture';     $insertData['html_capture'] = $d['html_capture']; }
                 elseif ($hasCol('contenu'))      { $insertCols[] = 'contenu';          $insertData['contenu'] = $d['html_capture']; }
+                if ($hasCol('html_merci'))       { $insertCols[] = 'html_merci';       $insertData['html_merci'] = $d['html_merci']; }
 
                 $sql = "INSERT INTO captures (" . implode(',', $insertCols) . ")
                         VALUES (:" . implode(',:', array_keys($insertData)) . ")";
@@ -176,6 +178,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_edit_submit'] ?? '') === 
                 if ($hasCol('form_button_text')) { $setClauses[] = 'form_button_text=:form_button_text';   $updateData['form_button_text'] = $buttonText; }
                 if ($hasCol('html_capture'))     { $setClauses[] = 'html_capture=:html_capture';           $updateData['html_capture'] = $d['html_capture']; }
                 elseif ($hasCol('contenu'))      { $setClauses[] = 'contenu=:contenu';                     $updateData['contenu'] = $d['html_capture']; }
+                if ($hasCol('html_merci'))       { $setClauses[] = 'html_merci=:html_merci';               $updateData['html_merci'] = $d['html_merci']; }
 
                 $stmt = $pdo->prepare("UPDATE captures SET " . implode(', ', $setClauses) . " WHERE id=:id");
                 $stmt->execute($updateData);
@@ -226,6 +229,7 @@ $v = [
     'description'   => $_POST['description']  ?? ($capture['description']   ?? ''),
     'cta_text'      => $_POST['cta_text']      ?? ($capture['cta_text']      ?? '📥 Recevoir mon guide gratuitement'),
     'html_capture'  => $_POST['html_capture']  ?? ($capture['html_capture']  ?? ($capture['contenu'] ?? '')),
+    'html_merci'    => $_POST['html_merci']    ?? ($capture['html_merci']    ?? ''),
     'page_merci_url'=> $_POST['page_merci_url']?? ($capture['page_merci_url']?? '/merci'),
     'lead_source'   => $_POST['lead_source']   ?? ($capture['lead_source']   ?? ''),
     'lead_tags'     => $_POST['lead_tags']     ?? ($capture['lead_tags']     ?? ''),
@@ -386,7 +390,11 @@ $csrfToken = $_SESSION['csrf_token'] ?? '';
         <?php if (!$isNew): ?>
         <a href="?page=builder-editor&context=capture&entity_id=<?= $captureId ?>"
            class="capedit-btn" style="background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;gap:6px">
-            <i class="fas fa-code"></i> Éditeur Visuel
+            <i class="fas fa-code"></i> Éditeur Capture
+        </a>
+        <a href="?page=builder-editor&context=capture_thankyou&entity_id=<?= $captureId ?>"
+           class="capedit-btn" style="background:linear-gradient(135deg,#0ea5e9,#2563eb);color:#fff;gap:6px">
+            <i class="fas fa-heart"></i> Éditeur Remerciement
         </a>
         <?php endif; ?>
         <button type="submit" form="capeditForm" class="capedit-btn capedit-btn-save">
@@ -528,23 +536,19 @@ $csrfToken = $_SESSION['csrf_token'] ?? '';
             </div>
         </div>
 
-        <!-- Éditeur HTML -->
+        <!-- Éditeur HTML remerciement -->
         <div class="capedit-card">
-            <div class="capedit-card-hd"><i class="fas fa-code"></i><h3>Éditeur HTML (copier/coller)</h3></div>
+            <div class="capedit-card-hd"><i class="fas fa-heart"></i><h3>Éditeur HTML page de remerciement</h3></div>
             <div class="capedit-card-body">
                 <div class="capedit-ai-actions">
-                    <button type="button" class="capedit-btn capedit-btn-ai" onclick="capeditGenerateHtmlSkeleton(event)">
-                        <i class="fas fa-wand-magic-sparkles"></i> Générer HTML capture (orange)
+                    <button type="button" class="capedit-btn capedit-btn-ai" onclick="capeditGenerateMerciSkeleton(event)">
+                        <i class="fas fa-wand-magic-sparkles"></i> Générer HTML remerciement
                     </button>
                 </div>
-                <textarea name="html_capture" id="capeditHtmlCapture" class="capedit-textarea capedit-code"
-                          placeholder="Collez ici votre code HTML généré (Claude, autre IA, etc.)..."><?= htmlspecialchars($v['html_capture']) ?></textarea>
+                <textarea name="html_merci" id="capeditHtmlMerci" class="capedit-textarea capedit-code"
+                          placeholder="Collez ici votre code HTML de la page de remerciement..."><?= htmlspecialchars($v['html_merci']) ?></textarea>
                 <div class="capedit-hint">
-                    Important : laissez <code>{{FORMULAIRE}}</code> dans votre HTML. Ce placeholder garde la connexion du formulaire au CRM, aux emails et à la liste de contacts.
-                </div>
-                <div id="capeditAiStatus" class="capedit-ai-status"></div>
-                <div class="capedit-ai-help">
-                    Si erreur token/API : <a href="#" onclick="capeditVerifyAiConfig();return false;">Vérifier la configuration IA</a> (clé, quota, crédit, compte).
+                    Cette page s'affiche après soumission. Si vide, la page de remerciement par défaut sera utilisée.
                 </div>
             </div>
         </div>
@@ -727,7 +731,11 @@ $csrfToken = $_SESSION['csrf_token'] ?? '';
                 <?php if (!$isNew): ?>
                 <a href="?page=builder-editor&context=capture&entity_id=<?= $captureId ?>"
                    class="capedit-btn" style="justify-content:center;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff">
-                    <i class="fas fa-code"></i> Éditeur Visuel (code)
+                    <i class="fas fa-code"></i> Éditeur Capture
+                </a>
+                <a href="?page=builder-editor&context=capture_thankyou&entity_id=<?= $captureId ?>"
+                   class="capedit-btn" style="justify-content:center;background:linear-gradient(135deg,#0ea5e9,#2563eb);color:#fff">
+                    <i class="fas fa-heart"></i> Éditeur Remerciement
                 </a>
                 <?php endif; ?>
                 <a href="?page=captures" class="capedit-btn capedit-btn-outline" style="justify-content:center;color:var(--text-2)">
@@ -1020,6 +1028,40 @@ async function capeditGenerateHtmlSkeleton(ev) {
     } finally {
         if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fas fa-wand-magic-sparkles"></i> Générer HTML capture (orange)'; }
     }
+}
+
+function capeditGenerateMerciSkeleton(ev) {
+    const btn = ev?.currentTarget;
+    const merciField = document.getElementById('capeditHtmlMerci');
+    if (!merciField) return;
+    if (btn) { btn.disabled = true; }
+    merciField.value = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Merci pour votre demande</title>
+  <style>
+    body{margin:0;font-family:Inter,Arial,sans-serif;background:#f8fafc;color:#0f172a}
+    .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+    .card{max-width:680px;width:100%;background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:32px;box-shadow:0 8px 30px rgba(15,23,42,.08);text-align:center}
+    h1{margin:0 0 12px;font-size:30px}
+    p{margin:0 0 18px;color:#475569;line-height:1.6}
+    .btn{display:inline-block;padding:12px 18px;border-radius:10px;background:#2563eb;color:#fff;text-decoration:none;font-weight:700}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="card">
+      <div style="font-size:48px;margin-bottom:10px">✅</div>
+      <h1>Merci, votre demande est bien envoyée.</h1>
+      <p>Nous vous avons bien enregistré. Vérifiez votre email, votre guide arrive dans quelques instants.</p>
+      <a class="btn" href="/">Retour à l'accueil</a>
+    </section>
+  </main>
+</body>
+</html>`;
+    if (btn) { btn.disabled = false; }
 }
 
 async function capeditVerifyAiConfig() {

@@ -28,7 +28,7 @@ if (!$_isAuth) {
 $context  = trim($_GET['context']   ?? 'page');
 $entityId = (int)($_GET['entity_id'] ?? ($_GET['id'] ?? 0));
 
-$dynamicContexts = ['article', 'secteur', 'guide', 'capture'];
+$dynamicContexts = ['article', 'secteur', 'guide', 'capture', 'capture_thankyou'];
 $isDynamic = in_array($context, $dynamicContexts);
 
 $CTX = [
@@ -39,6 +39,7 @@ $CTX = [
     'header'  => ['table'=>'headers',      'col_title'=>'name',  'col_content'=>'custom_html','col_css'=>'custom_css','col_js'=>'custom_js','col_slug'=>'name','col_status'=>'status','col_php'=>null,         'list'=>'dashboard.php?page=builder&sub=headers'],
     'footer'  => ['table'=>'footers',      'col_title'=>'name',  'col_content'=>'custom_html','col_css'=>'custom_css','col_js'=>'custom_js','col_slug'=>'name','col_status'=>'status','col_php'=>null,         'list'=>'dashboard.php?page=builder&sub=footers'],
     'capture' => ['table'=>'captures','col_title'=>'titre',  'col_content'=>'contenu',    'col_css'=>'custom_css','col_js'=>'custom_js','col_slug'=>'slug','col_status'=>'status','col_php'=>'php_content','list'=>'dashboard.php?page=captures'],
+    'capture_thankyou' => ['table'=>'captures','col_title'=>'titre',  'col_content'=>'html_merci', 'col_css'=>'custom_css','col_js'=>'custom_js','col_slug'=>'slug','col_status'=>'status','col_php'=>null,'list'=>'dashboard.php?page=captures'],
 ];
 
 if (!isset($CTX[$context])) $context = 'page';
@@ -64,10 +65,10 @@ $status    = $entity[$C['col_status']]  ?? 'draft';
 $metaTitle = htmlspecialchars($entity['meta_title']       ?? '', ENT_QUOTES);
 $metaDesc  = htmlspecialchars($entity['meta_description'] ?? '', ENT_QUOTES);
 
-$ctxLabels = ['page'=>'Page','secteur'=>'Secteur','article'=>'Article','guide'=>'Guide Local','header'=>'Header','footer'=>'Footer','capture'=>'Page Capture'];
+$ctxLabels = ['page'=>'Page','secteur'=>'Secteur','article'=>'Article','guide'=>'Guide Local','header'=>'Header','footer'=>'Footer','capture'=>'Page Capture','capture_thankyou'=>'Merci Capture'];
 $ctxLabel  = $ctxLabels[$context] ?? 'Page';
 
-$previewUrls = ['page'=>"/front/page.php?preview=1&slug={$slug}",'secteur'=>"/{$slug}",'article'=>"/blog/{$slug}",'header'=>'','footer'=>'','guide'=>"/guide/{$slug}",'capture'=>"/capture/{$slug}"];
+$previewUrls = ['page'=>"/front/page.php?preview=1&slug={$slug}",'secteur'=>"/{$slug}",'article'=>"/blog/{$slug}",'header'=>'','footer'=>'','guide'=>"/guide/{$slug}",'capture'=>"/capture/{$slug}",'capture_thankyou'=>"/capture/{$slug}?preview_merci=1"];
 $frontUrl = $previewUrls[$context] ?? '';
 $aiProxyUrl = '/admin/api/ai/generate.php';
 
@@ -92,6 +93,10 @@ if ($isDynamic) {
                 $rs = $pdo->query("SELECT id, titre as name, slug, status FROM captures ORDER BY created_at DESC LIMIT 60");
                 $connectorData=$rs?$rs->fetchAll(PDO::FETCH_ASSOC):[];
                 $connectorLabel='Ressources';$connectorIcon='fa-magnet';$connectorEditBase='/admin/modules/content/pages-capture/edit.php?id='; break;
+            case 'capture_thankyou':
+                $rs = $pdo->query("SELECT id, titre as name, slug, status FROM captures ORDER BY created_at DESC LIMIT 60");
+                $connectorData=$rs?$rs->fetchAll(PDO::FETCH_ASSOC):[];
+                $connectorLabel='Remerciements capture';$connectorIcon='fa-heart';$connectorEditBase='/admin/modules/content/pages-capture/edit.php?id='; break;
         }
     } catch (Exception $e) {}
 }
@@ -156,6 +161,15 @@ try {
                 ['key'=>'{{lead.telephone}}','desc'=>'Téléphone lead'],['key'=>'{{lead.source}}','desc'=>'Source lead'],
                 ['key'=>'{{leads.count}}','desc'=>'Nb total leads'],
             ],'loop'=>'<?php foreach($leads as $l): ?>'."\n".'<tr>'."\n".'  <td><?= htmlspecialchars($l[\'nom\']??\'\')?></td>'."\n".'  <td><?= htmlspecialchars($l[\'email\']??\'\')?></td>'."\n".'  <td><?= date(\'d/m/Y\',strtotime($l[\'created_at\']))?></td>'."\n".'</tr>'."\n".'<?php endforeach; ?>','table'=>'capture_pages + leads'];
+            break;
+        case 'capture_thankyou':
+            $r=$pdo->query("SELECT COUNT(*) FROM captures"); $dbStats=['Pages de remerciement capture'=>$r?(int)$r->fetchColumn():0];
+            $dbData=['vars'=>[
+                ['key'=>'{{capture.name}}','desc'=>'Nom page capture'],['key'=>'{{capture.slug}}','desc'=>'Slug URL'],
+                ['key'=>'{{capture.page_merci_url}}','desc'=>'URL de redirection'],
+                ['key'=>'{{lead.prenom}}','desc'=>'Prénom lead'],['key'=>'{{lead.email}}','desc'=>'Email lead'],
+                ['key'=>'{{site.name}}','desc'=>'Nom du site'],
+            ],'table'=>'captures'];
             break;
         default:
             $r=$pdo->query("SELECT COUNT(*) FROM pages"); $r2=$pdo->query("SELECT COUNT(*) FROM pages WHERE status='published'");
@@ -387,6 +401,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .db-context-badge.secteur{background:rgba(34,197,94,.15);color:#16a34a}
 .db-context-badge.guide{background:rgba(168,85,247,.15);color:#7c3aed}
 .db-context-badge.capture{background:rgba(6,182,212,.15);color:#0891b2}
+.db-context-badge.capture_thankyou{background:rgba(236,72,153,.15);color:#be185d}
 .db-context-badge.header,.db-context-badge.footer{background:rgba(239,68,68,.1);color:#dc2626}
 .db-section{margin-bottom:18px}
 .db-section-title{font-size:10px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:6px}
@@ -1491,11 +1506,11 @@ async function startClone() {
 // ── PANEL DB ──────────────────────────────────────────────────────────────────
 const DB_CONTEXT_LABELS = {
   page:'📄 Pages CMS',article:'📰 Articles Blog',secteur:'📍 Secteurs',
-  guide:'📚 Guides Locaux',capture:'🎯 Pages Capture',header:'🔝 Headers',footer:'🔻 Footers',
+  guide:'📚 Guides Locaux',capture:'🎯 Pages Capture',capture_thankyou:'🙏 Merci Capture',header:'🔝 Headers',footer:'🔻 Footers',
 };
 const DB_CONTEXT_ICONS = {
   page:'fa-file-alt',article:'fa-newspaper',secteur:'fa-map-marker-alt',
-  guide:'fa-book',capture:'fa-magnet',header:'fa-heading',footer:'fa-shoe-prints',
+  guide:'fa-book',capture:'fa-magnet',capture_thankyou:'fa-heart',header:'fa-heading',footer:'fa-shoe-prints',
 };
 function loadDbPanel() {
   const body = document.getElementById('db-panel-body');

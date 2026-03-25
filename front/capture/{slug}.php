@@ -79,7 +79,7 @@ $pdo->prepare("UPDATE captures SET vues = vues + 1 WHERE id = ?")->execute([$pag
 // ══════════════════════════════════════════════════════════
 // TRAITEMENT DU FORMULAIRE (POST)
 // ══════════════════════════════════════════════════════════
-$showMerci = false;
+$showMerci = isset($_GET['preview_merci']) && $_GET['preview_merci'] === '1';
 $formError = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['capture_submit'])) {

@@ -15,7 +15,7 @@
 class BuilderController
 {
     /** Contextes autorisés (utilisé par editor.php pour valider) */
-    const CONTEXTS = ['article', 'capture', 'landing', 'secteur', 'header', 'footer'];
+    const CONTEXTS = ['article', 'capture', 'capture_thankyou', 'landing', 'secteur', 'header', 'footer'];
 
     /** Catégories de blocs → labels et icônes */
     const CATEGORY_META = [
