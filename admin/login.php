@@ -72,7 +72,6 @@ function sendOTPEmail($to, $otp) {
                 $to,
                 $subject,
                 nl2br(htmlspecialchars($message, ENT_QUOTES, 'UTF-8')),
-                []
                 [
                     'from_email' => ADMIN_EMAIL,
                     'from_name'  => SITE_TITLE,
@@ -169,19 +168,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 if (!empty($sendResult['success'])) {
                     $success = "Code envoyé par email";
-
                     $step = "otp";
                 } else {
                     $error = "Impossible d'envoyer le code de connexion. Vérifiez la configuration SMTP/env (outil: /diagnostic-smtp.php).";
-
-                    // Message diagnostic non bloquant si fallback utilisé
-                    if (($sendResult['transport'] ?? '') === 'mail_fallback' && !empty($sendResult['smtp_error'])) {
-                        $success .= " (SMTP en échec, fallback mail() utilisé)";
-                    }
-
-                    $step = "otp";
-                } else {
-                    $error = "Impossible d'envoyer le code de connexion. Vérifiez la configuration SMTP/env.";
                     if (!empty($sendResult['error'])) {
                         $error .= " Détail: " . $sendResult['error'];
                     }
