@@ -20,8 +20,12 @@ if (!isset($pdo) && !isset($db)) {
         return;
     }
 }
-if (isset($db) && !isset($pdo)) $pdo = $db;
-if (isset($pdo) && !isset($db)) $db = $pdo;
+if (isset($db) && !isset($pdo)) {
+    $pdo = $db;
+}
+if (isset($pdo) && !isset($db)) {
+    $db = $pdo;
+}
 
 require_once dirname(__DIR__, 4) . '/includes/classes/EmailService.php';
 $emailService = new EmailService($pdo);
