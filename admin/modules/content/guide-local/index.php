@@ -351,6 +351,11 @@ $flashMessages = [
     color: #fff; box-shadow: 0 1px 4px rgba(59,130,246,.2);
 }
 .glm-btn-guide:hover { opacity: .9; transform: translateY(-1px); color: #fff; }
+.glm-btn-prospect {
+    background: linear-gradient(135deg, #0ea5e9, #2563eb);
+    color: #fff; box-shadow: 0 1px 4px rgba(37,99,235,.2);
+}
+.glm-btn-prospect:hover { opacity: .92; transform: translateY(-1px); color: #fff; }
 
 /* ═══ BULK ═══ */
 .glm-bulk {
@@ -530,12 +535,38 @@ $flashMessages = [
 .glm-empty h3 { font-family: var(--font-display); color: var(--text-2); font-size: 1rem; font-weight: 600; margin-bottom: 6px; }
 .glm-empty a { color: #10b981; }
 
+/* Prospection modal */
+.glp-overlay {
+    position: fixed; inset: 0; background: rgba(15,23,42,.55);
+    display: none; align-items: center; justify-content: center; z-index: 9999; padding: 20px;
+}
+.glp-overlay.open { display: flex; }
+.glp-modal {
+    width: min(980px, 100%); max-height: 90vh; overflow: auto;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    box-shadow: 0 16px 42px rgba(2,6,23,.25);
+}
+.glp-head, .glp-foot { padding: 14px 16px; border-bottom: 1px solid var(--border); }
+.glp-foot { border-top: 1px solid var(--border); border-bottom: 0; display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap; }
+.glp-title { margin: 0; font-size: 1rem; display:flex;align-items:center;gap:8px; }
+.glp-body { padding: 16px; display: flex; flex-direction: column; gap: 14px; }
+.glp-grid { display:grid; grid-template-columns: 1fr 1fr 120px auto; gap: 8px; align-items: end; }
+.glp-grid input, .glp-grid select {
+    width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface);
+}
+.glp-table { width: 100%; border-collapse: collapse; }
+.glp-table th, .glp-table td { border-bottom: 1px solid var(--border); padding: 8px; font-size: .78rem; text-align: left; vertical-align: top; }
+.glp-table th { font-size: .66rem; text-transform: uppercase; color: var(--text-3); letter-spacing: .05em; }
+.glp-muted { color: var(--text-3); font-size: .74rem; }
+.glp-tag { padding: 2px 8px; border-radius: 20px; background: #eff6ff; color: #1d4ed8; font-size: .66rem; font-weight: 700; }
+
 @media (max-width: 1100px) { .glm-table .col-desc, .glm-table .col-gmb { display: none; } }
 @media (max-width: 900px)  { .glm-table .col-secteur, .glm-table .col-note { display: none; } }
 @media (max-width: 768px)  {
     .glm-banner { flex-direction: column; gap: 16px; align-items: flex-start; }
     .glm-toolbar { flex-direction: column; align-items: flex-start; }
     .glm-cat-pills { gap: 5px; }
+    .glp-grid { grid-template-columns: 1fr; }
 }
 </style>
 
@@ -712,6 +743,9 @@ $flashMessages = [
         <a href="?page=guide-local&action=generate" class="glm-btn glm-btn-guide">
             <i class="fas fa-robot"></i> Générer avec IA
         </a>
+        <button type="button" class="glm-btn glm-btn-prospect" onclick="GLP.open()">
+            <i class="fas fa-search-location"></i> Trouver partenaires (Perplexity)
+        </button>
         <a href="/admin/modules/content/guide-local/edit.php?action=create" class="glm-btn glm-btn-primary">
             <i class="fas fa-plus"></i> Ajouter partenaire
         </a>
@@ -932,6 +966,58 @@ $flashMessages = [
 <?php endif; // tableExists ?>
 </div>
 
+<div class="glp-overlay" id="glpOverlay">
+    <div class="glp-modal">
+        <div class="glp-head" style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+            <h3 class="glp-title"><i class="fas fa-handshake"></i> Prospection partenaires locaux (Perplexity + CRM)</h3>
+            <button type="button" class="glm-btn glm-btn-sm glm-btn-outline" onclick="GLP.close()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="glp-body">
+            <div class="glp-grid">
+                <label>Ville
+                    <input type="text" id="glpCity" value="<?= htmlspecialchars($filterVille !== 'all' ? $filterVille : 'Bordeaux') ?>">
+                </label>
+                <label>Catégorie
+                    <input type="text" id="glpCategory" value="<?= htmlspecialchars($filterCat !== 'all' ? ($partnerCategories[$filterCat]['label'] ?? 'Services locaux') : 'Services locaux') ?>">
+                </label>
+                <label>Nb
+                    <input type="number" id="glpLimit" min="3" max="20" value="8">
+                </label>
+                <button type="button" class="glm-btn glm-btn-guide" onclick="GLP.search(this)"><i class="fas fa-bolt"></i> Rechercher</button>
+            </div>
+            <div class="glp-muted">L'IA récupère des partenaires locaux, leurs coordonnées (email/téléphone si disponibles) et la raison du partenariat.</div>
+            <div id="glpResultsWrap" style="display:none;">
+                <table class="glp-table" id="glpTable">
+                    <thead>
+                        <tr>
+                            <th style="width:28px"><input type="checkbox" id="glpSelectAll" onchange="GLP.toggleAll(this.checked)"></th>
+                            <th>Partenaire</th>
+                            <th>Email</th>
+                            <th>Téléphone</th>
+                            <th>Raison</th>
+                        </tr>
+                    </thead>
+                    <tbody id="glpRows"></tbody>
+                </table>
+            </div>
+            <div id="glpEmpty" class="glp-muted">Aucun résultat pour le moment.</div>
+        </div>
+        <div class="glp-foot">
+            <div style="display:flex;align-items:center;gap:6px;">
+                <label class="glp-muted" for="glpMethod">Canal préféré :</label>
+                <select id="glpMethod">
+                    <option value="email">Email</option>
+                    <option value="telephone">Téléphone</option>
+                    <option value="both">Email + Téléphone</option>
+                </select>
+            </div>
+            <button type="button" class="glm-btn glm-btn-primary" onclick="GLP.createActions()">
+                <i class="fas fa-tasks"></i> Créer action CRM
+            </button>
+        </div>
+    </div>
+</div>
+
 <script>
 const GLM = {
     apiUrl: '/admin/api/content/guide-local.php',
@@ -996,6 +1082,86 @@ const GLM = {
         const r = await fetch(this.apiUrl, {method:'POST', body:fd});
         const d = await r.json();
         d.success ? location.reload() : alert(d.error||'Erreur');
+    }
+};
+
+const GLP = {
+    apiUrl: '/admin/api/content/guide-local-prospection.php',
+    rows: [],
+
+    open() {
+        document.getElementById('glpOverlay').classList.add('open');
+    },
+    close() {
+        document.getElementById('glpOverlay').classList.remove('open');
+    },
+    toggleAll(checked) {
+        document.querySelectorAll('.glp-cb').forEach(cb => cb.checked = checked);
+    },
+    selected() {
+        return this.rows.filter((_, idx) => {
+            const cb = document.getElementById(`glp_cb_${idx}`);
+            return cb && cb.checked;
+        });
+    },
+    async search(btnEl) {
+        const fd = new FormData();
+        fd.append('action', 'search_partners');
+        fd.append('city', document.getElementById('glpCity').value.trim());
+        fd.append('category', document.getElementById('glpCategory').value.trim());
+        fd.append('limit', document.getElementById('glpLimit').value);
+
+        const btn = btnEl || null;
+        if (btn) btn.disabled = true;
+        try {
+            const r = await fetch(this.apiUrl, { method: 'POST', body: fd });
+            const d = await r.json();
+            if (!d.success) return alert(d.error || 'Erreur de recherche');
+            this.rows = d.partners || [];
+            this.render();
+        } catch (e) {
+            alert('Erreur réseau');
+        } finally {
+            if (btn) btn.disabled = false;
+        }
+    },
+    render() {
+        const body = document.getElementById('glpRows');
+        const wrap = document.getElementById('glpResultsWrap');
+        const empty = document.getElementById('glpEmpty');
+        if (!this.rows.length) {
+            wrap.style.display = 'none';
+            empty.textContent = 'Aucun résultat trouvé.';
+            return;
+        }
+        wrap.style.display = '';
+        empty.textContent = `${this.rows.length} partenaire(s) trouvé(s).`;
+        body.innerHTML = this.rows.map((p, idx) => `
+            <tr>
+                <td><input id="glp_cb_${idx}" class="glp-cb" type="checkbox" checked></td>
+                <td><strong>${GLP.escape(p.nom || '')}</strong><br><span class="glp-tag">${GLP.escape(p.categorie || '')}</span><div class="glp-muted">${GLP.escape(p.ville || '')}</div></td>
+                <td>${p.email ? `<a href="mailto:${GLP.escape(p.email)}">${GLP.escape(p.email)}</a>` : '<span class="glp-muted">Non trouvé</span>'}</td>
+                <td>${p.telephone ? `<a href="tel:${GLP.escape(p.telephone)}">${GLP.escape(p.telephone)}</a>` : '<span class="glp-muted">Non trouvé</span>'}</td>
+                <td>${GLP.escape(p.raison || '')}</td>
+            </tr>
+        `).join('');
+    },
+    async createActions() {
+        const selected = this.selected();
+        if (!selected.length) return alert('Sélectionnez au moins un partenaire.');
+        const fd = new FormData();
+        fd.append('action', 'create_crm_actions');
+        fd.append('preferred_contact_method', document.getElementById('glpMethod').value);
+        fd.append('partners', JSON.stringify(selected));
+        const r = await fetch(this.apiUrl, { method: 'POST', body: fd });
+        const d = await r.json();
+        if (!d.success) return alert(d.error || 'Erreur CRM');
+        alert(d.message || 'Actions CRM créées');
+        this.close();
+        location.reload();
+    },
+    escape(v) {
+        return String(v).replace(/[&<>"']/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
     }
 };
 
