@@ -35,6 +35,7 @@ $captureTemplates = [
     'hero'    => ['label' => 'Hero',    'desc' => 'Grande image + formulaire'],
     'split'   => ['label' => 'Split',   'desc' => 'Contenu gauche + formulaire droite (recommandé pour guides)'],
     'minimal' => ['label' => 'Minimal', 'desc' => 'Ultra-compact, sans distraction'],
+    'editor'  => ['label' => 'Éditeur', 'desc' => 'Style interface moderne inspiré de l’éditeur d’admin'],
 ];
 $offerFormats = [
     'pdf'   => ['label' => 'Guide PDF',      'form_title' => 'Recevez votre guide PDF'],
@@ -104,6 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_edit_submit'] ?? '') === 
         'sous_titre'   => trim($_POST['sous_titre']   ?? ''),
         'description'  => trim($_POST['description']  ?? ''),
         'cta_text'     => trim($_POST['cta_text']     ?? ''),
+        'html_capture' => trim($_POST['html_capture'] ?? ''),
         'page_merci_url'=> trim($_POST['page_merci_url'] ?? '/merci'),
         'status'       => ($_POST['status'] ?? 'inactive') === 'active' ? 'active' : 'inactive',
         'active'       => ($_POST['status'] ?? 'inactive') === 'active' ? 1 : 0,
@@ -139,6 +141,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_edit_submit'] ?? '') === 
                 if ($hasCol('form_config'))      { $insertCols[] = 'form_config';      $insertData['form_config'] = json_encode($formPreset, JSON_UNESCAPED_UNICODE); }
                 if ($hasCol('form_titre'))       { $insertCols[] = 'form_titre';       $insertData['form_titre'] = $formTitle; }
                 if ($hasCol('form_button_text')) { $insertCols[] = 'form_button_text'; $insertData['form_button_text'] = $buttonText; }
+                if ($hasCol('html_capture'))     { $insertCols[] = 'html_capture';     $insertData['html_capture'] = $d['html_capture']; }
 
                 $sql = "INSERT INTO captures (" . implode(',', $insertCols) . ")
                         VALUES (:" . implode(',:', array_keys($insertData)) . ")";
@@ -165,6 +168,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_edit_submit'] ?? '') === 
                 if ($hasCol('form_config'))      { $setClauses[] = 'form_config=:form_config';             $updateData['form_config'] = json_encode($formPreset, JSON_UNESCAPED_UNICODE); }
                 if ($hasCol('form_titre'))       { $setClauses[] = 'form_titre=:form_titre';               $updateData['form_titre'] = $formTitle; }
                 if ($hasCol('form_button_text')) { $setClauses[] = 'form_button_text=:form_button_text';   $updateData['form_button_text'] = $buttonText; }
+                if ($hasCol('html_capture'))     { $setClauses[] = 'html_capture=:html_capture';           $updateData['html_capture'] = $d['html_capture']; }
 
                 $stmt = $pdo->prepare("UPDATE captures SET " . implode(', ', $setClauses) . " WHERE id=:id");
                 $stmt->execute($updateData);
@@ -214,6 +218,7 @@ $v = [
     'sous_titre'    => $_POST['sous_titre']    ?? ($capture['sous_titre']    ?? ''),
     'description'   => $_POST['description']  ?? ($capture['description']   ?? ''),
     'cta_text'      => $_POST['cta_text']      ?? ($capture['cta_text']      ?? '📥 Recevoir mon guide gratuitement'),
+    'html_capture'  => $_POST['html_capture']  ?? ($capture['html_capture']  ?? ''),
     'page_merci_url'=> $_POST['page_merci_url']?? ($capture['page_merci_url']?? '/merci'),
     'lead_source'   => $_POST['lead_source']   ?? ($capture['lead_source']   ?? ''),
     'lead_tags'     => $_POST['lead_tags']     ?? ($capture['lead_tags']     ?? ''),
@@ -271,9 +276,13 @@ $capUrl = '/capture/' . ($v['slug'] ?: 'draft');
     outline:none; border-color:#8b5cf6; box-shadow:0 0 0 3px rgba(139,92,246,.1);
 }
 .capedit-textarea { resize:vertical; min-height:80px; }
+.capedit-code { min-height:320px; font-family:var(--mono, ui-monospace, SFMono-Regular, Menlo, monospace); font-size:.78rem; line-height:1.5; background:#0f172a; color:#e2e8f0; border-color:#1e293b; }
 .capedit-input::placeholder, .capedit-textarea::placeholder { color:var(--text-3); }
 .capedit-hint { font-size:.7rem; color:var(--text-3); margin-top:4px; }
 .capedit-slug-preview { display:inline-flex; align-items:center; gap:5px; background:var(--surface-2); border:1px solid var(--border); border-radius:6px; padding:4px 10px; font-size:.72rem; color:var(--text-2); font-family:var(--mono); margin-top:5px; }
+.capedit-ai-actions { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px; }
+.capedit-btn-ai { background:linear-gradient(135deg,#f97316,#ea580c); color:#fff; border:none; }
+.capedit-btn-ai:hover { transform:translateY(-1px); color:#fff; box-shadow:0 8px 18px rgba(234,88,12,.28); }
 
 /* Template selector */
 .capedit-tpl-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
@@ -520,6 +529,26 @@ $capUrl = '/capture/' . ($v['slug'] ?: 'draft');
             </div>
         </div>
 
+        <!-- Éditeur HTML -->
+        <div class="capedit-card">
+            <div class="capedit-card-hd"><i class="fas fa-code"></i><h3>Éditeur HTML (copier/coller)</h3></div>
+            <div class="capedit-card-body">
+                <div class="capedit-ai-actions">
+                    <button type="button" class="capedit-btn capedit-btn-ai" onclick="capeditGenerateHtmlSkeleton()">
+                        <i class="fas fa-wand-magic-sparkles"></i> Générer HTML capture (orange)
+                    </button>
+                    <button type="button" class="capedit-btn capedit-btn-outline" onclick="capeditInsertFormPlaceholder()">
+                        <i class="fas fa-plus"></i> Insérer {{FORMULAIRE}}
+                    </button>
+                </div>
+                <textarea name="html_capture" id="capeditHtmlCapture" class="capedit-textarea capedit-code"
+                          placeholder="Collez ici votre code HTML généré (Claude, autre IA, etc.)..."><?= htmlspecialchars($v['html_capture']) ?></textarea>
+                <div class="capedit-hint">
+                    Important : laissez <code>{{FORMULAIRE}}</code> dans votre HTML. Ce placeholder garde la connexion du formulaire au CRM, aux emails et à la liste de contacts.
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- ══ COLONNE LATÉRALE ══ -->
@@ -709,6 +738,56 @@ function capeditToggleStatus(checkbox) {
         label.textContent   = '🔴 Inactive — page masquée';
         label.className = 'capedit-status-label off';
     }
+}
+
+function capeditInsertFormPlaceholder() {
+    const ta = document.getElementById('capeditHtmlCapture');
+    if (!ta) return;
+    const token = '{{FORMULAIRE}}';
+    if (ta.value.includes(token)) return;
+    ta.value = (ta.value.trim() ? ta.value.trim() + "\n\n" : '') + token;
+}
+
+function capeditGenerateHtmlSkeleton() {
+    const headline = document.querySelector('input[name="headline"]')?.value?.trim() || 'Téléchargez votre guide';
+    const sousTitre = document.querySelector('textarea[name="sous_titre"]')?.value?.trim() || 'Méthode claire et actionnable pour avancer rapidement.';
+    const description = document.querySelector('textarea[name="description"]')?.value?.trim() || 'Renseignez vos coordonnées pour recevoir la ressource.';
+    const ta = document.getElementById('capeditHtmlCapture');
+    if (!ta) return;
+
+    ta.value = `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${headline.replace(/</g, '&lt;')}</title>
+  <style>
+    body { margin:0; font-family: Inter, Arial, sans-serif; background:#f1f5f9; color:#0f172a; }
+    .wrap { max-width:1080px; margin:0 auto; padding:42px 16px; }
+    .grid { display:grid; gap:20px; grid-template-columns:1.1fr .9fr; }
+    .card { background:#fff; border:1px solid #dbe2ef; border-radius:16px; padding:24px; box-shadow:0 10px 24px rgba(15,23,42,.08); }
+    h1 { margin:0 0 10px; font-size:clamp(28px,4vw,44px); line-height:1.1; }
+    p { margin:0; line-height:1.7; color:#475569; }
+    .eyebrow { display:inline-block; margin-bottom:12px; padding:6px 10px; border-radius:999px; background:#eff6ff; color:#1d4ed8; font-size:12px; font-weight:700; }
+    @media (max-width: 900px) { .grid { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="grid">
+      <section class="card">
+        <span class="eyebrow">Guide immobilier</span>
+        <h1>${headline.replace(/</g, '&lt;')}</h1>
+        <p>${sousTitre.replace(/</g, '&lt;')}</p>
+        <p style="margin-top:12px">${description.replace(/</g, '&lt;')}</p>
+      </section>
+      <aside class="card">
+        {{FORMULAIRE}}
+      </aside>
+    </div>
+  </main>
+</body>
+</html>`;
 }
 
 // ── Flash auto-disparition ──
