@@ -1309,7 +1309,7 @@ $templateVars = [
                     </div>
                     <div style="margin-top:8px">
                         <label style="font-size:.75rem;color:var(--text-3);margin-bottom:4px">Objectif de l'email</label>
-                        <input type="text" id="aiObjective" placeholder="Ex: obtenir une réponse et planifier un appel">
+                        <input type="text" id="aiObjective" placeholder="Ex: obtenir une réponse et planifier un appel" data-user-edited="0">
                     </div>
                     <div style="display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap">
                         <button type="button" class="btn-seq btn-seq-outline btn-seq-sm" onclick="generateAiEmailDraft()">
@@ -1719,6 +1719,70 @@ const emailTemplates = {
     }
 };
 
+
+const sequenceContext = {
+    targetSegment: <?= json_encode($sequence['target_segment'] ?? '') ?>,
+    totalSteps: <?= json_encode(count($steps)) ?>
+};
+
+const aiObjectivePresets = {
+    acheteur: {
+        early: 'Qualifier les critères de recherche et proposer un premier échange téléphonique.',
+        mid: 'Partager une sélection ciblée de biens et obtenir une réponse sur les préférences.',
+        late: 'Lever les derniers freins et planifier une visite ou une offre.'
+    },
+    vendeur: {
+        early: 'Cadrer le projet de vente et proposer un rendez-vous estimation.',
+        mid: 'Présenter la stratégie de mise en vente et valider les prochaines actions.',
+        late: 'Accélérer la décision de mandat avec un plan de commercialisation concret.'
+    },
+    investisseur: {
+        early: 'Qualifier les objectifs de rendement et le niveau de risque accepté.',
+        mid: 'Proposer des opportunités alignées et obtenir un retour sur les critères financiers.',
+        late: 'Faire avancer la décision avec un plan d’action chiffré.'
+    },
+    locataire: {
+        early: 'Comprendre le besoin logement et cadrer les critères prioritaires.',
+        mid: 'Proposer des options adaptées et confirmer les disponibilités de visite.',
+        late: 'Faciliter la prise de décision et sécuriser les prochaines démarches.'
+    }
+};
+
+let aiObjectiveTouchedByUser = false;
+
+function resolveLeadTypeFromSequence(defaultType = 'acheteur') {
+    const candidate = String(sequenceContext.targetSegment || '').toLowerCase();
+    return ['acheteur', 'vendeur', 'investisseur', 'locataire'].includes(candidate) ? candidate : defaultType;
+}
+
+function resolvePresetObjective(leadType, position) {
+    const profile = aiObjectivePresets[leadType] || aiObjectivePresets.acheteur;
+    if (position <= 1) return profile.early;
+    if (position <= 3) return profile.mid;
+    return profile.late;
+}
+
+function autoPrefillAiAssistant(options = {}) {
+    const { forceObjective = false, stepOrder = null } = options;
+    const leadTypeInput = document.getElementById('aiLeadType');
+    const positionInput = document.getElementById('aiSequencePosition');
+    const objectiveInput = document.getElementById('aiObjective');
+    if (!leadTypeInput || !positionInput || !objectiveInput) return;
+
+    const resolvedLeadType = resolveLeadTypeFromSequence(leadTypeInput.value || 'acheteur');
+    leadTypeInput.value = resolvedLeadType;
+
+    const computedPosition = Math.max(1, parseInt(stepOrder || (sequenceContext.totalSteps + 1), 10) || 1);
+    positionInput.value = computedPosition;
+
+    const shouldFillObjective = forceObjective || !aiObjectiveTouchedByUser || !objectiveInput.value.trim();
+    if (shouldFillObjective) {
+        objectiveInput.value = resolvePresetObjective(resolvedLeadType, computedPosition);
+        objectiveInput.dataset.userEdited = '0';
+        aiObjectiveTouchedByUser = false;
+    }
+}
+
 function loadEmailTemplate() {
     const sel = document.getElementById('emailTemplateSelect');
     const key = sel.value;
@@ -1799,7 +1863,9 @@ function openAddStepModal() {
     document.getElementById('stepTaskDesc').value = '';
     document.getElementById('emailTemplateSelect').selectedIndex = 0;
     document.getElementById('stepSubmitBtn').innerHTML = '<i class="fas fa-save"></i> Ajouter l\'etape';
+    aiObjectiveTouchedByUser = false;
     toggleStepFields();
+    autoPrefillAiAssistant({ forceObjective: true, stepOrder: sequenceContext.totalSteps + 1 });
     switchEditorMode('edit', document.querySelector('.seq-editor-tab'));
     document.getElementById('addStepModal').classList.add('active');
 }
@@ -1835,7 +1901,9 @@ function openEditStepModal(step) {
     document.getElementById('stepTaskDesc').value = step.task_description || '';
     document.getElementById('emailTemplateSelect').selectedIndex = 0;
     document.getElementById('stepSubmitBtn').innerHTML = '<i class="fas fa-save"></i> Mettre a jour';
+    aiObjectiveTouchedByUser = false;
     toggleStepFields();
+    autoPrefillAiAssistant({ forceObjective: true, stepOrder: step.step_order || 1 });
     switchEditorMode('edit', document.querySelector('.seq-editor-tab'));
     document.getElementById('addStepModal').classList.add('active');
 }
@@ -1850,6 +1918,23 @@ function toggleStepFields() {
     document.getElementById('smsFields').style.display  = type === 'sms'   ? 'block' : 'none';
     document.getElementById('taskFields').style.display = type === 'task'  ? 'block' : 'none';
 }
+
+
+(function initAiAutofillBindings() {
+    const leadTypeInput = document.getElementById('aiLeadType');
+    const positionInput = document.getElementById('aiSequencePosition');
+    const objectiveInput = document.getElementById('aiObjective');
+    if (!leadTypeInput || !positionInput || !objectiveInput) return;
+
+    leadTypeInput.addEventListener('change', () => autoPrefillAiAssistant({ forceObjective: true, stepOrder: parseInt(positionInput.value || '1', 10) || 1 }));
+    positionInput.addEventListener('change', () => autoPrefillAiAssistant({ forceObjective: true, stepOrder: parseInt(positionInput.value || '1', 10) || 1 }));
+    objectiveInput.addEventListener('input', () => {
+        aiObjectiveTouchedByUser = true;
+        objectiveInput.dataset.userEdited = '1';
+    });
+
+    autoPrefillAiAssistant({ forceObjective: true, stepOrder: sequenceContext.totalSteps + 1 });
+})();
 
 // ====================================================
 // Variable Insertion
