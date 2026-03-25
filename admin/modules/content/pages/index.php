@@ -160,7 +160,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['_action'] ?? '') === 'crea
 
 // ─── Filtres ───
 $filterStatus     = $_GET['status']     ?? 'all';
-$filterVisibility = $_GET['visibility'] ?? 'all';
 $filterIndexed    = $_GET['indexed']    ?? 'all';
 $searchQuery      = trim($_GET['q']     ?? '');
 $currentPage      = max(1, (int)($_GET['p'] ?? 1));
@@ -168,11 +167,19 @@ $perPage          = 25;
 $offset           = ($currentPage - 1) * $perPage;
 
 $where = []; $params = [];
+// Scope du module: uniquement les pages publiques du site (hors contenus "secteur"/"article")
+if ($hasVisibility) {
+    $where[] = "p.visibility = ?";
+    $params[] = 'public';
+}
+if (in_array('content_type', $availCols)) {
+    $where[] = "(p.content_type IS NULL OR p.content_type NOT IN ('secteur','article'))";
+}
+if (in_array('type', $availCols)) {
+    $where[] = "(p.type IS NULL OR p.type NOT IN ('secteur','article'))";
+}
 if ($filterStatus !== 'all' && in_array($filterStatus, ['draft','published','archived'])) {
     $where[] = "p.status = ?"; $params[] = $filterStatus;
-}
-if ($filterVisibility !== 'all' && $hasVisibility && in_array($filterVisibility, ['public','private'])) {
-    $where[] = "p.visibility = ?"; $params[] = $filterVisibility;
 }
 if ($filterIndexed !== 'all' && $hasGoogleIndexed && in_array($filterIndexed, ['yes','no','pending','unknown'])) {
     $where[] = "p.google_indexed = ?"; $params[] = $filterIndexed;
@@ -186,10 +193,25 @@ $whereSQL = $where ? 'WHERE ' . implode(' AND ', $where) : '';
 // ─── Stats globales ───
 $stats = ['total'=>0,'published'=>0,'draft'=>0,'archived'=>0,'avg_seo'=>0,'avg_semantic'=>0,'indexed_count'=>0];
 try {
+    $statsWhere = [];
+    $statsParams = [];
+    if ($hasVisibility) {
+        $statsWhere[] = "visibility = ?";
+        $statsParams[] = 'public';
+    }
+    if (in_array('content_type', $availCols)) {
+        $statsWhere[] = "(content_type IS NULL OR content_type NOT IN ('secteur','article'))";
+    }
+    if (in_array('type', $availCols)) {
+        $statsWhere[] = "(type IS NULL OR type NOT IN ('secteur','article'))";
+    }
+    $statsWhereSQL = $statsWhere ? (' WHERE ' . implode(' AND ', $statsWhere)) : '';
     $seoAvgCol      = $hasSeoScore      ? ", ROUND(AVG(NULLIF(seo_score,0)),0) AS avg_seo"           : "";
     $semanticAvgCol = $hasSemanticScore ? ", ROUND(AVG(NULLIF(semantic_score,0)),0) AS avg_semantic"  : "";
     $indexedCol     = $hasGoogleIndexed ? ", SUM(google_indexed='yes') AS indexed_count"              : "";
-    $r = $pdo->query("SELECT COUNT(*) AS total, SUM(status='published') AS published, SUM(status='draft') AS draft, SUM(status='archived') AS archived {$seoAvgCol}{$semanticAvgCol}{$indexedCol} FROM pages");
+    $statsSql = "SELECT COUNT(*) AS total, SUM(status='published') AS published, SUM(status='draft') AS draft, SUM(status='archived') AS archived {$seoAvgCol}{$semanticAvgCol}{$indexedCol} FROM pages{$statsWhereSQL}";
+    $r = $pdo->prepare($statsSql);
+    $r->execute($statsParams);
     $stats = $r->fetch(PDO::FETCH_ASSOC) ?: $stats;
 } catch (PDOException $e) {}
 
@@ -435,7 +457,6 @@ $flash = $_GET['msg'] ?? '';
                 $active = ($filterStatus === $key) ? ' active' : '';
                 $url = '?page=pages' . ($key !== 'all' ? '&status='.$key : '');
                 if ($searchQuery)              $url .= '&q='.urlencode($searchQuery);
-                if ($filterVisibility !== 'all') $url .= '&visibility='.$filterVisibility;
                 if ($filterIndexed    !== 'all') $url .= '&indexed='.$filterIndexed;
             ?>
             <a href="<?= $url ?>" class="pgm-fbtn<?= $active ?>">
@@ -462,16 +483,6 @@ $flash = $_GET['msg'] ?? '';
 
     <!-- Sub-filters -->
     <div class="pgm-subfilters">
-        <?php if ($hasVisibility): ?>
-        <div class="pgm-subfilter">
-            <i class="fas fa-eye"></i>
-            <select onchange="PGM.filterBy('visibility',this.value)">
-                <option value="all"     <?= $filterVisibility==='all'    ?'selected':'' ?>>Toutes visibilités</option>
-                <option value="public"  <?= $filterVisibility==='public' ?'selected':'' ?>>🌐 Publique</option>
-                <option value="private" <?= $filterVisibility==='private'?'selected':'' ?>>🔒 Privée</option>
-            </select>
-        </div>
-        <?php endif; ?>
         <?php if ($hasGoogleIndexed): ?>
         <div class="pgm-subfilter">
             <i class="fab fa-google"></i>
@@ -495,8 +506,6 @@ $flash = $_GET['msg'] ?? '';
             <option value="publish">Publier</option>
             <option value="draft">Mettre en brouillon</option>
             <option value="archive">Archiver</option>
-            <option value="set_public">Rendre publique</option>
-            <option value="set_private">Rendre privée</option>
             <option value="delete">Supprimer</option>
         </select>
         <button class="pgm-btn pgm-btn-sm pgm-btn-outline" onclick="PGM.bulkExecute()">
@@ -630,7 +639,6 @@ $flash = $_GET['msg'] ?? '';
                 <?php for ($i=1;$i<=$totalPages;$i++):
                     $pUrl = '?page=pages&p='.$i;
                     if ($filterStatus!=='all')      $pUrl .= '&status='.$filterStatus;
-                    if ($filterVisibility!=='all')  $pUrl .= '&visibility='.$filterVisibility;
                     if ($filterIndexed!=='all')     $pUrl .= '&indexed='.$filterIndexed;
                     if ($searchQuery)               $pUrl .= '&q='.urlencode($searchQuery);
                 ?>
@@ -720,14 +728,11 @@ const PGM = {
         const ids = [...document.querySelectorAll('.pgm-cb:checked')].map(cb => parseInt(cb.value));
         if (!ids.length) return;
         if (action === 'delete' && !confirm(`Supprimer ${ids.length} page(s) ?`)) return;
-        const actionMap = { publish:'published', draft:'draft', archive:'archived', delete:'delete', set_public:'public', set_private:'private' };
+        const actionMap = { publish:'published', draft:'draft', archive:'archived', delete:'delete' };
         try {
             const fd = new FormData();
             if (action === 'delete') {
                 fd.append('action', 'bulk_delete');
-            } else if (action === 'set_public' || action === 'set_private') {
-                fd.append('action', 'bulk_visibility');
-                fd.append('visibility', actionMap[action]);
             } else {
                 fd.append('action', 'bulk_status');
                 fd.append('status', actionMap[action]);
