@@ -117,13 +117,11 @@ $step = $_POST['step'] ?? 'email';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    /* Étape 1 : Email + téléphone */
+    /* Étape 1 : Email */
 
     if ($step === 'email') {
 
         $email = sanitize($_POST['email'] ?? '', 'email');
-        $phone = sanitize($_POST['phone'] ?? '');
-
         if (!$email || !isValidEmail($email)) {
 
             $error = "Email invalide";
@@ -148,7 +146,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $_SESSION['otp'] = $otp;
                 $_SESSION['otp_email'] = $email;
-                $_SESSION['otp_phone'] = $phone;
                 $_SESSION['otp_time'] = time();
 
                 $sendResult = sendOTPEmail($email, $otp);
@@ -212,7 +209,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             unset($_SESSION['otp']);
             unset($_SESSION['otp_email']);
-            unset($_SESSION['otp_phone']);
             unset($_SESSION['otp_time']);
 
             header("Location:/admin/dashboard.php");
@@ -344,11 +340,6 @@ name="email"
 placeholder="<?= ADMIN_EMAIL ?>"
 required>
 
-<input type="tel"
-name="phone"
-placeholder="Numéro de téléphone"
-required>
-
 <button>Recevoir le code sécurisé</button>
 
 <p class="info">
@@ -366,11 +357,6 @@ Connexion sécurisée par code OTP
 <p class="info">
 Code envoyé à<br>
 <strong><?= htmlspecialchars($_SESSION['otp_email'] ?? '') ?></strong>
-</p>
-
-<p class="info">
-Téléphone enregistré<br>
-<strong><?= htmlspecialchars($_SESSION['otp_phone'] ?? '') ?></strong>
 </p>
 
 <input type="text"
