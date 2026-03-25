@@ -1246,6 +1246,35 @@ $templateVars = [
                     </select>
                 </div>
 
+                <div class="seq-form-group" style="background:var(--surface-2);padding:12px;border:1px solid var(--border);border-radius:10px">
+                    <label><i class="fas fa-robot"></i> Assistant IA (Étape 2)</label>
+                    <div class="seq-form-row">
+                        <div>
+                            <label style="font-size:.75rem;color:var(--text-3);margin-bottom:4px">Type de contact</label>
+                            <select id="aiLeadType">
+                                <option value="acheteur">Acheteur</option>
+                                <option value="vendeur">Vendeur</option>
+                                <option value="investisseur">Investisseur</option>
+                                <option value="locataire">Locataire</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label style="font-size:.75rem;color:var(--text-3);margin-bottom:4px">Position séquence</label>
+                            <input type="number" id="aiSequencePosition" min="1" max="30" value="1">
+                        </div>
+                    </div>
+                    <div style="margin-top:8px">
+                        <label style="font-size:.75rem;color:var(--text-3);margin-bottom:4px">Objectif de l'email</label>
+                        <input type="text" id="aiObjective" placeholder="Ex: obtenir une réponse et planifier un appel">
+                    </div>
+                    <div style="display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap">
+                        <button type="button" class="btn-seq btn-seq-outline btn-seq-sm" onclick="generateAiEmailDraft()">
+                            <i class="fas fa-wand-magic-sparkles"></i> Générer avec IA
+                        </button>
+                        <small id="aiGenStatus" style="color:var(--text-3)">Remplit automatiquement l'objet + le corps HTML.</small>
+                    </div>
+                </div>
+
                 <div class="seq-form-group">
                     <label>Objet de l'email</label>
                     <input type="text" name="subject" id="stepSubject" placeholder="Ex: {{prenom}}, votre projet immobilier a Bordeaux">
@@ -1658,6 +1687,55 @@ function loadEmailTemplate() {
 
     // Reset to edit mode
     switchEditorMode('edit', document.querySelector('.seq-editor-tab'));
+}
+
+async function generateAiEmailDraft() {
+    const status = document.getElementById('aiGenStatus');
+    const leadType = document.getElementById('aiLeadType').value;
+    const position = parseInt(document.getElementById('aiSequencePosition').value || '1', 10);
+    const objective = (document.getElementById('aiObjective').value || '').trim();
+
+    if (!objective) {
+        status.textContent = "Ajoutez un objectif pour générer un brouillon IA.";
+        status.style.color = 'var(--red)';
+        return;
+    }
+
+    status.textContent = 'Génération IA en cours...';
+    status.style.color = 'var(--text-3)';
+
+    try {
+        const response = await fetch('/admin/api/router.php?module=ai&action=generate_sequence_email', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-Token': <?= json_encode($_SESSION['csrf_token'] ?? '') ?>
+            },
+            body: JSON.stringify({
+                lead_type: leadType,
+                sequence_position: position,
+                objective: objective,
+                language: 'fr'
+            })
+        });
+
+        const data = await response.json();
+        if (!data.success || !data.data) {
+            throw new Error(data.message || 'Erreur IA');
+        }
+
+        document.getElementById('stepSubject').value = data.data.subject || '';
+        document.getElementById('seqEditorVisual').innerHTML = data.data.body_html || '';
+        document.getElementById('stepBodyHtml').value = data.data.body_html || '';
+        switchEditorMode('edit', document.querySelector('.seq-editor-tab'));
+
+        status.textContent = 'Brouillon IA injecté dans l’éditeur.';
+        status.style.color = 'var(--green)';
+    } catch (error) {
+        status.textContent = 'Génération impossible : ' + error.message;
+        status.style.color = 'var(--red)';
+    }
 }
 
 // ====================================================
