@@ -37,16 +37,27 @@ $sidebarGroups = [
         'children' => [
             ['slug'=>'pages',     'icon'=>'fa-file-lines',       'label'=>'Mes pages'],
             ['slug'=>'menus',     'icon'=>'fa-bars',             'label'=>'Menus'],
+        'slugs' => ['pages','menus','headers','footers','sections','templates','builder'],
+        'children' => [
+            ['slug'=>'pages',     'icon'=>'fa-file-lines',       'label'=>'Mes pages'],
+            ['slug'=>'menus',     'icon'=>'fa-bars',             'label'=>'Menus'],
+            ['slug'=>'headers',   'icon'=>'fa-window-maximize',  'label'=>'Haut de page'],
+            ['slug'=>'footers',   'icon'=>'fa-window-minimize',  'label'=>'Bas de page'],
+            ['slug'=>'sections',  'icon'=>'fa-cubes',         'label'=>'Mes sections'],
+            ['slug'=>'templates', 'icon'=>'fa-layer-group',        'label'=>'Mod&egrave;les de pages'],
+            ['slug'=>'builder',   'icon'=>'fa-wand-magic-sparkles','label'=>'&Eacute;diteur de site', 'badge'=>'PRO'],
         ],
     ],
     [
         'id' => 'grp-seo-content', 'label' => 'SEO local &amp; contenu',
         'icon' => 'fa-magnifying-glass', 'color' => '#65a30d',
         'slugs' => ['secteurs','guide-local','articles','ressources','seo-semantic','seo','local-seo','analytics','market-analyzer'],
+        'slugs' => ['secteurs','guide-local','articles','journal','ressources','seo-semantic','seo','local-seo','analytics','market-analyzer'],
         'children' => [
             ['slug'=>'secteurs',     'icon'=>'fa-map-pin',          'label'=>'Mes quartiers'],
             ['slug'=>'guide-local',  'icon'=>'fa-map',              'label'=>'Guide du quartier', 'badge'=>'NEW'],
             ['slug'=>'articles',     'icon'=>'fa-newspaper',        'label'=>'Mes articles'],
+            ['slug'=>'journal',      'icon'=>'fa-calendar-days',    'label'=>'Planning contenu'],
             ['slug'=>'ressources',   'icon'=>'fa-book-open',        'label'=>'Guides &amp; ressources', 'badge'=>'NEW'],
             ['slug'=>'seo-semantic', 'icon'=>'fa-chart-bar',        'label'=>'Mots-cl&eacute;s &amp; s&eacute;mantique'],
             ['slug'=>'seo',          'icon'=>'fa-magnifying-glass', 'label'=>'Mon r&eacute;f&eacute;rencement'],

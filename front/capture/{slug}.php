@@ -15,22 +15,44 @@ $slug = preg_replace('/[^a-z0-9\-]/', '', strtolower($slug));
 
 if (empty($slug)) {
     http_response_code(404);
-    include __DIR__ . '/404.php';
+    $notFound = dirname(__DIR__) . '/renderers/404.php';
+    if (file_exists($notFound)) {
+        include $notFound;
+    } else {
+        echo 'Page introuvable';
+    }
     exit;
 }
 
 // ── Connexion BD ──
 try {
-    $configPath = __DIR__ . '/../config/database.php';
-    if (!file_exists($configPath)) $configPath = __DIR__ . '/../config/config.php';
-    require_once $configPath;
-    if (!isset($pdo)) {
-        $pdo = new PDO(
-            'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME, DB_USER, DB_PASS,
-            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
-        );
+    $rootPath = dirname(__DIR__, 2);
+    $databasePath = $rootPath . '/config/database.php';
+    $configPath = $rootPath . '/config/config.php';
+
+    if (file_exists($databasePath)) {
+        require_once $databasePath;
     }
-} catch (PDOException $e) {
+    if (file_exists($configPath)) {
+        require_once $configPath;
+    }
+
+    if (!isset($pdo) || !($pdo instanceof PDO)) {
+        if (function_exists('getDB')) {
+            $pdo = getDB();
+        } else {
+            $pdo = new PDO(
+                'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME,
+                DB_USER,
+                DB_PASS,
+                [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                ]
+            );
+        }
+    }
+} catch (Throwable $e) {
     http_response_code(500);
     die('Erreur serveur');
 }
@@ -42,7 +64,12 @@ $page = $stmt->fetch();
 
 if (!$page) {
     http_response_code(404);
-    include __DIR__ . '/404.php';
+    $notFound = dirname(__DIR__) . '/renderers/404.php';
+    if (file_exists($notFound)) {
+        include $notFound;
+    } else {
+        echo 'Page introuvable';
+    }
     exit;
 }
 
