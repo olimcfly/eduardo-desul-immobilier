@@ -23,39 +23,68 @@ class PromptBuilderService
         $clean = $this->sanitizeData($data);
         $platformRules = $this->rules[$plateforme] ?? $this->rules['default'];
 
+        $typeLabel = $clean['type_contenu'] !== '' ? $clean['type_contenu'] : $type;
+
         $lines = [
             'CONTEXTE',
-            sprintf('Tu es un expert en contenu immobilier (%s) orienté performance locale.', $type),
+            sprintf(
+                'Tu es un expert senior en marketing immobilier local (%s), UX/UI, copywriting et conversion.',
+                $typeLabel
+            ),
+            sprintf('Zone ciblée : %s. Audience : %s.', $clean['ville'] ?: 'zone locale à définir', $clean['persona'] ?: 'audience locale'),
             '',
             'OBJECTIF',
-            $clean['objectif'] !== '' ? $clean['objectif'] : 'Produire un contenu immobilier utile, crédible et actionnable.',
+            $clean['objectif'] !== ''
+                ? $clean['objectif']
+                : 'Produire un contenu/action marketing prêt à exécuter, orienté conversion et crédibilité.',
             '',
-            'CIBLE',
-            trim(($clean['persona'] ?: 'Audience locale') . ' à ' . ($clean['ville'] ?: 'zone cible')),
+            'RÈGLES MARKETING À RESPECTER',
+            '- Prioriser un message clair : promesse principale + bénéfice concret pour le prospect.',
+            '- Suivre une logique conversion : Hook → Valeur → Réassurance → CTA.',
+            '- Éviter les promesses irréalistes ou non vérifiables.',
             '',
-            'CONTRAINTES',
-            '- Utiliser un ton humain et professionnel',
-            '- Prioriser les informations concrètes et locales',
-            '- Respecter la structure demandée sans inventer de chiffres',
-            '',
-            'REGLES PLATEFORME',
-            $this->toList($platformRules['rules'] ?? []),
-            '',
-            'SEO',
+            'RÈGLES SEO À RESPECTER',
             '- Mot-clé principal : ' . ($clean['mot_cle'] ?: 'non défini'),
             '- Niveau de conscience : ' . ($clean['niveau_conscience'] ?: 'non défini'),
-            '- Type de contenu : ' . ($clean['type_contenu'] ?: $type),
+            '- Intégrer des variantes sémantiques naturelles (pas de keyword stuffing).',
+            '- Structurer le contenu avec des titres lisibles et une intention de recherche claire.',
             '',
-            'INTERDIT',
+            'STYLE VISUEL ATTENDU',
+            '- Ton premium, rassurant, lisible et professionnel.',
+            '- Style rédactionnel : phrases courtes, rythme fluide, vocabulaire concret.',
+            '- Conserver une cohérence de marque locale immobilière.',
+            '',
+            'CONTRAINTES DE DESIGN',
+            '- Lisibilité mobile prioritaire.',
+            '- Hiérarchie visuelle claire (titres, sous-titres, blocs de preuve).',
+            '- CTA visible sans être agressif.',
+            '',
+            'STRUCTURE ATTENDUE',
+            '- 1) Hook d\'ouverture centré sur le problème client.',
+            '- 2) Proposition de valeur et différenciation locale.',
+            '- 3) Preuves / réassurance (méthode, expérience, données locales si disponibles).',
+            '- 4) Passage à l\'action (CTA principal + option de contact).',
+            '',
+            'COPYWRITING',
+            '- Utiliser un ton humain, direct et empathique.',
+            '- Mettre en avant les bénéfices client avant les caractéristiques.',
+            '- Conclure avec une action simple, sans pression commerciale excessive.',
+            '',
+            'CONTENU À UTILISER',
+            '- Plateforme : ' . ($plateforme ?: 'générique'),
+            '- Type de contenu : ' . $typeLabel,
+            '- Contraintes plateforme :',
+            $this->toList($platformRules['rules'] ?? []),
+            '- Éléments à éviter :',
             $this->toList($platformRules['forbidden'] ?? []),
             '',
-            'FORMAT',
-            '- Structure lisible avec titres',
-            '- Paragraphes courts',
-            '- CTA final discret et pertinent',
+            'IMPORTANT',
+            '- Ne pas inventer de statistiques, prix ou garanties sans source fournie.',
+            '- Ne pas laisser de placeholders non remplacés.',
+            '- Toujours contextualiser avec la ville et le persona quand disponibles.',
             '',
-            'SORTIE ATTENDUE',
-            'Un contenu final prêt à publication, contextualisé, sans placeholders.',
+            'LIVRABLE ATTENDU',
+            'Une sortie finale propre, directement exploitable, structurée par sections, sans commentaires techniques.',
         ];
 
         return implode("\n", $lines);
@@ -82,7 +111,7 @@ class PromptBuilderService
         $keyword = $clean['mot_cle'] ?: 'immobilier local';
 
         return [
-            'article_pilier' => sprintf('Guide complet : %s à %s (%s)', $keyword, $city, date('Y')), 
+            'article_pilier' => sprintf('Guide complet : %s à %s (%s)', $keyword, $city, date('Y')),
             'articles_satellites' => [
                 sprintf('Prix au m² : tendances %s à %s', date('Y'), $city),
                 sprintf('Vendre rapidement à %s : étapes clés', $city),
