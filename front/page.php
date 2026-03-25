@@ -446,6 +446,8 @@ if ($type) {
         case 'secteur':         require_once $renderers . 'secteur.php';         exit;
         case 'guide':           require_once $renderers . 'guide.php';           exit;
         case 'cms':             require_once $renderers . 'cms.php';             exit;
+        case 'estimateur':
+        case 'estimation':      require_once $renderers . 'estimateur.php';      exit;
         case 'properties':
         case 'biens':           require_once $renderers . 'properties-listing.php'; exit;
         case 'property':
@@ -473,6 +475,15 @@ if ($uri === 'biens-immobiliers' || $uri === 'biens') {
 
 if ($uri === 'politique-confidentialite') {
     require_once $renderers . 'politique-confidentialite.php'; exit;
+}
+
+if ($uri === 'estimation') {
+    require_once $renderers . 'estimateur.php'; exit;
+}
+
+if (preg_match('/^estimation-immobiliere-([a-z0-9\-]+)$/', $uri, $matches)) {
+    $_GET['city_slug'] = $matches[1];
+    require_once $renderers . 'estimateur.php'; exit;
 }
 
 // Route dédiée capture dynamique : /capture/{slug}
