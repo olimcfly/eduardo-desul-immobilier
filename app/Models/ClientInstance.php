@@ -3,12 +3,15 @@
 class ClientInstance
 {
     private PDO $db;
+    private SecretVaultService $secretVault;
 
     public const STATUSES = ['draft', 'ready', 'generated', 'deployed', 'delivered'];
 
     public function __construct(PDO $db)
     {
         $this->db = $db;
+        $secretKey = getenv('INSTANCE_SECRET_KEY') ?: getenv('APP_KEY') ?: 'change-this-instance-secret-key';
+        $this->secretVault = new SecretVaultService($secretKey);
     }
 
     public function ensureTable(): void
@@ -30,13 +33,20 @@ class ClientInstance
             smtp_port SMALLINT UNSIGNED DEFAULT NULL,
             smtp_user VARCHAR(190) DEFAULT NULL,
             smtp_pass VARCHAR(255) DEFAULT NULL,
+            smtp_pass_encrypted TEXT DEFAULT NULL,
             smtp_encryption VARCHAR(20) DEFAULT NULL,
             from_email VARCHAR(190) DEFAULT NULL,
+            first_name VARCHAR(120) DEFAULT NULL,
+            last_name VARCHAR(120) DEFAULT NULL,
+            install_email VARCHAR(190) DEFAULT NULL,
+            instance_slug VARCHAR(190) DEFAULT NULL,
             openai_api_key TEXT DEFAULT NULL,
             perplexity_api_key TEXT DEFAULT NULL,
             logo_path VARCHAR(255) DEFAULT NULL,
             status ENUM('draft','ready','generated','deployed','delivered') NOT NULL DEFAULT 'draft',
             zip_path VARCHAR(255) DEFAULT NULL,
+            progress_percent TINYINT UNSIGNED NOT NULL DEFAULT 0,
+            current_step TINYINT UNSIGNED NOT NULL DEFAULT 1,
             generated_at DATETIME DEFAULT NULL,
             created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
             updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -117,6 +127,8 @@ class ClientInstance
     private function normalize(array $data): array
     {
         $status = in_array($data['status'] ?? 'draft', self::STATUSES, true) ? $data['status'] : 'draft';
+        $dbPass = $this->protectSecret((string) ($data['db_pass'] ?? ''), false);
+        $smtpPass = $this->protectSecret((string) ($data['smtp_pass'] ?? ''), true);
 
         return [
             'client_name' => trim((string) ($data['client_name'] ?? '')),
@@ -129,11 +141,11 @@ class ClientInstance
             'db_port' => (int) ($data['db_port'] ?? 3306),
             'db_name' => trim((string) ($data['db_name'] ?? '')),
             'db_user' => trim((string) ($data['db_user'] ?? '')),
-            'db_pass' => trim((string) ($data['db_pass'] ?? '')),
+            'db_pass' => $dbPass ?? '',
             'smtp_host' => $this->nullIfEmpty($data['smtp_host'] ?? null),
             'smtp_port' => $this->nullIfEmpty($data['smtp_port'] ?? null),
             'smtp_user' => $this->nullIfEmpty($data['smtp_user'] ?? null),
-            'smtp_pass' => $this->nullIfEmpty($data['smtp_pass'] ?? null),
+            'smtp_pass' => $smtpPass,
             'smtp_encryption' => $this->nullIfEmpty($data['smtp_encryption'] ?? null),
             'from_email' => $this->nullIfEmpty($data['from_email'] ?? null),
             'openai_api_key' => $this->nullIfEmpty($data['openai_api_key'] ?? null),
@@ -148,5 +160,19 @@ class ClientInstance
         $value = trim((string) $value);
 
         return $value === '' ? null : $value;
+    }
+
+    private function protectSecret(string $value, bool $allowNull = true): ?string
+    {
+        $value = trim($value);
+        if ($value === '') {
+            return $allowNull ? null : '';
+        }
+
+        if (str_starts_with($value, 'enc:')) {
+            return $value;
+        }
+
+        return 'enc:' . $this->secretVault->encrypt($value);
     }
 }

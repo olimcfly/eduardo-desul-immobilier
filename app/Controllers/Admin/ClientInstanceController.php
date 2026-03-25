@@ -4,6 +4,7 @@ class ClientInstanceController
 {
     private ClientInstance $model;
     private InstanceGeneratorService $generatorService;
+    private InstanceIntakeParserService $intakeParserService;
 
     public function __construct(PDO $db)
     {
@@ -14,6 +15,7 @@ class ClientInstanceController
             new PlaceholderReplacementService(),
             new ZipExportService()
         );
+        $this->intakeParserService = new InstanceIntakeParserService();
     }
 
     public function handle(): void
@@ -31,6 +33,10 @@ class ClientInstanceController
             }
             if (($_POST['action'] ?? '') === 'generate') {
                 $this->generate();
+                return;
+            }
+            if (($_POST['action'] ?? '') === 'parse_intake') {
+                $this->parseIntake();
                 return;
             }
         }
@@ -177,6 +183,17 @@ class ClientInstanceController
             'logo_path' => trim((string) ($input['logo_path'] ?? '')),
             'status' => trim((string) ($input['status'] ?? 'draft')),
         ];
+    }
+
+    private function parseIntake(): void
+    {
+        header('Content-Type: application/json; charset=utf-8');
+
+        $rawText = (string) ($_POST['raw_text'] ?? '');
+        $result = $this->intakeParserService->parse($rawText);
+
+        echo json_encode($result, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        exit;
     }
 
     private function validatePayload(array $payload): array
