@@ -34,8 +34,8 @@ if (!defined('ADMIN_ROUTER')) {
             <div style="font-size:.85rem;color:var(--text-3);">Disponible dans la modale d’ajout/modif d’étape email.</div>
         </div>
         <div style="padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--surface-2);opacity:.75;">
-            <div style="font-weight:700;color:#92400e"><i class="fas fa-clock"></i> Étape 3 — Moteur d'envoi / cron</div>
-            <div style="font-size:.85rem;color:var(--text-3);">Prévu après validation étape 2.</div>
+            <div style="font-weight:700;color:#065f46"><i class="fas fa-check-circle"></i> Étape 3 — Moteur d'envoi / cron</div>
+            <div style="font-size:.85rem;color:var(--text-3);">Script cron ajouté : <code>scripts/cron/send-sequence-emails.php</code>.</div>
         </div>
     </div>
 </div>
