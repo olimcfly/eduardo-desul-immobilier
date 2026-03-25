@@ -895,5 +895,10 @@ ob_start();
 
 <?php
 $content = ob_get_clean();
+if (defined('ADMIN_ROUTER')) {
+    // Chargé depuis /admin/dashboard.php : le layout est déjà rendu.
+    echo $content;
+    return;
+}
 require_once __DIR__ . '/../../includes/layout.php';
 ?>
