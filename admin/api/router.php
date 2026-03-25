@@ -66,6 +66,7 @@ $moduleMap = [
 
     // ── MARKETING / CRM ──────────────────
     'leads'       => $handlersDir . 'leads.php',
+    'triggers'    => $handlersDir . 'triggers.php',
 
     // ── SEO ──────────────────────────────
     'seo'              => $handlersDir . 'seo.php',

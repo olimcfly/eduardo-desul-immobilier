@@ -23,6 +23,15 @@ try {
 }
 $hasCol = static fn(string $col): bool => in_array($col, $captureCols, true);
 
+// ── Disponibilité IA ──────────────────────────────────────────
+$aiAvailable = (defined('ANTHROPIC_API_KEY') && !empty(ANTHROPIC_API_KEY))
+            || (defined('OPENAI_API_KEY')    && !empty(OPENAI_API_KEY));
+$aiProvider = '';
+if (defined('ANTHROPIC_API_KEY') && !empty(ANTHROPIC_API_KEY)) $aiProvider = 'Claude';
+elseif (defined('OPENAI_API_KEY') && !empty(OPENAI_API_KEY))   $aiProvider = 'OpenAI';
+$AI_ENDPOINT = '/admin/api/ai/generate.php';
+$SAVE_ENDPOINT = '/admin/api/builder/save-content.php';
+
 // ── Types et templates ────────────────────────────────────────
 $captureTypes = [
     'estimation' => ['icon' => 'fa-calculator', 'label' => 'Estimation',         'color' => '#3b82f6'],
@@ -374,6 +383,12 @@ $csrfToken = $_SESSION['csrf_token'] ?? '';
             <i class="fas fa-eye"></i> Voir la page
         </a>
         <?php endif; ?>
+        <?php if (!$isNew): ?>
+        <a href="?page=builder-editor&context=capture&entity_id=<?= $captureId ?>"
+           class="capedit-btn" style="background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;gap:6px">
+            <i class="fas fa-code"></i> Éditeur Visuel
+        </a>
+        <?php endif; ?>
         <button type="submit" form="capeditForm" class="capedit-btn capedit-btn-save">
             <i class="fas fa-save"></i> Enregistrer
         </button>
@@ -534,6 +549,27 @@ $csrfToken = $_SESSION['csrf_token'] ?? '';
             </div>
         </div>
 
+        <!-- Éditeur HTML -->
+        <div class="capedit-card">
+            <div class="capedit-card-hd"><i class="fas fa-code"></i><h3>Éditeur HTML (copier/coller)</h3></div>
+            <div class="capedit-card-body">
+                <div class="capedit-ai-actions">
+                    <button type="button" class="capedit-btn capedit-btn-ai" onclick="capeditGenerateHtmlSkeleton(event)">
+                        <i class="fas fa-wand-magic-sparkles"></i> Générer HTML capture (orange)
+                    </button>
+                </div>
+                <textarea name="html_capture" id="capeditHtmlCapture" class="capedit-textarea capedit-code"
+                          placeholder="Collez ici votre code HTML généré (Claude, autre IA, etc.)..."><?= htmlspecialchars($v['html_capture']) ?></textarea>
+                <div class="capedit-hint">
+                    Important : laissez <code>{{FORMULAIRE}}</code> dans votre HTML. Ce placeholder garde la connexion du formulaire au CRM, aux emails et à la liste de contacts.
+                </div>
+                <div id="capeditAiStatus" class="capedit-ai-status"></div>
+                <div class="capedit-ai-help">
+                    Si erreur token/API : <a href="#" onclick="capeditVerifyAiConfig();return false;">Vérifier la configuration IA</a> (clé, quota, crédit, compte).
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- ══ COLONNE LATÉRALE ══ -->
@@ -628,6 +664,53 @@ $csrfToken = $_SESSION['csrf_token'] ?? '';
         </div>
         <?php endif; ?>
 
+        <!-- IA Claude -->
+        <div class="capedit-card" style="border-color:#e9d5ff">
+            <div class="capedit-card-hd" style="background:linear-gradient(135deg,#faf5ff,#f3e8ff);border-color:#e9d5ff">
+                <i class="fas fa-robot" style="color:#7c3aed"></i>
+                <h3 style="color:#7c3aed">IA <?= $aiProvider ?: 'Claude' ?> — Générer la page</h3>
+            </div>
+            <div class="capedit-card-body" style="padding:14px">
+                <?php if ($aiAvailable && !$isNew): ?>
+                <div style="font-size:.73rem;color:var(--text-2);margin-bottom:8px;line-height:1.5">
+                    Décrivez votre page et l'IA génère le code HTML/CSS complet, adapté à votre identité.
+                </div>
+                <textarea id="capeditAiPrompt"
+                    style="width:100%;box-sizing:border-box;padding:9px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:.8rem;font-family:var(--font);resize:vertical;min-height:80px;margin-bottom:10px;transition:border-color .15s"
+                    placeholder="Ex: Landing page pour un guide PDF sur la vente immobilière, hero accrocheur, 3 bullet points bénéfices, formulaire avec prénom + email…"></textarea>
+                <button type="button" onclick="capeditGenerateAI()" id="capeditAiBtnGenerate"
+                    style="width:100%;display:flex;align-items:center;justify-content:center;gap:9px;padding:12px 16px;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;border:none;border-radius:var(--radius);font-size:.85rem;font-weight:700;cursor:pointer;transition:all .2s;font-family:var(--font);box-shadow:0 3px 10px rgba(124,58,237,.3)">
+                    <i class="fas fa-magic"></i> Générer avec <?= $aiProvider ?: 'Claude' ?>
+                </button>
+                <div id="capeditAiStatus" style="display:none;margin-top:10px;text-align:center;font-size:.78rem;color:#7c3aed;font-weight:600">
+                    <i class="fas fa-spinner fa-spin"></i> Génération en cours…
+                </div>
+                <div id="capeditAiResult" style="display:none;margin-top:12px">
+                    <div id="capeditAiResultMsg" style="font-size:.75rem;padding:8px 12px;border-radius:8px;margin-bottom:8px"></div>
+                    <a href="?page=builder-editor&context=capture&entity_id=<?= $captureId ?>"
+                       id="capeditAiOpenBuilder"
+                       style="display:none;align-items:center;justify-content:center;gap:7px;padding:10px 14px;background:linear-gradient(135deg,#0ea5e9,#2563eb);color:#fff;border-radius:var(--radius);font-size:.82rem;font-weight:700;text-decoration:none;text-align:center">
+                        <i class="fas fa-code"></i> Ouvrir dans l'éditeur
+                    </a>
+                </div>
+                <?php elseif ($aiAvailable && $isNew): ?>
+                <div style="text-align:center;padding:12px">
+                    <i class="fas fa-robot" style="font-size:1.8rem;color:#e9d5ff;display:block;margin-bottom:8px"></i>
+                    <div style="font-size:.78rem;color:var(--text-2)">Enregistrez d'abord la capture pour utiliser l'IA.</div>
+                </div>
+                <?php else: ?>
+                <div style="text-align:center;padding:12px">
+                    <i class="fas fa-robot" style="font-size:1.8rem;color:#e9d5ff;display:block;margin-bottom:8px"></i>
+                    <div style="font-size:.78rem;color:var(--text-2);margin-bottom:10px">Configurez votre clé API pour utiliser l'IA</div>
+                    <a href="?page=system/settings/ai"
+                       style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#f3e8ff;color:#7c3aed;border-radius:8px;font-size:.78rem;font-weight:700;text-decoration:none">
+                        <i class="fas fa-cog"></i> Configurer l'IA
+                    </a>
+                </div>
+                <?php endif; ?>
+            </div>
+        </div>
+
         <!-- Actions -->
         <div class="capedit-card">
             <div class="capedit-card-hd"><i class="fas fa-bolt"></i><h3>Actions rapides</h3></div>
@@ -639,6 +722,12 @@ $csrfToken = $_SESSION['csrf_token'] ?? '';
                 <a href="/capture/<?= htmlspecialchars($v['slug']) ?>" target="_blank"
                    class="capedit-btn capedit-btn-preview" style="justify-content:center">
                     <i class="fas fa-eye"></i> Voir la page publique
+                </a>
+                <?php endif; ?>
+                <?php if (!$isNew): ?>
+                <a href="?page=builder-editor&context=capture&entity_id=<?= $captureId ?>"
+                   class="capedit-btn" style="justify-content:center;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff">
+                    <i class="fas fa-code"></i> Éditeur Visuel (code)
                 </a>
                 <?php endif; ?>
                 <a href="?page=captures" class="capedit-btn capedit-btn-outline" style="justify-content:center;color:var(--text-2)">
@@ -962,4 +1051,112 @@ async function capeditVerifyAiConfig() {
 document.querySelectorAll('.capedit-flash').forEach(el => {
     setTimeout(() => { el.style.transition='opacity .4s'; el.style.opacity='0'; setTimeout(()=>el.remove(),400); }, 5000);
 });
+
+// ── IA Claude — Génération de la page de capture ──────────────
+async function capeditGenerateAI() {
+    const promptEl  = document.getElementById('capeditAiPrompt');
+    const btnEl     = document.getElementById('capeditAiBtnGenerate');
+    const statusEl  = document.getElementById('capeditAiStatus');
+    const resultEl  = document.getElementById('capeditAiResult');
+    const msgEl     = document.getElementById('capeditAiResultMsg');
+    const openBtnEl = document.getElementById('capeditAiOpenBuilder');
+
+    const userPrompt = (promptEl?.value || '').trim();
+    const captureId  = <?= $captureId ?: 0 ?>;
+
+    if (!captureId) {
+        alert('Veuillez d\'abord enregistrer la capture avant de générer avec l\'IA.');
+        return;
+    }
+
+    // Contexte automatique depuis les champs du formulaire
+    const titre    = document.querySelector('[name="titre"]')?.value || '';
+    const headline = document.querySelector('[name="headline"]')?.value || '';
+    const sousTitre= document.querySelector('[name="sous_titre"]')?.value || '';
+    const ctaTxt   = document.querySelector('[name="cta_text"]')?.value || '';
+    const type     = document.querySelector('[name="type"]')?.value || '';
+    const format   = document.querySelector('[name="offer_format"]')?.value || '';
+    const objectif = document.querySelector('[name="objective"]')?.value || '';
+
+    const autoCtx = [
+        titre    ? `Titre: ${titre}` : '',
+        headline ? `Headline: ${headline}` : '',
+        sousTitre? `Sous-titre: ${sousTitre}` : '',
+        ctaTxt   ? `CTA: ${ctaTxt}` : '',
+        type     ? `Type: ${type}` : '',
+        format   ? `Format: ${format}` : '',
+        objectif ? `Objectif: ${objectif}` : '',
+    ].filter(Boolean).join(' | ');
+
+    const fullPrompt = (userPrompt || 'Génère une landing page de capture optimisée pour la conversion.')
+        + (autoCtx ? `\n\nContexte de la capture:\n${autoCtx}` : '');
+
+    // UI : chargement
+    if (btnEl)    { btnEl.disabled = true; btnEl.style.opacity = '0.7'; }
+    if (statusEl) statusEl.style.display = 'block';
+    if (resultEl) resultEl.style.display = 'none';
+    if (openBtnEl) openBtnEl.style.display = 'none';
+
+    try {
+        const res = await fetch('<?= $AI_ENDPOINT ?>', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                module:  'builder',
+                action:  'generate',
+                context: 'capture',
+                id:      captureId,
+                prompt:  fullPrompt
+            })
+        });
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+
+        if (!data.success && !data.html) {
+            throw new Error(data.error || data.message || 'Erreur inconnue');
+        }
+
+        const html = data.html || '';
+        const css  = data.css  || '';
+        const js   = data.js   || '';
+
+        if (!html) throw new Error('L\'IA n\'a pas retourné de code HTML.');
+
+        // Sauvegarder le contenu généré via l'API builder
+        const saveForm = new FormData();
+        saveForm.append('context',      'capture');
+        saveForm.append('entity_id',    captureId);
+        saveForm.append('html_content', html);
+        saveForm.append('custom_css',   css);
+        saveForm.append('custom_js',    js);
+        saveForm.append('status',       'keep');
+
+        const saveRes  = await fetch('<?= $SAVE_ENDPOINT ?>', { method: 'POST', body: saveForm });
+        const saveData = await saveRes.json();
+
+        if (msgEl) {
+            if (saveData.success) {
+                msgEl.style.cssText = 'font-size:.75rem;padding:8px 12px;border-radius:8px;background:#d1fae5;color:#065f46;border:1px solid rgba(5,150,105,.15);margin-bottom:8px';
+                msgEl.innerHTML = '<i class="fas fa-check-circle"></i> Page générée et sauvegardée !';
+            } else {
+                msgEl.style.cssText = 'font-size:.75rem;padding:8px 12px;border-radius:8px;background:#fef3c7;color:#92400e;border:1px solid rgba(245,158,11,.2);margin-bottom:8px';
+                msgEl.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Code généré — ouvrez l\'éditeur pour appliquer.';
+            }
+        }
+
+        if (openBtnEl) openBtnEl.style.display = 'flex';
+        if (resultEl)  resultEl.style.display  = 'block';
+
+    } catch (err) {
+        if (msgEl) {
+            msgEl.style.cssText = 'font-size:.75rem;padding:8px 12px;border-radius:8px;background:rgba(220,38,38,.06);color:#dc2626;border:1px solid rgba(220,38,38,.12);margin-bottom:8px';
+            msgEl.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${err.message}`;
+        }
+        if (resultEl) resultEl.style.display = 'block';
+    } finally {
+        if (btnEl)    { btnEl.disabled = false; btnEl.style.opacity = '1'; }
+        if (statusEl) statusEl.style.display = 'none';
+    }
+}
 </script>
