@@ -37,6 +37,10 @@ $hasLastConv  = in_array('last_conversion_at', $availCols);
 $hasTitre     = in_array('titre',              $availCols);
 $hasTitle     = in_array('title',              $availCols);
 $hasGuideIds  = in_array('guide_ids',          $availCols);
+$hasLeadSource= in_array('lead_source',        $availCols);
+$hasUtmSource = in_array('utm_source',         $availCols);
+$hasSourceCol = in_array('source',             $availCols);
+$hasLeadTags  = in_array('lead_tags',          $availCols);
 $colTitle     = $hasTitre ? 'titre' : ($hasTitle ? 'title' : 'titre');
 
 // ─── Stats ───
@@ -65,6 +69,7 @@ try {
 // ─── Filtres ───
 $filterStatus  = $_GET['status']  ?? 'all';
 $filterPersona = $_GET['persona'] ?? 'all';
+$filterOrigin  = $_GET['origin']  ?? 'all';
 $searchQuery   = trim($_GET['q']  ?? '');
 $currentPage   = max(1, (int)($_GET['p'] ?? 1));
 $perPage       = 20;
@@ -79,6 +84,23 @@ if ($filterStatus !== 'all') {
 }
 if ($filterPersona !== 'all' && $hasRessources) { $where[] = "r.persona = ?"; $params[] = $filterPersona; }
 if ($searchQuery !== '') { $where[] = "(c.`{$colTitle}` LIKE ? OR c.slug LIKE ?)"; $params[] = "%{$searchQuery}%"; $params[] = "%{$searchQuery}%"; }
+$originMap = [
+    'mailing'      => ['label'=>'📧 Mailing',          'color'=>'#0ea5e9', 'patterns'=>['%mail%','%email%','%newsletter%']],
+    'google_ads'   => ['label'=>'🔍 Google Ads',       'color'=>'#f59e0b', 'patterns'=>['%google%','%gads%','%adwords%','%cpc%']],
+    'facebook_ads' => ['label'=>'📱 Facebook/Meta Ads','color'=>'#2563eb', 'patterns'=>['%facebook%','%meta%','%instagram%','%fb%']],
+    'organique'    => ['label'=>'🌱 Organique',        'color'=>'#10b981', 'patterns'=>['%organic%','%organique%','%seo%','%direct%']],
+];
+if (!isset($originMap[$filterOrigin]) && $filterOrigin !== 'all') $filterOrigin = 'all';
+if ($filterOrigin !== 'all' && ($hasLeadSource || $hasUtmSource || $hasSourceCol || $hasLeadTags)) {
+    $matchers = [];
+    foreach ($originMap[$filterOrigin]['patterns'] as $pattern) {
+        if ($hasLeadSource) { $matchers[] = "c.lead_source LIKE ?"; $params[] = $pattern; }
+        if ($hasUtmSource)  { $matchers[] = "c.utm_source LIKE ?";  $params[] = $pattern; }
+        if ($hasSourceCol)  { $matchers[] = "c.source LIKE ?";      $params[] = $pattern; }
+        if ($hasLeadTags)   { $matchers[] = "c.lead_tags LIKE ?";   $params[] = $pattern; }
+    }
+    if ($matchers) $where[] = '(' . implode(' OR ', $matchers) . ')';
+}
 $whereSQL = $where ? 'WHERE '.implode(' AND ',$where) : '';
 
 // ─── Requête ───
@@ -104,6 +126,10 @@ if ($tableExists) {
         if (in_array('description',$availCols))  $sel .= ", c.description";
         if (in_array('type',$availCols))         $sel .= ", c.type";
         if (in_array('headline',$availCols))     $sel .= ", c.headline";
+        if ($hasLeadSource)                      $sel .= ", c.lead_source";
+        if ($hasUtmSource)                       $sel .= ", c.utm_source";
+        if ($hasSourceCol)                       $sel .= ", c.source";
+        if ($hasLeadTags)                        $sel .= ", c.lead_tags";
         $sel .= $selRes;
         $leadsJoin = '';
         if ($hasLeadsTable) { $sel .= ", COUNT(lc.id) AS nb_leads"; $leadsJoin = "LEFT JOIN leads_captures lc ON lc.capture_id = c.id"; }
@@ -129,11 +155,29 @@ function tauxClass(float $t): string {
     if ($t > 0)   return 'bad';
     return 'none';
 }
+function captureOrigin(array $capture): string {
+    $hay = strtolower(trim(
+        ($capture['lead_source'] ?? '') . ' ' .
+        ($capture['utm_source'] ?? '') . ' ' .
+        ($capture['source'] ?? '') . ' ' .
+        ($capture['lead_tags'] ?? '')
+    ));
+    if ($hay === '') return 'organique';
+    if (preg_match('/facebook|meta|instagram|fb/', $hay)) return 'facebook_ads';
+    if (preg_match('/google|adwords|gads|cpc/', $hay)) return 'google_ads';
+    if (preg_match('/mail|email|newsletter/', $hay)) return 'mailing';
+    return 'organique';
+}
 $personaLabels = [
     'vendeur'      => ['label'=>'🏷️ Vendeurs',      'color'=>'#d4a574'],
     'acheteur'     => ['label'=>'🛒 Acheteurs',     'color'=>'#1a4d7a'],
     'proprietaire' => ['label'=>'🏠 Propriétaires', 'color'=>'#059669'],
 ];
+$originCounts = ['all' => $stats['total'], 'mailing' => 0, 'google_ads' => 0, 'facebook_ads' => 0, 'organique' => 0];
+foreach ($captures as $cap) {
+    $o = captureOrigin($cap);
+    if (isset($originCounts[$o])) $originCounts[$o]++;
+}
 $flash = $_GET['msg'] ?? '';
 ?>
 
@@ -174,6 +218,14 @@ $flash = $_GET['msg'] ?? '';
 .cap-pf-btn { padding:5px 12px; border:2px solid #e2e8f0; background:white; border-radius:20px; font-size:.73rem; font-weight:700; cursor:pointer; transition:.15s; text-decoration:none; color:#64748b; display:flex; align-items:center; gap:4px; }
 .cap-pf-btn:hover { border-color:#d97706; color:#d97706; }
 .cap-pf-btn.active { border-color:transparent; color:white; }
+.cap-origin-hub { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:10px; margin:0 0 14px; }
+.cap-origin-card { background:var(--surface,#fff); border:1px solid var(--border,#e5e7eb); border-radius:12px; padding:11px 12px; text-decoration:none; color:inherit; display:flex; align-items:center; justify-content:space-between; transition:all .15s; }
+.cap-origin-card:hover { border-color:#d97706; transform:translateY(-1px); }
+.cap-origin-card.active { box-shadow:0 0 0 2px rgba(217,119,6,.18); border-color:#d97706; }
+.cap-origin-left { display:flex; align-items:center; gap:8px; font-size:.78rem; font-weight:700; }
+.cap-origin-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+.cap-origin-count { font-size:.84rem; font-weight:800; color:var(--text,#111827); }
+.cap-origin-badge { display:inline-flex; margin-top:4px; font-size:.62rem; padding:2px 8px; border-radius:999px; font-weight:700; }
 
 /* Search */
 .cap-search { position:relative; }
@@ -348,6 +400,28 @@ $flash = $_GET['msg'] ?? '';
     </div>
 </div>
 
+<!-- Hub Origines -->
+<div class="cap-origin-hub">
+    <?php
+    $hubCards = ['all' => ['label'=>'🧭 Hub global','color'=>'#64748b']] + $originMap;
+    foreach ($hubCards as $key => $cfg):
+        $hUrl='?page=captures';
+        if($filterStatus!=='all') $hUrl.='&status='.$filterStatus;
+        if($filterPersona!=='all') $hUrl.='&persona='.$filterPersona;
+        if($searchQuery) $hUrl.='&q='.urlencode($searchQuery);
+        if($key!=='all') $hUrl.='&origin='.$key;
+        $countVal = $originCounts[$key] ?? 0;
+    ?>
+    <a href="<?= $hUrl ?>" class="cap-origin-card <?= $filterOrigin===$key?'active':'' ?>">
+        <div class="cap-origin-left">
+            <span class="cap-origin-dot" style="background:<?= $cfg['color'] ?>"></span>
+            <span><?= $cfg['label'] ?></span>
+        </div>
+        <span class="cap-origin-count"><?= (int)$countVal ?></span>
+    </a>
+    <?php endforeach; ?>
+</div>
+
 <!-- Toolbar -->
 <div class="cap-toolbar">
     <div class="cap-toolbar-l">
@@ -358,6 +432,7 @@ $flash = $_GET['msg'] ?? '';
                 $isA = ($filterStatus === $key);
                 $url = '?page=captures'.($key!=='all'?'&status='.$key:'');
                 if ($filterPersona!=='all') $url .= '&persona='.$filterPersona;
+                if ($filterOrigin!=='all') $url .= '&origin='.$filterOrigin;
                 if ($searchQuery) $url .= '&q='.urlencode($searchQuery);
             ?>
             <a href="<?= $url ?>" class="cap-fbtn<?= $isA?' active':'' ?>">
@@ -371,6 +446,7 @@ $flash = $_GET['msg'] ?? '';
             <?php
             $pfAll = '?page=captures';
             if ($filterStatus!=='all') $pfAll .= '&status='.$filterStatus;
+            if ($filterOrigin!=='all') $pfAll .= '&origin='.$filterOrigin;
             if ($searchQuery) $pfAll .= '&q='.urlencode($searchQuery);
             ?>
             <a href="<?= $pfAll ?>" class="cap-pf-btn <?= $filterPersona==='all'?'active':'' ?>"
@@ -378,6 +454,7 @@ $flash = $_GET['msg'] ?? '';
             <?php foreach ($personaLabels as $key => $pl):
                 $pfUrl = '?page=captures&persona='.$key;
                 if ($filterStatus!=='all') $pfUrl .= '&status='.$filterStatus;
+                if ($filterOrigin!=='all') $pfUrl .= '&origin='.$filterOrigin;
                 if ($searchQuery) $pfUrl .= '&q='.urlencode($searchQuery);
                 $isP = ($filterPersona===$key);
             ?>
@@ -403,6 +480,7 @@ $flash = $_GET['msg'] ?? '';
             <input type="hidden" name="page" value="captures">
             <?php if ($filterStatus!=='all'): ?><input type="hidden" name="status" value="<?= htmlspecialchars($filterStatus) ?>"><?php endif; ?>
             <?php if ($filterPersona!=='all'): ?><input type="hidden" name="persona" value="<?= htmlspecialchars($filterPersona) ?>"><?php endif; ?>
+            <?php if ($filterOrigin!=='all'): ?><input type="hidden" name="origin" value="<?= htmlspecialchars($filterOrigin) ?>"><?php endif; ?>
             <i class="fas fa-search"></i>
             <input type="text" name="q" placeholder="Titre, slug…" value="<?= htmlspecialchars($searchQuery) ?>">
         </form>
@@ -449,8 +527,11 @@ $flash = $_GET['msg'] ?? '';
                 $dC    = !empty($cap['created_at']) ? date('d/m/Y',strtotime($cap['created_at'])) : '—';
                 $dL    = !empty($cap['last_conversion_at']) ? date('d/m/Y',strtotime($cap['last_conversion_at'])) : '—';
                 $eUrl  = "?page=captures&action=edit&id={$cap['id']}";
+                if ($filterOrigin!=='all') $eUrl .= '&origin='.$filterOrigin;
                 $resId = $cap['res_id']??null; $resName=$cap['res_name']??null; $resIcon=$cap['res_icon']??'📄';
                 $resP  = $cap['res_persona']??null; $pColor=$personaLabels[$resP]['color']??'#94a3b8'; $pLabel=$personaLabels[$resP]['label']??'';
+                $originKey = captureOrigin($cap);
+                $originCfg = $originMap[$originKey] ?? $originMap['organique'];
             ?>
             <tr data-id="<?= (int)$cap['id'] ?>">
                 <td class="cap-title-cell">
@@ -460,6 +541,7 @@ $flash = $_GET['msg'] ?? '';
                         <span class="cap-slug">/capture/<?= htmlspecialchars($slug) ?></span>
                         <span class="cap-type-badge <?= htmlspecialchars($type) ?>"><?= htmlspecialchars($type) ?></span>
                     </div>
+                    <span class="cap-origin-badge" style="background:<?= $originCfg['color'] ?>22;color:<?= $originCfg['color'] ?>;"><?= $originCfg['label'] ?></span>
                 </td>
                 <td>
                     <?php if ($resId && $resName): ?>
@@ -505,6 +587,7 @@ $flash = $_GET['msg'] ?? '';
                     $pU='?page=captures&p='.$i;
                     if($filterStatus!=='all') $pU.='&status='.$filterStatus;
                     if($filterPersona!=='all') $pU.='&persona='.$filterPersona;
+                    if($filterOrigin!=='all') $pU.='&origin='.$filterOrigin;
                     if($searchQuery) $pU.='&q='.urlencode($searchQuery);
                 ?>
                 <a href="<?= $pU ?>" class="<?= $i===$currentPage?'active':'' ?>"><?= $i ?></a>
@@ -531,8 +614,11 @@ $flash = $_GET['msg'] ?? '';
         $head  = $cap['headline']??'';
         $dC    = !empty($cap['created_at']) ? date('d/m/Y',strtotime($cap['created_at'])) : '—';
         $eUrl  = "?page=captures&action=edit&id={$cap['id']}";
+        if ($filterOrigin!=='all') $eUrl .= '&origin='.$filterOrigin;
         $resId = $cap['res_id']??null; $resName=$cap['res_name']??null; $resIcon=$cap['res_icon']??'📄';
         $resP  = $cap['res_persona']??null; $pColor=$personaLabels[$resP]['color']??'#94a3b8'; $pLabel=$personaLabels[$resP]['label']??'';
+        $originKey = captureOrigin($cap);
+        $originCfg = $originMap[$originKey] ?? $originMap['organique'];
     ?>
     <div class="cap-card" data-id="<?= (int)$cap['id'] ?>">
         <!-- Dot statut -->
@@ -546,6 +632,7 @@ $flash = $_GET['msg'] ?? '';
                         <span class="cap-type-badge <?= htmlspecialchars($type) ?>"><?= htmlspecialchars($type) ?></span>
                         <span class="cap-status <?= $sN ?>" style="font-size:.55rem;padding:2px 7px"><?= capStatusLabel($sN) ?></span>
                     </div>
+                    <span class="cap-origin-badge" style="background:<?= $originCfg['color'] ?>22;color:<?= $originCfg['color'] ?>;"><?= $originCfg['label'] ?></span>
                 </div>
             </div>
             <?php if ($desc || $head): ?>
@@ -606,6 +693,7 @@ $flash = $_GET['msg'] ?? '';
                 $pU='?page=captures&p='.$i;
                 if($filterStatus!=='all') $pU.='&status='.$filterStatus;
                 if($filterPersona!=='all') $pU.='&persona='.$filterPersona;
+                if($filterOrigin!=='all') $pU.='&origin='.$filterOrigin;
                 if($searchQuery) $pU.='&q='.urlencode($searchQuery);
             ?>
             <a href="<?= $pU ?>" class="<?= $i===$currentPage?'active':'' ?>"><?= $i ?></a>
