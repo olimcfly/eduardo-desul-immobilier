@@ -47,6 +47,14 @@ $hasPublishedAt = in_array('published_at',  $availCols);
 $hasWordCount   = in_array('word_count',    $availCols);
 $hasSeoScore    = in_array('seo_score',     $availCols);
 $hasSemanticScore = in_array('semantic_score', $availCols);
+$hasSeoTitle    = in_array('seo_title',     $availCols);
+$hasSeoDesc     = in_array('seo_description', $availCols);
+$hasSeoKw       = in_array('seo_keywords',  $availCols);
+$hasNoindex     = in_array('noindex',       $availCols);
+$hasFocusKw     = in_array('focus_keyword', $availCols);
+$hasMainKw      = in_array('main_keyword',  $availCols);
+$hasSecondaryKw = in_array('secondary_keywords', $availCols);
+$hasH1          = in_array('h1',            $availCols);
 
 // ─── Templates de pages (gérés dans Settings) ───
 try {
@@ -131,13 +139,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['_save_page'])) {
             'meta_description' => trim($_POST['meta_description'] ?? ''),
             'updated_at'       => date('Y-m-d H:i:s'),
         ];
+        $plainText = trim(preg_replace('/\s+/u', ' ', strip_tags((string)$fields['content'])));
+        $wordCount = $plainText === '' ? 0 : count(preg_split('/\s+/u', $plainText));
+
         if ($hasTemplate)   $fields['template']      = trim($_POST['template']   ?? 'default') ?: 'default';
         if ($hasVisibility) $fields['visibility']    = in_array($_POST['visibility']??'public',['public','private']) ? $_POST['visibility'] : 'public';
         if ($hasMetaKw)     $fields['meta_keywords'] = trim($_POST['meta_keywords'] ?? '');
         if ($hasOgImage)    $fields['og_image']      = trim($_POST['og_image']      ?? '');
         if ($hasCustomCss)  $fields['custom_css']    = $_POST['custom_css']  ?? '';
         if ($hasCustomJs)   $fields['custom_js']     = $_POST['custom_js']   ?? '';
-        if ($hasWordCount)  $fields['word_count']    = (int)($_POST['word_count'] ?? 0);
+        if ($hasWordCount)  $fields['word_count']    = $wordCount;
+        if ($hasSeoTitle)   $fields['seo_title']       = trim($_POST['seo_title'] ?? '');
+        if ($hasSeoDesc)    $fields['seo_description'] = trim($_POST['seo_description'] ?? '');
+        if ($hasSeoKw)      $fields['seo_keywords']    = trim($_POST['seo_keywords'] ?? '');
+        if ($hasNoindex)    $fields['noindex']         = isset($_POST['noindex']) ? 1 : 0;
+        if ($hasFocusKw)    $fields['focus_keyword']   = trim($_POST['focus_keyword'] ?? '');
+        if ($hasMainKw)     $fields['main_keyword']    = trim($_POST['main_keyword'] ?? '');
+        if ($hasSecondaryKw)$fields['secondary_keywords'] = trim($_POST['secondary_keywords'] ?? '');
+        if ($hasH1)         $fields['h1']              = trim($_POST['h1'] ?? '');
         if ($hasTemplateConfigKey) $fields['template_config_key'] = trim($_POST['template_config_key'] ?? '');
         if ($hasTemplateData) {
             $templateData = $_POST['template_data'] ?? [];
@@ -193,6 +212,8 @@ $val = fn(string $k, string $d='') => htmlspecialchars((string)(($page[$k] ?? nu
 $currentStatus = $page['status'] ?? 'draft';
 $currentVis    = $page['visibility'] ?? 'public';
 $pageLabel     = $isCreate ? 'Nouvelle page' : htmlspecialchars($page['title'] ?? 'Page');
+$seoScoreVal   = (int)($page['seo_score'] ?? 0);
+$semScoreVal   = (int)($page['semantic_score'] ?? 0);
 $selectedTemplateKey = $page['template_config_key'] ?? '';
 $templateData = json_decode((string)($page['template_data'] ?? ''), true);
 if (!is_array($templateData)) $templateData = [];
@@ -570,6 +591,15 @@ if (!isset($_SESSION['csrf_token'])) $_SESSION['csrf_token'] = bin2hex(random_by
                            oninput="PGA.countChars('pgaMetaTitle','pgaMTCount',50,65);PGA.updateSerp()">
                     <div class="pga-counter" id="pgaMTCount"><?= strlen($page['meta_title']??'') ?> / 65</div>
                 </div>
+                <?php if ($hasSeoTitle): ?>
+                <div class="pga-field">
+                    <label>SEO Title (prioritaire)</label>
+                    <input type="text" name="seo_title" id="pgaSeoTitle"
+                           value="<?= $val('seo_title') ?>"
+                           placeholder="Optionnel : remplace Meta Title dans le rendu SEO"
+                           oninput="PGA.updateSerp();PGA.updateLiveScores()">
+                </div>
+                <?php endif; ?>
                 <div class="pga-field">
                     <label>Meta Description</label>
                     <textarea name="meta_description" id="pgaMetaDesc" rows="3"
@@ -577,10 +607,59 @@ if (!isset($_SESSION['csrf_token'])) $_SESSION['csrf_token'] = bin2hex(random_by
                               oninput="PGA.countChars('pgaMetaDesc','pgaMDCount',120,160);PGA.updateSerp()"><?= $val('meta_description') ?></textarea>
                     <div class="pga-counter" id="pgaMDCount"><?= strlen($page['meta_description']??'') ?> / 160</div>
                 </div>
+                <?php if ($hasSeoDesc): ?>
+                <div class="pga-field">
+                    <label>SEO Description (prioritaire)</label>
+                    <textarea name="seo_description" id="pgaSeoDesc" rows="3"
+                              placeholder="Optionnel : remplace Meta Description dans le rendu SEO"
+                              oninput="PGA.updateSerp();PGA.updateLiveScores()"><?= $val('seo_description') ?></textarea>
+                </div>
+                <?php endif; ?>
                 <?php if ($hasMetaKw): ?>
                 <div class="pga-field">
                     <label>Mots-clés (séparés par virgule)</label>
                     <input type="text" name="meta_keywords" value="<?= $val('meta_keywords') ?>" placeholder="immobilier bordeaux, achat maison bordeaux…">
+                </div>
+                <?php endif; ?>
+                <?php if ($hasSeoKw): ?>
+                <div class="pga-field">
+                    <label>SEO Keywords (prioritaires)</label>
+                    <input type="text" name="seo_keywords" id="pgaSeoKeywords" value="<?= $val('seo_keywords') ?>"
+                           oninput="PGA.updateLiveScores()"
+                           placeholder="mot-clé principal, variante locale, intention…">
+                </div>
+                <?php endif; ?>
+                <?php if ($hasFocusKw || $hasMainKw || $hasSecondaryKw): ?>
+                <div class="pga-field">
+                    <label>Mot-clé focus</label>
+                    <input type="text" name="focus_keyword" id="pgaFocusKeyword" value="<?= $val('focus_keyword') ?>"
+                           oninput="PGA.updateLiveScores()" placeholder="ex : estimation maison bordeaux">
+                </div>
+                <?php if ($hasMainKw): ?>
+                <div class="pga-field">
+                    <label>Mot-clé principal</label>
+                    <input type="text" name="main_keyword" id="pgaMainKeyword" value="<?= $val('main_keyword') ?>"
+                           oninput="PGA.updateLiveScores()">
+                </div>
+                <?php endif; ?>
+                <?php if ($hasSecondaryKw): ?>
+                <div class="pga-field">
+                    <label>Mots-clés secondaires</label>
+                    <input type="text" name="secondary_keywords" id="pgaSecondaryKeywords" value="<?= $val('secondary_keywords') ?>"
+                           oninput="PGA.updateLiveScores()" placeholder="séparés par virgule">
+                </div>
+                <?php endif; ?>
+                <?php endif; ?>
+                <?php if ($hasH1): ?>
+                <div class="pga-field">
+                    <label>H1 (optionnel)</label>
+                    <input type="text" name="h1" id="pgaH1" value="<?= $val('h1') ?>" oninput="PGA.updateLiveScores()">
+                </div>
+                <?php endif; ?>
+                <?php if ($hasNoindex): ?>
+                <div class="pga-field" style="display:flex;align-items:center;gap:8px">
+                    <input type="checkbox" name="noindex" id="pgaNoindex" <?= !empty($page['noindex']) ? 'checked' : '' ?>>
+                    <label for="pgaNoindex" style="margin:0;text-transform:none;letter-spacing:normal">Noindex (ne pas indexer cette page)</label>
                 </div>
                 <?php endif; ?>
                 <?php if ($hasOgImage): ?>
@@ -594,9 +673,9 @@ if (!isset($_SESSION['csrf_token'])) $_SESSION['csrf_token'] = bin2hex(random_by
                 <!-- SERP Preview -->
                 <div class="pga-serp">
                     <div class="pga-serp-label">Aperçu Google</div>
-                    <div class="pga-serp-title" id="pgaSerpTitle"><?= $val('meta_title') ?: $val('title') ?></div>
+                    <div class="pga-serp-title" id="pgaSerpTitle"><?= $val('seo_title') ?: ($val('meta_title') ?: $val('title')) ?></div>
                     <div class="pga-serp-url">https://eduardo-desul-immobilier.fr/<span id="pgaSerpSlug"><?= $val('slug') ?></span></div>
-                    <div class="pga-serp-desc" id="pgaSerpDesc"><?= $val('meta_description') ?></div>
+                    <div class="pga-serp-desc" id="pgaSerpDesc"><?= $val('seo_description') ?: $val('meta_description') ?></div>
                 </div>
             </div>
 
@@ -675,6 +754,28 @@ if (!isset($_SESSION['csrf_token'])) $_SESSION['csrf_token'] = bin2hex(random_by
         </div>
     </div>
     <?php endif; ?>
+
+    <!-- Actions rapides -->
+    <div class="pga-card">
+        <div class="pga-card-head"><h3><i class="fas fa-chart-line"></i> SEO &amp; Sémantique</h3></div>
+        <div class="pga-card-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+                <div style="padding:10px;border:1px solid var(--border,#e5e7eb);border-radius:10px;background:var(--surface-2,#f9fafb);text-align:center">
+                    <div style="font-size:.68rem;color:var(--text-3,#9ca3af);text-transform:uppercase;letter-spacing:.05em">SEO</div>
+                    <div id="pgaSeoScoreLive" style="font-size:1.3rem;font-weight:800;color:#2563eb"><?= $seoScoreVal ?></div>
+                </div>
+                <div style="padding:10px;border:1px solid var(--border,#e5e7eb);border-radius:10px;background:var(--surface-2,#f9fafb);text-align:center">
+                    <div style="font-size:.68rem;color:var(--text-3,#9ca3af);text-transform:uppercase;letter-spacing:.05em">Sémantique</div>
+                    <div id="pgaSemanticScoreLive" style="font-size:1.3rem;font-weight:800;color:#059669"><?= $semScoreVal ?></div>
+                </div>
+            </div>
+            <ul id="pgaSeoHints" style="margin:0;padding-left:16px;font-size:.74rem;color:var(--text-2,#6b7280);line-height:1.5">
+                <li>Ajoutez un mot-clé principal et des variantes.</li>
+                <li>Renseignez les méta (title/description) pour Google.</li>
+                <li>Utilisez un H1 et une structure claire.</li>
+            </ul>
+        </div>
+    </div>
 
     <!-- Actions rapides -->
     <div class="pga-card">
@@ -778,12 +879,69 @@ const PGA = {
     },
 
     updateSerp() {
+        const seoTitle = document.getElementById('pgaSeoTitle');
+        const seoDesc = document.getElementById('pgaSeoDesc');
         const mt = document.getElementById('pgaMetaTitle');
         const md = document.getElementById('pgaMetaDesc');
         const st = document.getElementById('pgaSerpTitle');
         const sd = document.getElementById('pgaSerpDesc');
-        if (mt && st) st.textContent = mt.value || document.getElementById('pgaTitle').value || '…';
-        if (md && sd) sd.textContent = md.value || '…';
+        if (st) st.textContent = (seoTitle && seoTitle.value) || (mt && mt.value) || document.getElementById('pgaTitle').value || '…';
+        if (sd) sd.textContent = (seoDesc && seoDesc.value) || (md && md.value) || '…';
+    },
+
+    updateLiveScores() {
+        const title = (document.getElementById('pgaTitle')?.value || '').trim();
+        const metaTitle = (document.getElementById('pgaMetaTitle')?.value || '').trim();
+        const metaDesc = (document.getElementById('pgaMetaDesc')?.value || '').trim();
+        const seoTitle = (document.getElementById('pgaSeoTitle')?.value || '').trim();
+        const seoDesc = (document.getElementById('pgaSeoDesc')?.value || '').trim();
+        const h1 = (document.getElementById('pgaH1')?.value || '').trim();
+        const content = document.getElementById('pgaContent')?.value || '';
+        const focus = (document.getElementById('pgaFocusKeyword')?.value || '').trim();
+        const main = (document.getElementById('pgaMainKeyword')?.value || '').trim();
+        const secondary = (document.getElementById('pgaSecondaryKeywords')?.value || '').trim();
+        const kws = (document.getElementById('pgaSeoKeywords')?.value || '').trim();
+
+        const plain = content
+            .replace(/<[^>]+>/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim()
+            .toLowerCase();
+        const words = plain ? plain.split(' ').length : 0;
+        const targetKeyword = (focus || main || (kws.split(',')[0] || '')).trim().toLowerCase();
+        const kwCount = targetKeyword && plain ? (plain.match(new RegExp(targetKeyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length : 0;
+
+        let seo = 0;
+        let sem = 0;
+        const hints = [];
+
+        if ((seoTitle || metaTitle).length >= 45 && (seoTitle || metaTitle).length <= 65) seo += 22; else hints.push('Meta title/SEO title : visez 45-65 caractères.');
+        if ((seoDesc || metaDesc).length >= 110 && (seoDesc || metaDesc).length <= 160) seo += 22; else hints.push('Meta description : visez 110-160 caractères.');
+        if (targetKeyword) seo += 18; else hints.push('Ajoutez un mot-clé focus/principal.');
+        if (title.length >= 10) seo += 10;
+        if (h1.length >= 10 || /<h1[\s>]/i.test(content)) seo += 14; else hints.push('Ajoutez un H1 explicite.');
+        if (words >= 120) seo += 14; else hints.push('Ajoutez plus de contenu utile (120+ mots).');
+
+        if (words >= 200) sem += 30; else if (words >= 120) sem += 18; else hints.push('Le texte est court pour la sémantique.');
+        if (targetKeyword && kwCount > 0) sem += 25; else hints.push('Le mot-clé principal n’apparaît pas encore dans le contenu.');
+        if (secondary.split(',').filter(Boolean).length >= 2) sem += 20;
+        if (/(<h2[\s>]|<h3[\s>])/i.test(content)) sem += 15; else hints.push('Structurez avec H2/H3.');
+        if (/[.!?]/.test(plain)) sem += 10;
+
+        seo = Math.min(100, seo);
+        sem = Math.min(100, sem);
+
+        const seoEl = document.getElementById('pgaSeoScoreLive');
+        const semEl = document.getElementById('pgaSemanticScoreLive');
+        const hintsEl = document.getElementById('pgaSeoHints');
+        if (seoEl) seoEl.textContent = String(seo);
+        if (semEl) semEl.textContent = String(sem);
+        if (hintsEl) {
+            const uniqHints = Array.from(new Set(hints)).slice(0, 4);
+            hintsEl.innerHTML = uniqHints.length
+                ? uniqHints.map(h => `<li>${h}</li>`).join('')
+                : '<li>Excellente base SEO/sémantique. Continuez avec un maillage interne.</li>';
+        }
     },
 
     async duplicate(id) {
@@ -807,6 +965,10 @@ const PGA = {
 document.addEventListener('DOMContentLoaded', () => {
     PGA.countChars('pgaMetaTitle','pgaMTCount',50,65);
     PGA.countChars('pgaMetaDesc','pgaMDCount',120,160);
+    PGA.updateSerp();
+    PGA.updateLiveScores();
+    ['pgaTitle','pgaMetaTitle','pgaMetaDesc','pgaSeoTitle','pgaSeoDesc','pgaFocusKeyword','pgaMainKeyword','pgaSecondaryKeywords','pgaSeoKeywords','pgaH1','pgaContent']
+        .forEach(id => document.getElementById(id)?.addEventListener('input', () => PGA.updateLiveScores()));
     // Sync slug vide en création
     <?php if ($isCreate): ?>
     document.getElementById('pgaSlugEditWrap').style.display = 'block';
