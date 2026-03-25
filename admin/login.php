@@ -73,7 +73,6 @@ function sendOTPEmail($to, $otp) {
                 $subject,
                 nl2br(htmlspecialchars($message, ENT_QUOTES, 'UTF-8')),
                 [
-                    'from_email' => ADMIN_EMAIL,
                     'from_name'  => SITE_TITLE,
                     'reply_to'   => ADMIN_EMAIL,
                 ]
