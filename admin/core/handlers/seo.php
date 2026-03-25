@@ -6,11 +6,35 @@
  *
  * JS actions: toggle-noindex, toggle-validation, analyze, analyze-all,
  *             preview-seo, generate-seo, details, list, get, update, validate, stats
- * Note: JS sends all requests as GET, so params come from $_GET.
+ * Note: mixed GET/POST requests; write actions should be POST.
  */
 
 $input = json_decode(file_get_contents('php://input'), true) ?? $_POST;
 $action = CURRENT_ACTION;
+
+function seoRespond(array $payload, int $code = 200): void {
+    http_response_code($code);
+    echo json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+}
+
+function seoRespondException(string $context, Throwable $e, string $publicMessage = 'Erreur serveur', int $code = 500): void {
+    error_log(sprintf(
+        '[seo handler] %s | action=%s | method=%s | %s',
+        $context,
+        CURRENT_ACTION,
+        $_SERVER['REQUEST_METHOD'] ?? 'CLI',
+        $e->getMessage()
+    ));
+    seoRespond(['success' => false, 'error' => $publicMessage], $code);
+}
+
+function seoRequirePost(): bool {
+    if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
+        seoRespond(['success' => false, 'error' => 'Méthode non autorisée'], 405);
+        return false;
+    }
+    return true;
+}
 
 /**
  * Helper: compute a basic SEO score for a page row.
@@ -143,7 +167,7 @@ switch ($action) {
             $stmt = $pdo->query("SELECT id, title, slug, status, seo_score, seo_title, seo_description, seo_keywords, seo_analyzed_at, noindex FROM pages ORDER BY seo_score ASC, title ASC");
             echo json_encode(['success' => true, 'data' => $stmt->fetchAll(PDO::FETCH_ASSOC)]);
         } catch (PDOException $e) {
-            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+            seoRespondException('list', $e, 'Erreur base de donnees');
         }
         break;
 
@@ -155,7 +179,7 @@ switch ($action) {
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
             echo json_encode($row ? ['success' => true, 'data' => $row] : ['success' => false, 'message' => 'Page non trouvee']);
         } catch (PDOException $e) {
-            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+            seoRespondException('get', $e, 'Erreur base de donnees');
         }
         break;
 
@@ -172,7 +196,7 @@ switch ($action) {
             $pdo->prepare("UPDATE pages SET " . implode(', ', $sets) . " WHERE id = ?")->execute($params);
             echo json_encode(['success' => true, 'message' => 'SEO mis a jour']);
         } catch (PDOException $e) {
-            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+            seoRespondException('update', $e, 'Erreur base de donnees');
         }
         break;
 
@@ -182,7 +206,7 @@ switch ($action) {
             $pdo->prepare("UPDATE pages SET seo_validated = 1, seo_validated_at = NOW() WHERE id = ?")->execute([$id]);
             echo json_encode(['success' => true, 'message' => 'SEO valide']);
         } catch (PDOException $e) {
-            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+            seoRespondException('validate', $e, 'Erreur base de donnees');
         }
         break;
 
@@ -196,7 +220,7 @@ switch ($action) {
             ];
             echo json_encode(['success' => true, 'data' => $stats]);
         } catch (PDOException $e) {
-            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+            seoRespondException('stats', $e, 'Erreur base de donnees');
         }
         break;
 
@@ -217,7 +241,7 @@ switch ($action) {
             $pdo->prepare("UPDATE pages SET noindex = ? WHERE id = ?")->execute([$noindex, $id]);
             echo json_encode(['success' => true]);
         } catch (PDOException $e) {
-            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            seoRespondException('toggle-noindex', $e, 'Erreur base de donnees');
         }
         break;
 
@@ -238,7 +262,7 @@ switch ($action) {
             }
             echo json_encode(['success' => true]);
         } catch (PDOException $e) {
-            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            seoRespondException('toggle-validation', $e, 'Erreur base de donnees');
         }
         break;
 
@@ -249,7 +273,8 @@ switch ($action) {
      */
     case 'analyze':
         try {
-            $id = (int)($_GET['id'] ?? 0);
+            if (!seoRequirePost()) { break; }
+            $id = (int)($input['id'] ?? $_POST['id'] ?? 0);
             if (!$id) { echo json_encode(['success' => false, 'error' => 'ID requis']); break; }
             $stmt = $pdo->prepare("SELECT * FROM pages WHERE id = ?");
             $stmt->execute([$id]);
@@ -265,7 +290,9 @@ switch ($action) {
 
             echo json_encode(['success' => true, 'result' => $result]);
         } catch (PDOException $e) {
-            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            seoRespondException('analyze', $e, 'Erreur base de donnees');
+        } catch (Exception $e) {
+            seoRespondException('analyze', $e);
         }
         break;
 
@@ -276,6 +303,7 @@ switch ($action) {
      */
     case 'analyze-all':
         try {
+            if (!seoRequirePost()) { break; }
             $rows = $pdo->query("SELECT * FROM pages")->fetchAll(PDO::FETCH_ASSOC);
             $count = 0;
             $updateStmt = $pdo->prepare("UPDATE pages SET seo_score = ?, seo_issues = ?, seo_analyzed_at = NOW() WHERE id = ?");
@@ -287,7 +315,9 @@ switch ($action) {
             }
             echo json_encode(['success' => true, 'analyzed' => $count]);
         } catch (PDOException $e) {
-            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            seoRespondException('analyze-all', $e, 'Erreur base de donnees');
+        } catch (Exception $e) {
+            seoRespondException('analyze-all', $e);
         }
         break;
 
@@ -361,7 +391,7 @@ switch ($action) {
                 'ai_provider' => 'Analyse automatique',
             ]);
         } catch (PDOException $e) {
-            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            seoRespondException('preview-seo', $e, 'Erreur base de donnees');
         }
         break;
 
@@ -372,7 +402,8 @@ switch ($action) {
      */
     case 'generate-seo':
         try {
-            $id = (int)($_GET['id'] ?? 0);
+            if (!seoRequirePost()) { break; }
+            $id = (int)($input['id'] ?? $_POST['id'] ?? 0);
             if (!$id) { echo json_encode(['success' => false, 'error' => 'ID requis']); break; }
             $stmt = $pdo->prepare("SELECT * FROM pages WHERE id = ?");
             $stmt->execute([$id]);
@@ -420,7 +451,9 @@ switch ($action) {
                 'new_score' => $result['percentage'],
             ]);
         } catch (PDOException $e) {
-            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            seoRespondException('generate-seo', $e, 'Erreur base de donnees');
+        } catch (Exception $e) {
+            seoRespondException('generate-seo', $e);
         }
         break;
 
@@ -451,7 +484,7 @@ switch ($action) {
                 'seo' => $seo,
             ]);
         } catch (PDOException $e) {
-            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+            seoRespondException('details', $e, 'Erreur base de donnees');
         }
         break;
 
@@ -480,10 +513,11 @@ switch ($action) {
                 }
                 echo json_encode(['success'=>true,'scores'=>['global'=>$gl,'technique'=>$tch,'contenu'=>$cnt,'semantique'=>$sem]]);
             } catch(PDOException $e2) {
-                echo json_encode(['success'=>true,'warning'=>'seo_scores table missing: '.$e2->getMessage()]);
+                error_log('[seo handler] save_score: seo_scores table missing - ' . $e2->getMessage());
+                echo json_encode(['success'=>true,'warning'=>'seo_scores table missing']);
             }
         } catch(PDOException $e) {
-            echo json_encode(['success'=>false,'error'=>$e->getMessage()]);
+            seoRespondException('save_score', $e, 'Erreur base de donnees');
         }
         break;
 
