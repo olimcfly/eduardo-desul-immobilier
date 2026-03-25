@@ -4,10 +4,6 @@
  * /admin/login.php
  */
 
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
 /* ─────────────────────────────────────────
    Charger configuration
 ───────────────────────────────────────── */
@@ -18,7 +14,7 @@ require_once ROOT_PATH . '/includes/classes/EmailService.php';
 
 /* Déjà connecté */
 
-if (!empty($_SESSION['admin_id'])) {
+if (!empty($_SESSION['admin_id']) && !empty($_SESSION['admin_email']) && !empty($_SESSION['admin_logged_in'])) {
     header("Location: /admin/dashboard.php");
     exit;
 }
@@ -134,7 +130,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if (!$admin) {
 
-                $error = "Email non autorisé";
+                $error = "Email non reconnu";
 
             } elseif (isset($admin['is_active']) && !$admin['is_active']) {
 
@@ -203,6 +199,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['admin_name']=$admin['name'] ?? '';
             $_SESSION['admin_logged_in']=true;
             $_SESSION['admin_login_time']=time();
+            session_regenerate_id(true);
 
             // Mettre à jour last_login
             $db->prepare("UPDATE admins SET last_login = NOW() WHERE id = ?")->execute([$admin['id']]);
