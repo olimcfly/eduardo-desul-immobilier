@@ -111,7 +111,7 @@ class SequenceEngineService
                 WHERE se.status = 'active'
                   AND s.is_active = 1
                   AND se.next_action_at IS NOT NULL
-                  AND se.next_action_at <= NOW()
+                  AND se.next_action_at <= CURRENT_TIMESTAMP
                   AND l.email IS NOT NULL
                   AND l.email != ''
                 ORDER BY se.next_action_at ASC
@@ -145,17 +145,23 @@ class SequenceEngineService
         $delayDays = (int)($nextStep['delay_days'] ?? 0);
         $delayHours = (int)($nextStep['delay_hours'] ?? 0);
 
+        $nextActionAt = (new DateTimeImmutable('now'))
+            ->modify(sprintf('+%d days', $delayDays))
+            ->modify(sprintf('+%d hours', $delayHours))
+            ->format('Y-m-d H:i:s');
+
         $sql = "UPDATE crm_sequence_enrollments
-                SET current_step = ?, next_action_at = DATE_ADD(NOW(), INTERVAL ? DAY) + INTERVAL ? HOUR
+                SET current_step = ?, next_action_at = ?
                 WHERE id = ?";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([$nextStepOrder, $delayDays, $delayHours, $enrollmentId]);
+        $stmt->execute([$nextStepOrder, $nextActionAt, $enrollmentId]);
     }
 
     private function completeEnrollment(int $enrollmentId): void
     {
-        $this->pdo->prepare("UPDATE crm_sequence_enrollments SET status='completed', completed_at=NOW(), next_action_at=NULL WHERE id=?")
-            ->execute([$enrollmentId]);
+        $completedAt = date('Y-m-d H:i:s');
+        $this->pdo->prepare("UPDATE crm_sequence_enrollments SET status='completed', completed_at=?, next_action_at=NULL WHERE id=?")
+            ->execute([$completedAt, $enrollmentId]);
     }
 
     private function markEnrollmentFailed(int $enrollmentId, string $error): void
@@ -166,10 +172,12 @@ class SequenceEngineService
 
     private function registerSend(int $enrollmentId, int $stepId, int $leadId, int $sequenceId, string $subject, string $status, string $trackingId, ?string $error): void
     {
+        $scheduledAt = date('Y-m-d H:i:s');
+        $sentAt = $status === 'sent' ? $scheduledAt : null;
         $this->pdo->prepare("INSERT INTO crm_sequence_sends
             (enrollment_id, step_id, lead_id, sequence_id, subject, status, tracking_id, scheduled_at, sent_at, error_message)
-            VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), IF(?='sent', NOW(), NULL), ?)")
-            ->execute([$enrollmentId, $stepId, $leadId, $sequenceId, $subject, $status, $trackingId, $status, $error]);
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)")
+            ->execute([$enrollmentId, $stepId, $leadId, $sequenceId, $subject, $status, $trackingId, $scheduledAt, $sentAt, $error]);
     }
 
     private function replaceVars(string $content, array $lead): string
