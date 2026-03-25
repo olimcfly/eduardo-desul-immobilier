@@ -226,7 +226,7 @@ function buildDesignSystem(): string {
 // ── callLLM ─────────────────────────────────────────────────
 function callLLM(string $sys, string $usr, int $max = 3000): string {
     global $provider, $anthropicKey, $openaiKey, $aiModelAnthropic, $aiModelOpenai;
-    if ($provider === 'anthropic') {
+    $callAnthropic = function() use ($sys, $usr, $max, $anthropicKey, $aiModelAnthropic): string {
         $ch = curl_init('https://api.anthropic.com/v1/messages');
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true,
@@ -251,7 +251,9 @@ function callLLM(string $sys, string $usr, int $max = 3000): string {
         if ($code !== 200) throw new Exception('Anthropic HTTP '.$code.': '.substr($resp,0,300));
         $d = json_decode($resp, true);
         return $d['content'][0]['text'] ?? throw new Exception('Réponse Anthropic inattendue');
-    } else {
+    };
+
+    $callOpenAI = function() use ($sys, $usr, $max, $openaiKey, $aiModelOpenai): string {
         $ch = curl_init('https://api.openai.com/v1/chat/completions');
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true, CURLOPT_POST => true,
@@ -277,7 +279,21 @@ function callLLM(string $sys, string $usr, int $max = 3000): string {
         if ($code !== 200) throw new Exception('OpenAI HTTP '.$code.': '.substr($resp,0,300));
         $d = json_decode($resp, true);
         return $d['choices'][0]['message']['content'] ?? throw new Exception('Réponse OpenAI inattendue');
+    };
+
+    if ($provider === 'anthropic') {
+        try {
+            return $callAnthropic();
+        } catch (Throwable $e) {
+            if (!empty($openaiKey)) {
+                error_log('[AI fallback] Anthropic indisponible, tentative OpenAI: '.$e->getMessage());
+                return $callOpenAI();
+            }
+            throw $e;
+        }
     }
+
+    return $callOpenAI();
 }
 
 // ── extractJson ─────────────────────────────────────────────
