@@ -63,6 +63,15 @@ $dateFrom = date('Y-m-d', strtotime("-{$daysBack} days"));
 
 $q = fn($sql) => (int)($pdo->query($sql)->fetchColumn() ?? 0);
 $safe = fn($sql) => (function() use ($pdo, $sql) { try { return $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC); } catch(Exception $e) { return []; } })();
+$tableExists = function(string $table) use ($pdo): bool {
+    try {
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?");
+        $stmt->execute([$table]);
+        return (int)$stmt->fetchColumn() > 0;
+    } catch (Exception $e) {
+        return false;
+    }
+};
 
 $totalViews     = $q("SELECT COUNT(*) FROM page_views WHERE created_at >= '{$dateFrom}'");
 $uniqueVisitors = $q("SELECT COUNT(DISTINCT session_id) FROM page_views WHERE created_at >= '{$dateFrom}' AND session_id IS NOT NULL");
@@ -112,6 +121,37 @@ $deviceLabels = json_encode(array_column($devices, 'device'));
 $deviceValues = json_encode(array_map('intval', array_column($devices, 'cnt')));
 
 $trendIcon = fn($v) => $v > 0 ? '<i class="fas fa-arrow-up" style="color:var(--green)"></i>' : ($v < 0 ? '<i class="fas fa-arrow-down" style="color:var(--red)"></i>' : '<i class="fas fa-minus" style="color:var(--text-3)"></i>');
+
+// Fallback KPI: si aucun tracking natif, réutiliser les stats des pages de capture.
+$isAnalyticsEmpty = ($totalViews + $uniqueVisitors + $conversions) === 0;
+if ($isAnalyticsEmpty && $tableExists('captures_stats')) {
+    $fallbackStats = $safe("SELECT date AS d, COALESCE(SUM(vues),0) AS views, COALESCE(SUM(conversions),0) AS visitors
+                            FROM captures_stats
+                            WHERE date >= '{$dateFrom}'
+                            GROUP BY date
+                            ORDER BY date");
+    $fallbackViews = (int)$q("SELECT COALESCE(SUM(vues),0) FROM captures_stats WHERE date >= '{$dateFrom}'");
+    $fallbackConversions = (int)$q("SELECT COALESCE(SUM(conversions),0) FROM captures_stats WHERE date >= '{$dateFrom}'");
+
+    if ($fallbackViews > 0 || $fallbackConversions > 0) {
+        $totalViews = $fallbackViews;
+        $uniqueVisitors = $fallbackViews; // approximation en mode fallback
+        $totalSessions = max($totalSessions, $totalViews);
+        $conversions = $fallbackConversions;
+        $convRate = $totalSessions > 0 ? round(($conversions / $totalSessions) * 100, 2) : 0;
+        $avgPages = $totalSessions > 0 ? round($totalViews / $totalSessions, 1) : 0;
+        $bounceRate = 0;
+        $pctViews = 0;
+        $pctVisitors = 0;
+
+        if (!empty($fallbackStats)) {
+            $chartData = $fallbackStats;
+            $chartLabels = json_encode(array_map(fn($r) => date('d/m', strtotime($r['d'])), $chartData));
+            $chartViews = json_encode(array_map('intval', array_column($chartData, 'views')));
+            $chartVisitors = json_encode(array_map('intval', array_column($chartData, 'visitors')));
+        }
+    }
+}
 ?>
 
 <style>
