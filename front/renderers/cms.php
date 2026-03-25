@@ -456,14 +456,14 @@ $stripStyles($footerHtml);
       line-height: 1.6;
       margin: 0;
     }
-    .hero-landing, .hero-section, [class*="hero"] { color: #fff !important; }
+    /* Harmonisation visuelle limitée aux sections explicites */
+    .hero-landing, .hero-section { color: #fff; }
     .hero-landing h1, .hero-landing h2, .hero-landing h3,
     .hero-landing p, .hero-landing li,
     .hero-section h1, .hero-section h2, .hero-section h3,
-    .hero-section p,
-    [class*="hero"] h1, [class*="hero"] h2, [class*="hero"] p { color: #fff !important; }
-    .cta-final, .section-dark, .bg-dark { color: #fff !important; }
-    .cta-final h1, .cta-final h2, .cta-final h3, .cta-final p { color: #fff !important; }
+    .hero-section p { color: #fff; }
+    .cta-final, .section-dark, .bg-dark { color: #fff; }
+    .cta-final h1, .cta-final h2, .cta-final h3, .cta-final p { color: #fff; }
     </style>
 
     <?php foreach ($externalCss as $cssUrl): ?>
