@@ -379,7 +379,7 @@ require_once __DIR__ . '/layout/sidebar.php';
             <h3><i class="fas fa-wand-magic-sparkles" style="color:var(--gold);margin-right:6px"></i>Mes outils IA</h3>
         </div>
         <div style="display:flex;flex-direction:column;gap:8px">
-            <a href="?page=journal"         class="btn btn-s btn-sm"><i class="fas fa-calendar-days"></i> Planning contenu</a>
+            <a href="?page=local-seo"       class="btn btn-s btn-sm"><i class="fas fa-location-dot"></i> Google My Business</a>
             <a href="?page=seo-semantic"    class="btn btn-s btn-sm"><i class="fas fa-chart-bar"></i> Mots-clés & textes</a>
             <a href="?page=neuropersona"    class="btn btn-s btn-sm"><i class="fas fa-brain"></i> Mon client idéal</a>
             <a href="?page=advisor-context" class="btn btn-s btn-sm"><i class="fas fa-user-circle"></i> Mon profil IA</a>

@@ -15,81 +15,54 @@ try {
 // ── Structure de navigation ──────────────────────────────────
 $sidebarGroups = [
     [
+        'id' => 'grp-activity', 'label' => 'Mon activit&eacute;',
+        'icon' => 'fa-briefcase', 'color' => '#c9913b',
+        'slugs' => ['properties','estimation','rdv','financement','crm','leads','scoring','messagerie','emails'],
+        'children' => [
+            ['slug'=>'properties',  'icon'=>'fa-house',          'label'=>'Mes biens'],
+            ['slug'=>'estimation',  'icon'=>'fa-calculator',     'label'=>'Estimations re&ccedil;ues'],
+            ['slug'=>'rdv',         'icon'=>'fa-calendar-check', 'label'=>'Mes rendez-vous'],
+            ['slug'=>'financement', 'icon'=>'fa-piggy-bank',     'label'=>'Financement'],
+            ['slug'=>'crm',         'icon'=>'fa-address-book',   'label'=>'Mes clients'],
+            ['slug'=>'leads',       'icon'=>'fa-user-plus',      'label'=>'Leads entrants'],
+            ['slug'=>'scoring',     'icon'=>'fa-star-half-stroke','label'=>'Score prospects'],
+            ['slug'=>'messagerie',  'icon'=>'fa-comments',       'label'=>'Messagerie', 'sep'=>true],
+            ['slug'=>'emails',      'icon'=>'fa-envelope-open-text','label'=>'Emails automatiques'],
+        ],
+    ],
+    [
         'id' => 'grp-site', 'label' => 'Mon Site',
         'icon' => 'fa-globe', 'color' => '#6366f1',
-        'slugs' => ['pages','secteurs','guide-local'],
+        'slugs' => ['pages','menus'],
         'children' => [
-            ['slug'=>'pages',       'icon'=>'fa-file-lines',  'label'=>'Mes pages'],
-            ['slug'=>'secteurs',    'icon'=>'fa-map-pin',     'label'=>'Mes quartiers'],
-            ['slug'=>'guide-local', 'icon'=>'fa-map',         'label'=>'Guide du quartier', 'badge'=>'NEW'],
+            ['slug'=>'pages',     'icon'=>'fa-file-lines',       'label'=>'Mes pages'],
+            ['slug'=>'menus',     'icon'=>'fa-bars',             'label'=>'Menus'],
         ],
     ],
     [
-        'id' => 'grp-contenu', 'label' => 'Contenu',
-        'icon' => 'fa-pen-nib', 'color' => '#0891b2',
-        'slugs' => ['articles','journal','ressources','sections'],
+        'id' => 'grp-seo-content', 'label' => 'SEO local &amp; contenu',
+        'icon' => 'fa-magnifying-glass', 'color' => '#65a30d',
+        'slugs' => ['secteurs','guide-local','articles','ressources','seo-semantic','seo','local-seo','analytics','market-analyzer'],
         'children' => [
-            ['slug'=>'articles',  'icon'=>'fa-newspaper',     'label'=>'Mes articles'],
-            ['slug'=>'journal',   'icon'=>'fa-calendar-days', 'label'=>'Planning contenu'],
-            ['slug'=>'ressources','icon'=>'fa-book-open',     'label'=>'Guides &amp; ressources', 'badge'=>'NEW'],
-            ['slug'=>'sections',  'icon'=>'fa-cubes',         'label'=>'Mes sections'],
-        ],
-    ],
-    [
-        'id' => 'grp-design', 'label' => 'Design',
-        'icon' => 'fa-wand-magic-sparkles', 'color' => '#c026d3',
-        'slugs' => ['builder','templates','headers','footers','menus'],
-        'children' => [
-            ['slug'=>'builder',   'icon'=>'fa-wand-magic-sparkles','label'=>'&Eacute;diteur de site', 'badge'=>'PRO'],
-            ['slug'=>'templates', 'icon'=>'fa-layer-group',        'label'=>'Mod&egrave;les de pages'],
-            ['slug'=>'headers',   'icon'=>'fa-window-maximize',    'label'=>'Haut de page'],
-            ['slug'=>'footers',   'icon'=>'fa-window-minimize',    'label'=>'Bas de page'],
-            ['slug'=>'menus',     'icon'=>'fa-bars',               'label'=>'Menus'],
+            ['slug'=>'secteurs',     'icon'=>'fa-map-pin',          'label'=>'Mes quartiers'],
+            ['slug'=>'guide-local',  'icon'=>'fa-map',              'label'=>'Guide du quartier', 'badge'=>'NEW'],
+            ['slug'=>'articles',     'icon'=>'fa-newspaper',        'label'=>'Mes articles'],
+            ['slug'=>'ressources',   'icon'=>'fa-book-open',        'label'=>'Guides &amp; ressources', 'badge'=>'NEW'],
+            ['slug'=>'seo-semantic', 'icon'=>'fa-chart-bar',        'label'=>'Mots-cl&eacute;s &amp; s&eacute;mantique'],
+            ['slug'=>'seo',          'icon'=>'fa-magnifying-glass', 'label'=>'Mon r&eacute;f&eacute;rencement'],
+            ['slug'=>'local-seo',    'icon'=>'fa-location-dot',     'label'=>'Google My Business'],
+            ['slug'=>'analytics',    'icon'=>'fa-chart-line',       'label'=>'Mes statistiques'],
+            ['slug'=>'market-analyzer', 'icon'=>'fa-chart-line',    'label'=>'Analyseur March&eacute;', 'badge'=>'NEW'],
         ],
     ],
     [
         'id' => 'grp-acquisition', 'label' => 'Acquisition',
         'icon' => 'fa-bullseye', 'color' => '#dc2626',
-        'slugs' => ['captures','pages-capture','leads','scoring','sequences','campagnes'],
+        'slugs' => ['captures','sequences','campagnes'],
         'children' => [
-            ['slug'=>'captures',  'icon'=>'fa-bolt',             'label'=>'Pages de capture'],
-            ['slug'=>'leads',     'icon'=>'fa-user-plus',        'label'=>'Leads entrants'],
-            ['slug'=>'scoring',   'icon'=>'fa-star-half-stroke', 'label'=>'Score prospects'],
-            ['slug'=>'sequences', 'icon'=>'fa-list-check',       'label'=>'S&eacute;quences email', 'sep'=>true],
-            ['slug'=>'campagnes', 'icon'=>'fa-paper-plane',      'label'=>'Campagnes email'],
-        ],
-    ],
-    [
-        'id' => 'grp-immo', 'label' => 'Mes Biens',
-        'icon' => 'fa-house', 'color' => '#c9913b',
-        'slugs' => ['properties','estimation','rdv','financement','market-analyzer'],
-        'children' => [
-            ['slug'=>'properties',      'icon'=>'fa-house',          'label'=>'Mes biens'],
-            ['slug'=>'estimation',      'icon'=>'fa-calculator',     'label'=>'Estimations re&ccedil;ues'],
-            ['slug'=>'rdv',             'icon'=>'fa-calendar-check', 'label'=>'Mes rendez-vous'],
-            ['slug'=>'financement',     'icon'=>'fa-piggy-bank',     'label'=>'Financement'],
-            ['slug'=>'market-analyzer', 'icon'=>'fa-chart-line',     'label'=>'Analyseur March&eacute;', 'badge'=>'NEW'],
-        ],
-    ],
-    [
-        'id' => 'grp-clients', 'label' => 'Mes Clients',
-        'icon' => 'fa-users', 'color' => '#0891b2',
-        'slugs' => ['crm','messagerie','emails'],
-        'children' => [
-            ['slug'=>'crm',        'icon'=>'fa-address-book',       'label'=>'Mes contacts'],
-            ['slug'=>'messagerie', 'icon'=>'fa-comments',           'label'=>'Messagerie'],
-            ['slug'=>'emails',     'icon'=>'fa-envelope-open-text', 'label'=>'Emails automatiques'],
-        ],
-    ],
-    [
-        'id' => 'grp-seo', 'label' => 'Ma Visibilit&eacute;',
-        'icon' => 'fa-magnifying-glass', 'color' => '#65a30d',
-        'slugs' => ['seo','seo-semantic','local-seo','analytics'],
-        'children' => [
-            ['slug'=>'seo',          'icon'=>'fa-magnifying-glass', 'label'=>'Mon r&eacute;f&eacute;rencement'],
-            ['slug'=>'seo-semantic', 'icon'=>'fa-chart-bar',        'label'=>'Mots-cl&eacute;s &amp; s&eacute;mantique'],
-            ['slug'=>'local-seo',    'icon'=>'fa-location-dot',     'label'=>'Google My Business'],
-            ['slug'=>'analytics',    'icon'=>'fa-chart-line',       'label'=>'Mes statistiques'],
+            ['slug'=>'captures',  'icon'=>'fa-bolt',           'label'=>'Pages de capture'],
+            ['slug'=>'sequences', 'icon'=>'fa-list-check',     'label'=>'S&eacute;quences email'],
+            ['slug'=>'campagnes', 'icon'=>'fa-paper-plane',    'label'=>'Campagnes email'],
         ],
     ],
     [
@@ -130,7 +103,7 @@ $sidebarGroups = [
         ],
     ],
     [
-        'id' => 'grp-systeme', 'label' => 'R&eacute;glages',
+        'id' => 'grp-systeme', 'label' => 'Param&egrave;tres / Configuration',
         'icon' => 'fa-gear', 'color' => '#64748b',
         'slugs' => ['modules','settings','maintenance','license','api-keys','ai-settings','users'],
         'children' => array_merge(
@@ -338,13 +311,13 @@ foreach ($sidebarGroups as $grp) {
     <nav class="sb-nav" id="sidebarNav">
         <?php
         // Groupes qui commencent un nouveau bloc logique (separateur plus marque)
-        $sepGroups = ['grp-acquisition', 'grp-immo', 'grp-seo', 'grp-plan', 'grp-ia', 'grp-systeme'];
+        $sepGroups = ['grp-site', 'grp-seo-content', 'grp-acquisition', 'grp-social', 'grp-plan', 'grp-ia', 'grp-systeme'];
 
         foreach ($sidebarGroups as $grp):
             // Filtrer les enfants selon les permissions de l'admin
             $visibleChildren = [];
             foreach ($grp['children'] as $item) {
-                if (function_exists('isModuleAllowed') && isModuleAllowed($item['slug'])) {
+                if (!function_exists('isModuleAllowed') || isModuleAllowed($item['slug'])) {
                     $visibleChildren[] = $item;
                 }
             }
