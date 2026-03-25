@@ -24,11 +24,12 @@ try {
 $hasCol = static fn(string $col): bool => in_array($col, $captureCols, true);
 
 // ── Disponibilité IA ──────────────────────────────────────────
-$aiAvailable = (defined('ANTHROPIC_API_KEY') && !empty(ANTHROPIC_API_KEY))
-            || (defined('OPENAI_API_KEY')    && !empty(OPENAI_API_KEY));
+$hasClaudeKey = defined('ANTHROPIC_API_KEY') && !empty(ANTHROPIC_API_KEY);
+$hasOpenAiKey = defined('OPENAI_API_KEY') && !empty(OPENAI_API_KEY);
+$aiAvailable = $hasClaudeKey || $hasOpenAiKey;
 $aiProvider = '';
-if (defined('ANTHROPIC_API_KEY') && !empty(ANTHROPIC_API_KEY)) $aiProvider = 'Claude';
-elseif (defined('OPENAI_API_KEY') && !empty(OPENAI_API_KEY))   $aiProvider = 'OpenAI';
+if ($hasClaudeKey) $aiProvider = 'Claude';
+elseif ($hasOpenAiKey) $aiProvider = 'OpenAI';
 $AI_ENDPOINT = '/admin/api/ai/generate.php';
 $SAVE_ENDPOINT = '/admin/api/builder/save-content.php';
 
@@ -671,6 +672,31 @@ $csrfToken = $_SESSION['csrf_token'] ?? '';
                 <h3 style="color:#7c3aed">IA <?= $aiProvider ?: 'Claude' ?> — Générer la page</h3>
             </div>
             <div class="capedit-card-body" style="padding:14px">
+                <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--surface)">
+                        <div style="display:flex;align-items:center;gap:8px;font-size:.78rem;font-weight:700;color:var(--text)">
+                            <span style="width:9px;height:9px;border-radius:50%;display:inline-block;background:<?= $hasOpenAiKey ? '#22c55e' : '#ef4444' ?>;box-shadow:0 0 0 2px rgba(0,0,0,.06)"></span>
+                            OpenAI
+                        </div>
+                        <span style="font-size:.72rem;font-weight:700;color:<?= $hasOpenAiKey ? '#15803d' : '#dc2626' ?>">
+                            <?= $hasOpenAiKey ? 'Connecté' : 'Non connecté' ?>
+                        </span>
+                    </div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--surface)">
+                        <div style="display:flex;align-items:center;gap:8px;font-size:.78rem;font-weight:700;color:var(--text)">
+                            <span style="width:9px;height:9px;border-radius:50%;display:inline-block;background:<?= $hasClaudeKey ? '#22c55e' : '#ef4444' ?>;box-shadow:0 0 0 2px rgba(0,0,0,.06)"></span>
+                            Claude
+                        </div>
+                        <span style="font-size:.72rem;font-weight:700;color:<?= $hasClaudeKey ? '#15803d' : '#dc2626' ?>">
+                            <?= $hasClaudeKey ? 'Connecté' : 'Non connecté' ?>
+                        </span>
+                    </div>
+                    <a href="?page=system/settings/ai"
+                       style="display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:9px 12px;background:#f3e8ff;color:#7c3aed;border-radius:8px;font-size:.78rem;font-weight:700;text-decoration:none">
+                        <i class="fas fa-key"></i> Configurer API
+                    </a>
+                </div>
+
                 <?php if ($aiAvailable && !$isNew): ?>
                 <div style="font-size:.73rem;color:var(--text-2);margin-bottom:8px;line-height:1.5">
                     Décrivez votre page et l'IA génère le code HTML/CSS complet, adapté à votre identité.
@@ -702,10 +728,6 @@ $csrfToken = $_SESSION['csrf_token'] ?? '';
                 <div style="text-align:center;padding:12px">
                     <i class="fas fa-robot" style="font-size:1.8rem;color:#e9d5ff;display:block;margin-bottom:8px"></i>
                     <div style="font-size:.78rem;color:var(--text-2);margin-bottom:10px">Configurez votre clé API pour utiliser l'IA</div>
-                    <a href="?page=system/settings/ai"
-                       style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#f3e8ff;color:#7c3aed;border-radius:8px;font-size:.78rem;font-weight:700;text-decoration:none">
-                        <i class="fas fa-cog"></i> Configurer l'IA
-                    </a>
                 </div>
                 <?php endif; ?>
             </div>
