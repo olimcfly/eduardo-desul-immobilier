@@ -14,14 +14,10 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// ✅ BYPASS TEMPORAIRE : forcer la session admin pour tester
-if (empty($_SESSION['admin_id'])) {
-    $_SESSION['admin_id'] = 1;
-    $_SESSION['user'] = 'admin@test.local';
-    $_SESSION['admin_email'] = 'admin@test.local';
-    $_SESSION['admin_role'] = 'superuser';
-    $_SESSION['advisor_name'] = 'Administrateur';
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+// Sécurité : accès réservé aux admins connectés
+if (empty($_SESSION['admin_id']) || empty($_SESSION['admin_email'])) {
+    header('Location: /admin/login.php');
+    exit;
 }
 
 // CSRF token

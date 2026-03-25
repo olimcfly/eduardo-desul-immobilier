@@ -185,6 +185,235 @@ if ($action === 'list') {
     $offset  = ($page - 1) * $limit;
     $sort    = $_GET['sort'] ?? 'updated_desc';
 
+    $orderBy = match ($sort) {
+        'score_desc' => 'seo_score DESC, updated_at DESC',
+        'score_asc'  => 'seo_score ASC, updated_at DESC',
+        'title_asc'  => 'title ASC',
+        'title_desc' => 'title DESC',
+        default      => 'updated_at DESC',
+    };
+
+    // Fast path: pagination SQL native pour réduire la charge sur gros volumes
+    if ($type !== 'all') {
+        try {
+            $items = [];
+            $total = 0;
+
+            if ($type === 'page' && $hasPagesTable) {
+                $titleCol   = tableHasCol($db, 'pages', 'title') ? 'title' : (tableHasCol($db, 'pages', 'titre') ? 'titre' : 'id');
+                $slugCol    = tableHasCol($db, 'pages', 'slug') ? 'slug' : 'id';
+                $statusCol  = tableHasCol($db, 'pages', 'status') ? 'status' : (tableHasCol($db, 'pages', 'statut') ? 'statut' : null);
+                $contentCol = tableHasCol($db, 'pages', 'content') ? 'content' : (tableHasCol($db, 'pages', 'contenu') ? 'contenu' : null);
+                $updatedCol = tableHasCol($db, 'pages', 'updated_at') ? 'updated_at' : (tableHasCol($db, 'pages', 'created_at') ? 'created_at' : null);
+
+                $titleExpr = "{$titleCol}";
+                $slugExpr = "{$slugCol}";
+                $statusExpr = $statusCol ? "{$statusCol}" : "'unknown'";
+                $updatedExpr = $updatedCol ? "{$updatedCol}" : "NULL";
+                $metaTitleExpr = $pagesHasMetaTitle ? "meta_title" : "''";
+                $metaDescExpr = $pagesHasMetaDesc ? "meta_description" : "''";
+                $contentLenExpr = $contentCol ? "CHAR_LENGTH({$contentCol})" : "0";
+                $seoExpr = $pagesHasSeoScore
+                    ? "COALESCE(seo_score, 0)"
+                    : "(
+                        (CASE WHEN {$metaTitleExpr} <> '' THEN 20 ELSE 0 END) +
+                        (CASE WHEN CHAR_LENGTH({$metaTitleExpr}) BETWEEN 40 AND 70 THEN 10 ELSE 0 END) +
+                        (CASE WHEN {$metaDescExpr} <> '' THEN 20 ELSE 0 END) +
+                        (CASE WHEN CHAR_LENGTH({$metaDescExpr}) BETWEEN 100 AND 160 THEN 10 ELSE 0 END) +
+                        (CASE WHEN {$slugExpr} REGEXP '^[a-z0-9-]+$' THEN 10 ELSE 0 END) +
+                        (CASE WHEN {$contentLenExpr} >= 300 THEN 15 ELSE 0 END) +
+                        (CASE WHEN {$contentLenExpr} >= 800 THEN 15 ELSE 0 END)
+                    )";
+
+                $where = '1=1';
+                $params = [];
+                if (!empty($search)) {
+                    $where .= " AND ({$titleExpr} LIKE :s OR {$slugExpr} LIKE :s2)";
+                    $params[':s'] = '%' . $search . '%';
+                    $params[':s2'] = '%' . $search . '%';
+                }
+                if ($filter === 'no_meta' && $pagesHasMetaTitle) $where .= " AND (meta_title IS NULL OR meta_title = '')";
+                if ($filter === 'good') $where .= " AND ({$seoExpr}) >= 70";
+                if ($filter === 'issues') $where .= " AND ({$seoExpr}) < 50";
+
+                $countStmt = $db->prepare("SELECT COUNT(*) FROM pages WHERE {$where}");
+                foreach ($params as $k => $v) $countStmt->bindValue($k, $v);
+                $countStmt->execute();
+                $total = (int) $countStmt->fetchColumn();
+
+                $sql = "SELECT
+                            id,
+                            {$titleExpr} AS title,
+                            {$slugExpr} AS slug,
+                            {$statusExpr} AS status,
+                            {$metaTitleExpr} AS meta_title,
+                            {$metaDescExpr} AS meta_description,
+                            {$contentLenExpr} AS content_length,
+                            {$updatedExpr} AS updated_at,
+                            ({$seoExpr}) AS seo_score
+                        FROM pages
+                        WHERE {$where}
+                        ORDER BY {$orderBy}
+                        LIMIT :limit OFFSET :offset";
+                $stmt = $db->prepare($sql);
+                foreach ($params as $k => $v) $stmt->bindValue($k, $v);
+                $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+                $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+                $stmt->execute();
+                $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                $items = array_map(static fn(array $p): array => [
+                    'id'               => $p['id'],
+                    'type'             => 'page',
+                    'type_label'       => 'Page',
+                    'title'            => $p['title'] ?? '',
+                    'slug'             => $p['slug'] ?? '',
+                    'status'           => $p['status'] ?? 'unknown',
+                    'meta_title'       => $p['meta_title'] ?? '',
+                    'meta_description' => $p['meta_description'] ?? '',
+                    'seo_score'        => (int) ($p['seo_score'] ?? 0),
+                    'content_length'   => (int) ($p['content_length'] ?? 0),
+                    'updated_at'       => $p['updated_at'] ?? null,
+                    'url'              => '/' . ($p['slug'] ?? $p['id']),
+                ], $items);
+            } elseif ($type === 'article' && $hasArticlesTable) {
+                $titleCol   = tableHasCol($db, 'articles', 'title') ? 'title' : (tableHasCol($db, 'articles', 'titre') ? 'titre' : 'id');
+                $slugCol    = tableHasCol($db, 'articles', 'slug') ? 'slug' : 'id';
+                $statusCol  = tableHasCol($db, 'articles', 'status') ? 'status' : (tableHasCol($db, 'articles', 'statut') ? 'statut' : null);
+                $contentCol = tableHasCol($db, 'articles', 'content') ? 'content' : (tableHasCol($db, 'articles', 'contenu') ? 'contenu' : null);
+                $updatedCol = tableHasCol($db, 'articles', 'updated_at') ? 'updated_at' : (tableHasCol($db, 'articles', 'created_at') ? 'created_at' : null);
+
+                $titleExpr = "{$titleCol}";
+                $slugExpr = "{$slugCol}";
+                $statusExpr = $statusCol ? "{$statusCol}" : "'unknown'";
+                $updatedExpr = $updatedCol ? "{$updatedCol}" : "NULL";
+                $metaTitleExpr = $articlesHasMetaTitle ? "meta_title" : "''";
+                $metaDescExpr = $articlesHasMetaDesc ? "meta_description" : "''";
+                $contentLenExpr = $contentCol ? "CHAR_LENGTH({$contentCol})" : "0";
+                $seoExpr = $articlesHasSeoScore
+                    ? "COALESCE(seo_score, 0)"
+                    : "(
+                        (CASE WHEN {$metaTitleExpr} <> '' THEN 20 ELSE 0 END) +
+                        (CASE WHEN CHAR_LENGTH({$metaTitleExpr}) BETWEEN 40 AND 70 THEN 10 ELSE 0 END) +
+                        (CASE WHEN {$metaDescExpr} <> '' THEN 20 ELSE 0 END) +
+                        (CASE WHEN CHAR_LENGTH({$metaDescExpr}) BETWEEN 100 AND 160 THEN 10 ELSE 0 END) +
+                        (CASE WHEN {$slugExpr} REGEXP '^[a-z0-9-]+$' THEN 10 ELSE 0 END) +
+                        (CASE WHEN {$contentLenExpr} >= 300 THEN 15 ELSE 0 END) +
+                        (CASE WHEN {$contentLenExpr} >= 800 THEN 15 ELSE 0 END)
+                    )";
+
+                $where = '1=1';
+                $params = [];
+                if (!empty($search)) {
+                    $where .= " AND ({$titleExpr} LIKE :s OR {$slugExpr} LIKE :s2)";
+                    $params[':s'] = '%' . $search . '%';
+                    $params[':s2'] = '%' . $search . '%';
+                }
+                if ($filter === 'no_meta' && $articlesHasMetaTitle) $where .= " AND (meta_title IS NULL OR meta_title = '')";
+                if ($filter === 'good') $where .= " AND ({$seoExpr}) >= 70";
+                if ($filter === 'issues') $where .= " AND ({$seoExpr}) < 50";
+
+                $countStmt = $db->prepare("SELECT COUNT(*) FROM articles WHERE {$where}");
+                foreach ($params as $k => $v) $countStmt->bindValue($k, $v);
+                $countStmt->execute();
+                $total = (int) $countStmt->fetchColumn();
+
+                $sql = "SELECT
+                            id,
+                            {$titleExpr} AS title,
+                            {$slugExpr} AS slug,
+                            {$statusExpr} AS status,
+                            {$metaTitleExpr} AS meta_title,
+                            {$metaDescExpr} AS meta_description,
+                            {$contentLenExpr} AS content_length,
+                            {$updatedExpr} AS updated_at,
+                            ({$seoExpr}) AS seo_score
+                        FROM articles
+                        WHERE {$where}
+                        ORDER BY {$orderBy}
+                        LIMIT :limit OFFSET :offset";
+                $stmt = $db->prepare($sql);
+                foreach ($params as $k => $v) $stmt->bindValue($k, $v);
+                $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+                $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+                $stmt->execute();
+                $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                $items = array_map(static fn(array $a): array => [
+                    'id'               => $a['id'],
+                    'type'             => 'article',
+                    'type_label'       => 'Article',
+                    'title'            => $a['title'] ?? '',
+                    'slug'             => $a['slug'] ?? '',
+                    'status'           => $a['status'] ?? 'unknown',
+                    'meta_title'       => $a['meta_title'] ?? '',
+                    'meta_description' => $a['meta_description'] ?? '',
+                    'seo_score'        => (int) ($a['seo_score'] ?? 0),
+                    'content_length'   => (int) ($a['content_length'] ?? 0),
+                    'updated_at'       => $a['updated_at'] ?? null,
+                    'url'              => '/blog/' . ($a['slug'] ?? $a['id']),
+                ], $items);
+            } elseif ($type === 'secteur' && $hasSecteursTable) {
+                $nameCol    = tableHasCol($db, 'secteurs', 'name') ? 'name' : (tableHasCol($db, 'secteurs', 'nom') ? 'nom' : 'id');
+                $slugCol    = tableHasCol($db, 'secteurs', 'slug') ? 'slug' : 'id';
+                $statusCol  = tableHasCol($db, 'secteurs', 'status') ? 'status' : null;
+                $updatedCol = tableHasCol($db, 'secteurs', 'updated_at') ? 'updated_at' : null;
+
+                $where = '1=1';
+                $params = [];
+                if (!empty($search)) {
+                    $where .= " AND ({$nameCol} LIKE :s OR {$slugCol} LIKE :s2)";
+                    $params[':s'] = '%' . $search . '%';
+                    $params[':s2'] = '%' . $search . '%';
+                }
+
+                $countStmt = $db->prepare("SELECT COUNT(*) FROM secteurs WHERE {$where}");
+                foreach ($params as $k => $v) $countStmt->bindValue($k, $v);
+                $countStmt->execute();
+                $total = (int) $countStmt->fetchColumn();
+
+                $statusExpr = $statusCol ? "{$statusCol}" : "'published'";
+                $updatedExpr = $updatedCol ? "{$updatedCol}" : "NULL";
+                $sql = "SELECT id, {$nameCol} AS title, {$slugCol} AS slug, {$statusExpr} AS status, {$updatedExpr} AS updated_at
+                        FROM secteurs
+                        WHERE {$where}
+                        ORDER BY " . ($sort === 'title_asc' ? 'title ASC' : ($sort === 'title_desc' ? 'title DESC' : 'updated_at DESC')) . "
+                        LIMIT :limit OFFSET :offset";
+                $stmt = $db->prepare($sql);
+                foreach ($params as $k => $v) $stmt->bindValue($k, $v);
+                $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+                $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+                $stmt->execute();
+                $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                $items = array_map(static fn(array $s): array => [
+                    'id'               => $s['id'],
+                    'type'             => 'secteur',
+                    'type_label'       => 'Secteur',
+                    'title'            => $s['title'] ?? '',
+                    'slug'             => $s['slug'] ?? '',
+                    'status'           => $s['status'] ?? 'published',
+                    'meta_title'       => '',
+                    'meta_description' => '',
+                    'seo_score'        => 0,
+                    'content_length'   => 0,
+                    'updated_at'       => $s['updated_at'] ?? null,
+                    'url'              => '/' . ($s['slug'] ?? $s['id']),
+                ], $items);
+            }
+
+            apiOk([
+                'items'      => $items,
+                'total'      => $total,
+                'page'       => $page,
+                'limit'      => $limit,
+                'pages'      => (int) ceil($total / $limit),
+            ]);
+        } catch (Exception $e) {
+            apiErr('Erreur list: ' . $e->getMessage(), 500);
+        }
+    }
+
     $rows  = [];
     $total = 0;
 

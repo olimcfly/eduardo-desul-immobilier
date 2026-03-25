@@ -12,6 +12,19 @@ if (!defined('ADMIN_ROUTER')) {
 $page_title = "Séquences Email";
 $current_module = "sequences";
 
+if (!function_exists('seq_log_sql_error')) {
+    function seq_log_sql_error(string $context, PDOException $e): void
+    {
+        error_log(sprintf(
+            '[sequences][%s] SQLSTATE=%s CODE=%s MESSAGE=%s',
+            $context,
+            (string) $e->getCode(),
+            isset($e->errorInfo[1]) ? (string) $e->errorInfo[1] : 'n/a',
+            $e->getMessage()
+        ));
+    }
+}
+
 // ====================================================
 // INIT DB — pattern standard IMMO LOCAL+
 // ====================================================
@@ -24,7 +37,8 @@ if (!isset($pdo) && !isset($db)) {
              PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]
         );
     } catch (PDOException $e) {
-        echo '<div style="padding:20px;color:#ef4444">Erreur DB: '.htmlspecialchars($e->getMessage()).'</div>';
+        seq_log_sql_error('db_init', $e);
+        echo '<div style="padding:20px;color:#ef4444">Connexion base de données impossible. Vérifiez la configuration puis réessayez.</div>';
         return;
     }
 }
@@ -148,7 +162,8 @@ if (!$tablesExist) {
         ");
         $tablesExist = true;
     } catch (PDOException $e) {
-        echo '<div style="padding:20px;color:#ef4444">Erreur création tables : ' . htmlspecialchars($e->getMessage()) . '</div>';
+        seq_log_sql_error('schema_bootstrap', $e);
+        echo '<div style="padding:20px;color:#ef4444">Impossible d’initialiser les tables CRM. Contactez un administrateur.</div>';
         return;
     }
 }
@@ -239,6 +254,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             case 'add_step':
                 $seqId = (int)$_POST['sequence_id'];
+                $stepType = (string)($_POST['step_type'] ?? 'email');
+                $subject = trim((string)($_POST['subject'] ?? ''));
+                $bodyHtml = trim((string)($_POST['body_html'] ?? ''));
+                if ($stepType === 'email') {
+                    if ($subject === '') {
+                        throw new InvalidArgumentException('Le sujet est obligatoire pour une étape email.');
+                    }
+                    if ($bodyHtml === '') {
+                        throw new InvalidArgumentException('Le corps du message est obligatoire pour une étape email.');
+                    }
+                }
                 $maxOrder = $db->prepare("SELECT COALESCE(MAX(step_order), 0) + 1 FROM crm_sequence_steps WHERE sequence_id = ?");
                 $maxOrder->execute([$seqId]);
                 $nextOrder = $maxOrder->fetchColumn();
@@ -249,10 +275,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt->execute([
                     $seqId,
                     $nextOrder,
-                    $_POST['step_type'] ?? 'email',
+                    $stepType,
                     (int)($_POST['delay_days'] ?? 0),
                     (int)($_POST['delay_hours'] ?? 0),
-                    trim($_POST['subject'] ?? ''),
+                    $subject,
                     $_POST['body_html'] ?? '',
                     trim($_POST['sms_text'] ?? ''),
                     trim($_POST['task_description'] ?? ''),
@@ -262,6 +288,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 break;
 
             case 'update_step':
+                $stepType = (string)($_POST['step_type'] ?? 'email');
+                $subject = trim((string)($_POST['subject'] ?? ''));
+                $bodyHtml = trim((string)($_POST['body_html'] ?? ''));
+                if ($stepType === 'email') {
+                    if ($subject === '') {
+                        throw new InvalidArgumentException('Le sujet est obligatoire pour une étape email.');
+                    }
+                    if ($bodyHtml === '') {
+                        throw new InvalidArgumentException('Le corps du message est obligatoire pour une étape email.');
+                    }
+                }
                 $stmt = $db->prepare("
                     UPDATE crm_sequence_steps SET
                         step_type = ?, delay_days = ?, delay_hours = ?,
@@ -269,10 +306,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     WHERE id = ? AND sequence_id = ?
                 ");
                 $stmt->execute([
-                    $_POST['step_type'] ?? 'email',
+                    $stepType,
                     (int)($_POST['delay_days'] ?? 0),
                     (int)($_POST['delay_hours'] ?? 0),
-                    trim($_POST['subject'] ?? ''),
+                    $subject,
                     $_POST['body_html'] ?? '',
                     trim($_POST['sms_text'] ?? ''),
                     trim($_POST['task_description'] ?? ''),
@@ -323,7 +360,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
     } catch (PDOException $e) {
-        $message = 'Erreur : ' . $e->getMessage();
+        seq_log_sql_error('post_action:' . ($postAction !== '' ? $postAction : 'unknown'), $e);
+        $message = 'Une erreur technique est survenue lors de l’enregistrement. Merci de réessayer dans quelques instants.';
         $messageType = 'danger';
     }
 }
@@ -838,6 +876,9 @@ $templateVars = [
             <a href="?page=sequences&action=edit&id=<?= $seq['id'] ?>" class="btn-seq btn-seq-outline btn-seq-sm">
                 <i class="fas fa-edit"></i> Éditer
             </a>
+            <a href="?page=sequences&action=edit&id=<?= $seq['id'] ?>&open_add_step=1&step_type=email" class="btn-seq btn-seq-primary btn-seq-sm">
+                <i class="fas fa-envelope"></i> Créer un email
+            </a>
             <form method="POST" style="display:inline">
                 <input type="hidden" name="action" value="toggle_sequence">
                 <input type="hidden" name="sequence_id" value="<?= $seq['id'] ?>">
@@ -1010,7 +1051,7 @@ $templateVars = [
             <div class="seq-step-preview"><?= htmlspecialchars($step['task_description']) ?></div>
             <?php endif; ?>
             <div class="seq-step-actions">
-                <button class="btn-seq btn-seq-outline btn-seq-sm" onclick="openEditStepModal(<?= htmlspecialchars(json_encode($step)) ?>)">
+                <button type="button" class="btn-seq btn-seq-outline btn-seq-sm" onclick="openEditStepModal(<?= htmlspecialchars(json_encode($step)) ?>)">
                     <i class="fas fa-edit"></i> Modifier
                 </button>
                 <form method="POST" style="display:inline" onsubmit="return confirm('Supprimer cette étape ?')">
@@ -1024,7 +1065,7 @@ $templateVars = [
         <?php endforeach; ?>
     </div>
     <?php endif; ?>
-    <button class="btn-seq btn-seq-primary" onclick="openAddStepModal()" style="margin-top:16px">
+    <button type="button" class="btn-seq btn-seq-primary" onclick="openAddStepModal()" style="margin-top:16px">
         <i class="fas fa-plus"></i> Ajouter une étape
     </button>
 </div>
@@ -1770,6 +1811,23 @@ function openAddStepModal() {
     document.getElementById('addStepModal').classList.add('active');
 }
 
+function maybeOpenStepModalFromQuery() {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('open_add_step') !== '1') return;
+
+    openAddStepModal();
+
+    const requestedType = params.get('step_type');
+    if (requestedType && ['email', 'sms', 'wait', 'task'].includes(requestedType)) {
+        document.getElementById('stepType').value = requestedType;
+        toggleStepFields();
+    }
+
+    if (requestedType === 'email') {
+        document.getElementById('stepSubject').focus();
+    }
+}
+
 function openEditStepModal(step) {
     document.getElementById('stepModalTitle').innerHTML = '<i class="fas fa-edit"></i> Modifier l\'etape ' + step.step_order;
     document.getElementById('stepFormAction').value = 'update_step';
@@ -1864,4 +1922,6 @@ document.addEventListener('keydown', e => {
 document.querySelectorAll('.seq-modal-overlay').forEach(o => {
     o.addEventListener('click', e => { if (e.target === o) o.classList.remove('active'); });
 });
+
+maybeOpenStepModalFromQuery();
 </script>
