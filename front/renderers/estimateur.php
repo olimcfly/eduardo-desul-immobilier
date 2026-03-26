@@ -19,6 +19,22 @@ use App\Services\EstimatorService;
 use App\Services\LeadQualificationService;
 
 $db = getDB();
+
+// Auto-migration : crée les tables si elles n'existent pas encore
+$migrationFile = dirname(__DIR__, 2) . '/database/migrations/20260325_estimateur_module.sql';
+try {
+    $tableCheck = $db->query("SHOW TABLES LIKE 'estimator_configs'")->fetchColumn();
+    if (!$tableCheck && file_exists($migrationFile)) {
+        $sql = file_get_contents($migrationFile);
+        foreach (array_filter(array_map('trim', explode(';', $sql))) as $statement) {
+            if ($statement !== '') {
+                $db->exec($statement);
+            }
+        }
+    }
+} catch (\PDOException $e) {
+    // Migration failed silently — page will render without config
+}
 $citySlug = $_GET['city_slug'] ?? '';
 
 $configRepository = new EstimatorConfigRepository($db);

@@ -14,26 +14,30 @@ class EstimationRequestRepository
 
     public function create(array $payload): int
     {
-        $stmt = $this->pdo->prepare(
-            "INSERT INTO estimation_requests (
-                config_id, mode, city_slug, zone_code, property_type, property_address, surface_m2, rooms,
-                estimate_min, estimate_target, estimate_max, currency,
-                bant_budget, bant_authority, bant_need, bant_timeline,
-                contact_first_name, contact_last_name, contact_email, contact_phone,
-                advisor_name, advisor_network, appointment_enabled, appointment_slot,
-                crm_status, status, source_page, notes, history_json, created_at, updated_at
-            ) VALUES (
-                :config_id, :mode, :city_slug, :zone_code, :property_type, :property_address, :surface_m2, :rooms,
-                :estimate_min, :estimate_target, :estimate_max, :currency,
-                :bant_budget, :bant_authority, :bant_need, :bant_timeline,
-                :contact_first_name, :contact_last_name, :contact_email, :contact_phone,
-                :advisor_name, :advisor_network, :appointment_enabled, :appointment_slot,
-                :crm_status, :status, :source_page, :notes, :history_json, NOW(), NOW()
-            )"
-        );
-        $stmt->execute($payload);
+        try {
+            $stmt = $this->pdo->prepare(
+                "INSERT INTO estimation_requests (
+                    config_id, mode, city_slug, zone_code, property_type, property_address, surface_m2, rooms,
+                    estimate_min, estimate_target, estimate_max, currency,
+                    bant_budget, bant_authority, bant_need, bant_timeline,
+                    contact_first_name, contact_last_name, contact_email, contact_phone,
+                    advisor_name, advisor_network, appointment_enabled, appointment_slot,
+                    crm_status, status, source_page, notes, history_json, created_at, updated_at
+                ) VALUES (
+                    :config_id, :mode, :city_slug, :zone_code, :property_type, :property_address, :surface_m2, :rooms,
+                    :estimate_min, :estimate_target, :estimate_max, :currency,
+                    :bant_budget, :bant_authority, :bant_need, :bant_timeline,
+                    :contact_first_name, :contact_last_name, :contact_email, :contact_phone,
+                    :advisor_name, :advisor_network, :appointment_enabled, :appointment_slot,
+                    :crm_status, :status, :source_page, :notes, :history_json, NOW(), NOW()
+                )"
+            );
+            $stmt->execute($payload);
 
-        return (int) $this->pdo->lastInsertId();
+            return (int) $this->pdo->lastInsertId();
+        } catch (\PDOException $e) {
+            return 0;
+        }
     }
 
     public function listByConfig(int $configId, int $limit = 50): array
