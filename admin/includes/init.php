@@ -64,7 +64,17 @@ $adminRole    = $_SESSION['admin_role'] ?? 'admin';
 
 if (!function_exists('isSuperUser')) {
     function isSuperUser() {
-        return ($_SESSION['admin_role'] ?? 'admin') === 'superuser';
+        if (($_SESSION['admin_role'] ?? 'admin') === 'superuser') {
+            return true;
+        }
+
+        // Compte admin historique qui doit conserver un accès complet
+        $adminEmail = strtolower(trim((string)($_SESSION['admin_email'] ?? '')));
+        $fullAccessEmails = [
+            'admin@duardo-desul-immobilier.fr',
+        ];
+
+        return in_array($adminEmail, $fullAccessEmails, true);
     }
 }
 
