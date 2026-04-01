@@ -178,7 +178,7 @@ if (!$alreadyLoggedIn && $_SERVER['REQUEST_METHOD'] === 'POST') {
             unset($_SESSION['otp']);
         }
 
-        elseif ($otp !== $_SESSION['otp']) {
+        elseif (!hash_equals($_SESSION['otp'] ?? '', $otp)) {
 
             $error="Code incorrect";
 
