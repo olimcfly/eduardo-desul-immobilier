@@ -293,6 +293,22 @@ $quickLinks = [
                 display: none;
             }
         }
+
+        @media (max-width: 1024px) {
+            .header {
+                padding: var(--spacing-md) var(--spacing-lg);
+                gap: var(--spacing-md);
+            }
+
+            .header-quick-links {
+                display: none;
+            }
+
+            .header-search {
+                min-width: auto;
+                flex: 1;
+            }
+        }
     </style>
 </head>
 

@@ -63,15 +63,17 @@ $sidebarSections = [
 $advisorName = 'Mon espace';
 $advisorCity = '';
 try {
-    $stmt = $pdo->query("SELECT field_key, field_value FROM advisor_context
-                         WHERE field_key IN ('advisor_name', 'advisor_city')");
-    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    foreach ($rows as $row) {
-        if ($row['field_key'] === 'advisor_name') {
-            $advisorName = htmlspecialchars($row['field_value']);
-        }
-        if ($row['field_key'] === 'advisor_city') {
-            $advisorCity = htmlspecialchars($row['field_value']);
+    if (!empty($pdo)) {
+        $stmt = $pdo->query("SELECT field_key, field_value FROM advisor_context
+                             WHERE field_key IN ('advisor_name', 'advisor_city')");
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($rows as $row) {
+            if ($row['field_key'] === 'advisor_name') {
+                $advisorName = htmlspecialchars($row['field_value']);
+            }
+            if ($row['field_key'] === 'advisor_city') {
+                $advisorCity = htmlspecialchars($row['field_value']);
+            }
         }
     }
 } catch (Exception $e) {
@@ -127,6 +129,19 @@ try {
     }
 }
 
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: var(--border);
+        flex-direction: row;
+        padding: var(--spacing-sm) var(--spacing-md);
+        overflow-x: auto;
+        overflow-y: hidden;
+    }
+}
+
 /* Logo / Branding */
 .sidebar-logo {
     display: flex;
@@ -145,11 +160,20 @@ try {
 @media (max-width: 1024px) {
     .sidebar-logo {
         font-size: 0;
+        margin-bottom: var(--spacing-md);
     }
 
     .sidebar-logo::before {
         content: '🏠';
         font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .sidebar-logo {
+        order: -1;
+        flex-shrink: 0;
+        margin-bottom: 0;
     }
 }
 
@@ -160,6 +184,16 @@ try {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-sm);
+}
+
+@media (max-width: 768px) {
+    .sidebar-nav {
+        flex-direction: row;
+        flex: 1;
+        padding: 0;
+        gap: var(--spacing-sm);
+        overflow-x: auto;
+    }
 }
 
 /* Navigation Items */
@@ -226,7 +260,7 @@ try {
     display: none;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1025px) {
     .sidebar-item-desc {
         display: block;
     }
@@ -272,6 +306,38 @@ try {
     }
 }
 
+@media (max-width: 768px) {
+    .sidebar-item {
+        width: auto;
+        height: auto;
+        padding: var(--spacing-sm);
+        flex-direction: column;
+    }
+
+    .sidebar-item::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        bottom: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        margin-bottom: var(--spacing-sm);
+        white-space: nowrap;
+        background: var(--color-gray-600);
+        color: var(--color-white);
+        padding: var(--spacing-xs) var(--spacing-sm);
+        border-radius: var(--radius);
+        font-size: 12px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+        z-index: 1000;
+    }
+
+    .sidebar-item:hover::after {
+        opacity: 1;
+    }
+}
+
 /* Settings Item (bottom) */
 .sidebar-footer {
     display: flex;
@@ -281,6 +347,12 @@ try {
     margin-top: auto;
     border-top: var(--border);
     padding-top: var(--spacing-lg);
+}
+
+@media (max-width: 768px) {
+    .sidebar-footer {
+        display: none;
+    }
 }
 
 .sidebar-settings {
@@ -360,9 +432,9 @@ try {
     <!-- Navigation principale (7 sections) -->
     <nav class="sidebar-nav">
         <?php foreach ($sidebarSections as $section):
-            $isActive = ($currentSection === str_replace('?section=', '', $section['url']));
-            $activeClass = $isActive ? ' active' : '';
             $sectionName = str_replace('?section=', '', $section['url']);
+            $isActive = ($currentSection === $sectionName);
+            $activeClass = $isActive ? ' active' : '';
         ?>
             <a href="<?= htmlspecialchars($section['url']) ?>"
                class="sidebar-item<?= $activeClass ?>"
