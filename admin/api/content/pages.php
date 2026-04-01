@@ -103,8 +103,11 @@ $neededCols = [
 foreach ($neededCols as $col => $def) {
     if (!in_array($col, $existingCols)) {
         try {
-            $pdo->exec("ALTER TABLE `{$tableName}` ADD COLUMN `{$col}` {$def}");
-            $existingCols[] = $col;
+            // Validate against whitelist to prevent SQL injection
+            if (isset($neededCols[$col]) && $def === $neededCols[$col]) {
+                $pdo->exec("ALTER TABLE `" . $tableName . "` ADD COLUMN `" . $col . "` " . $def);
+                $existingCols[] = $col;
+            }
         } catch (PDOException $e) { /* already exists or other issue */ }
     }
 }

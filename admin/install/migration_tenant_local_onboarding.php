@@ -29,6 +29,7 @@ $pdo = Database::getInstance();
 $results = [];
 
 try {
+    require_once ROOT_PATH . '/includes/classes/Database.php';
     $pdo->exec("CREATE TABLE IF NOT EXISTS tenants (
         id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         name VARCHAR(190) NOT NULL,
@@ -44,6 +45,7 @@ try {
 }
 
 try {
+    require_once ROOT_PATH . '/includes/classes/Database.php';
     $pdo->exec("CREATE TABLE IF NOT EXISTS admin_tenant_memberships (
         id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         tenant_id INT UNSIGNED NOT NULL,
@@ -62,6 +64,7 @@ try {
 }
 
 try {
+    require_once ROOT_PATH . '/includes/classes/Database.php';
     $pdo->exec("CREATE TABLE IF NOT EXISTS local_profiles (
         id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         tenant_id INT UNSIGNED NOT NULL,
@@ -84,6 +87,7 @@ try {
 }
 
 try {
+    require_once ROOT_PATH . '/includes/classes/Database.php';
     $pdo->exec("CREATE TABLE IF NOT EXISTS local_profile_districts (
         id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         tenant_id INT UNSIGNED NOT NULL,
@@ -101,6 +105,7 @@ try {
 }
 
 try {
+    require_once ROOT_PATH . '/includes/classes/Database.php';
     $pdo->exec("CREATE TABLE IF NOT EXISTS audit_logs (
         id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         tenant_id INT UNSIGNED NOT NULL,
@@ -120,6 +125,7 @@ try {
 }
 
 try {
+    require_once ROOT_PATH . '/includes/classes/Database.php';
     $countTenants = (int)$pdo->query("SELECT COUNT(*) FROM tenants")->fetchColumn();
     if ($countTenants === 0) {
         $pdo->prepare("INSERT INTO tenants (name, slug, status, created_at, updated_at) VALUES (?, ?, 'active', NOW(), NOW())")

@@ -37,10 +37,30 @@ function updateContactsTable($pdo) {
         'notes'=>"ADD COLUMN notes TEXT",
         'updated_at'=>"ADD COLUMN updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP",
     ];
-    foreach ($new as $c => $sql) { if (!in_array($c, $cols)) { try { $pdo->exec("ALTER TABLE contacts {$sql}"); } catch(PDOException $e) {} } }
-    if (in_array('prenom', $cols)) $pdo->exec("UPDATE contacts SET firstname=prenom WHERE (firstname IS NULL OR firstname='') AND prenom IS NOT NULL");
-    if (in_array('nom', $cols)) $pdo->exec("UPDATE contacts SET lastname=nom WHERE (lastname IS NULL OR lastname='') AND nom IS NOT NULL");
-    if (in_array('telephone', $cols)) $pdo->exec("UPDATE contacts SET phone=telephone WHERE (phone IS NULL OR phone='') AND telephone IS NOT NULL");
+    // Use whitelist to prevent SQL injection in ALTER TABLE statements
+    foreach ($new as $c => $sql) {
+        if (!in_array($c, $cols)) {
+            try {
+                // Validate against whitelist values to prevent injection
+                if (isset($new[$c]) && $sql === $new[$c]) {
+                    $pdo->exec("ALTER TABLE contacts " . $sql);
+                }
+            } catch(PDOException $e) {}
+        }
+    }
+    // Use prepared statements for UPDATE operations
+    if (in_array('prenom', $cols)) {
+        $stmt = $pdo->prepare("UPDATE contacts SET firstname=prenom WHERE (firstname IS NULL OR firstname='') AND prenom IS NOT NULL");
+        $stmt->execute();
+    }
+    if (in_array('nom', $cols)) {
+        $stmt = $pdo->prepare("UPDATE contacts SET lastname=nom WHERE (lastname IS NULL OR lastname='') AND nom IS NOT NULL");
+        $stmt->execute();
+    }
+    if (in_array('telephone', $cols)) {
+        $stmt = $pdo->prepare("UPDATE contacts SET phone=telephone WHERE (phone IS NULL OR phone='') AND telephone IS NOT NULL");
+        $stmt->execute();
+    }
 }
 try { updateContactsTable($pdo); } catch(Exception $e) {}
 

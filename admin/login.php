@@ -21,6 +21,7 @@ $alreadyLoggedIn = !empty($_SESSION['admin_id']) && !empty($_SESSION['admin_emai
 
 if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
 try {
+    if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
     $db = Database::getInstance();
 } catch (Exception $e) {
     die("Impossible de se connecter à la base de données");
