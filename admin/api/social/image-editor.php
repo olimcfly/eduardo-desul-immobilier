@@ -6,6 +6,11 @@ if (file_exists($initPath)) {
     require_once $initPath;
 }
 
+// Load ErrorHandler for secure error logging
+if (!class_exists('ErrorHandler')) {
+    require_once dirname(dirname(__DIR__)) . '/includes/classes/ErrorHandler.php';
+}
+
 if (!isset($pdo)) {
     echo json_encode(['success' => false, 'message' => 'Connexion DB indisponible']);
     exit;
@@ -160,5 +165,6 @@ try {
 
     ieRespond(['success' => false, 'message' => 'Action non supportée'], 400);
 } catch (Throwable $e) {
-    ieRespond(['success' => false, 'message' => $e->getMessage()], 500);
+    ErrorHandler::log($e, 'image-editor::api', ['action' => $action ?? 'unknown']);
+    ieRespond(['success' => false, 'message' => 'An error occurred'], 500);
 }

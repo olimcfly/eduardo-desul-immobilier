@@ -34,11 +34,12 @@ class BuilderController
         if ($pdo) {
             $this->db = $pdo;
         } elseif (function_exists('getDB')) {
-            $this->db = getDB();
+    if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
+            $this->db = Database::getInstance();
         } else {
             // Fallback : charger config.php
             require_once dirname(dirname(dirname(__DIR__))) . '/config/config.php';
-            $this->db = getDB();
+            $this->db = Database::getInstance();
         }
     }
 

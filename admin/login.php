@@ -21,6 +21,7 @@ $alreadyLoggedIn = !empty($_SESSION['admin_id']) && !empty($_SESSION['admin_emai
 
 if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
 try {
+    if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
     $db = Database::getInstance();
 } catch (Exception $e) {
     die("Impossible de se connecter à la base de données");
@@ -178,7 +179,7 @@ if (!$alreadyLoggedIn && $_SERVER['REQUEST_METHOD'] === 'POST') {
             unset($_SESSION['otp']);
         }
 
-        elseif ($otp !== $_SESSION['otp']) {
+        elseif (!hash_equals($_SESSION['otp'] ?? '', $otp)) {
 
             $error="Code incorrect";
 

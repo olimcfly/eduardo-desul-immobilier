@@ -19,6 +19,7 @@ use App\Services\EstimatorService;
 use App\Services\LeadQualificationService;
 if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
 
+    if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
 $db = Database::getInstance();
 
 // Auto-migration : crée les tables si elles n'existent pas encore
