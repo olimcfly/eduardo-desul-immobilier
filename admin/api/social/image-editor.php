@@ -6,8 +6,21 @@ if (file_exists($initPath)) {
     require_once $initPath;
 }
 
+// Load rate limiter
+$rateLimiterPath = dirname(dirname(__DIR__)) . '/includes/RateLimiter.php';
+if (file_exists($rateLimiterPath)) {
+    require_once $rateLimiterPath;
+}
+
 if (!isset($pdo)) {
     echo json_encode(['success' => false, 'message' => 'Connexion DB indisponible']);
+    exit;
+}
+
+// Check rate limit: 100 requests per 60 seconds per IP
+if (class_exists('RateLimiter') && !RateLimiter::check(100, 60)) {
+    http_response_code(429);
+    echo json_encode(['success' => false, 'message' => 'Rate limit exceeded. Max 100 requests per minute.']);
     exit;
 }
 

@@ -13,6 +13,9 @@ if (!defined('ADMIN_ROUTER')) {
     require_once dirname(dirname(__DIR__)) . '/includes/init.php';
 }
 
+// Load rate limiter
+require_once dirname(dirname(__DIR__)) . '/includes/RateLimiter.php';
+
 header('Content-Type: application/json; charset=utf-8');
 
 function jsonOk(array $data = []): void {
@@ -26,6 +29,13 @@ function jsonErr(string $msg, int $code = 400): void {
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') jsonErr('Méthode non autorisée', 405);
+
+// Check rate limit: 100 requests per 60 seconds per IP
+if (!RateLimiter::check(100, 60)) {
+    http_response_code(429);
+    echo json_encode(['success' => false, 'error' => 'Rate limit exceeded. Max 100 requests per minute.']);
+    exit;
+}
 
 global $pdo, $db;
 if (!isset($pdo) && isset($db)) $pdo = $db;

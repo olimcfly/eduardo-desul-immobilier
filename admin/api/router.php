@@ -21,6 +21,7 @@ header('Content-Type: application/json; charset=utf-8');
 header('X-Content-Type-Options: nosniff');
 
 require_once dirname(__DIR__) . '/includes/init.php';
+require_once dirname(__DIR__) . '/includes/RateLimiter.php';
 
 // ── Fonction CSRF ───────────────────────────────────────────
 if (!function_exists('validateCsrfToken')) {
@@ -41,6 +42,19 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
         echo json_encode(['success' => false, 'message' => 'Token CSRF invalide']);
         exit;
     }
+}
+
+// ── RATE LIMITING ──────────────────────────────────────────────
+// 100 requests per 60 seconds per IP
+if (!RateLimiter::check(100, 60)) {
+    http_response_code(429);
+    echo json_encode([
+        'success' => false,
+        'message' => 'Rate limit exceeded',
+        'error' => 'Trop de requêtes. Maximum 100 requêtes par minute.',
+        'remaining' => 0
+    ]);
+    exit;
 }
 
 // ── ROUTING ──────────────────────────────────────────────────
