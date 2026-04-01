@@ -14,7 +14,7 @@ if (!$db instanceof PDO) {
     exit('DB indisponible');
 }
 
-$websiteId = (int)($_SESSION['current_website_id'] ?? $_GET['website_id'] ?? 1);
+$websiteId = (int)($_SESSION['auth_current_website_id'] ?? $_GET['website_id'] ?? 1);
 $slug = (string)($_GET['slug'] ?? '');
 $preview = isset($_GET['preview']) && $_GET['preview'] === '1';
 

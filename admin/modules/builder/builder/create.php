@@ -11,7 +11,7 @@ header('Content-Type: application/json; charset=utf-8');
 
 // ─── Auth check ───
 session_start();
-if (empty($_SESSION['admin_id']) && empty($_SESSION['user_id']) && empty($_SESSION['logged_in'])) {
+if (empty($_SESSION['auth_admin_id']) && empty($_SESSION['auth_user_id']) && empty($_SESSION['auth_logged_in'])) {
     echo json_encode(['success' => false, 'error' => 'Non autorisé']);
     exit;
 }

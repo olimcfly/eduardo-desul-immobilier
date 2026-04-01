@@ -19,7 +19,7 @@ if (!class_exists('Database')) require_once $rootPath . '/includes/classes/Datab
 
 // ── Session & auth ────────────────────────────────────────
 if (session_status() === PHP_SESSION_NONE) session_start();
-if (empty($_SESSION['user_id'])) {
+if (empty($_SESSION['auth_user_id'])) {
     http_response_code(401);
     echo json_encode(['success' => false, 'error' => 'Non autorisé']);
     exit;

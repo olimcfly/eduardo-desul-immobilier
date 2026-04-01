@@ -48,7 +48,7 @@ try {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 } catch (Exception $e) { /* existe déjà */ }
 
-$user_id = $_SESSION['admin_id'] ?? 1;
+$user_id = $_SESSION['auth_admin_id'] ?? 1;
 $action  = $_GET['action'] ?? 'overview';
 
 // ══════════════════════════════════════════════

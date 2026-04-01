@@ -497,7 +497,7 @@ class JournalController extends BaseController
             ':source_diagnostic' => $data['source_diagnostic'] ?? null,
             ':mere_hook'         => $data['mere_hook']         ?? null,
             ':notes'             => $data['notes']             ?? null,
-            ':created_by'        => $data['created_by']        ?? ($_SESSION['admin_id'] ?? null),
+            ':created_by'        => $data['created_by']        ?? ($_SESSION['auth_admin_id'] ?? null),
         ]);
 
         return (int)$this->db->lastInsertId();

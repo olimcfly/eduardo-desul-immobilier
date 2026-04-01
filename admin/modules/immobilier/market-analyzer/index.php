@@ -23,7 +23,7 @@ try {
 
 require_once __DIR__ . '/MarketAnalyzer.php';
 
-$user_id = $_SESSION['admin_id'] ?? 1;
+$user_id = $_SESSION['auth_admin_id'] ?? 1;
 $analyzer = new MarketAnalyzer($pdo, $user_id);
 $cities = $analyzer->getUserCities();
 $analyses = $analyzer->getAllAnalyses();
@@ -439,7 +439,7 @@ $availableSuggestions = array_filter($suggestedCities, function($c) use ($existi
 // ═══════════════════════════════════════════════
 
 const API_URL = 'modules/immobilier/market-analyzer/api.php';
-const CSRF_TOKEN = <?= json_encode($_SESSION['csrf_token'] ?? '') ?>;
+const CSRF_TOKEN = <?= json_encode($_SESSION['auth_csrf_token'] ?? '') ?>;
 const allCities = <?= json_encode(array_values($suggestedCities)) ?>;
 let selectedCity = '';
 

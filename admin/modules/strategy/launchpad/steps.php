@@ -9,7 +9,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-if (!isset($_SESSION['admin_id'])) {
+if (!isset($_SESSION['auth_admin_id'])) {
     header('Location: /admin/login.php');
     exit;
 }
@@ -26,7 +26,7 @@ try {
         [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
     );
     
-    $manager = new LaunchpadManager($pdo, $_SESSION['admin_id']);
+    $manager = new LaunchpadManager($pdo, $_SESSION['auth_admin_id']);
     $requested_step = $_GET['step'] ?? $manager->getCurrentStep();
     $manager->goToStep($requested_step);
     

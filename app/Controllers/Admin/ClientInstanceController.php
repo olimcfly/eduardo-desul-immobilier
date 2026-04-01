@@ -76,7 +76,7 @@ class ClientInstanceController
         $instance = $this->model->find($id);
 
         if (!$instance) {
-            $_SESSION['instance_generator_flash'] = ['type' => 'error', 'message' => 'Instance introuvable'];
+            $_SESSION['auth_instance_generator_flash'] = ['type' => 'error', 'message' => 'Instance introuvable'];
             $this->redirectToIndex();
         }
 
@@ -90,7 +90,7 @@ class ClientInstanceController
         $instance = $this->model->find($id);
 
         if (!$instance) {
-            $_SESSION['instance_generator_flash'] = ['type' => 'error', 'message' => 'Instance introuvable'];
+            $_SESSION['auth_instance_generator_flash'] = ['type' => 'error', 'message' => 'Instance introuvable'];
             $this->redirectToIndex();
         }
 
@@ -103,13 +103,13 @@ class ClientInstanceController
         $errors = $this->validatePayload($payload);
 
         if ($errors !== []) {
-            $_SESSION['instance_generator_flash'] = ['type' => 'error', 'message' => implode(' ', $errors)];
-            $_SESSION['instance_generator_old'] = $payload;
+            $_SESSION['auth_instance_generator_flash'] = ['type' => 'error', 'message' => implode(' ', $errors)];
+            $_SESSION['auth_instance_generator_old'] = $payload;
             $this->redirect('/admin/dashboard.php?page=instance-generator&action=create');
         }
 
         $id = $this->model->create($payload);
-        $_SESSION['instance_generator_flash'] = ['type' => 'success', 'message' => 'Instance créée avec succès'];
+        $_SESSION['auth_instance_generator_flash'] = ['type' => 'success', 'message' => 'Instance créée avec succès'];
         $this->redirect('/admin/dashboard.php?page=instance-generator&action=show&id=' . $id);
     }
 
@@ -120,13 +120,13 @@ class ClientInstanceController
         $errors = $this->validatePayload($payload);
 
         if ($errors !== []) {
-            $_SESSION['instance_generator_flash'] = ['type' => 'error', 'message' => implode(' ', $errors)];
-            $_SESSION['instance_generator_old'] = $payload;
+            $_SESSION['auth_instance_generator_flash'] = ['type' => 'error', 'message' => implode(' ', $errors)];
+            $_SESSION['auth_instance_generator_old'] = $payload;
             $this->redirect('/admin/dashboard.php?page=instance-generator&action=edit&id=' . $id);
         }
 
         $this->model->update($id, $payload);
-        $_SESSION['instance_generator_flash'] = ['type' => 'success', 'message' => 'Instance mise à jour'];
+        $_SESSION['auth_instance_generator_flash'] = ['type' => 'success', 'message' => 'Instance mise à jour'];
         $this->redirect('/admin/dashboard.php?page=instance-generator&action=show&id=' . $id);
     }
 
@@ -136,7 +136,7 @@ class ClientInstanceController
         $instance = $this->model->find($id);
 
         if (!$instance) {
-            $_SESSION['instance_generator_flash'] = ['type' => 'error', 'message' => 'Instance introuvable'];
+            $_SESSION['auth_instance_generator_flash'] = ['type' => 'error', 'message' => 'Instance introuvable'];
             $this->redirectToIndex();
         }
 
@@ -144,12 +144,12 @@ class ClientInstanceController
             $zipPath = $this->generatorService->generate($instance);
             $this->model->markGenerated($id, $zipPath);
 
-            $_SESSION['instance_generator_flash'] = [
+            $_SESSION['auth_instance_generator_flash'] = [
                 'type' => 'success',
                 'message' => 'Package généré: ' . $zipPath,
             ];
         } catch (Throwable $e) {
-            $_SESSION['instance_generator_flash'] = [
+            $_SESSION['auth_instance_generator_flash'] = [
                 'type' => 'error',
                 'message' => 'Erreur de génération: ' . $e->getMessage(),
             ];
@@ -232,8 +232,8 @@ class ClientInstanceController
 
     private function defaultInstance(): array
     {
-        $old = $_SESSION['instance_generator_old'] ?? [];
-        unset($_SESSION['instance_generator_old']);
+        $old = $_SESSION['auth_instance_generator_old'] ?? [];
+        unset($_SESSION['auth_instance_generator_old']);
 
         return array_merge([
             'id' => null,

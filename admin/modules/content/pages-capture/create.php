@@ -14,7 +14,7 @@
  */
 
 if (session_status() === PHP_SESSION_NONE) session_start();
-if (!isset($_SESSION['admin_id'])) { header('Location: /admin/login.php'); exit; }
+if (!isset($_SESSION['auth_admin_id'])) { header('Location: /admin/login.php'); exit; }
 
 if (!isset($pdo) && !isset($db)) {
     if (!defined('ADMIN_ROUTER')) {

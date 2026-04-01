@@ -105,7 +105,7 @@ $currentDomain = $_SERVER['HTTP_HOST'] ?? '';
 // ============================================
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $csrf = $_POST['csrf_token'] ?? '';
-    if (empty($_SESSION['csrf_token']) || !hash_equals($_SESSION['csrf_token'], $csrf)) {
+    if (empty($_SESSION['auth_csrf_token']) || !hash_equals($_SESSION['auth_csrf_token'], $csrf)) {
         $flash = "Erreur de sécurité (CSRF). Rechargez la page.";
         $flashType = 'error';
     } else {
@@ -201,7 +201,7 @@ if (file_exists($licenseLogFile)) {
     }
 }
 
-$csrfToken = $_SESSION['csrf_token'] ?? '';
+$csrfToken = $_SESSION['auth_csrf_token'] ?? '';
 ?>
 
 <style>

@@ -28,7 +28,7 @@ $serviceFile = __DIR__ . '/AdsLaunchService.php';
 if (file_exists($serviceFile)) {
     require_once $serviceFile;
     try {
-        $ads = new AdsLaunchService($db, $_SESSION['admin_id'] ?? $_SESSION['user_id'] ?? 0);
+        $ads = new AdsLaunchService($db, $_SESSION['auth_admin_id'] ?? $_SESSION['auth_user_id'] ?? 0);
         $accounts = $ads->getAccounts();
     } catch (Exception $e) {
         $accounts = [];

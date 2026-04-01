@@ -16,8 +16,8 @@ $current_module = "linkedin";
 // ====================================================
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $token = $_POST['csrf_token'] ?? '';
-    if (!hash_equals($_SESSION['csrf_token'] ?? '', $token)) {
-        $_SESSION['error_message'] = "Token CSRF invalide.";
+    if (!hash_equals($_SESSION['auth_csrf_token'] ?? '', $token)) {
+        $_SESSION['auth_error_message'] = "Token CSRF invalide.";
         header("Location: /admin/index.php?module=linkedin");
         exit;
     }
@@ -29,9 +29,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             try {
                 $stmt = $pdo->prepare("DELETE FROM social_posts WHERE id = ? AND platform = 'linkedin'");
                 $stmt->execute([$postId]);
-                $_SESSION['success_message'] = "Publication supprimée.";
+                $_SESSION['auth_success_message'] = "Publication supprimée.";
             } catch (Exception $e) {
-                $_SESSION['error_message'] = "Erreur suppression : " . $e->getMessage();
+                $_SESSION['auth_error_message'] = "Erreur suppression : " . $e->getMessage();
             }
             break;
 
@@ -39,9 +39,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             try {
                 $stmt = $pdo->prepare("UPDATE social_posts SET status = 'published', published_at = NOW() WHERE id = ? AND platform = 'linkedin'");
                 $stmt->execute([$postId]);
-                $_SESSION['success_message'] = "Publication marquée comme publiée.";
+                $_SESSION['auth_success_message'] = "Publication marquée comme publiée.";
             } catch (Exception $e) {
-                $_SESSION['error_message'] = "Erreur : " . $e->getMessage();
+                $_SESSION['auth_error_message'] = "Erreur : " . $e->getMessage();
             }
             break;
 
@@ -51,9 +51,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 try {
                     $stmt = $pdo->prepare("UPDATE social_posts SET status = 'scheduled', scheduled_at = ? WHERE id = ? AND platform = 'linkedin'");
                     $stmt->execute([$scheduledAt, $postId]);
-                    $_SESSION['success_message'] = "Publication planifiée.";
+                    $_SESSION['auth_success_message'] = "Publication planifiée.";
                 } catch (Exception $e) {
-                    $_SESSION['error_message'] = "Erreur planification : " . $e->getMessage();
+                    $_SESSION['auth_error_message'] = "Erreur planification : " . $e->getMessage();
                 }
             }
             break;
@@ -186,14 +186,14 @@ try {
 $totalPages = ceil($totalItems / $perPage);
 
 // CSRF Token
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+if (empty($_SESSION['auth_csrf_token'])) {
+    $_SESSION['auth_csrf_token'] = bin2hex(random_bytes(32));
 }
 
 // Messages flash
-$successMsg = $_SESSION['success_message'] ?? null;
-$errorMsg = $_SESSION['error_message'] ?? null;
-unset($_SESSION['success_message'], $_SESSION['error_message']);
+$successMsg = $_SESSION['auth_success_message'] ?? null;
+$errorMsg = $_SESSION['auth_error_message'] ?? null;
+unset($_SESSION['auth_success_message'], $_SESSION['auth_error_message']);
 
 ob_start();
 ?>
@@ -1272,7 +1272,7 @@ ob_start();
 
                     <?php if ($statusClass === 'draft'): ?>
                         <form method="post" style="display:inline;">
-                            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                            <input type="hidden" name="csrf_token" value="<?= $_SESSION['auth_csrf_token'] ?>">
                             <input type="hidden" name="action" value="publish">
                             <input type="hidden" name="post_id" value="<?= $pub['id'] ?>">
                             <button type="submit" class="li-pub-action success" title="Marquer comme publiée"
@@ -1283,7 +1283,7 @@ ob_start();
                     <?php endif; ?>
 
                     <form method="post" style="display:inline;">
-                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['auth_csrf_token'] ?>">
                         <input type="hidden" name="action" value="delete">
                         <input type="hidden" name="post_id" value="<?= $pub['id'] ?>">
                         <button type="submit" class="li-pub-action danger" title="Supprimer"

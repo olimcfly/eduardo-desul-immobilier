@@ -100,7 +100,7 @@ class AiDispatcher
 
         // 5. Logger l'appel entrant
         AiLogger::info("→ {$module}.{$action}", [
-            'admin_id' => $_SESSION['admin_id'] ?? 0,
+            'admin_id' => $_SESSION['auth_admin_id'] ?? 0,
             'ip'       => $_SERVER['REMOTE_ADDR'] ?? 'unknown',
         ]);
 

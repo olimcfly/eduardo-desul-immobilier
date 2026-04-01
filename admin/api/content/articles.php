@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 // ─── Auth session ───
-if (empty($_SESSION['admin_id']) && empty($_SESSION['user_id'])) {
+if (empty($_SESSION['auth_admin_id']) && empty($_SESSION['auth_user_id'])) {
     echo json_encode(['success' => false, 'error' => 'Non authentifié']); exit;
 }
 

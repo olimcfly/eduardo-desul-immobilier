@@ -14,11 +14,11 @@ require_once $_initPath;
 
 if (session_status() !== PHP_SESSION_ACTIVE) session_start();
 
-$_isAuth = !empty($_SESSION['admin_logged_in'])
-        || !empty($_SESSION['user_id'])
-        || !empty($_SESSION['admin_id'])
-        || !empty($_SESSION['logged_in'])
-        || !empty($_SESSION['is_admin']);
+$_isAuth = !empty($_SESSION['auth_admin_logged_in'])
+        || !empty($_SESSION['auth_user_id'])
+        || !empty($_SESSION['auth_admin_id'])
+        || !empty($_SESSION['auth_logged_in'])
+        || !empty($_SESSION['auth_is_admin']);
 
 if (!$_isAuth) {
     if (headers_sent()) { echo '<script>window.location="/admin/login.php";</script>'; exit; }

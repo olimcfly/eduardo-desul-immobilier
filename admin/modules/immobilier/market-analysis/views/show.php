@@ -20,7 +20,7 @@ $jsonSections = [
     </div>
 
     <form method="post" style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
-        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
+        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['auth_csrf_token'] ?? '') ?>">
         <input type="hidden" name="id" value="<?= (int) $analysis['id'] ?>">
         <button class="ma2-btn" type="submit" name="action" value="run-analysis"><i class="fas fa-play"></i> Lancer analyse</button>
         <button class="ma2-btn" type="submit" name="action" value="recalculate-keywords"><i class="fas fa-key"></i> Recalculer mots-clés</button>

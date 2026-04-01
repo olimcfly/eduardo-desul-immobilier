@@ -42,7 +42,7 @@ try {
 } catch (Exception $e) {
 }
 
-$csrf = $_SESSION['csrf_token'] ?? '';
+$csrf = $_SESSION['auth_csrf_token'] ?? '';
 ?>
 
 <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">

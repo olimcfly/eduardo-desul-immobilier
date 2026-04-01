@@ -101,7 +101,7 @@ class PromptController
         $id = (int) ($_GET['id'] ?? 0);
         $prompt = $this->model->find($id);
         if (!$prompt) {
-            $_SESSION['prompt_flash'] = ['type' => 'error', 'message' => 'Prompt introuvable'];
+            $_SESSION['auth_prompt_flash'] = ['type' => 'error', 'message' => 'Prompt introuvable'];
             header('Location: /admin/dashboard.php?page=ai-prompts');
             exit;
         }
@@ -115,7 +115,7 @@ class PromptController
     {
         $payload = $this->sanitizePayload($_POST);
         $this->model->create($payload);
-        $_SESSION['prompt_flash'] = ['type' => 'success', 'message' => 'Prompt créé avec succès'];
+        $_SESSION['auth_prompt_flash'] = ['type' => 'success', 'message' => 'Prompt créé avec succès'];
         header('Location: /admin/dashboard.php?page=ai-prompts');
         exit;
     }
@@ -125,7 +125,7 @@ class PromptController
         $id = (int) ($_POST['id'] ?? 0);
         $payload = $this->sanitizePayload($_POST);
         $this->model->update($id, $payload);
-        $_SESSION['prompt_flash'] = ['type' => 'success', 'message' => 'Prompt mis à jour'];
+        $_SESSION['auth_prompt_flash'] = ['type' => 'success', 'message' => 'Prompt mis à jour'];
         header('Location: /admin/dashboard.php?page=ai-prompts');
         exit;
     }
@@ -135,7 +135,7 @@ class PromptController
         $id = (int) ($_POST['id'] ?? 0);
         if ($id > 0) {
             $this->model->delete($id);
-            $_SESSION['prompt_flash'] = ['type' => 'success', 'message' => 'Prompt supprimé'];
+            $_SESSION['auth_prompt_flash'] = ['type' => 'success', 'message' => 'Prompt supprimé'];
         }
 
         header('Location: /admin/dashboard.php?page=ai-prompts');
@@ -150,7 +150,7 @@ class PromptController
             }
         }
 
-        $_SESSION['prompt_flash'] = ['type' => 'success', 'message' => '10 prompts système installés'];
+        $_SESSION['auth_prompt_flash'] = ['type' => 'success', 'message' => '10 prompts système installés'];
         header('Location: /admin/dashboard.php?page=ai-prompts');
         exit;
     }

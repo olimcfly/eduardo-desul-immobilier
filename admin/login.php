@@ -13,7 +13,7 @@ require_once ROOT_PATH . '/config/config.php';
 require_once ROOT_PATH . '/includes/classes/EmailService.php';
 
 /* Déjà connecté */
-$alreadyLoggedIn = !empty($_SESSION['admin_id']) && !empty($_SESSION['admin_email']) && !empty($_SESSION['admin_logged_in']);
+$alreadyLoggedIn = !empty($_SESSION['auth_admin_id']) && !empty($_SESSION['auth_admin_email']) && !empty($_SESSION['auth_admin_logged_in']);
 
 /* ─────────────────────────────────────────
    Connexion base
@@ -138,9 +138,9 @@ if (!$alreadyLoggedIn && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $otp = str_pad(random_int(0,999999),6,'0',STR_PAD_LEFT);
 
-                $_SESSION['otp'] = $otp;
-                $_SESSION['otp_email'] = $email;
-                $_SESSION['otp_time'] = time();
+                $_SESSION['auth_otp'] = $otp;
+                $_SESSION['auth_otp_email'] = $email;
+                $_SESSION['auth_otp_time'] = time();
 
                 $sendResult = sendOTPEmail($email, $otp);
 
@@ -164,22 +164,22 @@ if (!$alreadyLoggedIn && $_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $otp = sanitize($_POST['otp'] ?? '');
 
-        if (!isset($_SESSION['otp'])) {
+        if (!isset($_SESSION['auth_otp'])) {
 
             $error = "Session expirée";
             $step='email';
 
         }
 
-        elseif (time() - $_SESSION['otp_time'] > 600) {
+        elseif (time() - $_SESSION['auth_otp_time'] > 600) {
 
             $error="Code expiré";
             $step='email';
 
-            unset($_SESSION['otp']);
+            unset($_SESSION['auth_otp']);
         }
 
-        elseif (!hash_equals($_SESSION['otp'] ?? '', $otp)) {
+        elseif ($otp !== $_SESSION['auth_otp']) {
 
             $error="Code incorrect";
 
@@ -188,23 +188,23 @@ if (!$alreadyLoggedIn && $_SERVER['REQUEST_METHOD'] === 'POST') {
         else {
 
             $stmt=$db->prepare("SELECT id, email, role, name FROM admins WHERE email=? LIMIT 1");
-            $stmt->execute([$_SESSION['otp_email']]);
+            $stmt->execute([$_SESSION['auth_otp_email']]);
             $admin=$stmt->fetch();
 
-            $_SESSION['admin_id']=$admin['id'];
-            $_SESSION['admin_email']=$admin['email'];
-            $_SESSION['admin_role']=$admin['role'] ?? 'admin';
-            $_SESSION['admin_name']=$admin['name'] ?? '';
-            $_SESSION['admin_logged_in']=true;
-            $_SESSION['admin_login_time']=time();
+            $_SESSION['auth_admin_id']=$admin['id'];
+            $_SESSION['auth_admin_email']=$admin['email'];
+            $_SESSION['auth_admin_role']=$admin['role'] ?? 'admin';
+            $_SESSION['auth_admin_name']=$admin['name'] ?? '';
+            $_SESSION['auth_admin_logged_in']=true;
+            $_SESSION['auth_admin_login_time']=time();
             session_regenerate_id(true);
 
             // Mettre à jour last_login
             $db->prepare("UPDATE admins SET last_login = NOW() WHERE id = ?")->execute([$admin['id']]);
 
-            unset($_SESSION['otp']);
-            unset($_SESSION['otp_email']);
-            unset($_SESSION['otp_time']);
+            unset($_SESSION['auth_otp']);
+            unset($_SESSION['auth_otp_email']);
+            unset($_SESSION['auth_otp_time']);
 
             header("Location:/admin/dashboard.php");
             exit;
@@ -365,7 +365,7 @@ Connexion sécurisée par code OTP
 
 <p class="info">
 Code envoyé à<br>
-<strong><?= htmlspecialchars($_SESSION['otp_email'] ?? '') ?></strong>
+<strong><?= htmlspecialchars($_SESSION['auth_otp_email'] ?? '') ?></strong>
 </p>
 
 <input type="text"
@@ -389,7 +389,7 @@ Vous n'avez rien reçu ? Vérifiez aussi la webmail :<br>
 
 <form method="POST" style="margin-top:8px;">
 <input type="hidden" name="step" value="email">
-<input type="hidden" name="email" value="<?= htmlspecialchars($_SESSION['otp_email'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+<input type="hidden" name="email" value="<?= htmlspecialchars($_SESSION['auth_otp_email'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
 <button type="submit" class="secondary-btn">Renvoyer un nouveau code</button>
 </form>
 

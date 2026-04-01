@@ -1007,7 +1007,7 @@ $upcomingApts = array_slice($upcomingApts, 0, 5);
 
 <script>
 const API_URL = '/admin/api/router.php?module=rdv';
-const CSRF_TOKEN = '<?php echo $_SESSION['csrf_token'] ?? ''; ?>';
+const CSRF_TOKEN = '<?php echo $_SESSION['auth_csrf_token'] ?? ''; ?>';
 let currentRdvId = null;
 
 const rdvTypes = <?php echo json_encode($rdvTypes); ?>;

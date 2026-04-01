@@ -235,7 +235,7 @@ if ($activeTemplate && !empty($activeTemplate['fields_json'])) {
 }
 
 // ─── CSRF ───
-if (!isset($_SESSION['csrf_token'])) $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+if (!isset($_SESSION['auth_csrf_token'])) $_SESSION['auth_csrf_token'] = bin2hex(random_bytes(32));
 ?>
 
 <style>
@@ -430,7 +430,7 @@ if (!isset($_SESSION['csrf_token'])) $_SESSION['csrf_token'] = bin2hex(random_by
 
 <form method="POST" id="pgaForm">
 <input type="hidden" name="_save_page" value="1">
-<input type="hidden" name="_csrf"       value="<?= htmlspecialchars($_SESSION['csrf_token']) ?>">
+<input type="hidden" name="_csrf"       value="<?= htmlspecialchars($_SESSION['auth_csrf_token']) ?>">
 <input type="hidden" name="status"      id="pgaStatus" value="<?= htmlspecialchars($currentStatus) ?>">
 <input type="hidden" name="slug"        id="pgaSlugHidden" value="<?= $val('slug') ?>">
 

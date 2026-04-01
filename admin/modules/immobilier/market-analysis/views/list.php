@@ -34,7 +34,7 @@ $items = $pagination['items'] ?? [];
                             <div class="ma2-actions">
                                 <a class="ma2-link" href="?page=market-analysis&action=show&id=<?= (int) $analysis['id'] ?>">Voir</a>
                                 <form method="post" onsubmit="return confirm('Supprimer cette analyse ?');" style="display:inline;">
-                                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
+                                    <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['auth_csrf_token'] ?? '') ?>">
                                     <input type="hidden" name="action" value="delete">
                                     <input type="hidden" name="id" value="<?= (int) $analysis['id'] ?>">
                                     <button class="ma2-danger" type="submit"><i class="fas fa-trash"></i></button>

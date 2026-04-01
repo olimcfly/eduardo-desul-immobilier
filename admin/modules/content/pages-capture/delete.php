@@ -13,7 +13,7 @@
  */
 
 if (session_status() === PHP_SESSION_NONE) session_start();
-if (empty($_SESSION['admin_id'])) { header('Location: /admin/login.php'); exit; }
+if (empty($_SESSION['auth_admin_id'])) { header('Location: /admin/login.php'); exit; }
 
 // ─── DB ───
 if (!isset($pdo) && !isset($db)) {
@@ -46,7 +46,7 @@ if (!$rec) { header('Location: ?page=captures&msg=notfound'); exit; }
 $error = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm']) && $_POST['confirm'] === '1') {
     // CSRF check
-    if (empty($_POST['_csrf']) || $_POST['_csrf'] !== ($_SESSION['csrf_token'] ?? '')) {
+    if (empty($_POST['_csrf']) || $_POST['_csrf'] !== ($_SESSION['auth_csrf_token'] ?? '')) {
         $error = 'Token de sécurité invalide.';
     } else {
         try {
@@ -67,8 +67,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirm']) && $_POST[
 }
 
 // ─── Token CSRF ───
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+if (empty($_SESSION['auth_csrf_token'])) {
+    $_SESSION['auth_csrf_token'] = bin2hex(random_bytes(32));
 }
 
 // ─── Stats pour afficher l'impact ───
@@ -287,7 +287,7 @@ $typeLabels = [
             <form method="POST" id="deleteForm">
                 <input type="hidden" name="id"      value="<?= $pageId ?>">
                 <input type="hidden" name="confirm" value="1">
-                <input type="hidden" name="_csrf"   value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
+                <input type="hidden" name="_csrf"   value="<?= htmlspecialchars($_SESSION['auth_csrf_token'] ?? '') ?>">
 
                 <div class="cap-del-actions">
                     <a href="?page=captures&action=edit&id=<?= $pageId ?>" class="cap-btn cap-btn-outline">

@@ -258,8 +258,8 @@ if (!empty($articles)) {
 }
 
 // ─── CSRF ───
-if (!isset($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+if (!isset($_SESSION['auth_csrf_token'])) {
+    $_SESSION['auth_csrf_token'] = bin2hex(random_bytes(32));
 }
 
 // ─── Normaliser status ───

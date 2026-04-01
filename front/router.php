@@ -183,8 +183,8 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-$_SESSION['current_website'] = $website;
-$_SESSION['current_website_id'] = $website['id'] ?? null;
+$_SESSION['auth_current_website'] = $website;
+$_SESSION['auth_current_website_id'] = $website['id'] ?? null;
 
 // ========================================
 // RÉCUPÉRER L'URI DEMANDÉE

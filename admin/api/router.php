@@ -26,8 +26,8 @@ require_once dirname(__DIR__) . '/includes/init.php';
 if (!function_exists('validateCsrfToken')) {
     function validateCsrfToken($token) {
         return !empty($token)
-            && !empty($_SESSION['csrf_token'])
-            && hash_equals($_SESSION['csrf_token'], $token);
+            && !empty($_SESSION['auth_csrf_token'])
+            && hash_equals($_SESSION['auth_csrf_token'], $token);
     }
 }
 

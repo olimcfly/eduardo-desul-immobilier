@@ -29,7 +29,7 @@ class ArticleBridgeService {
         $payload = [
             'module' => 'articles',
             'action' => 'generate',
-            'csrf_token' => $_SESSION['csrf_token'] ?? null,
+            'csrf_token' => $_SESSION['auth_csrf_token'] ?? null,
             'subject' => $item['title'],
             'keywords' => $item['keyword'] ?? '',
             'word_count' => 1000,

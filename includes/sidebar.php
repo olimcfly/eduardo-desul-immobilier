@@ -283,7 +283,7 @@ $adminName = $currentAdmin['name'] ?? 'Administrator';
             </div>
             <div class="user-details">
                 <div class="user-name"><?php echo escape($adminName); ?></div>
-                <div class="user-email"><?php echo escape(substr($_SESSION['admin_email'] ?? '', 0, 20)); ?></div>
+                <div class="user-email"><?php echo escape(substr($_SESSION['auth_admin_email'] ?? '', 0, 20)); ?></div>
             </div>
         </div>
         <a href="/admin/logout.php" class="logout-btn">

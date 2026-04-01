@@ -1825,7 +1825,7 @@ async function generateAiEmailDraft() {
             headers: {
                 'Content-Type': 'application/json',
                 'X-Requested-With': 'XMLHttpRequest',
-                'X-CSRF-Token': <?= json_encode($_SESSION['csrf_token'] ?? '') ?>
+                'X-CSRF-Token': <?= json_encode($_SESSION['auth_csrf_token'] ?? '') ?>
             },
             body: JSON.stringify({
                 lead_type: leadType,

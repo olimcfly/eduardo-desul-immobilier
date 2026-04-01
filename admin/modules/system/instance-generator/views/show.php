@@ -1,6 +1,6 @@
 <?php
-$flash = $_SESSION['instance_generator_flash'] ?? null;
-unset($_SESSION['instance_generator_flash']);
+$flash = $_SESSION['auth_instance_generator_flash'] ?? null;
+unset($_SESSION['auth_instance_generator_flash']);
 
 $mask = static function (?string $value): string {
     if ($value === null || $value === '') {

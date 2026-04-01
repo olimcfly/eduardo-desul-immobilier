@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $action = $_POST['action'];
 
     // Vérifier CSRF
-    if (empty($_POST['csrf_token']) || $_POST['csrf_token'] !== ($_SESSION['csrf_token'] ?? '')) {
+    if (empty($_POST['csrf_token']) || $_POST['csrf_token'] !== ($_SESSION['auth_csrf_token'] ?? '')) {
         $message = 'Token de sécurité invalide.';
         $messageType = 'error';
     } else {
@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     if (!empty($_POST['modules']) && is_array($_POST['modules'])) {
                         $ins = $pdo->prepare("INSERT INTO admin_module_permissions (admin_id, module_slug, is_allowed, granted_by) VALUES (?, ?, 1, ?)");
                         foreach ($_POST['modules'] as $slug) {
-                            $ins->execute([$newAdminId, $slug, $_SESSION['admin_id']]);
+                            $ins->execute([$newAdminId, $slug, $_SESSION['auth_admin_id']]);
                         }
                     }
 
@@ -85,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 if (!empty($_POST['modules']) && is_array($_POST['modules'])) {
                     $ins = $pdo->prepare("INSERT INTO admin_module_permissions (admin_id, module_slug, is_allowed, granted_by) VALUES (?, ?, 1, ?)");
                     foreach ($_POST['modules'] as $slug) {
-                        $ins->execute([$targetId, $slug, $_SESSION['admin_id']]);
+                        $ins->execute([$targetId, $slug, $_SESSION['auth_admin_id']]);
                     }
                 }
 
@@ -100,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $newState = (int)($_POST['is_active'] ?? 0);
 
             // Ne pas se désactiver soi-même
-            if ($targetId === (int)$_SESSION['admin_id']) {
+            if ($targetId === (int)$_SESSION['auth_admin_id']) {
                 $message = 'Vous ne pouvez pas vous désactiver vous-même.';
                 $messageType = 'error';
             } else {
@@ -115,7 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         elseif ($action === 'delete_admin') {
             $targetId = (int)($_POST['admin_id'] ?? 0);
 
-            if ($targetId === (int)$_SESSION['admin_id']) {
+            if ($targetId === (int)$_SESSION['auth_admin_id']) {
                 $message = 'Vous ne pouvez pas supprimer votre propre compte.';
                 $messageType = 'error';
             } else {
@@ -376,7 +376,7 @@ $moduleLabels = [
                 <i class="fas fa-key"></i> Modules
             </button>
             <form method="POST" style="display:inline">
-                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
+                <input type="hidden" name="csrf_token" value="<?= $_SESSION['auth_csrf_token'] ?? '' ?>">
                 <input type="hidden" name="action" value="toggle_active">
                 <input type="hidden" name="admin_id" value="<?= $admin['id'] ?>">
                 <input type="hidden" name="is_active" value="<?= $isActive ? '0' : '1' ?>">
@@ -386,7 +386,7 @@ $moduleLabels = [
                 </button>
             </form>
             <form method="POST" style="display:inline" onsubmit="return confirm('Supprimer cet utilisateur ?')">
-                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
+                <input type="hidden" name="csrf_token" value="<?= $_SESSION['auth_csrf_token'] ?? '' ?>">
                 <input type="hidden" name="action" value="delete_admin">
                 <input type="hidden" name="admin_id" value="<?= $admin['id'] ?>">
                 <button type="submit" class="btn-danger"><i class="fas fa-trash"></i></button>
@@ -417,7 +417,7 @@ $moduleLabels = [
     <div class="modal">
         <h3><i class="fas fa-user-plus" style="color:#6366f1;margin-right:8px"></i>Nouvel administrateur</h3>
         <form method="POST">
-            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
+            <input type="hidden" name="csrf_token" value="<?= $_SESSION['auth_csrf_token'] ?? '' ?>">
             <input type="hidden" name="action" value="create_admin">
 
             <label>Nom complet</label>
@@ -461,7 +461,7 @@ $moduleLabels = [
     <div class="modal">
         <h3><i class="fas fa-key" style="color:#6366f1;margin-right:8px"></i>Modifier les modules</h3>
         <form method="POST" id="permissionsForm">
-            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
+            <input type="hidden" name="csrf_token" value="<?= $_SESSION['auth_csrf_token'] ?? '' ?>">
             <input type="hidden" name="action" value="update_permissions">
             <input type="hidden" name="admin_id" id="permAdminId" value="">
 

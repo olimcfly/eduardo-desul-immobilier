@@ -19,7 +19,7 @@ if ($_standalone) {
     // CSRF check for POST
     if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
         $csrfToken = $_POST['csrf_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
-        if (empty($csrfToken) || $csrfToken !== ($_SESSION['csrf_token'] ?? '')) {
+        if (empty($csrfToken) || $csrfToken !== ($_SESSION['auth_csrf_token'] ?? '')) {
             echo json_encode(['success' => false, 'error' => 'Token CSRF invalide']);
             exit;
         }
@@ -30,7 +30,7 @@ if ($_standalone) {
         'action' => $_GET['action'] ?? $_POST['action'] ?? 'list',
         'method' => $_SERVER['REQUEST_METHOD'],
         'params' => array_merge($_GET, $_POST),
-        'admin_id' => $_SESSION['admin_id'] ?? null,
+        'admin_id' => $_SESSION['auth_admin_id'] ?? null,
     ];
 }
 

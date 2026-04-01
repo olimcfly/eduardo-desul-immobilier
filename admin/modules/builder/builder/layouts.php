@@ -20,7 +20,7 @@ $flashType = 'success';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $action = $_POST['action'];
     $token  = $_POST['csrf_token'] ?? '';
-    if (!isset($_SESSION['csrf_token']) || $token !== $_SESSION['csrf_token']) {
+    if (!isset($_SESSION['auth_csrf_token']) || $token !== $_SESSION['auth_csrf_token']) {
         $flash = 'Erreur de sécurité (CSRF). Rechargez la page.';
         $flashType = 'error';
     } else {
@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     }
 }
 
-if (!isset($_SESSION['csrf_token'])) $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+if (!isset($_SESSION['auth_csrf_token'])) $_SESSION['auth_csrf_token'] = bin2hex(random_bytes(32));
 
 $filterContext = $_GET['context'] ?? '';
 try {
@@ -285,7 +285,7 @@ ob_start();
 <div class="lm-panel" id="layoutForm" style="<?= (!$editLayout&&!isset($_GET['create']))?'display:none':'' ?>">
     <h2><i class="fas fa-<?= $editLayout?'edit':'plus-circle' ?>"></i> <?= $editLayout?'Modifier le layout':'Nouveau layout' ?></h2>
     <form method="POST">
-        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+        <input type="hidden" name="csrf_token" value="<?= $_SESSION['auth_csrf_token'] ?>">
         <input type="hidden" name="action"     value="<?= $editLayout?'update':'create' ?>">
         <?php if($editLayout): ?><input type="hidden" name="id" value="<?= $editLayout['id'] ?>"><?php endif; ?>
         <div class="lm-grid">
@@ -380,7 +380,7 @@ ob_start();
             <div class="lm-actions">
                 <?php if(!$isDef): ?>
                 <form method="POST" style="display:inline;" onsubmit="return confirm('Définir par défaut pour « <?= $ctx['label'] ?> » ?');">
-                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['auth_csrf_token'] ?>">
                     <input type="hidden" name="action"  value="set_default">
                     <input type="hidden" name="id"      value="<?= $layout['id'] ?>">
                     <input type="hidden" name="context" value="<?= $layout['context'] ?>">
@@ -390,7 +390,7 @@ ob_start();
                 <a href="layouts.php?edit=<?= $layout['id'] ?>" class="lm-ico" title="Modifier"><i class="fas fa-edit"></i></a>
                 <?php if(!$isDef&&$tplCount===0): ?>
                 <form method="POST" style="display:inline;" onsubmit="return confirm('Supprimer « <?= htmlspecialchars(addslashes($layout['name'])) ?> » ?');">
-                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['auth_csrf_token'] ?>">
                     <input type="hidden" name="action" value="delete">
                     <input type="hidden" name="id"     value="<?= $layout['id'] ?>">
                     <button type="submit" class="lm-ico d" title="Supprimer"><i class="fas fa-trash"></i></button>

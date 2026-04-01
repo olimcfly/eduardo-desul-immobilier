@@ -9,7 +9,7 @@
 $adminInit = __DIR__ . '/../../../includes/init.php';
 if (file_exists($adminInit)) {
     require_once $adminInit;
-    if (!isset($_SESSION['admin_logged_in']) || !$_SESSION['admin_logged_in']) {
+    if (!isset($_SESSION['auth_admin_logged_in']) || !$_SESSION['auth_admin_logged_in']) {
         http_response_code(403);
         echo json_encode(['success'=>false,'error'=>'Non autorisé']);
         exit;
@@ -17,7 +17,7 @@ if (file_exists($adminInit)) {
 } else {
     // Fallback : vérifier session manuellement
     session_start();
-    if (empty($_SESSION['admin_logged_in'])) {
+    if (empty($_SESSION['auth_admin_logged_in'])) {
         http_response_code(403);
         echo json_encode(['success'=>false,'error'=>'Non autorisé']);
         exit;

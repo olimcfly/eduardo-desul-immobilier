@@ -12,7 +12,7 @@ class LaunchpadSession {
     
     public function __construct($pdo, $user_id = null) {
         $this->pdo = $pdo;
-        $this->user_id = $user_id ?? ($_SESSION['user_id'] ?? null);
+        $this->user_id = $user_id ?? ($_SESSION['auth_user_id'] ?? null);
         
         if (!$this->user_id) {
             throw new Exception('User ID required');

@@ -43,7 +43,7 @@ try {
     
     // VÉRIFIER LE STATUT
     $isPreview = isset($_GET['preview']) && $_GET['preview'] === '1';
-    $isAdmin = isset($_SESSION['user_id']); // À adapter selon ta session
+    $isAdmin = isset($_SESSION['auth_user_id']); // À adapter selon ta session
     
     if ($page['status'] === 'draft' && !$isPreview && !$isAdmin) {
         // PAGE EN BROUILLON - REFUSER L'ACCÈS
