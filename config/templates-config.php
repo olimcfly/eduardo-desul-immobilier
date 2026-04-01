@@ -21,60 +21,90 @@ return [
         // ─── HOME ────────────────────────────────────────
         'home' => [
             'name' => 'Accueil',
-            'description' => 'Page d\'accueil avec hero, services, CTA et témoignages',
+            'description' => 'Page d\'accueil haut de gamme - Eduardo De Sul',
             'icon' => 'fas fa-home',
             'blocks' => [
                 'hero' => [
-                    'type' => 'hero',
+                    'type' => 'home_hero',
                     'label' => 'Hero principal',
-                    'description' => 'Section héro avec titre, sous-titre et image de fond',
+                    'description' => 'Section héro avec titre, sous-titre, 2 CTA et badge',
                     'fields' => [
-                        'title' => ['type' => 'text', 'label' => 'Titre', 'required' => true],
+                        'title' => ['type' => 'text', 'label' => 'Titre principal', 'required' => true],
                         'subtitle' => ['type' => 'textarea', 'label' => 'Sous-titre'],
                         'background_image' => ['type' => 'image', 'label' => 'Image de fond'],
-                        'button_text' => ['type' => 'text', 'label' => 'Texte du bouton'],
-                        'button_url' => ['type' => 'url', 'label' => 'URL du bouton'],
-                        'background_color' => ['type' => 'color', 'label' => 'Couleur fond (fallback)'],
+                        'cta_primary_text' => ['type' => 'text', 'label' => 'CTA primaire - Texte'],
+                        'cta_primary_url' => ['type' => 'url', 'label' => 'CTA primaire - URL'],
+                        'cta_secondary_text' => ['type' => 'text', 'label' => 'CTA secondaire - Texte'],
+                        'cta_secondary_url' => ['type' => 'url', 'label' => 'CTA secondaire - URL'],
+                        'badge' => ['type' => 'text', 'label' => 'Badge (ex: "Depuis 15 ans")'],
                     ]
                 ],
                 'services' => [
-                    'type' => 'features',
+                    'type' => 'home_services',
                     'label' => 'Services',
-                    'description' => 'Section avec liste de services/bénéfices',
+                    'description' => 'Titre + 3 services (icône, titre, description, lien)',
                     'fields' => [
-                        'section_title' => ['type' => 'text', 'label' => 'Titre section'],
-                        'section_subtitle' => ['type' => 'textarea', 'label' => 'Sous-titre section'],
-                        'items' => ['type' => 'repeater', 'label' => 'Services', 'item_fields' => [
-                            'icon' => ['type' => 'text', 'label' => 'Icône (emoji ou class FontAwesome)'],
-                            'title' => ['type' => 'text', 'label' => 'Titre'],
-                            'description' => ['type' => 'textarea', 'label' => 'Description'],
+                        'headline' => ['type' => 'text', 'label' => 'Titre section', 'required' => true],
+                        'card_1_icon' => ['type' => 'text', 'label' => 'Service 1 - Icône'],
+                        'card_1_title' => ['type' => 'text', 'label' => 'Service 1 - Titre'],
+                        'card_1_description' => ['type' => 'textarea', 'label' => 'Service 1 - Description'],
+                        'card_1_link' => ['type' => 'url', 'label' => 'Service 1 - Lien'],
+                        'card_2_icon' => ['type' => 'text', 'label' => 'Service 2 - Icône'],
+                        'card_2_title' => ['type' => 'text', 'label' => 'Service 2 - Titre'],
+                        'card_2_description' => ['type' => 'textarea', 'label' => 'Service 2 - Description'],
+                        'card_2_link' => ['type' => 'url', 'label' => 'Service 2 - Lien'],
+                        'card_3_icon' => ['type' => 'text', 'label' => 'Service 3 - Icône'],
+                        'card_3_title' => ['type' => 'text', 'label' => 'Service 3 - Titre'],
+                        'card_3_description' => ['type' => 'textarea', 'label' => 'Service 3 - Description'],
+                        'card_3_link' => ['type' => 'url', 'label' => 'Service 3 - Lien'],
+                    ]
+                ],
+                'advisor_intro' => [
+                    'type' => 'home_advisor',
+                    'label' => 'Présentation Conseiller',
+                    'description' => 'Présentation du conseiller avec photo et bio courte',
+                    'fields' => [
+                        'photo' => ['type' => 'image', 'label' => 'Photo du conseiller'],
+                        'name' => ['type' => 'text', 'label' => 'Nom', 'required' => true],
+                        'title' => ['type' => 'text', 'label' => 'Titre/Fonction'],
+                        'bio_short' => ['type' => 'textarea', 'label' => 'Bio courte (2-3 lignes)'],
+                        'cta_text' => ['type' => 'text', 'label' => 'CTA - Texte'],
+                        'cta_url' => ['type' => 'url', 'label' => 'CTA - URL'],
+                    ]
+                ],
+                'social_proof' => [
+                    'type' => 'home_social_proof',
+                    'label' => 'Preuve sociale',
+                    'description' => 'Nombre d\'avis, note, CTA Google Reviews',
+                    'fields' => [
+                        'stars' => ['type' => 'number', 'label' => 'Note (ex: 4.8)', 'required' => true],
+                        'count' => ['type' => 'number', 'label' => 'Nombre d\'avis', 'required' => true],
+                        'cta_text' => ['type' => 'text', 'label' => 'Texte CTA Google', 'value' => 'Voir nos avis'],
+                        'cta_url' => ['type' => 'url', 'label' => 'Lien Google Reviews'],
+                    ]
+                ],
+                'sectors' => [
+                    'type' => 'home_sectors',
+                    'label' => 'Secteurs d\'intervention',
+                    'description' => 'Titre + liste de secteurs avec liens',
+                    'fields' => [
+                        'headline' => ['type' => 'text', 'label' => 'Titre section'],
+                        'items' => ['type' => 'repeater', 'label' => 'Secteurs', 'item_fields' => [
+                            'name' => ['type' => 'text', 'label' => 'Nom secteur'],
+                            'slug' => ['type' => 'text', 'label' => 'URL slug'],
                         ]],
                     ]
                 ],
-                'cta' => [
-                    'type' => 'cta',
-                    'label' => 'Appel à l\'action',
-                    'description' => 'Section CTA avec texte et bouton',
+                'cta_final' => [
+                    'type' => 'home_cta_final',
+                    'label' => 'Appel à l\'action final',
+                    'description' => 'CTA final avec message de rassurance',
                     'fields' => [
-                        'headline' => ['type' => 'text', 'label' => 'Titre principal'],
-                        'description' => ['type' => 'textarea', 'label' => 'Description'],
-                        'button_text' => ['type' => 'text', 'label' => 'Texte du bouton'],
-                        'button_url' => ['type' => 'url', 'label' => 'URL du bouton'],
-                        'background_color' => ['type' => 'color', 'label' => 'Couleur fond'],
-                    ]
-                ],
-                'testimonials' => [
-                    'type' => 'testimonials',
-                    'label' => 'Témoignages',
-                    'description' => 'Section avec témoignages clients',
-                    'fields' => [
-                        'section_title' => ['type' => 'text', 'label' => 'Titre section'],
-                        'items' => ['type' => 'repeater', 'label' => 'Témoignages', 'item_fields' => [
-                            'name' => ['type' => 'text', 'label' => 'Nom client'],
-                            'role' => ['type' => 'text', 'label' => 'Rôle/Situation'],
-                            'text' => ['type' => 'textarea', 'label' => 'Témoignage'],
-                            'image' => ['type' => 'image', 'label' => 'Photo'],
-                        ]],
+                        'headline' => ['type' => 'text', 'label' => 'Titre principal', 'required' => true],
+                        'subtext' => ['type' => 'textarea', 'label' => 'Sous-texte'],
+                        'cta_text' => ['type' => 'text', 'label' => 'CTA - Texte'],
+                        'cta_url' => ['type' => 'url', 'label' => 'CTA - URL'],
+                        'reassurance' => ['type' => 'text', 'label' => 'Message rassurance (ex: "Sans engagement")'],
                     ]
                 ],
             ]
