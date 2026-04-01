@@ -7,9 +7,20 @@
  * MODIF v3.1 :
  *   - getList()   : ajout filtre 'search' (LIKE sur title)
  *   - countList() : nouvelle methode pour la pagination
+ *
+ * MODIF v3.2 (P1-4):
+ *   - Inherit from BaseController for centralized error handling
+ *   - Use ErrorHandler::log() instead of silent error_log()
  */
 
-class JournalController
+if (!class_exists('BaseController')) {
+    require_once dirname(__FILE__, 4) . '/classes/BaseController.php';
+}
+if (!class_exists('ErrorHandler')) {
+    require_once dirname(__FILE__, 4) . '/classes/ErrorHandler.php';
+}
+
+class JournalController extends BaseController
 {
     private PDO $db;
 
@@ -88,9 +99,10 @@ class JournalController
     // CONSTRUCTEUR
     // ================================================================
 
-    public function __construct(PDO $db)
+    public function __construct(PDO $db = null)
     {
-        $this->db = $db;
+        parent::__construct();
+        $this->db = $db ?? $this->db;
     }
 
     // ================================================================
@@ -366,7 +378,9 @@ class JournalController
                 "SELECT id, nom, slug FROM secteurs WHERE status = 'active' ORDER BY nom"
             )->fetchAll(PDO::FETCH_ASSOC);
             if (!empty($rows)) return $rows;
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+            ErrorHandler::log($e, 'JournalController::getSecteurs', ['fallback' => 'using default secteurs']);
+        }
 
         return [
             ['id' =>  1, 'nom' => 'Bordeaux Centre',    'slug' => 'bordeaux-centre'],
@@ -397,6 +411,7 @@ class JournalController
                 "SELECT id, nom, slug, categorie FROM neuropersona_types WHERE status = 'active' ORDER BY nom"
             )->fetchAll(PDO::FETCH_ASSOC);
         } catch (\Exception $e) {
+            ErrorHandler::log($e, 'JournalController::getPersonas', ['fallback' => 'empty array']);
             return [];
         }
     }
@@ -415,7 +430,9 @@ class JournalController
                 $decoded        = json_decode($r['config_value'], true);
                 $config[$r['config_key']] = ($decoded !== null) ? $decoded : $r['config_value'];
             }
-        } catch (\Exception $e) {}
+        } catch (\Exception $e) {
+            ErrorHandler::log($e, 'JournalController::getConfig', ['fallback' => 'empty config']);
+        }
         return $config;
     }
 
@@ -673,6 +690,7 @@ class JournalController
             $this->db->query("SELECT 1 FROM editorial_journal LIMIT 1");
             return true;
         } catch (\Exception $e) {
+            ErrorHandler::log($e, 'JournalController::tableExists', ['table' => 'editorial_journal']);
             return false;
         }
     }
