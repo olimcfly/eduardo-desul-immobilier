@@ -622,7 +622,8 @@ class GmbScraperController
             );
             $stmt->execute([':cid' => $contactId, ':lid' => $listId]);
             // Update count
-            $this->db->exec("UPDATE gmb_contact_lists SET contacts_count = (SELECT COUNT(*) FROM gmb_contact_list_members WHERE list_id = {$listId}) WHERE id = {$listId}");
+            $stmt = $this->db->prepare("UPDATE gmb_contact_lists SET contacts_count = (SELECT COUNT(*) FROM gmb_contact_list_members WHERE list_id = ?) WHERE id = ?");
+            $stmt->execute([$listId, $listId]);
             return true;
         } catch (PDOException $e) {
             return false;
@@ -633,7 +634,8 @@ class GmbScraperController
     {
         $stmt = $this->db->prepare("DELETE FROM gmb_contact_list_members WHERE contact_id = :cid AND list_id = :lid");
         $stmt->execute([':cid' => $contactId, ':lid' => $listId]);
-        $this->db->exec("UPDATE gmb_contact_lists SET contacts_count = (SELECT COUNT(*) FROM gmb_contact_list_members WHERE list_id = {$listId}) WHERE id = {$listId}");
+        $stmt = $this->db->prepare("UPDATE gmb_contact_lists SET contacts_count = (SELECT COUNT(*) FROM gmb_contact_list_members WHERE list_id = ?) WHERE id = ?");
+        $stmt->execute([$listId, $listId]);
         return true;
     }
 
