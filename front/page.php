@@ -13,8 +13,9 @@ require_once $root . '/config/database.php';
 if (file_exists($root . '/includes/maintenance-check.php')) {
     require_once $root . '/includes/maintenance-check.php';
 }
+if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
 
-$db = getDB();
+$db = Database::getInstance();
 $renderers = __DIR__ . '/renderers/';
 
 // ─────────────────────────────────────────────────────────
@@ -25,7 +26,7 @@ if (!function_exists('siteName')) { function siteName(): string { return SITE_TI
 if (!function_exists('_ss')) {
     function _ss(string $key, string $default = ''): string {
         try {
-            $db = getDB();
+            $db = Database::getInstance();
             $s = $db->prepare("SELECT value FROM settings WHERE name=? LIMIT 1");
             $s->execute([$key]);
             return $s->fetchColumn() ?: $default;

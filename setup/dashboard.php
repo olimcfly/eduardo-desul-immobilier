@@ -26,8 +26,9 @@ $admin_email = $_SESSION['admin_email'];
 // 2. CONNEXION BD VIA CONFIG
 // ═══════════════════════════════════════════════════════════
 
+if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
 try {
-    $db = getDB();
+    $db = Database::getInstance();
 } catch (Exception $e) {
     die('Erreur BD: ' . $e->getMessage());
 }

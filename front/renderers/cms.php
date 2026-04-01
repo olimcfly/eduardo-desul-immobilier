@@ -13,8 +13,9 @@ if (!defined('FRONT_ROUTER')) {
     exit('Accès direct interdit.');
 }
 
+if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
 global $db;
-if (!$db) $db = getDB();
+if (!$db) $db = Database::getInstance();
 
 $pageSlug = $pageSlug ?? $_GET['slug'] ?? '';
 if ($pageSlug === '') {
