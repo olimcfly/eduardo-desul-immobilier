@@ -1,470 +1,394 @@
 <?php
 /**
- * SIDEBAR — IMMO LOCAL+
+ * SIDEBAR — IMMO LOCAL+ (Mode Strict - 7 entrées)
  * /admin/layout/sidebar.php
+ *
+ * Spécifications:
+ * - 7 entrées MAXIMUM (+ 1 Paramètres en bas)
+ * - Icônes emoji + FontAwesome
+ * - Responsive: 72px sur <1024px (icônes uniquement + tooltips CSS)
+ * - Tooltips CSS pur
+ * - État "active" : fond #EEF2FF, texte #6366F1
  */
-$activeModule = $activeModule ?? ($_GET['page'] ?? 'dashboard');
 
-// ── Infos conseiller ────────────────────────────────────────
-$advisorName = 'Mon espace';
-try {
-    $r = $pdo->query("SELECT field_value FROM advisor_context WHERE field_key='advisor_name' LIMIT 1")->fetch();
-    if ($r) $advisorName = $r['field_value'];
-} catch (Exception $e) {}
+$currentSection = $_GET['section'] ?? 'dashboard';
 
-// ── Structure de navigation ──────────────────────────────────
-$sidebarGroups = [
+// Sidebar items: 7 sections principales
+$sidebarSections = [
     [
-        'id' => 'grp-build', 'label' => '🧱 Construire',
-        'description' => 'Poser les bases',
-        'icon' => 'fa-brick', 'color' => '#f97316',
-        'slugs' => ['launchpad','neuropersona','strategy-module','analyse-marche','secteurs','scraper-gmb'],
-        'children' => [
-            ['slug'=>'launchpad',      'icon'=>'fa-rocket',       'label'=>'Plan de lancement'],
-            ['slug'=>'neuropersona',   'icon'=>'fa-user',         'label'=>'NeuroPersona'],
-            ['slug'=>'strategy-module','icon'=>'fa-bullseye',     'label'=>'Strat&eacute;gie globale'],
-            ['slug'=>'analyse-marche', 'icon'=>'fa-chart-pie',    'label'=>'Analyse de march&eacute;', 'badge'=>'SOON'],
-            ['slug'=>'secteurs',       'icon'=>'fa-map-pin',      'label'=>'Zones de prospection'],
-            ['slug'=>'scraper-gmb',    'icon'=>'fa-binoculars',   'label'=>'Trouver des partenaires'],
-        ],
+        'emoji' => '🧱',
+        'label' => 'Construire',
+        'description' => 'Configurer votre activité',
+        'url' => '?section=construire',
     ],
     [
-        'id' => 'grp-setup', 'label' => '🌐 Mettre en place',
-        'description' => 'Votre syst&egrave;me digital',
-        'icon' => 'fa-globe', 'color' => '#0ea5e9',
-        'slugs' => ['pages','menus','estimateur','captures','sequences','campagnes'],
-        'children' => [
-            ['slug'=>'pages',     'icon'=>'fa-file-lines',       'label'=>'Mes pages'],
-            ['slug'=>'menus',     'icon'=>'fa-bars',             'label'=>'Menus'],
-            ['slug'=>'estimateur', 'icon'=>'fa-sliders',         'label'=>'Estimateur (config)'],
-            ['slug'=>'captures',   'icon'=>'fa-bolt',            'label'=>'Pages de capture'],
-            ['slug'=>'sequences',  'icon'=>'fa-list-check',      'label'=>'S&eacute;quences email'],
-            ['slug'=>'campagnes',  'icon'=>'fa-paper-plane',     'label'=>'Campagnes email'],
-        ],
+        'emoji' => '🧲',
+        'label' => 'Attirer',
+        'description' => 'Générer des leads vendeurs',
+        'url' => '?section=attirer',
     ],
     [
-        'id' => 'grp-attract', 'label' => '🚀 Attirer',
-        'description' => 'G&eacute;n&eacute;rer des vendeurs',
-        'icon' => 'fa-rocket', 'color' => '#ef4444',
-        'slugs' => ['guide-local','articles','ressources','seo-semantic','seo','local-seo','reseaux-sociaux','facebook','instagram','linkedin','tiktok','gmb','image-editor','visual-studio','seo-strategie'],
-        'children' => [
-            ['slug'=>'guide-local',  'icon'=>'fa-map',              'label'=>'Guide du quartier', 'badge'=>'NEW'],
-            ['slug'=>'articles',     'icon'=>'fa-newspaper',        'label'=>'Mes articles'],
-            ['slug'=>'ressources',   'icon'=>'fa-book-open',        'label'=>'Guides &amp; ressources', 'badge'=>'NEW'],
-            ['slug'=>'seo-semantic', 'icon'=>'fa-chart-bar',        'label'=>'Mots-cl&eacute;s &amp; s&eacute;mantique'],
-            ['slug'=>'seo',          'icon'=>'fa-magnifying-glass', 'label'=>'Mon r&eacute;f&eacute;rencement'],
-            ['slug'=>'local-seo',    'icon'=>'fa-location-dot',     'label'=>'Google My Business'],
-            ['slug'=>'reseaux-sociaux','icon'=>'fa-share-nodes',  'label'=>"Vue d'ensemble"],
-            ['slug'=>'facebook',       'icon'=>'fab fa-facebook', 'label'=>'Facebook'],
-            ['slug'=>'instagram',      'icon'=>'fab fa-instagram','label'=>'Instagram'],
-            ['slug'=>'linkedin',       'icon'=>'fab fa-linkedin', 'label'=>'LinkedIn'],
-            ['slug'=>'tiktok',         'icon'=>'fab fa-tiktok',   'label'=>'TikTok'],
-            ['slug'=>'gmb',            'icon'=>'fab fa-google',    'label'=>'Google My Business'],
-            ['slug'=>'image-editor',   'icon'=>'fa-image',        'label'=>"Éditeur d'images IA", 'badge'=>'NEW'],
-            ['slug'=>'visual-studio',  'icon'=>'fa-wand-magic-sparkles', 'label'=>'Studio Visuel IA', 'badge'=>'NEW'],
-            ['slug'=>'seo-strategie',  'icon'=>'fa-bullhorn',     'label'=>'SEO strat&eacute;gie', 'badge'=>'SOON'],
-        ],
+        'emoji' => '🔄',
+        'label' => 'Convertir',
+        'description' => 'Transformer en mandats',
+        'url' => '?section=convertir',
     ],
     [
-        'id' => 'grp-capture', 'label' => '🧲 Capturer',
-        'description' => 'Transformer en contacts',
-        'icon' => 'fa-horseshoe', 'color' => '#3b82f6',
-        'slugs' => ['leads','crm','messagerie'],
-        'children' => [
-            ['slug'=>'leads',       'icon'=>'fa-user-plus',      'label'=>'Leads entrants'],
-            ['slug'=>'crm',         'icon'=>'fa-address-book',   'label'=>'CRM contacts'],
-            ['slug'=>'messagerie',  'icon'=>'fa-comments',       'label'=>'Messagerie'],
-        ],
+        'emoji' => '🏠',
+        'label' => 'Vendre',
+        'description' => 'Finaliser les transactions',
+        'url' => '?section=vendre',
     ],
     [
-        'id' => 'grp-convert', 'label' => '🤝 Convertir',
-        'description' => 'Transformer en clients',
-        'icon' => 'fa-handshake', 'color' => '#eab308',
-        'slugs' => ['rdv','financement','emails','properties','estimation','transactions'],
-        'children' => [
-            ['slug'=>'rdv',          'icon'=>'fa-calendar-check',  'label'=>'Rendez-vous'],
-            ['slug'=>'financement',  'icon'=>'fa-piggy-bank',      'label'=>'Financement'],
-            ['slug'=>'emails',       'icon'=>'fa-envelope-open-text','label'=>'Emails automatiques'],
-            ['slug'=>'properties',   'icon'=>'fa-house',           'label'=>'Mandats / biens'],
-            ['slug'=>'estimation',   'icon'=>'fa-calculator',      'label'=>'Estimations re&ccedil;ues'],
-        ],
+        'emoji' => '⚡',
+        'label' => 'Automatiser',
+        'description' => 'Automatiser les tâches répétitives',
+        'url' => '?section=automatiser',
     ],
     [
-        'id' => 'grp-optimize', 'label' => '📈 Optimiser',
-        'description' => 'Am&eacute;liorer vos r&eacute;sultats',
-        'icon' => 'fa-chart-line', 'color' => '#8b5cf6',
-        'slugs' => ['analytics','market-analyzer','scoring'],
-        'children' => [
-            ['slug'=>'analytics',      'icon'=>'fa-chart-line',     'label'=>'Mes statistiques'],
-            ['slug'=>'market-analyzer','icon'=>'fa-chart-pie',      'label'=>'Analyseur March&eacute;', 'badge'=>'NEW'],
-            ['slug'=>'scoring',        'icon'=>'fa-star-half-stroke','label'=>'Score prospects'],
-        ],
+        'emoji' => '📊',
+        'label' => 'Analyser',
+        'description' => 'Piloter vos performances',
+        'url' => '?section=analyser',
     ],
     [
-        'id' => 'grp-assistant', 'label' => '🤖 Assistant',
-        'description' => 'IA &agrave; votre service',
-        'icon' => 'fa-robot', 'color' => '#6366f1',
-        'slugs' => ['ai','ai-prompts','agents','advisor-context'],
-        'children' => [
-            ['slug'=>'ai',              'icon'=>'fa-robot',       'label'=>'Assistant IA'],
-            ['slug'=>'ai-prompts',      'icon'=>'fa-scroll',      'label'=>'Mes prompts'],
-            ['slug'=>'agents',          'icon'=>'fa-microchip',   'label'=>'Agents automatiques'],
-            ['slug'=>'advisor-context', 'icon'=>'fa-user-circle', 'label'=>'Mon profil IA', 'badge'=>'NEW'],
-        ],
-    ],
-    [
-        'id' => 'grp-settings', 'label' => '⚙️ Param&egrave;tres',
-        'description' => 'Compte &amp; pr&eacute;f&eacute;rences',
-        'icon' => 'fa-gear', 'color' => '#64748b',
-        'slugs' => ['modules','settings','maintenance','license','api-keys','ai-settings','users','instance-generator'],
-        'children' => array_merge(
-            isSuperUser() ? [['slug'=>'users', 'icon'=>'fa-users-gear', 'label'=>'Utilisateurs', 'badge'=>'SU']] : [],
-            [
-                ['slug'=>'modules',     'icon'=>'fa-puzzle-piece', 'label'=>'Modules &amp; sant&eacute;'],
-                ['slug'=>'settings',    'icon'=>'fa-sliders',      'label'=>'Configuration'],
-                ['slug'=>'instance-generator', 'icon'=>'fa-boxes-stacked', 'label'=>'G&eacute;n&eacute;rateur d’instance client', 'badge'=>'NEW'],
-                ['slug'=>'api-keys',    'icon'=>'fa-key',          'label'=>'Cl&eacute;s API'],
-                ['slug'=>'ai-settings', 'icon'=>'fa-robot',        'label'=>'Param&egrave;tres AI'],
-                ['slug'=>'maintenance', 'icon'=>'fa-wrench',       'label'=>'Maintenance'],
-                ['slug'=>'license',     'icon'=>'fa-shield-check', 'label'=>'Ma licence'],
-            ]
-        ),
+        'emoji' => '🎯',
+        'label' => 'Optimiser',
+        'description' => 'Améliorer en continu',
+        'url' => '?section=optimiser',
     ],
 ];
 
-// Groupe actif
-$autoOpenGroup = '';
-foreach ($sidebarGroups as $grp) {
-    if (in_array($activeModule, $grp['slugs'])) {
-        $autoOpenGroup = $grp['id'];
-        break;
+// Infos utilisateur (dynamiques)
+$advisorName = 'Mon espace';
+$advisorCity = '';
+try {
+    $stmt = $pdo->query("SELECT field_key, field_value FROM advisor_context
+                         WHERE field_key IN ('advisor_name', 'advisor_city')");
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($rows as $row) {
+        if ($row['field_key'] === 'advisor_name') {
+            $advisorName = htmlspecialchars($row['field_value']);
+        }
+        if ($row['field_key'] === 'advisor_city') {
+            $advisorCity = htmlspecialchars($row['field_value']);
+        }
     }
+} catch (Exception $e) {
+    error_log('Sidebar: ' . $e->getMessage());
 }
 ?>
 
 <style>
-/* ===============================================
-   SIDEBAR — clic fixe + sections distinctes
-=============================================== */
+/* ============================================
+   IMMO LOCAL+ SIDEBAR — Mode Strict Minimaliste
+   ============================================ */
 
-.sb-group-wrap .sb-children {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height .28s ease, opacity .2s ease;
-    opacity: 0;
-}
+:root {
+    --color-primary: #6366F1;
+    --color-primary-light: #EEF2FF;
+    --color-white: #FFFFFF;
+    --color-gray-50: #F9FAFB;
+    --color-gray-100: #F3F4F6;
+    --color-gray-200: #E5E7EB;
+    --color-gray-600: #4B5563;
+    --color-text-primary: #1F2937;
+    --color-text-secondary: #6B7280;
+    --color-shadow: rgba(0, 0, 0, 0.1);
 
-.sb-group-wrap.open .sb-children,
-.sb-group-wrap.active-group .sb-children {
-    max-height: 600px;
-    opacity: 1;
-}
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
 
-.sb-group-wrap.open .sb-group-chevron,
-.sb-group-wrap.active-group .sb-group-chevron {
-    transform: rotate(90deg);
-}
-.sb-group-chevron {
-    transition: transform .22s ease;
-    margin-left: auto;
-    font-size: 10px;
-    opacity: .45;
-}
-
-.sb-group-btn {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    width: 100%;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 10px 12px;
-    border-radius: 12px;
-    transition: background .18s;
-    color: var(--text-1, #f1f5f9);
-}
-.sb-group-btn:hover {
-    background: rgba(255,255,255,.07);
-}
-.sb-group-btn.has-active {
-    color: #fff;
-    background: rgba(255,255,255,.06);
+    --radius: 0.5rem;
+    --border: 1px solid var(--color-gray-200);
+    --shadow: 0 1px 3px var(--color-shadow);
 }
 
-.sb-group-icon {
-    width: 28px; height: 28px;
-    border-radius: 7px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 13px;
-    flex-shrink: 0;
-}
-
-.sb-group-label {
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: .1px;
-    opacity: .95;
-    flex: 1;
-    text-align: left;
-}
-.sb-group-btn.has-active .sb-group-label {
-    opacity: 1;
-}
-.sb-group-text {
+/* Sidebar Container */
+.sidebar {
     display: flex;
     flex-direction: column;
-    min-width: 0;
-    gap: 2px;
-    flex: 1;
-}
-.sb-group-desc {
-    font-size: 12px;
-    font-weight: 500;
-    opacity: .6;
-    text-align: left;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
+    width: 280px;
+    height: 100vh;
+    background: var(--color-white);
+    border-right: var(--border);
+    padding: var(--spacing-md) 0;
+    box-shadow: var(--shadow);
+    overflow-y: auto;
+    transition: width 0.3s ease;
 }
 
-.sb-group-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    opacity: 0;
-    flex-shrink: 0;
-    transition: opacity .2s;
-}
-.sb-group-btn.has-active .sb-group-dot {
-    opacity: 1;
+@media (max-width: 1024px) {
+    .sidebar {
+        width: 72px;
+    }
 }
 
-/* Separateur entre groupes */
-.sb-group-wrap {
-    position: relative;
-}
-.sb-group-wrap + .sb-group-wrap {
-    margin-top: 6px;
-}
-
-/* Separateur visuel plus marque entre blocs logiques */
-.sb-group-wrap.grp-sep-top {
-    margin-top: 14px;
-    padding-top: 12px;
-    border-top: 1px solid rgba(255,255,255,.18) !important;
-}
-
-.sb-children {
-    padding: 4px 8px 6px 8px;
-}
-.sb-item {
+/* Logo / Branding */
+.sidebar-logo {
     display: flex;
     align-items: center;
-    gap: 9px;
-    padding: 6px 10px;
-    border-radius: 7px;
-    font-size: 13px;
-    font-weight: 600;
-    color: #dbe4f2;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md) var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
     text-decoration: none;
-    transition: background .15s, color .15s;
+    color: var(--color-primary);
+    font-weight: 600;
+    font-size: 14px;
+    font-family: Inter, system-ui, -apple-system, sans-serif;
+}
+
+@media (max-width: 1024px) {
+    .sidebar-logo {
+        font-size: 0;
+    }
+
+    .sidebar-logo::before {
+        content: '🏠';
+        font-size: 1.5rem;
+    }
+}
+
+/* Navigation Container */
+.sidebar-nav {
+    flex: 1;
+    padding: 0 var(--spacing-sm);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+/* Navigation Items */
+.sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: var(--color-text-primary);
+    font-size: 14px;
+    font-weight: 500;
+    font-family: Inter, system-ui, -apple-system, sans-serif;
+    border: var(--border);
+    background: var(--color-white);
+    transition: all 0.2s ease;
+    cursor: pointer;
+    position: relative;
     white-space: nowrap;
-    overflow: hidden;
-}
-.sb-item:hover {
-    background: rgba(255,255,255,.1);
-    color: #fff;
-}
-.sb-item.active {
-    background: rgba(99,102,241,.26);
-    color: #fff;
-    font-weight: 700;
-}
-.sb-item i {
-    font-size: 13px;
-    width: 16px;
-    text-align: center;
-    flex-shrink: 0;
-    opacity: .7;
-}
-.sb-item.active i,
-.sb-item:hover i {
-    opacity: 1;
-}
-.sb-item.sep-before {
-    margin-top: 6px;
-    border-top: 1px solid rgba(255,255,255,.07);
-    padding-top: 8px;
 }
 
-.sb-badge {
-    margin-left: auto;
-    font-size: 9px;
-    font-weight: 700;
-    padding: 1px 5px;
-    border-radius: 4px;
-    letter-spacing: .4px;
-    text-transform: uppercase;
+.sidebar-item:hover {
+    background: var(--color-gray-50);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+}
+
+.sidebar-item.active {
+    background: var(--color-primary-light);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    font-weight: 600;
+}
+
+/* Item Icon (Emoji) */
+.sidebar-item-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    width: 2rem;
+    height: 2rem;
     flex-shrink: 0;
 }
-.sb-badge.new  { background: rgba(101,163,13,.25); color: #86efac; }
-.sb-badge.pro  { background: rgba(201,145,59,.25); color: #fcd34d; }
-.sb-badge.soon { background: rgba(100,116,139,.25); color: #cbd5e1; }
-.sb-badge.su   { background: rgba(99,102,241,.3); color: #a5b4fc; }
 
-@media (max-width: 1100px) {
-    .sb-group-btn {
-        padding: 9px 10px;
+/* Item Label */
+.sidebar-item-label {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    min-width: 0;
+}
+
+.sidebar-item-name {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.sidebar-item-desc {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    display: none;
+}
+
+@media (min-width: 1024px) {
+    .sidebar-item-desc {
+        display: block;
     }
-    .sb-group-label {
-        font-size: 14px;
+}
+
+/* Tooltip for mobile (CSS-only) */
+@media (max-width: 1024px) {
+    .sidebar-item {
+        width: 40px;
+        height: 40px;
+        padding: var(--spacing-sm);
+        justify-content: center;
+        gap: 0;
+        border: none;
+        background: transparent;
     }
-    .sb-group-desc {
-        font-size: 11px;
+
+    .sidebar-item-label {
+        display: none;
+    }
+
+    .sidebar-item::after {
+        content: attr(data-tooltip);
+        position: absolute;
+        left: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        margin-left: var(--spacing-md);
+        white-space: nowrap;
+        background: var(--color-gray-600);
+        color: var(--color-white);
+        padding: var(--spacing-xs) var(--spacing-sm);
+        border-radius: var(--radius);
+        font-size: 12px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+        z-index: 1000;
+    }
+
+    .sidebar-item:hover::after {
+        opacity: 1;
+    }
+}
+
+/* Settings Item (bottom) */
+.sidebar-footer {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-lg) var(--spacing-sm);
+    margin-top: auto;
+    border-top: var(--border);
+    padding-top: var(--spacing-lg);
+}
+
+.sidebar-settings {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    border-radius: var(--radius);
+    text-decoration: none;
+    color: var(--color-text-secondary);
+    font-size: 14px;
+    font-weight: 500;
+    border: var(--border);
+    background: var(--color-gray-50);
+    transition: all 0.2s ease;
+}
+
+.sidebar-settings:hover {
+    background: var(--color-gray-100);
+    color: var(--color-primary);
+    border-color: var(--color-primary);
+}
+
+.sidebar-settings-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    width: 2rem;
+    height: 2rem;
+}
+
+@media (max-width: 1024px) {
+    .sidebar-settings {
+        width: 40px;
+        height: 40px;
+        padding: var(--spacing-sm);
+        border: none;
+        background: transparent;
+    }
+
+    .sidebar-settings span {
+        display: none;
+    }
+
+    .sidebar-settings::after {
+        content: 'Paramètres';
+        position: absolute;
+        left: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+        margin-left: var(--spacing-md);
+        white-space: nowrap;
+        background: var(--color-gray-600);
+        color: var(--color-white);
+        padding: var(--spacing-xs) var(--spacing-sm);
+        border-radius: var(--radius);
+        font-size: 12px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+    }
+
+    .sidebar-settings:hover::after {
+        opacity: 1;
     }
 }
 </style>
 
-<aside class="sb" id="sidebar">
+<aside class="sidebar" role="navigation" aria-label="Navigation principale">
 
     <!-- Logo -->
-    <div class="sb-logo">
-        <a href="?page=dashboard" class="sb-logo-inner">
-            <div class="sb-logo-icon"><i class="fas fa-house-chimney"></i></div>
-            <div>
-                <div class="sb-logo-name">IMMO LOCAL+</div>
-                <div class="sb-logo-sub">Ecosyst&egrave;me v<?= defined('IMMO_VERSION') ? IMMO_VERSION : '8.6' ?></div>
-            </div>
-        </a>
-    </div>
+    <a href="?section=dashboard" class="sidebar-logo" title="IMMO LOCAL+ Dashboard">
+        <span>🏠 IMMO LOCAL+</span>
+    </a>
 
-    <!-- Navigation -->
-    <nav class="sb-nav" id="sidebarNav">
-        <?php
-        // Groupes qui commencent un nouveau bloc logique (separateur plus marque)
-        $sepGroups = ['grp-assistant', 'grp-settings'];
-
-        foreach ($sidebarGroups as $grp):
-            // Filtrer les enfants selon les permissions de l'admin
-            $visibleChildren = [];
-            foreach ($grp['children'] as $item) {
-                if (!function_exists('isModuleAllowed') || isModuleAllowed($item['slug'])) {
-                    $visibleChildren[] = $item;
-                }
-            }
-            // Si aucun enfant visible, masquer tout le groupe
-            if (empty($visibleChildren)) continue;
-
-            $isGroupActive = in_array($activeModule, $grp['slugs']);
-            $sepClass = in_array($grp['id'], $sepGroups) ? ' grp-sep-top' : '';
+    <!-- Navigation principale (7 sections) -->
+    <nav class="sidebar-nav">
+        <?php foreach ($sidebarSections as $section):
+            $isActive = ($currentSection === str_replace('?section=', '', $section['url']));
+            $activeClass = $isActive ? ' active' : '';
+            $sectionName = str_replace('?section=', '', $section['url']);
         ?>
-        <div class="sb-group-wrap<?= $isGroupActive ? ' active-group' : '' ?><?= $sepClass ?>"
-             id="<?= $grp['id'] ?>">
-
-            <button class="sb-group-btn<?= $isGroupActive ? ' has-active' : '' ?>"
-                    title="<?= htmlspecialchars(html_entity_decode($grp['label'])) ?>">
-                <div class="sb-group-icon"
-                     style="background:<?= $grp['color'] ?>22;color:<?= $grp['color'] ?>">
-                    <i class="fas <?= $grp['icon'] ?>"></i>
+            <a href="<?= htmlspecialchars($section['url']) ?>"
+               class="sidebar-item<?= $activeClass ?>"
+               data-tooltip="<?= htmlspecialchars($section['description']) ?>"
+               title="<?= htmlspecialchars($section['label']) ?> — <?= htmlspecialchars($section['description']) ?>">
+                <span class="sidebar-item-icon"><?= $section['emoji'] ?></span>
+                <div class="sidebar-item-label">
+                    <span class="sidebar-item-name"><?= htmlspecialchars($section['label']) ?></span>
+                    <span class="sidebar-item-desc"><?= htmlspecialchars($section['description']) ?></span>
                 </div>
-                <div class="sb-group-text">
-                    <span class="sb-group-label"><?= $grp['label'] ?></span>
-                    <span class="sb-group-desc"><?= $grp['description'] ?? '' ?></span>
-                </div>
-                <div class="sb-group-dot" style="background:<?= $grp['color'] ?>"></div>
-                <i class="fas fa-chevron-right sb-group-chevron"></i>
-            </button>
-
-            <div class="sb-children">
-                <?php foreach ($visibleChildren as $item):
-                    $isActive  = ($activeModule === $item['slug']);
-                    $iconCls   = str_starts_with($item['icon'], 'fab ') ? $item['icon'] : 'fas '.$item['icon'];
-                    $sepCls    = !empty($item['sep']) ? ' sep-before' : '';
-                    $badgeHtml = '';
-                    if (!empty($item['badge'])) {
-                        $cls = strtolower($item['badge']);
-                        $badgeHtml = '<span class="sb-badge '.$cls.'">'.$item['badge'].'</span>';
-                    }
-                ?>
-                <a href="?page=<?= $item['slug'] ?>"
-                   class="sb-item<?= $isActive ? ' active' : '' ?><?= $sepCls ?>">
-                    <i class="<?= $iconCls ?>"></i>
-                    <span><?= $item['label'] ?></span>
-                    <?= $badgeHtml ?>
-                </a>
-                <?php endforeach; ?>
-            </div>
-
-        </div>
+            </a>
         <?php endforeach; ?>
     </nav>
 
-    <!-- Footer -->
-    <div class="sb-footer">
-        <a href="?page=advisor-context" class="sb-user">
-            <div class="sb-user-avatar" style="<?= isSuperUser() ? 'background:linear-gradient(135deg,#6366f1,#8b5cf6)' : '' ?>"><?= strtoupper(mb_substr($advisorName, 0, 1)) ?></div>
-            <div>
-                <div class="sb-user-name"><?= htmlspecialchars($advisorName) ?></div>
-                <div class="sb-user-role"><?= getRoleLabel() ?></div>
-            </div>
-            <i class="fas fa-<?= isSuperUser() ? 'crown' : 'gear' ?> sb-user-icon"></i>
+    <!-- Footer: Utilisateur + Paramètres -->
+    <div class="sidebar-footer">
+        <div style="padding: 0 var(--spacing-md); font-size: 12px; color: var(--color-text-secondary);">
+            <?php if ($advisorCity): ?>
+                <strong><?= $advisorCity ?></strong>
+            <?php endif; ?>
+        </div>
+
+        <a href="?section=parametres" class="sidebar-settings" title="Paramètres">
+            <span class="sidebar-settings-icon">⚙️</span>
+            <span>Paramètres</span>
         </a>
     </div>
 
 </aside>
-
-<script>
-const sidebarGroups = document.querySelectorAll('.sb-group-wrap');
-const sidebarOpenKey = 'admin_sidebar_open_groups';
-let persistedOpenGroups = [];
-
-try {
-    persistedOpenGroups = JSON.parse(localStorage.getItem(sidebarOpenKey) || '[]');
-    if (!Array.isArray(persistedOpenGroups)) persistedOpenGroups = [];
-} catch (e) {
-    persistedOpenGroups = [];
-}
-
-sidebarGroups.forEach(group => {
-    const button = group.querySelector('.sb-group-btn');
-    if (!button) return;
-
-    if (group.classList.contains('active-group') || persistedOpenGroups.includes(group.id)) {
-        group.classList.add('open');
-    }
-
-    button.addEventListener('click', function() {
-        group.classList.toggle('open');
-
-        const openIds = Array.from(sidebarGroups)
-            .filter(wrap => wrap.classList.contains('open'))
-            .map(wrap => wrap.id);
-
-        localStorage.setItem(sidebarOpenKey, JSON.stringify(openIds));
-    });
-});
-
-const searchInput = document.getElementById('globalSearch');
-if (searchInput) {
-    let timer;
-    searchInput.addEventListener('input', function() {
-        clearTimeout(timer);
-        timer = setTimeout(() => {
-            const q = this.value.toLowerCase().trim();
-            if (!q) {
-                document.querySelectorAll('.sb-item, .sb-group-wrap').forEach(el => el.style.display = '');
-                return;
-            }
-            document.querySelectorAll('.sb-group-wrap').forEach(wrap => {
-                let hasMatch = false;
-                wrap.querySelectorAll('.sb-item').forEach(item => {
-                    const match = item.textContent.toLowerCase().includes(q);
-                    item.style.display = match ? '' : 'none';
-                    if (match) hasMatch = true;
-                });
-                wrap.style.display = hasMatch ? '' : 'none';
-            });
-        }, 180);
-    });
-}
-</script>
