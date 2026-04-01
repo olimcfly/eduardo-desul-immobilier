@@ -1,249 +1,363 @@
 <?php
 /**
- * BASE CONTROLLER CLASS
- * /includes/classes/BaseController.php
+ * BaseController - Base class for all controllers with error handling and RBAC
  *
- * Classe de base pour tous les contrôleurs
- * Fournit la gestion d'erreurs et les méthodes communes
+ * Provides:
+ * - Centralized error handling with ErrorHandler
+ * - Role-based access control (RBAC)
+ * - Validation and sanitization helpers
+ * - Database query wrapper with error logging
+ *
+ * @package Eduardo Desul Immobilier
  */
 
-class BaseController {
+if (!class_exists('Database')) require_once __DIR__ . '/Database.php';
+if (!class_exists('ErrorHandler')) require_once __DIR__ . '/ErrorHandler.php';
+if (!class_exists('RbacManager')) require_once __DIR__ . '/RbacManager.php';
 
+abstract class BaseController
+{
     protected $db;
     protected $errors = [];
-    protected $data = [];
-    protected $statusCode = 200;
+    protected $isApi = false;
 
     /**
-     * Constructeur
+     * Constructor - Initialize database connection
      */
-    public function __construct() {
+    public function __construct()
+    {
         try {
-            if (!class_exists('Database')) {
-                require_once dirname(__FILE__) . '/Database.php';
-            }
             $this->db = Database::getInstance();
+            $this->isApi = $this->detectApiContext();
         } catch (Exception $e) {
-            ErrorHandler::log($e, 'BaseController::__construct', ['message' => 'Failed to initialize database']);
-            $this->db = null;
+            ErrorHandler::log($e, 'BaseController.__construct');
+            throw $e;
         }
     }
 
     /**
-     * Exécuter une action de contrôleur avec gestion d'erreurs
+     * Require specific role to access action
      *
-     * @param string $action Nom de l'action à exécuter
-     * @param array $params Paramètres de l'action
-     * @return mixed Résultat de l'action
+     * @param string $module Module identifier (e.g. 'content_pages')
+     * @param string $permission Permission level (view, create, edit, delete, manage)
+     *
+     * @throws Exception If user doesn't have required permission
      */
-    protected function executeAction($action, $params = []) {
+    protected function requireRole(string $module, string $permission = RbacManager::PERM_VIEW): void
+    {
+        // Get user role from session
+        $userRole = $_SESSION['auth_admin_role'] ?? RbacManager::ROLE_VIEWER;
+
+        // Check permission
+        if (!RbacManager::hasPermission($userRole, $module, $permission)) {
+            ErrorHandler::respond(
+                'Accès refusé: Vous n\'avez pas les permissions pour accéder à ce module.',
+                403,
+                ['required_role' => $module, 'required_permission' => $permission],
+                null
+            );
+        }
+    }
+
+    /**
+     * Require specific roles (multiple roles check)
+     *
+     * @param array $modules Array of module identifiers to check
+     * @param string $permission Permission level
+     *
+     * @throws Exception If user doesn't have any of the required permissions
+     */
+    protected function requireAnyRole(array $modules, string $permission = RbacManager::PERM_VIEW): void
+    {
+        $userRole = $_SESSION['auth_admin_role'] ?? RbacManager::ROLE_VIEWER;
+        $hasPermission = false;
+
+        foreach ($modules as $module) {
+            if (RbacManager::hasPermission($userRole, $module, $permission)) {
+                $hasPermission = true;
+                break;
+            }
+        }
+
+        if (!$hasPermission) {
+            ErrorHandler::respond(
+                'Accès refusé: Vous n\'avez pas les permissions pour accéder à ce module.',
+                403,
+                ['required_modules' => $modules, 'required_permission' => $permission],
+                null
+            );
+        }
+    }
+
+    /**
+     * Execute action with error handling
+     *
+     * @param string $action Action name
+     * @param array $params Action parameters
+     *
+     * @return mixed Action result
+     */
+    public function executeAction(string $action, array $params = []): mixed
+    {
         try {
-            // Vérifier que la méthode existe
-            if (!method_exists($this, $action)) {
-                throw new Exception("Action '{$action}' not found in " . get_class($this));
+            $method = 'action' . ucfirst($action);
+
+            if (!method_exists($this, $method)) {
+                throw new Exception("Action '{$action}' non implémentée");
             }
 
-            // Vérifier la permission si nécessaire
-            if (method_exists($this, 'requirePermission')) {
-                $this->requirePermission($action);
-            }
-
-            // Exécuter l'action
-            return call_user_func_array([$this, $action], $params);
-
+            return $this->$method($params);
         } catch (Exception $e) {
             return $this->handleError($e, $action);
         }
     }
 
     /**
-     * Gérer une erreur
+     * Handle errors consistently
      *
-     * @param Exception $exception L'exception
-     * @param string $context Contexte (optional)
+     * @param Exception $exception The exception
+     * @param string $context Context information
+     *
+     * @return array Error response
      */
-    protected function handleError($exception, $context = '') {
-        // Logger l'erreur
-        ErrorHandler::log($exception, get_class($this) . '::' . $context);
+    protected function handleError(Exception $exception, string $context = ''): array
+    {
+        ErrorHandler::log($exception, $context);
 
-        // Ajouter à la liste des erreurs
-        $this->errors[] = [
-            'message' => $exception->getMessage(),
-            'code' => $exception->getCode(),
-            'context' => $context
-        ];
+        if ($this->isApi) {
+            return [
+                'success' => false,
+                'message' => $exception->getMessage(),
+                'context' => $context
+            ];
+        }
 
-        // Déterminer la réponse selon le contexte
-        if ($this->isApiRequest()) {
-            return $this->respondJson(
-                $exception->getMessage(),
-                false,
-                $this->statusCode ?: 500,
-                [],
-                $exception
-            );
+        return ['error' => $exception->getMessage()];
+    }
+
+    /**
+     * Detect if this is an API request
+     *
+     * @return bool True if API request
+     */
+    protected function detectApiContext(): bool
+    {
+        // Check content-type header
+        if (isset($_SERVER['CONTENT_TYPE']) && strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false) {
+            return true;
+        }
+
+        // Check if request is to /api/ endpoint
+        if (strpos($_SERVER['REQUEST_URI'] ?? '', '/api/') !== false) {
+            return true;
+        }
+
+        // Check for X-Requested-With header
+        if (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] === 'XMLHttpRequest') {
+            return true;
         }
 
         return false;
     }
 
     /**
-     * Vérifier si c'est une requête API
+     * Respond with JSON (for API)
+     *
+     * @param string $message Response message
+     * @param bool $success Success status
+     * @param int $statusCode HTTP status code
+     * @param array $data Additional data
+     * @param Exception $exception Optional exception for debugging
+     *
+     * @return array Response array
      */
-    protected function isApiRequest() {
-        return !empty($_SERVER['HTTP_X_REQUESTED_WITH']) &&
-               strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest' ||
-               strpos($_SERVER['REQUEST_URI'] ?? '', '/api/') !== false;
-    }
-
-    /**
-     * Répondre avec JSON
-     */
-    protected function respondJson($message = '', $success = true, $statusCode = 200, $data = [], $exception = null) {
-        header('Content-Type: application/json; charset=utf-8');
-        http_response_code($statusCode);
-
+    protected function respondJson(string $message, bool $success = true, int $statusCode = 200, array $data = [], ?Exception $exception = null): array
+    {
         $response = [
             'success' => $success,
             'message' => $message,
             'status' => $statusCode,
-            'timestamp' => date('c')
+            'timestamp' => date('c'),
         ];
 
         if (!empty($data)) {
             $response['data'] = $data;
         }
 
-        if (DEBUG_MODE && $exception) {
+        if (defined('DEBUG_MODE') && DEBUG_MODE && $exception) {
             $response['debug'] = [
                 'exception' => get_class($exception),
                 'file' => $exception->getFile(),
-                'line' => $exception->getLine()
+                'line' => $exception->getLine(),
             ];
         }
 
-        echo json_encode($response);
+        return $response;
+    }
+
+    /**
+     * Redirect with message
+     *
+     * @param string $url Target URL
+     * @param string $message Flash message
+     * @param string $messageType Message type (success, error, warning, info)
+     *
+     * @return never
+     */
+    protected function redirect(string $url, string $message = '', string $messageType = 'success'): never
+    {
+        if ($message) {
+            $_SESSION['auth_flash_message'] = $message;
+            $_SESSION['auth_flash_type'] = $messageType;
+        }
+
+        header("Location: " . htmlspecialchars($url, ENT_QUOTES, 'UTF-8'));
         exit;
     }
 
     /**
-     * Répondre avec redirection
+     * Validate data against rules
+     *
+     * @param array $data Data to validate
+     * @param array $rules Validation rules
+     *
+     * @return bool True if validation passes
      */
-    protected function redirect($url, $message = '', $messageType = 'info') {
-        if (!empty($message)) {
-            $_SESSION['message'] = $message;
-            $_SESSION['message_type'] = $messageType;
-        }
-        header('Location: ' . $url);
-        exit;
-    }
+    protected function validate(array $data, array $rules): bool
+    {
+        $this->errors = [];
 
-    /**
-     * Valider les données
-     */
-    protected function validate($data, $rules) {
-        try {
-            foreach ($rules as $field => $fieldRules) {
-                if (isset($fieldRules['required']) && $fieldRules['required']) {
-                    if (empty($data[$field])) {
-                        throw new Exception("Field '$field' is required");
-                    }
-                }
+        foreach ($rules as $field => $fieldRules) {
+            $value = $data[$field] ?? '';
 
-                if (isset($fieldRules['email']) && $fieldRules['email']) {
-                    if (!filter_var($data[$field], FILTER_VALIDATE_EMAIL)) {
-                        throw new Exception("Field '$field' must be a valid email");
-                    }
-                }
+            // Check required
+            if (isset($fieldRules['required']) && $fieldRules['required'] && empty($value)) {
+                $this->errors[$field] = "Le champ '{$field}' est requis";
+                continue;
+            }
 
-                if (isset($fieldRules['min']) && !empty($data[$field])) {
-                    if (strlen($data[$field]) < $fieldRules['min']) {
-                        throw new Exception("Field '$field' must be at least {$fieldRules['min']} characters");
-                    }
-                }
+            if (empty($value)) {
+                continue;
+            }
 
-                if (isset($fieldRules['max']) && !empty($data[$field])) {
-                    if (strlen($data[$field]) > $fieldRules['max']) {
-                        throw new Exception("Field '$field' must be at most {$fieldRules['max']} characters");
-                    }
+            // Check email
+            if (isset($fieldRules['email']) && $fieldRules['email']) {
+                if (!filter_var($value, FILTER_VALIDATE_EMAIL)) {
+                    $this->errors[$field] = "Le champ '{$field}' doit être un email valide";
                 }
             }
 
-            return true;
+            // Check min length
+            if (isset($fieldRules['min'])) {
+                if (strlen($value) < $fieldRules['min']) {
+                    $this->errors[$field] = "Le champ '{$field}' doit contenir au moins {$fieldRules['min']} caractères";
+                }
+            }
 
-        } catch (Exception $e) {
-            $this->handleError($e, 'validate');
-            return false;
+            // Check max length
+            if (isset($fieldRules['max'])) {
+                if (strlen($value) > $fieldRules['max']) {
+                    $this->errors[$field] = "Le champ '{$field}' doit contenir au maximum {$fieldRules['max']} caractères";
+                }
+            }
+
+            // Check pattern
+            if (isset($fieldRules['pattern'])) {
+                if (!preg_match($fieldRules['pattern'], $value)) {
+                    $this->errors[$field] = "Le champ '{$field}' n'a pas le format valide";
+                }
+            }
         }
+
+        return empty($this->errors);
     }
 
     /**
-     * Sanitiser les données
+     * Sanitize data
+     *
+     * @param array $data Data to sanitize
+     * @param array $fields Fields to sanitize (null = all)
+     *
+     * @return array Sanitized data
      */
-    protected function sanitize($data) {
-        try {
-            if (is_array($data)) {
-                return array_map(function($value) {
-                    return is_string($value) ? trim(htmlspecialchars($value, ENT_QUOTES, 'UTF-8')) : $value;
-                }, $data);
-            }
-            return is_string($data) ? trim(htmlspecialchars($data, ENT_QUOTES, 'UTF-8')) : $data;
+    protected function sanitize(array $data, ?array $fields = null): array
+    {
+        $sanitized = [];
 
-        } catch (Exception $e) {
-            ErrorHandler::log($e, 'BaseController::sanitize');
-            return $data;
+        foreach ($data as $key => $value) {
+            if ($fields && !in_array($key, $fields)) {
+                $sanitized[$key] = $value;
+                continue;
+            }
+
+            if (is_string($value)) {
+                $sanitized[$key] = htmlspecialchars(trim($value), ENT_QUOTES, 'UTF-8');
+            } else {
+                $sanitized[$key] = $value;
+            }
         }
+
+        return $sanitized;
     }
 
     /**
-     * Exécuter une requête DB avec gestion d'erreurs
+     * Execute database query with error handling
+     *
+     * @param string $sql SQL query
+     * @param array $params Bind parameters
+     *
+     * @return PDOStatement Statement object
+     *
+     * @throws Exception If query fails
      */
-    protected function query($sql, $params = []) {
+    protected function query(string $sql, array $params = []): PDOStatement
+    {
         try {
-            if (!$this->db) {
-                throw new Exception('Database connection not available');
-            }
-
             $stmt = $this->db->prepare($sql);
-            if (!$stmt) {
-                throw new Exception('Failed to prepare statement: ' . $this->db->error);
-            }
-
-            if (!$stmt->execute($params)) {
-                throw new Exception('Query execution failed: ' . $stmt->error);
-            }
-
+            $stmt->execute($params);
             return $stmt;
-
-        } catch (Exception $e) {
-            ErrorHandler::log($e, 'BaseController::query', ['sql' => $sql, 'params' => $params]);
-            throw $e;
+        } catch (PDOException $e) {
+            ErrorHandler::log($e, 'BaseController.query', ['sql' => $sql]);
+            throw new Exception("Erreur de base de données");
         }
     }
 
     /**
-     * Récupérer les erreurs
+     * Get errors
+     *
+     * @return array List of errors
      */
-    public function getErrors() {
+    public function getErrors(): array
+    {
         return $this->errors;
     }
 
     /**
-     * Ajouter un message d'erreur
+     * Add error
+     *
+     * @param string $field Field name
+     * @param string $message Error message
      */
-    protected function addError($message, $code = 0) {
-        $this->errors[] = [
-            'message' => $message,
-            'code' => $code,
-            'timestamp' => date('c')
-        ];
+    public function addError(string $field, string $message): void
+    {
+        $this->errors[$field] = $message;
     }
 
     /**
-     * Vérifier les permissions (à implémenter dans les contrôleurs enfants)
+     * Check if there are errors
+     *
+     * @return bool True if there are errors
      */
-    protected function requirePermission($action) {
-        // À surcharger dans les classes enfants si nécessaire
-        return true;
+    public function hasErrors(): bool
+    {
+        return !empty($this->errors);
+    }
+
+    /**
+     * Clear errors
+     */
+    public function clearErrors(): void
+    {
+        $this->errors = [];
     }
 }
