@@ -640,7 +640,7 @@ $sample_result = [
         <!-- Hero -->
         <div class="result-hero">
             <h3>✅ Estimation Calculée</h3>
-            <p><?php echo $sample_result['address']; ?></p>
+            <p><?php echo htmlspecialchars($sample_result['address']); ?></p>
         </div>
         
         <!-- Property Details -->
@@ -696,7 +696,7 @@ $sample_result = [
         <!-- Justification -->
         <div class="justification-box">
             <h4>📝 Justification</h4>
-            <p><?php echo $sample_result['justification']; ?></p>
+            <p><?php echo htmlspecialchars($sample_result['justification']); ?></p>
         </div>
         
         <!-- Comparables -->
@@ -705,7 +705,7 @@ $sample_result = [
             <?php foreach ($sample_result['search_data'] as $bien): ?>
             <div class="comparable-item">
                 <div>
-                    <div class="comparable-address"><?php echo $bien['adresse']; ?></div>
+                    <div class="comparable-address"><?php echo htmlspecialchars($bien['adresse']); ?></div>
                     <div class="comparable-info"><?php echo $bien['surface']; ?>m² • <?php echo number_format($bien['price'], 0); ?>€</div>
                 </div>
                 <div class="comparable-price"><?php echo number_format($bien['price'] / $bien['surface'], 0); ?>€/m²</div>
