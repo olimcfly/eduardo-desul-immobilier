@@ -271,6 +271,43 @@ if (file_exists($msFile)) {
     $moduleStates = json_decode(file_get_contents($msFile), true) ?: [];
 }
 
+// ── Welcome modules (page d'accueil standard) ───────────────
+$moduleWelcomeConfig = [];
+$moduleWelcomeFile = __DIR__ . '/../config/module-welcome.php';
+if (file_exists($moduleWelcomeFile)) {
+    $moduleWelcomeConfig = require $moduleWelcomeFile;
+}
+$showModuleWelcome = false;
+$moduleWelcomeContext = $_SESSION['module_welcome_context'][$module] ?? null;
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['module_welcome_form'] ?? '') === '1') {
+    $postedModule = strtolower((string)($_POST['module_key'] ?? ''));
+    if ($postedModule === $module && isset($moduleWelcomeConfig[$module])) {
+        $_SESSION['module_welcome_seen'][$module] = true;
+        $action = (string)($_POST['welcome_action'] ?? 'start');
+        if ($action === 'start') {
+            $_SESSION['module_welcome_context'][$module] = [
+                'choice' => trim((string)($_POST['module_choice'] ?? '')),
+                'note' => trim((string)($_POST['module_note'] ?? '')),
+                'at' => date('c'),
+            ];
+        }
+        header('Location: ?page=' . urlencode($module));
+        exit;
+    }
+}
+
+$moduleSeen = !empty($_SESSION['module_welcome_seen'][$module]);
+$forceWelcome = isset($_GET['welcome']) && $_GET['welcome'] === '1';
+if (
+    $module !== 'dashboard'
+    && empty($permissionDenied)
+    && $module_file
+    && isset($moduleWelcomeConfig[$module])
+    && (!$moduleSeen || $forceWelcome)
+) {
+    $showModuleWelcome = true;
+}
+
 // ── Vérification des permissions ─────────────────────────────
 if ($requiresSuperUser && !isSuperUser()) {
     $module_file = null;
@@ -417,7 +454,21 @@ require_once __DIR__ . '/layout/sidebar.php';
             <p><?= !empty($permissionDeniedReason) && $permissionDeniedReason === 'superuser_required' ? 'Ce module est réservé au Super Administrateur.' : "Vous n'avez pas accès à ce module. Contactez le Super Administrateur pour obtenir l'accès." ?></p>
             <a href="?page=dashboard" class="es-btn">&larr; Retour au tableau de bord</a>
         </div>
+    <?php elseif ($showModuleWelcome): ?>
+        <?php
+            require_once __DIR__ . '/../components/modules/ModuleWelcomePage.php';
+            renderModuleWelcomePage($moduleWelcomeConfig[$module], $module, [
+                'context' => $moduleWelcomeContext,
+            ]);
+        ?>
     <?php elseif ($module_file): ?>
+        <?php if (isset($moduleWelcomeConfig[$module])): ?>
+            <div style="display:flex;justify-content:flex-end;margin:0 0 10px">
+                <a href="?page=<?= urlencode($module) ?>&welcome=1" class="btn btn-s btn-sm">
+                    <i class="fas fa-compass"></i> Relancer le guidage
+                </a>
+            </div>
+        <?php endif; ?>
         <?php include $module_file; ?>
     <?php else: ?>
         <div class="es">
