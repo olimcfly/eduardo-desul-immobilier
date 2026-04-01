@@ -1,7 +1,17 @@
 <?php
 /**
  * Initialisation Admin
+ * P2-8: Security Headers
  */
+
+// 🔒 SECURITY HEADERS (P2-8)
+// Must be set before any output
+header('Strict-Transport-Security: max-age=31536000; includeSubDomains', false);
+header('X-Content-Type-Options: nosniff', false);
+header('X-Frame-Options: DENY', false);
+header('Content-Security-Policy: default-src \'self\'; script-src \'self\' \'unsafe-inline\'; style-src \'self\' \'unsafe-inline\'', false);
+header('X-XSS-Protection: 1; mode=block', false);
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
