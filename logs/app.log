@@ -6,3 +6,37 @@
 [2026-01-22 21:45:26] [WARNING] Invalid OTP for: admin@eduardo-desul-immobilier.fr
 [2026-01-22 21:45:47] [DEBUG] OTP validation attempt for: admin@eduardo-desul-immobilier.fr (input: 435103, stored: 435103)
 [2026-01-22 21:45:47] [INFO] Successful login for: admin@eduardo-desul-immobilier.fr
+[2026-03-25 00:02:50] [ERROR] [92.184.113.128] Échec SMTP OTP pour oliviercolas83@gmail.com: Connexion SMTP echouee: Connection timed out
+[2026-03-25 00:02:50] [WARNING] [92.184.113.128] OTP envoyé via fallback mail() après échec SMTP pour oliviercolas83@gmail.com
+[2026-03-25 00:03:08] [ERROR] [92.184.113.128] Échec SMTP OTP pour oliviercolas83@gmail.com: Connexion SMTP echouee: Connection timed out
+[2026-03-25 00:03:08] [WARNING] [92.184.113.128] OTP envoyé via fallback mail() après échec SMTP pour oliviercolas83@gmail.com
+[2026-03-25 00:03:12] [ERROR] [92.184.113.128] Échec SMTP OTP pour oliviercolas83@gmail.com: Connexion SMTP echouee: No route to host
+[2026-03-25 00:03:12] [WARNING] [92.184.113.128] OTP envoyé via fallback mail() après échec SMTP pour oliviercolas83@gmail.com
+[2026-03-25 00:03:34] [ERROR] [92.184.113.128] Échec SMTP OTP pour oliviercolas83@gmail.com: Connexion SMTP echouee: Connection timed out
+[2026-03-25 00:03:35] [WARNING] [92.184.113.128] OTP envoyé via fallback mail() après échec SMTP pour oliviercolas83@gmail.com
+[2026-03-25 00:03:39] [ERROR] [92.184.113.128] Échec SMTP OTP pour oliviercolas83@gmail.com: Connexion SMTP echouee: No route to host
+[2026-03-25 00:03:39] [WARNING] [92.184.113.128] OTP envoyé via fallback mail() après échec SMTP pour oliviercolas83@gmail.com
+[2026-03-25 04:17:57] [ERROR] [92.184.113.128] Échec SMTP OTP pour oliviercolas83@gmail.com: Destinataire rejete: 503 sender not yet given
+[2026-03-25 04:17:57] [WARNING] [92.184.113.128] OTP envoyé via fallback mail() après échec SMTP pour oliviercolas83@gmail.com
+[2026-03-25 04:25:45] [ERROR] [92.184.113.128] Échec SMTP OTP pour oliviercolas83@gmail.com: Destinataire rejete: 503 sender not yet given
+[2026-03-25 04:25:45] [WARNING] [92.184.113.128] OTP envoyé via fallback mail() après échec SMTP pour oliviercolas83@gmail.com
+[2026-03-25 06:29:36] [ERROR] [92.184.113.128] Échec SMTP OTP pour oliviercolas83@gmail.com: Destinataire rejete: 503 sender not yet given
+[2026-03-25 06:29:36] [WARNING] [92.184.113.128] OTP envoyé via fallback mail() après échec SMTP pour oliviercolas83@gmail.com
+[2026-03-25 06:31:18] [ERROR] [92.184.113.128] Échec SMTP OTP pour oliviercolas83@gmail.com: Destinataire rejete: 503 sender not yet given
+[2026-03-25 06:31:18] [WARNING] [92.184.113.128] OTP envoyé via fallback mail() après échec SMTP pour oliviercolas83@gmail.com
+[2026-03-25 06:34:06] [ERROR] [92.184.113.128] Échec SMTP OTP pour oliviercolas83@gmail.com: Destinataire rejete: 503 sender not yet given
+[2026-03-25 06:34:06] [WARNING] [92.184.113.128] OTP non envoyé: fallback mail() désactivé (SMTP configuré)
+[2026-03-25 06:38:25] [INFO] [92.184.113.128] OTP envoyé via SMTP à oliviercolas83@gmail.com
+[2026-03-25 06:41:56] [INFO] [92.184.113.128] OTP envoyé via SMTP à oliviercolas83@gmail.com
+[2026-03-25 06:42:03] [INFO] [92.184.113.128] OTP envoyé via SMTP à admin@ecosystemeimmo.fr
+[2026-03-25 06:53:12] [INFO] [92.184.113.128] OTP envoyé via SMTP à oliviercolas83@gmail.com
+[2026-03-25 06:53:55] [INFO] [92.184.113.128] OTP envoyé via SMTP à oliviercolas83@gmail.com
+[2026-03-25 06:59:44] [INFO] [92.184.113.128] OTP envoyé via SMTP à oliviercolas83@gmail.com
+[2026-03-25 06:59:50] [INFO] [92.184.113.128] OTP envoyé via SMTP à oliviercolas83@gmail.com
+[2026-03-25 07:00:01] [INFO] [92.184.113.128] OTP envoyé via SMTP à oliviercolas83@gmail.com
+[2026-03-25 07:01:17] [INFO] [92.184.113.128] OTP envoyé via SMTP à oliviercolas83@gmail.com
+[2026-03-25 07:02:02] [INFO] [92.184.113.128] OTP envoyé via SMTP à oliviercolas83@gmail.com
+[2026-03-25 07:02:40] [INFO] [92.184.113.128] OTP envoyé via SMTP à oliviercolas83@gmail.com
+[2026-03-25 17:33:48] [INFO] [92.184.113.205] OTP envoyé via SMTP à admin@eduardo-desul-immobilier.fr
+[2026-03-27 01:53:28] [INFO] [92.184.113.235] OTP envoyé via SMTP à oliviercolas83@gmail.com
+[2026-03-27 01:55:48] [INFO] [92.184.113.235] OTP envoyé via SMTP à admin@eduardo-desul-immobilier.fr
