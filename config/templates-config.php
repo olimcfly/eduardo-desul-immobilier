@@ -383,6 +383,187 @@ return [
             ]
         ],
 
+        // ─── SECTEURS ────────────────────────────────────
+        'secteurs' => [
+            'name' => 'Secteurs',
+            'description' => 'Page de présentation des secteurs d\'intervention',
+            'icon' => 'fas fa-map-marker-alt',
+            'blocks' => [
+                'hero' => [
+                    'type' => 'secteurs_hero',
+                    'label' => 'Hero principal',
+                    'description' => 'Section héro avec titre et sous-titre',
+                    'fields' => [
+                        'title' => ['type' => 'text', 'label' => 'Titre principal', 'required' => true],
+                        'subtitle' => ['type' => 'textarea', 'label' => 'Sous-titre'],
+                        'background_image' => ['type' => 'image', 'label' => 'Image de fond'],
+                    ]
+                ],
+                'sectors_grid' => [
+                    'type' => 'secteurs_grid',
+                    'label' => 'Grille des secteurs',
+                    'description' => 'Liste des secteurs d\'intervention avec descriptions',
+                    'fields' => [
+                        'headline' => ['type' => 'text', 'label' => 'Titre section'],
+                        'items' => ['type' => 'repeater', 'label' => 'Secteurs', 'item_fields' => [
+                            'name' => ['type' => 'text', 'label' => 'Nom du secteur'],
+                            'slug' => ['type' => 'text', 'label' => 'URL slug'],
+                            'description' => ['type' => 'textarea', 'label' => 'Description courte'],
+                            'icon' => ['type' => 'text', 'label' => 'Icône'],
+                        ]],
+                    ]
+                ],
+                'advisor' => [
+                    'type' => 'secteurs_advisor',
+                    'label' => 'Présentation conseiller',
+                    'description' => 'Présentation du conseiller spécialisé',
+                    'fields' => [
+                        'photo' => ['type' => 'image', 'label' => 'Photo du conseiller'],
+                        'name' => ['type' => 'text', 'label' => 'Nom', 'required' => true],
+                        'title' => ['type' => 'text', 'label' => 'Titre/Fonction'],
+                        'intro' => ['type' => 'textarea', 'label' => 'Introduction'],
+                        'cta_text' => ['type' => 'text', 'label' => 'CTA - Texte'],
+                        'cta_url' => ['type' => 'url', 'label' => 'CTA - URL'],
+                    ]
+                ],
+                'cta_final' => [
+                    'type' => 'secteurs_cta_final',
+                    'label' => 'Appel à l\'action final',
+                    'description' => 'CTA final',
+                    'fields' => [
+                        'headline' => ['type' => 'text', 'label' => 'Titre principal', 'required' => true],
+                        'subtext' => ['type' => 'textarea', 'label' => 'Sous-texte'],
+                        'cta_text' => ['type' => 'text', 'label' => 'CTA - Texte'],
+                        'cta_url' => ['type' => 'url', 'label' => 'CTA - URL'],
+                    ]
+                ],
+            ]
+        ],
+
+        // ─── FINANCEMENT ─────────────────────────────────
+        'financement' => [
+            'name' => 'Financement',
+            'description' => 'Page d\'aide au financement immobilier',
+            'icon' => 'fas fa-piggy-bank',
+            'blocks' => [
+                'hero' => [
+                    'type' => 'financement_hero',
+                    'label' => 'Hero principal',
+                    'description' => 'Section héro avec titre et sous-titre',
+                    'fields' => [
+                        'title' => ['type' => 'text', 'label' => 'Titre principal', 'required' => true],
+                        'subtitle' => ['type' => 'textarea', 'label' => 'Sous-titre'],
+                        'background_image' => ['type' => 'image', 'label' => 'Image de fond'],
+                        'cta_text' => ['type' => 'text', 'label' => 'CTA - Texte'],
+                        'cta_url' => ['type' => 'url', 'label' => 'CTA - URL'],
+                    ]
+                ],
+                'intro' => [
+                    'type' => 'financement_intro',
+                    'label' => 'Introduction',
+                    'description' => 'Introduction au financement immobilier',
+                    'fields' => [
+                        'headline' => ['type' => 'text', 'label' => 'Titre section'],
+                        'description' => ['type' => 'textarea', 'label' => 'Description'],
+                    ]
+                ],
+                'steps' => [
+                    'type' => 'financement_steps',
+                    'label' => 'Processus de financement',
+                    'description' => 'Les étapes pour financer',
+                    'fields' => [
+                        'headline' => ['type' => 'text', 'label' => 'Titre section'],
+                        'items' => ['type' => 'repeater', 'label' => 'Étapes', 'item_fields' => [
+                            'title' => ['type' => 'text', 'label' => 'Titre étape'],
+                            'description' => ['type' => 'textarea', 'label' => 'Description'],
+                        ]],
+                    ]
+                ],
+                'guide' => [
+                    'type' => 'financement_guide',
+                    'label' => 'Guide du financement',
+                    'description' => 'Ressources et guides',
+                    'fields' => [
+                        'headline' => ['type' => 'text', 'label' => 'Titre section'],
+                        'items' => ['type' => 'repeater', 'label' => 'Ressources', 'item_fields' => [
+                            'icon' => ['type' => 'text', 'label' => 'Icône'],
+                            'title' => ['type' => 'text', 'label' => 'Titre'],
+                            'description' => ['type' => 'textarea', 'label' => 'Description'],
+                        ]],
+                    ]
+                ],
+                'partner' => [
+                    'type' => 'financement_partner',
+                    'label' => 'Partenaire bancaire',
+                    'description' => 'Présentation du partenaire/réseau bancaire',
+                    'fields' => [
+                        'headline' => ['type' => 'text', 'label' => 'Titre section'],
+                        'description' => ['type' => 'textarea', 'label' => 'Description'],
+                        'logo' => ['type' => 'image', 'label' => 'Logo partenaire'],
+                    ]
+                ],
+                'cta_final' => [
+                    'type' => 'financement_cta_final',
+                    'label' => 'Appel à l\'action final',
+                    'description' => 'CTA final',
+                    'fields' => [
+                        'headline' => ['type' => 'text', 'label' => 'Titre principal', 'required' => true],
+                        'subtext' => ['type' => 'textarea', 'label' => 'Sous-texte'],
+                        'cta_text' => ['type' => 'text', 'label' => 'CTA - Texte'],
+                        'cta_url' => ['type' => 'url', 'label' => 'CTA - URL'],
+                    ]
+                ],
+            ]
+        ],
+
+        // ─── BLOG ────────────────────────────────────────
+        'blog' => [
+            'name' => 'Blog',
+            'description' => 'Page d\'archive et liste du blog',
+            'icon' => 'fas fa-newspaper',
+            'blocks' => [
+                'hero' => [
+                    'type' => 'blog_hero',
+                    'label' => 'Hero principal',
+                    'description' => 'Section héro avec titre',
+                    'fields' => [
+                        'title' => ['type' => 'text', 'label' => 'Titre principal', 'required' => true],
+                        'subtitle' => ['type' => 'textarea', 'label' => 'Sous-titre'],
+                        'background_image' => ['type' => 'image', 'label' => 'Image de fond'],
+                    ]
+                ],
+                'posts' => [
+                    'type' => 'blog_posts',
+                    'label' => 'Liste des articles',
+                    'description' => 'Affichage dynamique des articles',
+                    'fields' => [
+                        'headline' => ['type' => 'text', 'label' => 'Titre section'],
+                        'posts_per_page' => ['type' => 'number', 'label' => 'Articles par page'],
+                    ]
+                ],
+                'categories' => [
+                    'type' => 'blog_categories',
+                    'label' => 'Catégories',
+                    'description' => 'Liste des catégories de blog',
+                    'fields' => [
+                        'headline' => ['type' => 'text', 'label' => 'Titre section'],
+                        'show_count' => ['type' => 'checkbox', 'label' => 'Afficher le nombre d\'articles'],
+                    ]
+                ],
+                'cta_final' => [
+                    'type' => 'blog_cta_final',
+                    'label' => 'Appel à l\'action final',
+                    'description' => 'CTA pour newsletter ou contact',
+                    'fields' => [
+                        'headline' => ['type' => 'text', 'label' => 'Titre principal', 'required' => true],
+                        'description' => ['type' => 'textarea', 'label' => 'Description'],
+                        'cta_text' => ['type' => 'text', 'label' => 'CTA - Texte'],
+                        'cta_url' => ['type' => 'url', 'label' => 'CTA - URL'],
+                    ]
+                ],
+            ]
+        ],
+
         // ─── LANDING ─────────────────────────────────────
         'landing' => [
             'name' => 'Landing Page',
