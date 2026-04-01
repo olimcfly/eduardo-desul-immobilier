@@ -246,4 +246,122 @@ class BaseController {
         // À surcharger dans les classes enfants si nécessaire
         return true;
     }
+
+    // ════════════════════════════════════════════════════════════
+    // RATE LIMITING (P1-6)
+    // ════════════════════════════════════════════════════════════
+
+    /**
+     * Vérifier le rate limiting par IP
+     * Max 100 requêtes par minute par IP
+     *
+     * @param int $maxRequests Nombre max de requêtes (default: 100)
+     * @param int $windowSeconds Fenêtre de temps en secondes (default: 60)
+     * @return bool true si OK, false si dépassement
+     */
+    public function checkRateLimit($maxRequests = 100, $windowSeconds = 60) {
+        $clientIp = $this->getClientIp();
+        $rateKey = 'ratelimit_' . md5($clientIp);
+        $rateFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . $rateKey . '.tmp';
+
+        // Lire les données de rate limiting
+        $rateLimitData = [];
+        if (file_exists($rateFile)) {
+            $content = file_get_contents($rateFile);
+            $rateLimitData = json_decode($content, true) ?: [];
+        }
+
+        $now = time();
+        $cutoffTime = $now - $windowSeconds;
+
+        // Filtrer les anciennes requêtes (en dehors de la fenêtre)
+        $rateLimitData = array_filter($rateLimitData, function($timestamp) use ($cutoffTime) {
+            return $timestamp > $cutoffTime;
+        });
+
+        // Vérifier si le limite est dépassé
+        if (count($rateLimitData) >= $maxRequests) {
+            // Marquer la violation
+            ErrorHandler::log(
+                new Exception('Rate limit exceeded'),
+                'RateLimit::checkRateLimit',
+                ['ip' => $clientIp, 'requests' => count($rateLimitData), 'limit' => $maxRequests]
+            );
+            return false;
+        }
+
+        // Enregistrer cette requête
+        $rateLimitData[] = $now;
+        file_put_contents($rateFile, json_encode($rateLimitData), LOCK_EX);
+
+        // Nettoyer les fichiers de rate limit expirés toutes les 100 requêtes
+        if (rand(1, 100) === 1) {
+            $this->cleanupRateLimitFiles($windowSeconds);
+        }
+
+        return true;
+    }
+
+    /**
+     * Obtenir l'adresse IP du client
+     */
+    protected function getClientIp() {
+        if (!empty($_SERVER['HTTP_CF_CONNECTING_IP'])) {
+            // Cloudflare
+            return $_SERVER['HTTP_CF_CONNECTING_IP'];
+        }
+        if (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            // Proxy/Load Balancer
+            $ips = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+            return trim($ips[0]);
+        }
+        if (!empty($_SERVER['HTTP_X_FORWARDED'])) {
+            return $_SERVER['HTTP_X_FORWARDED'];
+        }
+        if (!empty($_SERVER['HTTP_FORWARDED_FOR'])) {
+            return $_SERVER['HTTP_FORWARDED_FOR'];
+        }
+        if (!empty($_SERVER['HTTP_FORWARDED'])) {
+            return $_SERVER['HTTP_FORWARDED'];
+        }
+        return $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+    }
+
+    /**
+     * Nettoyer les fichiers de rate limiting expirés
+     */
+    private function cleanupRateLimitFiles($windowSeconds) {
+        try {
+            $tempDir = sys_get_temp_dir();
+            $cutoffTime = time() - $windowSeconds;
+            $pattern = $tempDir . DIRECTORY_SEPARATOR . 'ratelimit_*.tmp';
+
+            foreach (glob($pattern) as $file) {
+                if (is_file($file) && filemtime($file) < $cutoffTime) {
+                    @unlink($file);
+                }
+            }
+        } catch (Exception $e) {
+            // Silently ignore cleanup errors
+        }
+    }
+
+    /**
+     * Répondre avec erreur rate limit (HTTP 429)
+     */
+    protected function respondRateLimited() {
+        header('Content-Type: application/json; charset=utf-8');
+        header('Retry-After: 60');
+        http_response_code(429);
+
+        echo json_encode([
+            'success' => false,
+            'message' => 'Too many requests. Maximum 100 requests per minute allowed.',
+            'status' => 429,
+            'timestamp' => date('c'),
+            'retry_after' => 60
+        ]);
+
+        exit;
+    }
 }
