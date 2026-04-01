@@ -171,16 +171,39 @@ switch ($action) {
     case 'upload_photo':
         if (empty($_FILES['photo'])) jsonErr('Aucun fichier reçu');
         $file = $_FILES['photo'];
+
+        // Allowed MIME types
         $allowed = ['image/jpeg','image/png','image/webp','image/gif'];
-        if (!in_array($file['type'], $allowed)) jsonErr('Type de fichier non autorisé');
+
+        // Extension mapping for allowed MIME types
+        $mimeExtMap = [
+            'image/jpeg' => 'jpg',
+            'image/png' => 'png',
+            'image/webp' => 'webp',
+            'image/gif' => 'gif'
+        ];
+
+        // Check file size
         if ($file['size'] > 5 * 1024 * 1024) jsonErr('Fichier trop volumineux (max 5 MB)');
+
+        // Detect actual MIME type using finfo (not client-supplied $_FILES['type'])
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        if (!$finfo) jsonErr('Erreur lors de la vérification du fichier', 500);
+        $actualMime = finfo_file($finfo, $file['tmp_name']);
+        finfo_close($finfo);
+
+        // Validate MIME type against whitelist
+        if (!$actualMime || !in_array($actualMime, $allowed)) {
+            jsonErr('Type de fichier non autorisé');
+        }
 
         $uploadDir = dirname(dirname(dirname(__DIR__))) . '/uploads/properties/';
         if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
 
-        $ext      = pathinfo($file['name'], PATHINFO_EXTENSION);
-        $filename = uniqid('prop_', true) . '.' . strtolower($ext);
-        $dest     = $uploadDir . $filename;
+        // Use detected MIME type to determine safe extension (not client-supplied filename)
+        $ext = $mimeExtMap[$actualMime] ?? 'bin';
+        $filename = uniqid('prop_', true) . '.' . $ext;
+        $dest = $uploadDir . $filename;
 
         if (!move_uploaded_file($file['tmp_name'], $dest)) jsonErr('Erreur lors du déplacement du fichier');
 
