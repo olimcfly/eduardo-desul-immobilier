@@ -217,44 +217,94 @@ return [
             'icon' => 'fas fa-tag',
             'blocks' => [
                 'hero' => [
-                    'type' => 'hero',
+                    'type' => 'vendre_hero',
                     'label' => 'Hero principal',
+                    'description' => 'Section héro avec titre, sous-titre et 2 CTA',
                     'fields' => [
-                        'title' => ['type' => 'text', 'label' => 'Titre', 'required' => true],
+                        'title' => ['type' => 'text', 'label' => 'Titre principal', 'required' => true],
                         'subtitle' => ['type' => 'textarea', 'label' => 'Sous-titre'],
                         'background_image' => ['type' => 'image', 'label' => 'Image de fond'],
+                        'cta_primary_text' => ['type' => 'text', 'label' => 'CTA primaire - Texte'],
+                        'cta_primary_url' => ['type' => 'url', 'label' => 'CTA primaire - URL'],
+                        'cta_secondary_text' => ['type' => 'text', 'label' => 'CTA secondaire - Texte'],
+                        'cta_secondary_url' => ['type' => 'url', 'label' => 'CTA secondaire - URL'],
+                    ]
+                ],
+                'pain_points' => [
+                    'type' => 'vendre_pain_points',
+                    'label' => 'Défis du vendeur',
+                    'description' => 'Afficher les principaux défis avec solutions',
+                    'fields' => [
+                        'headline' => ['type' => 'text', 'label' => 'Titre section'],
+                        'items' => ['type' => 'repeater', 'label' => 'Défis', 'item_fields' => [
+                            'icon' => ['type' => 'text', 'label' => 'Icône'],
+                            'title' => ['type' => 'text', 'label' => 'Défi'],
+                            'solution' => ['type' => 'textarea', 'label' => 'Notre solution'],
+                        ]],
+                    ]
+                ],
+                'advisor' => [
+                    'type' => 'vendre_advisor',
+                    'label' => 'Pourquoi nous choisir',
+                    'description' => 'Présentation du conseiller et de son approche',
+                    'fields' => [
+                        'photo' => ['type' => 'image', 'label' => 'Photo du conseiller'],
+                        'name' => ['type' => 'text', 'label' => 'Nom du conseiller', 'required' => true],
+                        'title' => ['type' => 'text', 'label' => 'Titre/Fonction'],
+                        'intro' => ['type' => 'textarea', 'label' => 'Introduction courte'],
+                        'benefits' => ['type' => 'repeater', 'label' => 'Avantages', 'item_fields' => [
+                            'icon' => ['type' => 'text', 'label' => 'Icône'],
+                            'text' => ['type' => 'text', 'label' => 'Avantage'],
+                        ]],
+                        'cta_text' => ['type' => 'text', 'label' => 'CTA - Texte'],
+                        'cta_url' => ['type' => 'url', 'label' => 'CTA - URL'],
                     ]
                 ],
                 'steps' => [
-                    'type' => 'steps',
-                    'label' => 'Étapes du processus',
-                    'description' => 'Processus en étapes numérotées',
+                    'type' => 'vendre_steps',
+                    'label' => 'Processus de vente',
+                    'description' => 'Les étapes pour vendre un bien',
                     'fields' => [
-                        'section_title' => ['type' => 'text', 'label' => 'Titre section'],
+                        'headline' => ['type' => 'text', 'label' => 'Titre section'],
                         'items' => ['type' => 'repeater', 'label' => 'Étapes', 'item_fields' => [
                             'title' => ['type' => 'text', 'label' => 'Titre étape'],
                             'description' => ['type' => 'textarea', 'label' => 'Description'],
                         ]],
                     ]
                 ],
-                'estimation_cta' => [
-                    'type' => 'cta',
-                    'label' => 'CTA Estimation',
+                'guide' => [
+                    'type' => 'vendre_guide',
+                    'label' => 'Guide du vendeur',
+                    'description' => 'Ressources et guide pour le vendeur',
                     'fields' => [
-                        'headline' => ['type' => 'text', 'label' => 'Titre'],
-                        'description' => ['type' => 'textarea', 'label' => 'Description'],
-                        'button_text' => ['type' => 'text', 'label' => 'Texte bouton'],
-                        'button_url' => ['type' => 'url', 'label' => 'URL bouton'],
+                        'headline' => ['type' => 'text', 'label' => 'Titre section'],
+                        'items' => ['type' => 'repeater', 'label' => 'Ressources', 'item_fields' => [
+                            'icon' => ['type' => 'text', 'label' => 'Icône'],
+                            'title' => ['type' => 'text', 'label' => 'Titre'],
+                            'description' => ['type' => 'textarea', 'label' => 'Description'],
+                        ]],
                     ]
                 ],
-                'faq' => [
-                    'type' => 'faq',
-                    'label' => 'Questions fréquentes',
+                'social_proof' => [
+                    'type' => 'vendre_social_proof',
+                    'label' => 'Preuve sociale',
+                    'description' => 'Avis clients et témoignages',
                     'fields' => [
-                        'items' => ['type' => 'repeater', 'label' => 'FAQ', 'item_fields' => [
-                            'question' => ['type' => 'text', 'label' => 'Question'],
-                            'answer' => ['type' => 'richtext', 'label' => 'Réponse'],
-                        ]],
+                        'stars' => ['type' => 'number', 'label' => 'Note (ex: 4.8)', 'required' => true],
+                        'count' => ['type' => 'number', 'label' => 'Nombre d\'avis', 'required' => true],
+                        'cta_text' => ['type' => 'text', 'label' => 'Texte CTA', 'value' => 'Voir les avis'],
+                        'cta_url' => ['type' => 'url', 'label' => 'Lien avis'],
+                    ]
+                ],
+                'cta_final' => [
+                    'type' => 'vendre_cta_final',
+                    'label' => 'Appel à l\'action final',
+                    'description' => 'CTA final pour estimation/contact',
+                    'fields' => [
+                        'headline' => ['type' => 'text', 'label' => 'Titre principal', 'required' => true],
+                        'subtext' => ['type' => 'textarea', 'label' => 'Sous-texte'],
+                        'cta_text' => ['type' => 'text', 'label' => 'CTA - Texte'],
+                        'cta_url' => ['type' => 'url', 'label' => 'CTA - URL'],
                     ]
                 ],
             ]
