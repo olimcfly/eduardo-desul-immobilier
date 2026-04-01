@@ -18,6 +18,7 @@ if (isset($pdo)) {
     } elseif (method_exists($pdo, 'query')) {
         $db = $pdo; // utilise directement si ça supporte query/prepare
     }
+if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
 }
 // Fallback via Database::getInstance()
 if (!$db) {

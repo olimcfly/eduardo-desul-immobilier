@@ -183,6 +183,7 @@ function calculatePropertyEstimate($property_type, $surface, $rooms, $year_built
 // Connexion DB et traitement
 // ─────────────────────────────────────────────────────────────
 
+if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
 try {
     // Charger la classe Database
     require_once ROOT_PATH . '/includes/classes/Database.php';

@@ -45,6 +45,7 @@ if (empty($_SESSION['csrf_token'])) {
     $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
+if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
 // ─── Connexion DB ($pdo et $db disponibles pour les modules) ───
 require_once ROOT_PATH . '/includes/classes/Database.php';
 $pdo = Database::getInstance();

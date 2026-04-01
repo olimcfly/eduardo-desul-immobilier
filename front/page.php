@@ -13,6 +13,7 @@ require_once $root . '/config/database.php';
 if (file_exists($root . '/includes/maintenance-check.php')) {
     require_once $root . '/includes/maintenance-check.php';
 }
+if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
 
     if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
 $db = Database::getInstance();

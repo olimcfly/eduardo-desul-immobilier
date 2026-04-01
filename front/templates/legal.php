@@ -29,6 +29,7 @@ if (!$db) {
     $configPath = dirname(dirname(__DIR__)) . '/config/config.php';
     if (file_exists($configPath)) require_once $configPath;
     $dbPath = dirname(dirname(__DIR__)) . '/config/database.php';
+if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
     if (file_exists($dbPath)) require_once $dbPath;
     if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
     if (function_exists('getDB')) $db = Database::getInstance();

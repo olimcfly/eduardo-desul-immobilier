@@ -25,6 +25,7 @@ if (!defined('FRONT_ROUTER')) {
     exit('Accès direct interdit.');
 }
 
+if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
 global $db;
     if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
 if (!$db) $db = Database::getInstance();

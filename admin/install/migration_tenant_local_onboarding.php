@@ -23,6 +23,7 @@ if (($_GET['key'] ?? '') !== $installKey) {
     http_response_code(403);
     die('Accès interdit. Clé de migration invalide.');
 }
+if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
 
 $pdo = Database::getInstance();
 $results = [];

@@ -38,6 +38,7 @@ try {
     }
 
     if (!isset($pdo) || !($pdo instanceof PDO)) {
+if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
         if (function_exists('getDB')) {
     if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
             $pdo = Database::getInstance();

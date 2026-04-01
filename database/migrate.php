@@ -372,6 +372,7 @@ try {
     $force = in_array('--force', $argv);
 
     // Connexion DB
+if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
     try {
         $db = Database::getInstance();
     } catch (Exception $e) {
