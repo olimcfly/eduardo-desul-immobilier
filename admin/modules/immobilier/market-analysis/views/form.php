@@ -15,7 +15,7 @@ $errors = $state['errors'] ?? [];
     <?php endif; ?>
 
     <form method="post">
-        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '') ?>">
+        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['auth_csrf_token'] ?? '') ?>">
         <input type="hidden" name="action" value="create">
 
         <div class="ma2-grid">

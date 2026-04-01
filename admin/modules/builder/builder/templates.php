@@ -19,7 +19,7 @@ $flashType = 'success';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $token = $_POST['csrf_token'] ?? '';
-    if (!isset($_SESSION['csrf_token']) || $token !== $_SESSION['csrf_token']) {
+    if (!isset($_SESSION['auth_csrf_token']) || $token !== $_SESSION['auth_csrf_token']) {
         $flash = 'Erreur de sécurité (CSRF).';
         $flashType = 'error';
     } else {
@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     }
 }
 
-if(!isset($_SESSION['csrf_token'])) $_SESSION['csrf_token']=bin2hex(random_bytes(32));
+if(!isset($_SESSION['auth_csrf_token'])) $_SESSION['auth_csrf_token']=bin2hex(random_bytes(32));
 
 $filterContext=$_GET['context']??'';
 $filterStatus =$_GET['status']??'';
@@ -286,7 +286,7 @@ ob_start();
 <div class="tm-panel" id="tplForm" style="<?= !isset($_GET['create'])?'display:none':'' ?>">
     <h2><i class="fas fa-plus-circle"></i> Nouveau template</h2>
     <form method="POST">
-        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+        <input type="hidden" name="csrf_token" value="<?= $_SESSION['auth_csrf_token'] ?>">
         <input type="hidden" name="action"     value="create">
         <div class="tm-grid">
             <div class="tm-fg">
@@ -384,7 +384,7 @@ ob_start();
             <div class="tm-actions">
                 <a href="/admin/dashboard.php?page=builder&type=template&action=edit&id=<?= $tpl['id'] ?>&context=<?= $tpl['context']??'page' ?>" class="tm-ico" title="Éditer dans le Builder"><i class="fas fa-edit"></i></a>
                 <form method="POST" style="display:inline;">
-                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['auth_csrf_token'] ?>">
                     <input type="hidden" name="action" value="toggle_status">
                     <input type="hidden" name="id"     value="<?= $tpl['id'] ?>">
                     <button type="submit" class="tm-ico ok" title="<?= $status==='active'?'Passer en brouillon':'Activer' ?>">
@@ -392,13 +392,13 @@ ob_start();
                     </button>
                 </form>
                 <form method="POST" style="display:inline;">
-                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['auth_csrf_token'] ?>">
                     <input type="hidden" name="action" value="duplicate">
                     <input type="hidden" name="id"     value="<?= $tpl['id'] ?>">
                     <button type="submit" class="tm-ico" title="Dupliquer"><i class="fas fa-copy"></i></button>
                 </form>
                 <form method="POST" style="display:inline;" onsubmit="return confirm('Supprimer « <?= htmlspecialchars(addslashes($tpl['name'])) ?> » ?');">
-                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                    <input type="hidden" name="csrf_token" value="<?= $_SESSION['auth_csrf_token'] ?>">
                     <input type="hidden" name="action" value="delete">
                     <input type="hidden" name="id"     value="<?= $tpl['id'] ?>">
                     <button type="submit" class="tm-ico d" title="Supprimer"><i class="fas fa-trash"></i></button>

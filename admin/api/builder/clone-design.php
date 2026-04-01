@@ -17,9 +17,9 @@ if (session_status() !== PHP_SESSION_ACTIVE) session_start();
 header('Content-Type: application/json; charset=utf-8');
 
 // ── AUTH ──────────────────────────────────────────────────────────────────────
-$_isAuth = !empty($_SESSION['admin_logged_in']) || !empty($_SESSION['user_id'])
-        || !empty($_SESSION['admin_id'])         || !empty($_SESSION['logged_in'])
-        || !empty($_SESSION['is_admin']);
+$_isAuth = !empty($_SESSION['auth_admin_logged_in']) || !empty($_SESSION['auth_user_id'])
+        || !empty($_SESSION['auth_admin_id'])         || !empty($_SESSION['auth_logged_in'])
+        || !empty($_SESSION['auth_is_admin']);
 if (!$_isAuth) {
     http_response_code(401);
     echo json_encode(['success'=>false,'error'=>'Non autorisé']); exit;

@@ -14,13 +14,13 @@ require_once dirname(dirname(__FILE__)) . '/config/config.php';
 // 1. VERIFIER L'AUTHENTIFICATION
 // ═══════════════════════════════════════════════════════════
 
-if (empty($_SESSION['admin_id']) || empty($_SESSION['admin_email'])) {
+if (empty($_SESSION['auth_admin_id']) || empty($_SESSION['auth_admin_email'])) {
     header('Location: /admin/login.php');
     exit;
 }
 
-$admin_id = $_SESSION['admin_id'];
-$admin_email = $_SESSION['admin_email'];
+$admin_id = $_SESSION['auth_admin_id'];
+$admin_email = $_SESSION['auth_admin_email'];
 
 // ═══════════════════════════════════════════════════════════
 // 2. CONNEXION BD VIA CONFIG

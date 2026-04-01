@@ -10,7 +10,7 @@
  */
 
 if (session_status() === PHP_SESSION_NONE) session_start();
-if (empty($_SESSION['admin_id'])) {
+if (empty($_SESSION['auth_admin_id'])) {
     die('Accès refusé. <a href="/admin/login.php">Connexion</a>');
 }
 

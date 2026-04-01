@@ -17,7 +17,7 @@
 // Sécurité : vérifier confirmation
 if (php_sapi_name() !== 'cli') {
     session_start();
-    if (!isset($_SESSION['admin_id'])) die('Auth required');
+    if (!isset($_SESSION['auth_admin_id'])) die('Auth required');
     if (($_GET['confirm'] ?? '') !== 'yes') {
         die('<h2>Migration API</h2>
         <p>Cette opération va réorganiser /admin/api/ en sous-dossiers.</p>

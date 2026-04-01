@@ -20,7 +20,7 @@
  */
 
 if (session_status() === PHP_SESSION_NONE) session_start();
-if (empty($_SESSION['admin_id'])) {
+if (empty($_SESSION['auth_admin_id'])) {
     _respond(false, null, 'Non authentifié', 401);
 }
 

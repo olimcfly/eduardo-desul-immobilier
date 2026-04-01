@@ -10,7 +10,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 // Vérifier la session admin
-if (empty($_SESSION['user_id']) && empty($_SESSION['admin_logged_in'])) {
+if (empty($_SESSION['auth_user_id']) && empty($_SESSION['auth_admin_logged_in'])) {
     header('Location: /admin/login.php');
     exit;
 }

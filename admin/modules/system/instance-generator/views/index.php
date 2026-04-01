@@ -1,6 +1,6 @@
 <?php
-$flash = $_SESSION['instance_generator_flash'] ?? null;
-unset($_SESSION['instance_generator_flash']);
+$flash = $_SESSION['auth_instance_generator_flash'] ?? null;
+unset($_SESSION['auth_instance_generator_flash']);
 ?>
 <div class="card">
     <div class="card-hd" style="display:flex;justify-content:space-between;align-items:center;gap:12px;">

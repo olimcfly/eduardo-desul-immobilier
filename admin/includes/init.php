@@ -25,7 +25,7 @@ if (!file_exists($configPath)) {
 require_once $configPath;
 
 // ─── Vérifier la session admin ───
-if (empty($_SESSION['admin_id'])) {
+if (empty($_SESSION['auth_admin_id'])) {
     // Si c'est un appel AJAX/API, retourner du JSON au lieu de rediriger
     $isAjax = (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest')
               || (isset($_SERVER['CONTENT_TYPE']) && strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false)
@@ -41,8 +41,8 @@ if (empty($_SESSION['admin_id'])) {
 }
 
 // ─── CSRF token ───
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+if (empty($_SESSION['auth_csrf_token'])) {
+    $_SESSION['auth_csrf_token'] = bin2hex(random_bytes(32));
 }
 
 if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
@@ -56,21 +56,21 @@ if (!defined('ADMIN_ROUTER')) {
 }
 
 // ─── Infos admin ───
-$adminName    = $_SESSION['admin_name'] ?? $_SESSION['admin_email'] ?? 'Admin';
+$adminName    = $_SESSION['auth_admin_name'] ?? $_SESSION['auth_admin_email'] ?? 'Admin';
 $adminInitial = strtoupper(substr($adminName, 0, 1));
-$adminId      = $_SESSION['admin_id'];
-$adminRole    = $_SESSION['admin_role'] ?? 'admin';
+$adminId      = $_SESSION['auth_admin_id'];
+$adminRole    = $_SESSION['auth_admin_role'] ?? 'admin';
 
 // ─── Helpers rôles & permissions ───
 
 if (!function_exists('isSuperUser')) {
     function isSuperUser() {
-        if (($_SESSION['admin_role'] ?? 'admin') === 'superuser') {
+        if (($_SESSION['auth_admin_role'] ?? 'admin') === 'superuser') {
             return true;
         }
 
         // Compte admin historique qui doit conserver un accès complet
-        $adminEmail = strtolower(trim((string)($_SESSION['admin_email'] ?? '')));
+        $adminEmail = strtolower(trim((string)($_SESSION['auth_admin_email'] ?? '')));
         $fullAccessEmails = [
             'admin@duardo-desul-immobilier.fr',
         ];
@@ -98,7 +98,7 @@ if (!function_exists('isModuleAllowed')) {
             try {
                 $db = Database::getInstance();
                 $countStmt = $db->prepare("SELECT COUNT(*) FROM admin_module_permissions WHERE admin_id = ?");
-                $countStmt->execute([$_SESSION['admin_id']]);
+                $countStmt->execute([$_SESSION['auth_admin_id']]);
                 $hasCustomPermissions = (int)$countStmt->fetchColumn() > 0;
 
                 if (!$hasCustomPermissions) {
@@ -108,7 +108,7 @@ if (!function_exists('isModuleAllowed')) {
                 }
 
                 $stmt = $db->prepare("SELECT module_slug FROM admin_module_permissions WHERE admin_id = ? AND is_allowed = 1");
-                $stmt->execute([$_SESSION['admin_id']]);
+                $stmt->execute([$_SESSION['auth_admin_id']]);
                 $permissions = $stmt->fetchAll(PDO::FETCH_COLUMN);
             } catch (Exception $e) {
                 // Si la table n'existe pas encore, autoriser tout
@@ -122,7 +122,7 @@ if (!function_exists('isModuleAllowed')) {
 
 if (!function_exists('getAdminRole')) {
     function getAdminRole() {
-        return $_SESSION['admin_role'] ?? 'admin';
+        return $_SESSION['auth_admin_role'] ?? 'admin';
     }
 }
 

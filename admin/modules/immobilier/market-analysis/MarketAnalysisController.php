@@ -108,7 +108,7 @@ class MarketAnalysisController
 
     private function ensureCsrf(): void
     {
-        $sessionToken = (string) ($_SESSION['csrf_token'] ?? '');
+        $sessionToken = (string) ($_SESSION['auth_csrf_token'] ?? '');
         $sentToken = (string) ($_POST['csrf_token'] ?? '');
 
         if ($sessionToken !== '' && !hash_equals($sessionToken, $sentToken)) {

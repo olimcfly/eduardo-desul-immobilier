@@ -92,7 +92,7 @@ class AiLogger
             'provider' => $provider,
             'tokens'   => $tokens,
             'success'  => $success ? 'true' : 'false',
-            'admin_id' => $_SESSION['admin_id'] ?? 0,
+            'admin_id' => $_SESSION['auth_admin_id'] ?? 0,
         ]);
 
         // Persister en DB (silencieux si table inexistante)
@@ -215,7 +215,7 @@ SQL;
                 $provider,
                 $tokens,
                 (int) $success,
-                $_SESSION['admin_id'] ?? 0,
+                $_SESSION['auth_admin_id'] ?? 0,
             ]);
 
         } catch (Throwable) {

@@ -1,6 +1,6 @@
 <?php
-$flash = $_SESSION['prompt_flash'] ?? null;
-unset($_SESSION['prompt_flash']);
+$flash = $_SESSION['auth_prompt_flash'] ?? null;
+unset($_SESSION['auth_prompt_flash']);
 ?>
 
 <div class="mod-hero">

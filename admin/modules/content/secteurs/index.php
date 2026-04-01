@@ -13,7 +13,7 @@ require_once dirname(dirname(dirname(dirname(__DIR__)))) . '/includes/classes/Se
 $service = new SecteurService($pdo);
 $service->ensureSchema();
 
-$websiteId = max(1, (int)($_GET['website_id'] ?? $_SESSION['current_website_id'] ?? 1));
+$websiteId = max(1, (int)($_GET['website_id'] ?? $_SESSION['auth_current_website_id'] ?? 1));
 $action = $_GET['action'] ?? '';
 
 if ($action === 'create') {

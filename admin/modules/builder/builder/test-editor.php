@@ -7,7 +7,7 @@
 require_once __DIR__ . '/../../../includes/init.php';
 header('Content-Type: text/html; charset=utf-8');
 
-$csrf = $_SESSION['csrf_token'];
+$csrf = $_SESSION['auth_csrf_token'];
 $tests = [];
 
 // Test 1: DB connection
@@ -83,7 +83,7 @@ $tests[] = ['name'=>'template-load.php', 'ok'=>file_exists(__DIR__.'/../../../ap
 a{color:#3b82f6;font-weight:bold}
 </style></head><body>
 <h1>🔧 Test Éditeur Builder</h1>
-<p>Session admin: <strong><?=htmlspecialchars($_SESSION['admin_email']??'?')?></strong> | CSRF: <code><?=substr($csrf,0,16)?>...</code></p>
+<p>Session admin: <strong><?=htmlspecialchars($_SESSION['auth_admin_email']??'?')?></strong> | CSRF: <code><?=substr($csrf,0,16)?>...</code></p>
 <hr>
 <?php foreach($tests as $t): ?>
 <div class="test <?=$t['ok']?'ok':'fail'?>">

@@ -6,7 +6,7 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-if (!isset($_SESSION['admin_id'])) {
+if (!isset($_SESSION['auth_admin_id'])) {
     header('Location: /admin/login.php');
     exit;
 }
@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_POST['action'] === 'import') {
                         $article['featured_image'] ?? null,
                         'published',
                         $article['created_at'] ?? date('Y-m-d H:i:s'),
-                        $_SESSION['admin_id']
+                        $_SESSION['auth_admin_id']
                     ]);
 
                     $imported++;

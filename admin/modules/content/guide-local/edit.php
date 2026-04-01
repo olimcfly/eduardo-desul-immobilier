@@ -7,7 +7,7 @@
  */
 
 if (session_status() === PHP_SESSION_NONE) session_start();
-if (empty($_SESSION['admin_id'])) { header('Location: /admin/login.php'); exit; }
+if (empty($_SESSION['auth_admin_id'])) { header('Location: /admin/login.php'); exit; }
 
 if (!isset($pdo) && !isset($db)) {
     if (!defined('ADMIN_ROUTER')) require_once dirname(dirname(dirname(dirname(__DIR__)))) . '/includes/init.php';

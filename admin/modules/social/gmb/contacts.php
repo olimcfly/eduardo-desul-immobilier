@@ -17,7 +17,7 @@ $isEmbedded = isset($pdo);
 
 if (!$isEmbedded) {
     require_once __DIR__ . '/../../includes/init.php';
-    if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+    if (!isset($_SESSION['auth_admin_logged_in']) || $_SESSION['auth_admin_logged_in'] !== true) {
         header('Location: /admin/login.php');
         exit;
     }

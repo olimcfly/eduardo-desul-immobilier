@@ -20,7 +20,7 @@ try {
     return;
 }
 
-$user_id = $_SESSION['admin_id'] ?? 1;
+$user_id = $_SESSION['auth_admin_id'] ?? 1;
 $current_step = isset($_GET['etape']) ? intval($_GET['etape']) : 0;
 
 // Récupérer progression

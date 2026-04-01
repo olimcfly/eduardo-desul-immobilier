@@ -6,7 +6,7 @@
  * Ancienne position : modules/social/tiktok/api/save-script.php
  */
 if (session_status() === PHP_SESSION_NONE) session_start();
-if (empty($_SESSION['admin_id'])) {
+if (empty($_SESSION['auth_admin_id'])) {
     http_response_code(401);
     header('Content-Type: application/json');
     echo json_encode(['success' => false, 'error' => 'Non autorisé']);

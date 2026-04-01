@@ -115,7 +115,7 @@ try {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
-    if (!empty($_SESSION['admin_id']) || !empty($_SESSION['admin_logged_in']) || !empty($_SESSION['user_id'])) {
+    if (!empty($_SESSION['auth_admin_id']) || !empty($_SESSION['auth_admin_logged_in']) || !empty($_SESSION['auth_user_id'])) {
         // Admin connecté mais IP pas dans la whitelist → bandeau aussi
         $GLOBALS['maintenance_banner'] = true;
         $GLOBALS['maintenance_banner_message'] = $_maint_data['message'] ?: '';

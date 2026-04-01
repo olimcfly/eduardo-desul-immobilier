@@ -7,7 +7,7 @@
 if (session_status() === PHP_SESSION_NONE) session_start();
 header('Content-Type: application/json; charset=utf-8');
 
-if (empty($_SESSION['admin_id'])) {
+if (empty($_SESSION['auth_admin_id'])) {
     http_response_code(401);
     echo json_encode(['success' => false, 'error' => 'Session expirée']);
     exit;
@@ -196,7 +196,7 @@ if ($action === 'create_crm_actions') {
                 $method,
                 $channel,
                 $note,
-                (int)($_SESSION['admin_id'] ?? 0) ?: null
+                (int)($_SESSION['auth_admin_id'] ?? 0) ?: null
             ]);
             $created++;
         }

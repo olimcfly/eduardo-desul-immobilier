@@ -18,8 +18,8 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-if (empty($_SESSION['csrf_token'])) {
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+if (empty($_SESSION['auth_csrf_token'])) {
+    $_SESSION['auth_csrf_token'] = bin2hex(random_bytes(32));
 }
 
 // ========================================
@@ -1130,7 +1130,7 @@ $apiUrl = '/admin/api/router.php?module=seo';
 
 <script>
 const API_URL = '<?php echo $apiUrl; ?>';
-const CSRF_TOKEN = <?= json_encode($_SESSION['csrf_token'] ?? '', JSON_UNESCAPED_UNICODE) ?>;
+const CSRF_TOKEN = <?= json_encode($_SESSION['auth_csrf_token'] ?? '', JSON_UNESCAPED_UNICODE) ?>;
 let currentPageId = null;
 let pendingAIResult = null;
 

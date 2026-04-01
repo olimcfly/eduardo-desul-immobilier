@@ -147,19 +147,19 @@ if (!function_exists('redirect')) {
 
 if (!function_exists('isAdminLoggedIn')) {
     function isAdminLoggedIn() {
-        return !empty($_SESSION['admin_id']) && !empty($_SESSION['admin_email']);
+        return !empty($_SESSION['auth_admin_id']) && !empty($_SESSION['auth_admin_email']);
     }
 }
 
 if (!function_exists('getAdminId')) {
     function getAdminId() {
-        return $_SESSION['admin_id'] ?? null;
+        return $_SESSION['auth_admin_id'] ?? null;
     }
 }
 
 if (!function_exists('getAdminEmail')) {
     function getAdminEmail() {
-        return $_SESSION['admin_email'] ?? null;
+        return $_SESSION['auth_admin_email'] ?? null;
     }
 }
 
@@ -229,13 +229,13 @@ if (!function_exists('getSiteDomain')) {
 
 if (!function_exists('isSuperUser')) {
     function isSuperUser() {
-        return ($_SESSION['admin_role'] ?? 'admin') === 'superuser';
+        return ($_SESSION['auth_admin_role'] ?? 'admin') === 'superuser';
     }
 }
 
 if (!function_exists('getAdminRole')) {
     function getAdminRole() {
-        return $_SESSION['admin_role'] ?? 'admin';
+        return $_SESSION['auth_admin_role'] ?? 'admin';
     }
 }
 
@@ -258,7 +258,7 @@ if (!function_exists('isModuleAllowed')) {
             try {
                 $db = getDB();
                 $stmt = $db->prepare("SELECT module_slug FROM admin_module_permissions WHERE admin_id = ? AND is_allowed = 1");
-                $stmt->execute([$_SESSION['admin_id']]);
+                $stmt->execute([$_SESSION['auth_admin_id']]);
                 $permissions = $stmt->fetchAll(PDO::FETCH_COLUMN);
             } catch (Exception $e) {
                 return true;

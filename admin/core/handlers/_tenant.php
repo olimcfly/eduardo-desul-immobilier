@@ -26,7 +26,7 @@ if (!function_exists('requireTenantContext')) {
     function requireTenantContext(PDO $pdo): array
     {
         $tenantId = resolveTenantIdFromRequest();
-        $adminId = (int)($_SESSION['admin_id'] ?? 0);
+        $adminId = (int)($_SESSION['auth_admin_id'] ?? 0);
 
         if ($adminId <= 0) {
             throw new RuntimeException('Session admin invalide');
@@ -66,7 +66,7 @@ if (!function_exists('tenantCanWrite')) {
 if (!function_exists('createTenantAuditLog')) {
     function createTenantAuditLog(PDO $pdo, int $tenantId, string $action, string $entityType, int $entityId, array $after = []): void
     {
-        $actorUserId = (int)($_SESSION['admin_id'] ?? 0);
+        $actorUserId = (int)($_SESSION['auth_admin_id'] ?? 0);
 
         $stmt = $pdo->prepare(
             "INSERT INTO audit_logs (tenant_id, actor_user_id, action, entity_type, entity_id, before_json, after_json, created_at)

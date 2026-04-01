@@ -241,7 +241,7 @@ $v = [
 ];
 
 $capUrl = '/capture/' . ($v['slug'] ?: 'draft');
-$csrfToken = $_SESSION['csrf_token'] ?? '';
+$csrfToken = $_SESSION['auth_csrf_token'] ?? '';
 ?>
 
 <style>

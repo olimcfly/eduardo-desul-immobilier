@@ -6,7 +6,7 @@
 
 require_once __DIR__ . '/../../includes/init.php';
 
-if (!isset($_SESSION['admin_logged_in']) || !$_SESSION['admin_logged_in']) {
+if (!isset($_SESSION['auth_admin_logged_in']) || !$_SESSION['auth_admin_logged_in']) {
     header('Location: /admin/login.php');
     exit;
 }
@@ -60,7 +60,7 @@ function handleImageUpload($file, $uploadDir, $prefix, $allowedTypes, $maxSize) 
 
 // ── Traitement POST ──
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== ($_SESSION['csrf_token'] ?? '')) {
+    if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== ($_SESSION['auth_csrf_token'] ?? '')) {
         $message = 'Token de sécurité invalide.';
         $messageType = 'error';
     } else {
@@ -129,7 +129,7 @@ $siteFavicon = getSetting($db, 'site_favicon');
 $siteName   = getSetting($db, 'site_name', 'Eduardo De Sul');
 $logoWidth  = getSetting($db, 'site_logo_width', '180');
 
-$_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+$_SESSION['auth_csrf_token'] = bin2hex(random_bytes(32));
 
 $pageTitle = 'Identité du site';
 include __DIR__ . '/../../includes/header.php';
@@ -152,7 +152,7 @@ include __DIR__ . '/../../includes/header.php';
     <?php endif; ?>
 
     <form method="POST" enctype="multipart/form-data" style="max-width:900px;display:flex;flex-direction:column;gap:24px;">
-        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+        <input type="hidden" name="csrf_token" value="<?= $_SESSION['auth_csrf_token'] ?>">
 
         <!-- ═══ Nom du site ═══ -->
         <div style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06);">

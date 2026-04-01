@@ -8,7 +8,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-if (!isset($_SESSION['admin_id'])) {
+if (!isset($_SESSION['auth_admin_id'])) {
     http_response_code(401);
     echo json_encode(['success' => false, 'error' => 'Unauthorized']);
     exit;
@@ -35,7 +35,7 @@ try {
         exit;
     }
     
-    $manager = new LaunchpadManager($pdo, $_SESSION['admin_id']);
+    $manager = new LaunchpadManager($pdo, $_SESSION['auth_admin_id']);
     $result = [];
     
     switch ($step) {

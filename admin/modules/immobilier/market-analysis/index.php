@@ -12,7 +12,7 @@ if (!defined('ADMIN_ROUTER')) {
 
 require_once __DIR__ . '/MarketAnalysisController.php';
 
-$userId = (int) ($_SESSION['admin_id'] ?? 0);
+$userId = (int) ($_SESSION['auth_admin_id'] ?? 0);
 $controller = new MarketAnalysisController($pdo, $userId);
 $state = $controller->handleRequest();
 

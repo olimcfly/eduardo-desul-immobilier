@@ -56,8 +56,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') err('Méthode non autorisée');
 $body = json_decode(file_get_contents('php://input'), true);
 if (!is_array($body)) err('Payload JSON invalide');
 
-if (!empty($_SESSION['csrf_token'])) {
-    if (!hash_equals($_SESSION['csrf_token'], $body['csrf_token'] ?? ''))
+if (!empty($_SESSION['auth_csrf_token'])) {
+    if (!hash_equals($_SESSION['auth_csrf_token'], $body['csrf_token'] ?? ''))
         err('Token CSRF invalide');
 }
 

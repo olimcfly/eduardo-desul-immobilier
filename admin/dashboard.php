@@ -10,7 +10,7 @@ ini_set('display_errors', '1');
 require_once __DIR__ . '/includes/init.php';
 
 // Alias historique utilisé dans plusieurs vues/layouts
-$advisorName = $_SESSION['advisor_name'] ?? $_SESSION['admin_name'] ?? $_SESSION['admin_email'] ?? 'Administrateur';
+$advisorName = $_SESSION['auth_advisor_name'] ?? $_SESSION['auth_admin_name'] ?? $_SESSION['auth_admin_email'] ?? 'Administrateur';
 
 // Bootstrap
 if (!class_exists('Database')) {

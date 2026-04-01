@@ -20,7 +20,7 @@ session_name(defined('SESSION_NAME') ? SESSION_NAME : 'ECOSYSTEM_ADMIN');
 if (session_status() === PHP_SESSION_NONE) session_start();
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
-if (empty($_SESSION['admin_id']) && empty($_SESSION['user_id'])) {
+if (empty($_SESSION['auth_admin_id']) && empty($_SESSION['auth_user_id'])) {
     http_response_code(401);
     exit(json_encode(['success' => false, 'error' => 'Non authentifié']));
 }

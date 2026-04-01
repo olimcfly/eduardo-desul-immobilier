@@ -112,7 +112,7 @@ $settingsSchemaReport = ensureSettingsStorageSchema($pdo ?? null);
 
 // ─── Traitement POST ───
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-    if (empty($_SESSION['csrf_token']) || ($_POST['csrf_token'] ?? '') !== $_SESSION['csrf_token']) {
+    if (empty($_SESSION['auth_csrf_token']) || ($_POST['csrf_token'] ?? '') !== $_SESSION['auth_csrf_token']) {
         $flashMsg = 'Token CSRF invalide.'; $flashType = 'err';
     } else {
         $action_post = $_POST['action'];
@@ -288,7 +288,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         }
     }
     // Régénérer CSRF
-    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    $_SESSION['auth_csrf_token'] = bin2hex(random_bytes(32));
 }
 
 // ─── Chargement des settings ───
@@ -400,7 +400,7 @@ function buildEmailAuthDiagnostics($settings) {
     ];
 }
 
-$csrf = $_SESSION['csrf_token'];
+$csrf = $_SESSION['auth_csrf_token'];
 $emailDiagnostics = buildEmailAuthDiagnostics($settings);
 
 // ─── Advisor Context ───

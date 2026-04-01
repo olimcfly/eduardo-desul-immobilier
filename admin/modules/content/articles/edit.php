@@ -34,8 +34,8 @@ if (!isset($pdo)) {
 }
 
 // ─── CSRF ───────────────────────────────────────────────────────────────────
-if (empty($_SESSION['csrf_token'])) $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
-$csrfToken = $_SESSION['csrf_token'];
+if (empty($_SESSION['auth_csrf_token'])) $_SESSION['auth_csrf_token'] = bin2hex(random_bytes(32));
+$csrfToken = $_SESSION['auth_csrf_token'];
 
 // ─── Paramètres ─────────────────────────────────────────────────────────────
 $action  = $_GET['action'] ?? 'edit';

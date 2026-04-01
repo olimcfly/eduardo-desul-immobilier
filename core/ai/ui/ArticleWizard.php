@@ -50,13 +50,13 @@ class ArticleWizard
      *
      * @param array $options
      *   - 'ai_endpoint' : URL de l'endpoint IA (défaut : /admin/api/ai/generate.php)
-     *   - 'csrf_token'  : token CSRF (défaut : $_SESSION['csrf_token'])
+     *   - 'csrf_token'  : token CSRF (défaut : $_SESSION['auth_csrf_token'])
      *   - 'callback_fn' : nom de la fonction JS appelée après génération (défaut : événement custom)
      */
     public static function render(array $options = []): void
     {
         $aiEndpoint = $options['ai_endpoint'] ?? '/admin/api/ai/generate.php';
-        $csrfToken  = $options['csrf_token']  ?? ($_SESSION['csrf_token'] ?? '');
+        $csrfToken  = $options['csrf_token']  ?? ($_SESSION['auth_csrf_token'] ?? '');
         $callbackFn = $options['callback_fn'] ?? '';
         ?>
 

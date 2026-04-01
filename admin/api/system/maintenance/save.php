@@ -20,9 +20,9 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 require_once dirname(__FILE__, 4) . '/config/config.php';
 
 // Vérifier l'authentification admin (JSON au lieu d'un redirect HTML)
-$isAuthenticated = !empty($_SESSION['admin_id'])
-    || !empty($_SESSION['admin_logged_in'])
-    || !empty($_SESSION['user_id']);
+$isAuthenticated = !empty($_SESSION['auth_admin_id'])
+    || !empty($_SESSION['auth_admin_logged_in'])
+    || !empty($_SESSION['auth_user_id']);
 
 if (!$isAuthenticated) {
     http_response_code(401);

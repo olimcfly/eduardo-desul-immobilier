@@ -21,7 +21,7 @@ $public_pages = ['login.php', 'diag-pages.php'];
 $current_page = basename($_SERVER['PHP_SELF']);
 
 if (!in_array($current_page, $public_pages)) {
-    if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
+    if (!isset($_SESSION['auth_admin_logged_in']) || $_SESSION['auth_admin_logged_in'] !== true) {
         header('Location: ' . ADMIN_URL . '/login.php');
         exit;
     }

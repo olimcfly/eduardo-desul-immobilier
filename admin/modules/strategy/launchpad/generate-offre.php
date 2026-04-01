@@ -8,7 +8,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-if (!isset($_SESSION['admin_id'])) {
+if (!isset($_SESSION['auth_admin_id'])) {
     http_response_code(401);
     echo json_encode(['success' => false, 'error' => 'Unauthorized']);
     exit;
@@ -28,7 +28,7 @@ try {
         [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
     );
     
-    $manager = new LaunchpadManager($pdo, $_SESSION['admin_id']);
+    $manager = new LaunchpadManager($pdo, $_SESSION['auth_admin_id']);
     $ai = new LaunchpadAI($pdo, $manager->getLaunchpadId(), CLAUDE_API_KEY);
     
     // Récupérer les données des étapes précédentes
@@ -79,7 +79,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-if (!isset($_SESSION['admin_id'])) {
+if (!isset($_SESSION['auth_admin_id'])) {
     http_response_code(401);
     echo json_encode(['success' => false, 'error' => 'Unauthorized']);
     exit;
@@ -99,7 +99,7 @@ try {
         [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
     );
     
-    $manager = new LaunchpadManager($pdo, $_SESSION['admin_id']);
+    $manager = new LaunchpadManager($pdo, $_SESSION['auth_admin_id']);
     $ai = new LaunchpadAI($pdo, $manager->getLaunchpadId(), CLAUDE_API_KEY);
     
     // Récupérer les données
@@ -137,7 +137,7 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-if (!isset($_SESSION['admin_id'])) {
+if (!isset($_SESSION['auth_admin_id'])) {
     http_response_code(401);
     echo json_encode(['success' => false, 'error' => 'Unauthorized']);
     exit;
@@ -157,7 +157,7 @@ try {
         [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
     );
     
-    $manager = new LaunchpadManager($pdo, $_SESSION['admin_id']);
+    $manager = new LaunchpadManager($pdo, $_SESSION['auth_admin_id']);
     $ai = new LaunchpadAI($pdo, $manager->getLaunchpadId(), CLAUDE_API_KEY);
     
     // Récupérer le résumé complet

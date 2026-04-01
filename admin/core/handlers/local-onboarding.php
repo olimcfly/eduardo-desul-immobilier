@@ -155,7 +155,7 @@ switch ($action) {
                 $personaSummary,
                 json_encode($goals, JSON_UNESCAPED_UNICODE),
                 $status,
-                (int)($_SESSION['admin_id'] ?? 0),
+                (int)($_SESSION['auth_admin_id'] ?? 0),
             ]);
 
             $profileId = (int)$pdo->lastInsertId();

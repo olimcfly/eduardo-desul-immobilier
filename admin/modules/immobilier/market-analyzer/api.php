@@ -14,7 +14,7 @@ require_once __DIR__ . '/services/ArticleBridgeService.php';
 require_once __DIR__ . '/services/SiloLinkingService.php';
 require_once __DIR__ . '/services/ClusterJobOrchestratorService.php';
 
-$userId = (int)($_SESSION['admin_id'] ?? 0);
+$userId = (int)($_SESSION['auth_admin_id'] ?? 0);
 $analyzer = new MarketAnalyzer($pdo, $userId);
 $action = $_GET['action'] ?? $_POST['action'] ?? '';
 $input = json_decode(file_get_contents('php://input'), true) ?? [];
@@ -26,12 +26,12 @@ $linkingService = new SiloLinkingService($pdo, $userId);
 $orchestratorService = new ClusterJobOrchestratorService($pdo, $userId, $articleBridgeService);
 
 function requireMutableCsrf(array $input): void {
-    if (empty($_SESSION['csrf_token'])) {
+    if (empty($_SESSION['auth_csrf_token'])) {
         return;
     }
 
     $token = $input['csrf_token'] ?? $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
-    if (!is_string($token) || !hash_equals($_SESSION['csrf_token'], $token)) {
+    if (!is_string($token) || !hash_equals($_SESSION['auth_csrf_token'], $token)) {
         http_response_code(403);
         echo json_encode(['success' => false, 'error' => 'Token CSRF invalide']);
         exit;

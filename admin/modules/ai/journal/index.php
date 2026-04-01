@@ -34,7 +34,7 @@ $matrixData     = $jCtrl->getMatrixData();
 $config         = $jCtrl->getConfig();
 $secteurs       = $jCtrl->getSecteurs();
 $currentWeek    = JournalController::getCurrentWeek();
-$csrfToken      = $_SESSION['csrf_token'] ?? '';
+$csrfToken      = $_SESSION['auth_csrf_token'] ?? '';
 
 // Indexer stats par canal
 $channelStatsMap = [];

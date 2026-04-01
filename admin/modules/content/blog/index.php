@@ -49,11 +49,11 @@ $pdo->exec("CREATE TABLE IF NOT EXISTS blog_articles (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
 $flash = ''; $flashType = 'success';
-if (!isset($_SESSION['csrf_token'])) $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+if (!isset($_SESSION['auth_csrf_token'])) $_SESSION['auth_csrf_token'] = bin2hex(random_bytes(32));
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $tk = $_POST['csrf_token'] ?? '';
-    if (!isset($_SESSION['csrf_token']) || $tk !== $_SESSION['csrf_token']) {
+    if (!isset($_SESSION['auth_csrf_token']) || $tk !== $_SESSION['auth_csrf_token']) {
         $flash = 'Erreur CSRF.'; $flashType = 'error';
     } else {
         try {
@@ -207,13 +207,13 @@ function blogSortIcon($col) { global $sort, $order; if ($sort!==$col) return '<i
                         <a href="/blog/<?= htmlspecialchars($a['slug']) ?>" target="_blank" class="mod-btn-icon" title="Voir"><i class="fas fa-external-link-alt"></i></a>
                         <?php endif; ?>
                         <form method="POST" class="mod-inline-form">
-                            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                            <input type="hidden" name="csrf_token" value="<?= $_SESSION['auth_csrf_token'] ?>">
                             <input type="hidden" name="action" value="toggle_status">
                             <input type="hidden" name="id" value="<?= $a['id'] ?>">
                             <button type="submit" class="mod-btn-icon success" title="Toggle"><i class="fas fa-<?= ($a['status'] ?? 'draft')==='published'?'toggle-on':'toggle-off' ?>"></i></button>
                         </form>
                         <form method="POST" class="mod-inline-form" onsubmit="return confirm('Supprimer « <?= htmlspecialchars(addslashes($a['title'] ?? '')) ?> » ?')">
-                            <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token'] ?>">
+                            <input type="hidden" name="csrf_token" value="<?= $_SESSION['auth_csrf_token'] ?>">
                             <input type="hidden" name="action" value="delete">
                             <input type="hidden" name="id" value="<?= $a['id'] ?>">
                             <button type="submit" class="mod-btn-icon danger" title="Supprimer"><i class="fas fa-trash"></i></button>
