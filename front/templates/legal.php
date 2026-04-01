@@ -30,7 +30,8 @@ if (!$db) {
     if (file_exists($configPath)) require_once $configPath;
     $dbPath = dirname(dirname(__DIR__)) . '/config/database.php';
     if (file_exists($dbPath)) require_once $dbPath;
-    if (function_exists('getDB')) $db = getDB();
+    if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
+    if (function_exists('getDB')) $db = Database::getInstance();
 }
 
 // ── Helper eduardoHead ─────────────────────────────────────

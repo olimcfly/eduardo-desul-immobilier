@@ -26,7 +26,8 @@ if (!defined('FRONT_ROUTER')) {
 }
 
 global $db;
-if (!$db) $db = getDB();
+    if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
+if (!$db) $db = Database::getInstance();
 
 // ── Filtres URL ──────────────────────────────────────────
 $catFilter = trim($_GET['categorie'] ?? $_GET['cat'] ?? '');

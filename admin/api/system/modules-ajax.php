@@ -57,7 +57,8 @@ if ($action === 'ai_proxy') {
 
     // 1. Chercher en DB
     try {
-        $db = getDB();
+    require_once ROOT_PATH . '/includes/classes/Database.php';
+        $db = Database::getInstance();
         $r  = $db->query("SELECT setting_value FROM settings WHERE setting_key='anthropic_api_key' LIMIT 1")
                  ->fetch(PDO::FETCH_ASSOC);
         if (!empty($r['setting_value'])) {

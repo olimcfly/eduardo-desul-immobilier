@@ -184,7 +184,10 @@ function calculatePropertyEstimate($property_type, $surface, $rooms, $year_built
 // ─────────────────────────────────────────────────────────────
 
 try {
-    $db = getDB();
+    // Charger la classe Database
+    require_once ROOT_PATH . '/includes/classes/Database.php';
+
+    $db = Database::getInstance();
 
     // Charger le modèle Lead
     require_once ROOT_PATH . '/includes/classes/Lead.php';

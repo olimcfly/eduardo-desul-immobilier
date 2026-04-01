@@ -8,7 +8,7 @@ require_once dirname(__DIR__, 2) . '/includes/classes/SecteurSeoService.php';
 require_once dirname(__DIR__, 2) . '/includes/classes/SecteurPublishService.php';
 require_once dirname(__DIR__, 2) . '/includes/classes/SecteurService.php';
 
-$pdo = getDB();
+$pdo = Database::getInstance();
 $service = new SecteurService($pdo);
 $service->ensureSchema();
 

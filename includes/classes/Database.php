@@ -99,7 +99,13 @@ class Database {
     }
 
     /**
-     * Get singleton instance (returns PDO connection)
+     * Get the PDO connection instance (main method)
+     *
+     * Returns the singleton PDO connection for database operations.
+     * This is the recommended way to get the database connection.
+     *
+     * @return PDO The database connection
+     * @throws Exception If connection fails
      */
     public static function getInstance() {
         if (self::$instance === null) {
@@ -107,9 +113,14 @@ class Database {
         }
         return self::$instance->connection;
     }
-    
+
     /**
-     * Get the Database object itself
+     * Get the Database object itself (advanced usage)
+     *
+     * Returns the Database wrapper object. Most code should use getInstance()
+     * to get the PDO connection directly.
+     *
+     * @return Database The Database object
      */
     public static function getConnection() {
         if (self::$instance === null) {

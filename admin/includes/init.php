@@ -46,7 +46,8 @@ if (empty($_SESSION['csrf_token'])) {
 }
 
 // ─── Connexion DB ($pdo et $db disponibles pour les modules) ───
-$pdo = getDB();
+require_once ROOT_PATH . '/includes/classes/Database.php';
+$pdo = Database::getInstance();
 $db  = $pdo;
 
 // ─── Constante ADMIN_ROUTER pour compatibilité ───
@@ -95,7 +96,7 @@ if (!function_exists('isModuleAllowed')) {
         if ($permissions === null) {
             $permissions = [];
             try {
-                $db = getDB();
+                $db = Database::getInstance();
                 $countStmt = $db->prepare("SELECT COUNT(*) FROM admin_module_permissions WHERE admin_id = ?");
                 $countStmt->execute([$_SESSION['admin_id']]);
                 $hasCustomPermissions = (int)$countStmt->fetchColumn() > 0;

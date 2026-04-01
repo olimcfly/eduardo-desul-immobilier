@@ -20,6 +20,7 @@ declare(strict_types=1);
 // ═══════════════════════════════════════════════════════════
 
 define('ROOT_PATH', dirname(__DIR__));
+require_once ROOT_PATH . '/config/config.php';
 define('MIGRATIONS_PATH', __DIR__ . '/migrations');
 define('MIGRATIONS_TABLE', 'migrations');
 
@@ -34,11 +35,8 @@ class Colors {
 }
 
 // ═══════════════════════════════════════════════════════════
-// BOOTSTRAP & CONFIGURATION
+// HELPERS & UTILITIES
 // ═══════════════════════════════════════════════════════════
-
-// Charger config (config.php inclut database.php indirectly via getDB)
-require_once ROOT_PATH . '/config/config.php';
 
 // ═══════════════════════════════════════════════════════════
 // HELPERS
@@ -375,7 +373,7 @@ try {
 
     // Connexion DB
     try {
-        $db = getDB();
+        $db = Database::getInstance();
     } catch (Exception $e) {
         print_error('Database connection failed: ' . $e->getMessage());
         exit(1);

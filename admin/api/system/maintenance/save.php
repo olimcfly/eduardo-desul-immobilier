@@ -30,7 +30,8 @@ if (!$isAuthenticated) {
     exit;
 }
 
-$pdo = getDB();
+    if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
+$pdo = Database::getInstance();
 
 $rawInput = file_get_contents('php://input');
 $jsonInput = json_decode($rawInput ?: '', true);

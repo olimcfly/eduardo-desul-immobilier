@@ -39,7 +39,8 @@ try {
 
     if (!isset($pdo) || !($pdo instanceof PDO)) {
         if (function_exists('getDB')) {
-            $pdo = getDB();
+    if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
+            $pdo = Database::getInstance();
         } else {
             $pdo = new PDO(
                 'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME,

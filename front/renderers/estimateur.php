@@ -18,7 +18,8 @@ use App\Services\EstimatorConfigService;
 use App\Services\EstimatorService;
 use App\Services\LeadQualificationService;
 
-$db = getDB();
+    if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
+$db = Database::getInstance();
 
 // Auto-migration : crée les tables si elles n'existent pas encore
 $migrationFile = dirname(__DIR__, 2) . '/database/migrations/20260325_estimateur_module.sql';
