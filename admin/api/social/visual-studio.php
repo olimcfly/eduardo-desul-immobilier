@@ -6,6 +6,11 @@ if (file_exists($initPath)) {
     require_once $initPath;
 }
 
+// Load ErrorHandler for secure error logging
+if (!class_exists('ErrorHandler')) {
+    require_once dirname(dirname(__DIR__)) . '/includes/classes/ErrorHandler.php';
+}
+
 if (!isset($pdo)) {
     echo json_encode(['success' => false, 'message' => 'Connexion DB indisponible']);
     exit;
@@ -417,5 +422,6 @@ try {
 
     vsRespond(['success' => false, 'message' => 'Action non supportée'], 400);
 } catch (Throwable $e) {
-    vsRespond(['success' => false, 'message' => $e->getMessage()], 500);
+    ErrorHandler::log($e, 'visual-studio::api', ['payload' => isset($payload) ? array_keys($payload) : []]);
+    vsRespond(['success' => false, 'message' => 'An error occurred'], 500);
 }

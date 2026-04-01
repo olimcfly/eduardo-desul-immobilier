@@ -27,6 +27,11 @@ function jsonErr(string $msg, int $code = 400): void {
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') jsonErr('Méthode non autorisée', 405);
 
+// Load ErrorHandler for secure error logging
+if (!class_exists('ErrorHandler')) {
+    require_once dirname(__FILE__, 4) . '/includes/classes/ErrorHandler.php';
+}
+
 global $pdo, $db;
 if (!isset($pdo) && isset($db)) $pdo = $db;
 if (!isset($pdo)) jsonErr('Connexion DB absente', 500);
@@ -53,7 +58,8 @@ switch ($action) {
             if ($stmt->rowCount() === 0) jsonErr('Bien introuvable', 404);
             jsonOk(['deleted_id' => $id]);
         } catch (PDOException $e) {
-            jsonErr('Erreur DB : ' . $e->getMessage(), 500);
+            ErrorHandler::log($e, 'properties::delete', ['table' => 'properties']);
+            jsonErr('Database error', 500);
         }
         break;
 
@@ -68,7 +74,8 @@ switch ($action) {
             $stmt->execute($ids);
             jsonOk(['deleted_count' => $stmt->rowCount()]);
         } catch (PDOException $e) {
-            jsonErr('Erreur DB : ' . $e->getMessage(), 500);
+            ErrorHandler::log($e, 'properties::bulk_delete', ['ids_count' => count($ids)]);
+            jsonErr('Database error', 500);
         }
         break;
 
@@ -86,7 +93,8 @@ switch ($action) {
             $stmt->execute([$status, ...$ids]);
             jsonOk(['updated_count' => $stmt->rowCount()]);
         } catch (PDOException $e) {
-            jsonErr('Erreur DB : ' . $e->getMessage(), 500);
+            ErrorHandler::log($e, 'properties::bulk_status', ['status' => $status, 'ids_count' => count($ids)]);
+            jsonErr('Database error', 500);
         }
         break;
 
@@ -102,7 +110,8 @@ switch ($action) {
             $stmt->execute([$status, $id]);
             jsonOk(['new_status' => $status]);
         } catch (PDOException $e) {
-            jsonErr('Erreur DB : ' . $e->getMessage(), 500);
+            ErrorHandler::log($e, 'properties::toggle_status', ['id' => $id, 'status' => $status]);
+            jsonErr('Database error', 500);
         }
         break;
 
@@ -118,7 +127,8 @@ switch ($action) {
             $pdo->prepare("UPDATE properties SET `{$colFeat}` = ?, updated_at = NOW() WHERE id = ?")->execute([$new, $id]);
             jsonOk(['featured' => $new]);
         } catch (PDOException $e) {
-            jsonErr('Erreur DB : ' . $e->getMessage(), 500);
+            ErrorHandler::log($e, 'properties::toggle_featured', ['id' => $id]);
+            jsonErr('Database error', 500);
         }
         break;
 
@@ -152,7 +162,8 @@ switch ($action) {
             $newId = $pdo->lastInsertId();
             jsonOk(['new_id' => $newId]);
         } catch (PDOException $e) {
-            jsonErr('Erreur DB : ' . $e->getMessage(), 500);
+            ErrorHandler::log($e, 'properties::duplicate', ['orig_id' => $id]);
+            jsonErr('Database error', 500);
         }
         break;
 
@@ -223,7 +234,8 @@ CREATE TABLE IF NOT EXISTS `properties` (
             $pdo->exec($sql);
             jsonOk(['message' => 'Table properties créée avec succès']);
         } catch (PDOException $e) {
-            jsonErr('Erreur création table : ' . $e->getMessage(), 500);
+            ErrorHandler::log($e, 'properties::create_table', ['table' => 'properties']);
+            jsonErr('Database error', 500);
         }
         break;
 
