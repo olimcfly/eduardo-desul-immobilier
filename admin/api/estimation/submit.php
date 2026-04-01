@@ -186,6 +186,9 @@ function calculatePropertyEstimate($property_type, $surface, $rooms, $year_built
 try {
     $db = getDB();
 
+    // Charger le modèle Lead
+    require_once ROOT_PATH . '/includes/classes/Lead.php';
+
     // Nettoyer les données
     $first_name = trim($data['first_name']);
     $last_name = trim($data['last_name'] ?? '');
@@ -199,35 +202,29 @@ try {
     $notes = trim($data['notes'] ?? '');
 
     // ─────────────────────────────────────────────────────────────
-    // 1. Créer ou récupérer le lead
+    // 1. Créer le lead via le modèle Lead::createFromEstimation()
     // ─────────────────────────────────────────────────────────────
 
-    $lead_check = $db->prepare(
-        "SELECT id FROM leads WHERE email = ? LIMIT 1"
-    );
-    $lead_check->execute([$email]);
-    $existing_lead = $lead_check->fetch();
+    $leadModel = new Lead();
 
-    if ($existing_lead) {
-        $lead_id = $existing_lead['id'];
-    } else {
-        // Créer nouveau lead
-        $lead_insert = $db->prepare(
-            "INSERT INTO leads (first_name, last_name, email, phone, source, status, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, NOW())"
-        );
+    $lead_result = $leadModel->createFromEstimation([
+        'first_name' => $first_name,
+        'last_name' => $last_name,
+        'email' => $email,
+        'phone' => $phone,
+        'property_type' => $property_type,
+        'address' => $address,
+        'surface' => $surface,
+        'rooms' => $rooms,
+        'year_built' => $year_built
+    ]);
 
-        $lead_insert->execute([
-            $first_name,
-            $last_name,
-            $email,
-            $phone,
-            'estimation',  // source
-            'new'          // status
-        ]);
-
-        $lead_id = $db->lastInsertId();
+    if (!$lead_result) {
+        throw new Exception('Failed to create lead');
     }
+
+    $lead_id = $lead_result['id'];
+    $is_new_lead = $lead_result['created'] ?? false;
 
     // ─────────────────────────────────────────────────────────────
     // 2. Calculer l'estimation au m²
@@ -299,12 +296,12 @@ try {
     $estimation_id = $db->lastInsertId();
 
     // ─────────────────────────────────────────────────────────────
-    // 4. Envoyer email de confirmation au client (avec estimation)
+    // 4. Envoyer email supplémentaire avec détails d'estimation
+    //    (email de base déjà envoyé par Lead::createFromEstimation)
     // ─────────────────────────────────────────────────────────────
 
-    $smtp_config_exists = file_exists(ROOT_PATH . '/config/smtp.php');
-
-    if ($smtp_config_exists) {
+    // Optionnel: envoyer un email supplémentaire avec les détails d'estimation si nouveau lead
+    if ($smtp_config_exists && $is_new_lead) {
         try {
             require_once ROOT_PATH . '/includes/classes/EmailService.php';
 
@@ -317,9 +314,9 @@ try {
             $max_price_display = number_format($estimation_calc['max_price'], 0, ',', ' ');
 
             $email_body = "
-                <h2>Votre estimation gratuite a été calculée!</h2>
+                <h2>Détails de votre estimation</h2>
                 <p>Bonjour $first_name,</p>
-                <p>Merci d'avoir utilisé notre service d'estimation gratuite. Voici les résultats pour votre bien:</p>
+                <p>Voici les détails complets de l'estimation pour votre bien immobilier:</p>
 
                 <h3>Détails du bien</h3>
                 <ul>
@@ -352,18 +349,15 @@ try {
 
                 <p style='color: #666; font-size: 0.9em;'><em>Cette estimation est basée sur les données du marché immobilier local et les caractéristiques de votre bien. Elle peut varier selon les conditions spécifiques de votre propriété.</em></p>
 
-                <p>Notre équipe d'experts examinera votre demande et vous recontactera au <strong>$phone</strong> dans les <strong>24 heures</strong> pour discuter de votre bien et des opportunités de vente.</p>
-
-                <p>Si vous avez des questions avant cet appel, n'hésitez pas à nous contacter.</p>
+                <p>Notre équipe d'experts vous recontactera prochainement pour discuter des opportunités.</p>
 
                 <p style='margin-top: 30px;'>Cordialement,<br>
-                <strong>" . SITE_TITLE . "</strong><br>
-                " . ADMIN_EMAIL . "</p>
+                <strong>" . SITE_TITLE . "</strong></p>
             ";
 
             $mailer->sendEmail(
                 $email,
-                'Votre demande d\'estimation a été reçue',
+                'Détails de votre estimation immobilière',
                 $email_body,
                 [
                     'from_name' => SITE_TITLE,
@@ -371,27 +365,23 @@ try {
                 ]
             );
         } catch (Exception $e) {
-            // Log l'erreur mais ne bloque pas la réponse
-            error_log('Estimation confirmation email failed: ' . $e->getMessage());
+            error_log('Estimation details email failed: ' . $e->getMessage());
         }
     }
 
     // ─────────────────────────────────────────────────────────────
-    // 5. Envoyer notification à l'admin
+    // 5. Notification admin supplémentaire avec détails d'estimation
+    //    (notification de base déjà envoyée par Lead::createFromEstimation)
     // ─────────────────────────────────────────────────────────────
 
-    if ($smtp_config_exists) {
+    // Optionnel: envoyer notification supplémentaire si SMTP configuré
+    if ($smtp_config_exists && $is_new_lead) {
         try {
             $admin_body = "
-                <h2>✅ Nouvelle demande d'estimation enregistrée</h2>
+                <h2>📊 Estimation détaillée - " . ucfirst($property_type) . "</h2>
 
-                <h3>Informations client</h3>
-                <ul>
-                    <li><strong>Nom:</strong> $first_name $last_name</li>
-                    <li><strong>Email:</strong> <a href='mailto:$email'>$email</a></li>
-                    <li><strong>Téléphone:</strong> <a href='tel:$phone'>$phone</a></li>
-                    <li><strong>Statut:</strong> Nouveau lead</li>
-                </ul>
+                <h3>Client: $first_name $last_name</h3>
+                <p><a href='mailto:$email'>$email</a> | <a href='tel:$phone'>$phone</a></p>
 
                 <h3>Détails du bien</h3>
                 <ul>
@@ -404,34 +394,35 @@ try {
                 </ul>
 
                 <h3>Estimation calculée</h3>
-                <ul>
-                    <li><strong>Prix par m²:</strong> " . number_format($estimation_calc['price_per_sqm'], 0, ',', ' ') . " €</li>
-                    <li><strong>Prix total estimé:</strong> <strong style='color: #2c5f2d; font-size: 1.2em;'>" . number_format($estimation_calc['total_price'], 0, ',', ' ') . " €</strong></li>
-                    <li><strong>Fourchette:</strong> " . number_format($estimation_calc['min_price'], 0, ',', ' ') . " € à " . number_format($estimation_calc['max_price'], 0, ',', ' ') . " €</li>
-                </ul>
+                <table style='border-collapse: collapse; margin: 10px 0;'>
+                    <tr>
+                        <td style='padding: 8px; border: 1px solid #ddd;'>Prix par m²:</td>
+                        <td style='padding: 8px; border: 1px solid #ddd;'><strong>" . number_format($estimation_calc['price_per_sqm'], 0, ',', ' ') . " €</strong></td>
+                    </tr>
+                    <tr style='background: #f0f0f0;'>
+                        <td style='padding: 8px; border: 1px solid #ddd;'>Prix total:</td>
+                        <td style='padding: 8px; border: 1px solid #ddd;'><strong style='color: #2c5f2d; font-size: 1.1em;'>" . number_format($estimation_calc['total_price'], 0, ',', ' ') . " €</strong></td>
+                    </tr>
+                    <tr>
+                        <td style='padding: 8px; border: 1px solid #ddd;'>Fourchette:</td>
+                        <td style='padding: 8px; border: 1px solid #ddd;'>" . number_format($estimation_calc['min_price'], 0, ',', ' ') . " € à " . number_format($estimation_calc['max_price'], 0, ',', ' ') . " €</td>
+                    </tr>
+                </table>
 
-                <h3>Actions</h3>
-                <p>
-                    <a href='" . ADMIN_URL . "/modules/crm/leads/?id=$lead_id' style='display: inline-block; padding: 10px 20px; background: #2c5f2d; color: white; text-decoration: none; border-radius: 5px;'>
-                        Voir le lead
-                    </a>
-                    <a href='" . ADMIN_URL . "/modules/crm/estimations/?id=$estimation_id' style='display: inline-block; padding: 10px 20px; background: #4a90e2; color: white; text-decoration: none; border-radius: 5px; margin-left: 10px;'>
-                        Voir l'estimation
-                    </a>
+                <p style='color: #666; font-size: 0.9em; margin-top: 15px;'>
+                    Référence: #$estimation_id<br>
+                    Date: " . date('d/m/Y à H:i') . "
                 </p>
-
-                <hr style='margin: 20px 0; border: none; border-top: 1px solid #ddd;'>
-                <p style='color: #666; font-size: 0.9em;'>Demande d'estimation #" . $estimation_id . " du " . date('d/m/Y à H:i') . "</p>
             ";
 
             $mailer->sendEmail(
                 ADMIN_EMAIL,
-                'Nouvelle demande d\'estimation - ' . SITE_TITLE,
+                '📊 Estimation détaillée - ' . $property_type . ' - ' . SITE_TITLE,
                 $admin_body,
                 ['from_name' => SITE_TITLE]
             );
         } catch (Exception $e) {
-            error_log('Estimation admin notification failed: ' . $e->getMessage());
+            error_log('Estimation detailed admin email failed: ' . $e->getMessage());
         }
     }
 
