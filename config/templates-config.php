@@ -452,29 +452,53 @@ return [
             'icon' => 'fas fa-envelope',
             'blocks' => [
                 'hero' => [
-                    'type' => 'hero',
+                    'type' => 'contact_hero',
                     'label' => 'Hero principal',
+                    'description' => 'Section héro avec titre et sous-titre',
                     'fields' => [
                         'title' => ['type' => 'text', 'label' => 'Titre', 'required' => true],
                         'subtitle' => ['type' => 'textarea', 'label' => 'Sous-titre'],
                         'background_image' => ['type' => 'image', 'label' => 'Image de fond'],
                     ]
                 ],
+                'contact_info' => [
+                    'type' => 'contact_info',
+                    'label' => 'Informations de contact',
+                    'description' => 'Afficher les infos de contact (téléphone, email, heures)',
+                    'fields' => [
+                        'phone' => ['type' => 'tel', 'label' => 'Téléphone', 'required' => true],
+                        'email' => ['type' => 'email', 'label' => 'Email', 'required' => true],
+                        'address' => ['type' => 'text', 'label' => 'Adresse'],
+                        'hours' => ['type' => 'textarea', 'label' => 'Horaires d\'ouverture'],
+                    ]
+                ],
                 'contact_form' => [
-                    'type' => 'form',
+                    'type' => 'contact_form',
                     'label' => 'Formulaire contact',
+                    'description' => 'Formulaire de contact',
                     'fields' => [
                         'form_title' => ['type' => 'text', 'label' => 'Titre du formulaire'],
                         'form_description' => ['type' => 'textarea', 'label' => 'Description'],
                     ]
                 ],
                 'map' => [
-                    'type' => 'map',
+                    'type' => 'contact_map',
                     'label' => 'Localisation',
+                    'description' => 'Carte Google Maps avec localisation',
                     'fields' => [
-                        'address' => ['type' => 'text', 'label' => 'Adresse'],
-                        'phone' => ['type' => 'tel', 'label' => 'Téléphone'],
-                        'email' => ['type' => 'email', 'label' => 'Email'],
+                        'address' => ['type' => 'text', 'label' => 'Adresse complète'],
+                        'map_embed' => ['type' => 'text', 'label' => 'Code iframe Google Maps'],
+                    ]
+                ],
+                'social_proof' => [
+                    'type' => 'contact_social_proof',
+                    'label' => 'Preuve sociale',
+                    'description' => 'Avis clients et témoignages',
+                    'fields' => [
+                        'stars' => ['type' => 'number', 'label' => 'Note (ex: 4.8)', 'required' => true],
+                        'count' => ['type' => 'number', 'label' => 'Nombre d\'avis', 'required' => true],
+                        'cta_text' => ['type' => 'text', 'label' => 'Texte CTA'],
+                        'cta_url' => ['type' => 'url', 'label' => 'Lien avis'],
                     ]
                 ],
             ]
