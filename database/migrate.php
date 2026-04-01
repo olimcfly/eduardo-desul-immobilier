@@ -37,9 +37,8 @@ class Colors {
 // BOOTSTRAP & CONFIGURATION
 // ═══════════════════════════════════════════════════════════
 
-// Charger config
+// Charger config (config.php inclut database.php indirectly via getDB)
 require_once ROOT_PATH . '/config/config.php';
-require_once ROOT_PATH . '/config/database.php';
 
 // ═══════════════════════════════════════════════════════════
 // HELPERS
