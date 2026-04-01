@@ -310,6 +310,79 @@ return [
             ]
         ],
 
+        // ─── ESTIMER ─────────────────────────────────────
+        'estimer' => [
+            'name' => 'Estimer',
+            'description' => 'Page d\'estimation gratuite de bien immobilier',
+            'icon' => 'fas fa-calculator',
+            'blocks' => [
+                'hero' => [
+                    'type' => 'estimer_hero',
+                    'label' => 'Hero principal',
+                    'description' => 'Section héro avec titre et sous-titre',
+                    'fields' => [
+                        'title' => ['type' => 'text', 'label' => 'Titre principal', 'required' => true],
+                        'subtitle' => ['type' => 'textarea', 'label' => 'Sous-titre'],
+                        'background_image' => ['type' => 'image', 'label' => 'Image de fond'],
+                    ]
+                ],
+                'form_estimation' => [
+                    'type' => 'estimer_form',
+                    'label' => 'Formulaire d\'estimation',
+                    'description' => 'Formulaire pour estimer un bien',
+                    'fields' => [
+                        'form_title' => ['type' => 'text', 'label' => 'Titre du formulaire'],
+                        'form_description' => ['type' => 'textarea', 'label' => 'Description du formulaire'],
+                    ]
+                ],
+                'method' => [
+                    'type' => 'estimer_method',
+                    'label' => 'Méthode d\'estimation',
+                    'description' => 'Explication de la méthode d\'estimation',
+                    'fields' => [
+                        'headline' => ['type' => 'text', 'label' => 'Titre section'],
+                        'items' => ['type' => 'repeater', 'label' => 'Étapes', 'item_fields' => [
+                            'icon' => ['type' => 'text', 'label' => 'Icône'],
+                            'title' => ['type' => 'text', 'label' => 'Titre'],
+                            'description' => ['type' => 'textarea', 'label' => 'Description'],
+                        ]],
+                    ]
+                ],
+                'why_free' => [
+                    'type' => 'estimer_why_free',
+                    'label' => 'Pourquoi c\'est gratuit',
+                    'description' => 'Explication sur la gratuité de l\'estimation',
+                    'fields' => [
+                        'headline' => ['type' => 'text', 'label' => 'Titre section'],
+                        'description' => ['type' => 'textarea', 'label' => 'Description'],
+                        'icon' => ['type' => 'text', 'label' => 'Icône'],
+                    ]
+                ],
+                'social_proof' => [
+                    'type' => 'estimer_social_proof',
+                    'label' => 'Preuve sociale',
+                    'description' => 'Avis clients et témoignages',
+                    'fields' => [
+                        'stars' => ['type' => 'number', 'label' => 'Note (ex: 4.8)', 'required' => true],
+                        'count' => ['type' => 'number', 'label' => 'Nombre d\'avis', 'required' => true],
+                        'cta_text' => ['type' => 'text', 'label' => 'Texte CTA'],
+                        'cta_url' => ['type' => 'url', 'label' => 'Lien avis'],
+                    ]
+                ],
+                'cta_final' => [
+                    'type' => 'estimer_cta_final',
+                    'label' => 'Appel à l\'action final',
+                    'description' => 'CTA final pour demander une estimation complète',
+                    'fields' => [
+                        'headline' => ['type' => 'text', 'label' => 'Titre principal', 'required' => true],
+                        'subtext' => ['type' => 'textarea', 'label' => 'Sous-texte'],
+                        'cta_text' => ['type' => 'text', 'label' => 'CTA - Texte'],
+                        'cta_url' => ['type' => 'url', 'label' => 'CTA - URL'],
+                    ]
+                ],
+            ]
+        ],
+
         // ─── LANDING ─────────────────────────────────────
         'landing' => [
             'name' => 'Landing Page',
