@@ -99,10 +99,10 @@ class Database {
     }
 
     /**
-     * Get the PDO connection instance (PRIMARY METHOD)
+     * Get the PDO connection instance (main method)
      *
      * Returns the singleton PDO connection for database operations.
-     * This is the RECOMMENDED method for all database access.
+     * This is the recommended way to get the database connection.
      *
      * @return PDO The database connection
      * @throws Exception If connection fails
@@ -115,13 +115,12 @@ class Database {
     }
 
     /**
-     * Get the Database wrapper object (ADVANCED USAGE ONLY)
+     * Get the Database object itself (advanced usage)
      *
-     * Returns the Database class instance itself.
-     * Most code should use getInstance() to get the PDO connection directly.
-     * This method is provided for advanced usage that needs access to Database methods.
+     * Returns the Database wrapper object. Most code should use getInstance()
+     * to get the PDO connection directly.
      *
-     * @return Database The Database wrapper object
+     * @return Database The Database object
      */
     public static function getConnection() {
         if (self::$instance === null) {

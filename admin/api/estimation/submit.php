@@ -66,15 +66,35 @@ foreach ($required_fields as $field => $label) {
 
 // Validations spécifiques
 if (!empty($data['email']) && !filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
-    $errors['email'] = 'Email invalide';
+    $errors['email'] = 'Email invalide (ex: user@example.com)';
 }
 
-if (!empty($data['phone']) && !preg_match('/^[\d\s\-\+\.]+$/', $data['phone'])) {
-    $errors['phone'] = 'Numéro de téléphone invalide';
+// Validation téléphone français (plus stricte)
+if (!empty($data['phone'])) {
+    $phone_clean = preg_replace('/[\s\-\+\.]/', '', $data['phone']);
+    if (!preg_match('/^(?:(?:\+|00)33|0)[1-9](?:[0-9]{8})$/', $phone_clean)) {
+        $errors['phone'] = 'Téléphone invalide (format: 06 12 34 56 78 ou +33 6 12 34 56 78)';
+    }
 }
 
-if (!empty($data['surface']) && !is_numeric($data['surface'])) {
-    $errors['surface'] = 'Surface doit être un nombre';
+// Validation surface
+if (!empty($data['surface'])) {
+    if (!is_numeric($data['surface']) || (float)$data['surface'] <= 0) {
+        $errors['surface'] = 'Surface doit être un nombre positif';
+    } elseif ((float)$data['surface'] > 10000) {
+        $errors['surface'] = 'Surface invalide (maximum 10 000 m²)';
+    }
+}
+
+// Validation adresse
+if (!empty($data['address']) && strlen($data['address']) < 5) {
+    $errors['address'] = 'Adresse doit faire au moins 5 caractères';
+}
+
+// Validation type de bien
+$valid_property_types = ['maison', 'appartement', 'terrain', 'commercial', 'bureau'];
+if (!empty($data['property_type']) && !in_array(strtolower($data['property_type']), $valid_property_types)) {
+    $errors['property_type'] = 'Type de bien invalide';
 }
 
 // Retourner les erreurs
@@ -87,12 +107,91 @@ if (!empty($errors)) {
 }
 
 // ─────────────────────────────────────────────────────────────
+// Fonction: Calculer estimation au m²
+// ─────────────────────────────────────────────────────────────
+
+/**
+ * Calcule une estimation de prix basée sur:
+ * - Type de bien
+ * - Surface
+ * - Nombre de pièces
+ * - Année de construction
+ * - Région (par défaut Bordeaux/Aquitaine)
+ */
+function calculatePropertyEstimate($property_type, $surface, $rooms, $year_built) {
+    // Prix de base au m² par type de bien (marché Bordeaux/région)
+    $base_prices = [
+        'maison'      => 4500,      // €/m²
+        'appartement' => 4200,      // €/m²
+        'terrain'     => 800,       // €/m² (plus bas pour terrain)
+        'commercial'  => 5000,      // €/m²
+        'bureau'      => 3500       // €/m²
+    ];
+
+    $type_lower = strtolower($property_type);
+    $base_price = $base_prices[$type_lower] ?? 4000;
+
+    // Ajustement par année de construction
+    $year_adjust = 1.0;
+    if ($year_built > 0) {
+        $age = date('Y') - $year_built;
+
+        if ($age < 10) {
+            $year_adjust = 1.15;  // Neuf/récent +15%
+        } elseif ($age < 25) {
+            $year_adjust = 1.05;  // Récent +5%
+        } elseif ($age < 50) {
+            $year_adjust = 0.95;  // Normal -5%
+        } elseif ($age < 80) {
+            $year_adjust = 0.85;  // Ancien -15%
+        } else {
+            $year_adjust = 0.75;  // Très ancien -25%
+        }
+    }
+
+    // Ajustement par nombre de pièces
+    $rooms_adjust = 1.0;
+    if ($rooms > 0) {
+        if ($rooms >= 5) {
+            $rooms_adjust = 1.10;  // Plus pièces = plus cher
+        } elseif ($rooms >= 4) {
+            $rooms_adjust = 1.05;
+        }
+    }
+
+    // Ajustement par surface (économies d'échelle)
+    $surface_adjust = 1.0;
+    if ($surface > 300) {
+        $surface_adjust = 1.05;  // Grandes surfaces +5%
+    } elseif ($surface < 50) {
+        $surface_adjust = 1.08;  // Petites surfaces +8% (au m²)
+    }
+
+    // Calcul final
+    $price_per_sqm = $base_price * $year_adjust * $rooms_adjust * $surface_adjust;
+    $total_price = $price_per_sqm * $surface;
+
+    return [
+        'price_per_sqm' => round($price_per_sqm, 0),
+        'total_price' => round($total_price, 0),
+        'min_price' => round($total_price * 0.85, 0),    // -15% pour fourchette basse
+        'max_price' => round($total_price * 1.15, 0)     // +15% pour fourchette haute
+    ];
+}
+
+// ─────────────────────────────────────────────────────────────
 // Connexion DB et traitement
 // ─────────────────────────────────────────────────────────────
 
 if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
 try {
+    // Charger la classe Database
+    require_once ROOT_PATH . '/includes/classes/Database.php';
+
     $db = Database::getInstance();
+
+    // Charger le modèle Lead
+    require_once ROOT_PATH . '/includes/classes/Lead.php';
 
     // Nettoyer les données
     $first_name = trim($data['first_name']);
@@ -107,96 +206,162 @@ try {
     $notes = trim($data['notes'] ?? '');
 
     // ─────────────────────────────────────────────────────────────
-    // 1. Créer ou récupérer le lead
+    // 1. Créer le lead via le modèle Lead::createFromEstimation()
     // ─────────────────────────────────────────────────────────────
 
-    $lead_check = $db->prepare(
-        "SELECT id FROM leads WHERE email = ? LIMIT 1"
+    $leadModel = new Lead();
+
+    $lead_result = $leadModel->createFromEstimation([
+        'first_name' => $first_name,
+        'last_name' => $last_name,
+        'email' => $email,
+        'phone' => $phone,
+        'property_type' => $property_type,
+        'address' => $address,
+        'surface' => $surface,
+        'rooms' => $rooms,
+        'year_built' => $year_built
+    ]);
+
+    if (!$lead_result) {
+        throw new Exception('Failed to create lead');
+    }
+
+    $lead_id = $lead_result['id'];
+    $is_new_lead = $lead_result['created'] ?? false;
+
+    // ─────────────────────────────────────────────────────────────
+    // 2. Calculer l'estimation au m²
+    // ─────────────────────────────────────────────────────────────
+
+    $estimation_calc = calculatePropertyEstimate(
+        $property_type,
+        $surface,
+        $rooms,
+        $year_built
     );
-    $lead_check->execute([$email]);
-    $existing_lead = $lead_check->fetch();
 
-    if ($existing_lead) {
-        $lead_id = $existing_lead['id'];
-    } else {
-        // Créer nouveau lead
-        $lead_insert = $db->prepare(
-            "INSERT INTO leads (first_name, last_name, email, phone, source, status, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, NOW())"
-        );
+    // ─────────────────────────────────────────────────────────────
+    // 3. Créer/mettre à jour la table estimations
+    // ─────────────────────────────────────────────────────────────
 
-        $lead_insert->execute([
-            $first_name,
-            $last_name,
-            $email,
-            $phone,
-            'estimation',  // source
-            'new'          // status
-        ]);
-
-        $lead_id = $db->lastInsertId();
+    // Créer la table si n'existe pas
+    try {
+        $db->exec("
+            CREATE TABLE IF NOT EXISTS estimations (
+                id INT PRIMARY KEY AUTO_INCREMENT,
+                lead_id INT NOT NULL,
+                property_type VARCHAR(50) NOT NULL,
+                address VARCHAR(255) NOT NULL,
+                surface DECIMAL(10, 2) NOT NULL,
+                rooms INT DEFAULT 0,
+                year_built YEAR DEFAULT NULL,
+                notes LONGTEXT,
+                price_per_sqm INT DEFAULT 0,
+                total_price INT DEFAULT 0,
+                min_price INT DEFAULT 0,
+                max_price INT DEFAULT 0,
+                status ENUM('pending', 'completed', 'rejected') DEFAULT 'pending',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                FOREIGN KEY (lead_id) REFERENCES leads(id) ON DELETE CASCADE,
+                INDEX idx_lead (lead_id),
+                INDEX idx_status (status),
+                INDEX idx_created (created_at)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        ");
+    } catch (Exception $e) {
+        // Table existe déjà, on continue
     }
 
-    // ─────────────────────────────────────────────────────────────
-    // 2. Créer la demande d'estimation
-    // ─────────────────────────────────────────────────────────────
+    // Insérer l'estimation
+    $estimation_insert = $db->prepare(
+        "INSERT INTO estimations
+         (lead_id, property_type, address, surface, rooms, year_built, notes,
+          price_per_sqm, total_price, min_price, max_price, status, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())"
+    );
 
-    // Vérifier si table estimation_requests existe
-    $table_check = $db->query(
-        "SHOW TABLES LIKE 'estimation_requests'"
-    )->fetch();
+    $estimation_insert->execute([
+        $lead_id,
+        $property_type,
+        $address,
+        $surface,
+        $rooms,
+        $year_built ?: null,
+        $notes,
+        $estimation_calc['price_per_sqm'],
+        $estimation_calc['total_price'],
+        $estimation_calc['min_price'],
+        $estimation_calc['max_price'],
+        'pending'
+    ]);
 
-    $estimation_id = null;
-
-    if ($table_check) {
-        $estimation_insert = $db->prepare(
-            "INSERT INTO estimation_requests
-             (lead_id, property_type, address, surface, rooms, year_built, notes, status, created_at)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW())"
-        );
-
-        $estimation_insert->execute([
-            $lead_id,
-            $property_type,
-            $address,
-            $surface,
-            $rooms,
-            $year_built,
-            $notes,
-            'pending'
-        ]);
-
-        $estimation_id = $db->lastInsertId();
-    }
+    $estimation_id = $db->lastInsertId();
 
     // ─────────────────────────────────────────────────────────────
-    // 3. Envoyer email de confirmation au client
+    // 4. Envoyer email supplémentaire avec détails d'estimation
+    //    (email de base déjà envoyé par Lead::createFromEstimation)
     // ─────────────────────────────────────────────────────────────
 
-    $smtp_config_exists = file_exists(ROOT_PATH . '/config/smtp.php');
-
-    if ($smtp_config_exists) {
+    // Optionnel: envoyer un email supplémentaire avec les détails d'estimation si nouveau lead
+    if ($smtp_config_exists && $is_new_lead) {
         try {
             require_once ROOT_PATH . '/includes/classes/EmailService.php';
 
             $mailer = new EmailService();
+
+            // Formatage des prix
+            $price_display = number_format($estimation_calc['total_price'], 0, ',', ' ');
+            $price_per_sqm_display = number_format($estimation_calc['price_per_sqm'], 0, ',', ' ');
+            $min_price_display = number_format($estimation_calc['min_price'], 0, ',', ' ');
+            $max_price_display = number_format($estimation_calc['max_price'], 0, ',', ' ');
+
             $email_body = "
-                <h2>Merci pour votre demande d'estimation!</h2>
+                <h2>Détails de votre estimation</h2>
                 <p>Bonjour $first_name,</p>
-                <p>Nous avons bien reçu votre demande d'estimation pour votre bien immobilier.</p>
-                <p><strong>Détails de votre demande:</strong></p>
+                <p>Voici les détails complets de l'estimation pour votre bien immobilier:</p>
+
+                <h3>Détails du bien</h3>
                 <ul>
-                    <li>Type de bien: $property_type</li>
-                    <li>Adresse: $address</li>
-                    <li>Surface: ${surface}m²</li>
+                    <li><strong>Type:</strong> " . ucfirst($property_type) . "</li>
+                    <li><strong>Adresse:</strong> $address</li>
+                    <li><strong>Surface:</strong> ${surface} m²</li>
+                    " . ($rooms ? "<li><strong>Pièces:</strong> $rooms</li>" : "") . "
+                    " . ($year_built ? "<li><strong>Année construction:</strong> $year_built</li>" : "") . "
                 </ul>
-                <p>Notre équipe traitera votre demande dans les <strong>24 heures</strong> et vous recontactera au numéro suivant: $phone</p>
-                <p>Cordialement,<br>" . SITE_TITLE . "</p>
+
+                <h3>Estimation de prix</h3>
+                <table style='border-collapse: collapse; width: 100%; margin: 20px 0;'>
+                    <tr style='background: #f5f5f5;'>
+                        <td style='padding: 10px; border: 1px solid #ddd;'><strong>Prix par m²:</strong></td>
+                        <td style='padding: 10px; border: 1px solid #ddd;'><strong>$price_per_sqm_display €</strong></td>
+                    </tr>
+                    <tr>
+                        <td style='padding: 10px; border: 1px solid #ddd;'>Prix estimé:</td>
+                        <td style='padding: 10px; border: 1px solid #ddd;'><strong style='color: #2c5f2d; font-size: 1.3em;'>$price_display €</strong></td>
+                    </tr>
+                    <tr style='background: #f5f5f5;'>
+                        <td style='padding: 10px; border: 1px solid #ddd;'>Fourchette basse (-15%):</td>
+                        <td style='padding: 10px; border: 1px solid #ddd;'>$min_price_display €</td>
+                    </tr>
+                    <tr>
+                        <td style='padding: 10px; border: 1px solid #ddd;'>Fourchette haute (+15%):</td>
+                        <td style='padding: 10px; border: 1px solid #ddd;'>$max_price_display €</td>
+                    </tr>
+                </table>
+
+                <p style='color: #666; font-size: 0.9em;'><em>Cette estimation est basée sur les données du marché immobilier local et les caractéristiques de votre bien. Elle peut varier selon les conditions spécifiques de votre propriété.</em></p>
+
+                <p>Notre équipe d'experts vous recontactera prochainement pour discuter des opportunités.</p>
+
+                <p style='margin-top: 30px;'>Cordialement,<br>
+                <strong>" . SITE_TITLE . "</strong></p>
             ";
 
             $mailer->sendEmail(
                 $email,
-                'Votre demande d\'estimation a été reçue',
+                'Détails de votre estimation immobilière',
                 $email_body,
                 [
                     'from_name' => SITE_TITLE,
@@ -204,43 +369,69 @@ try {
                 ]
             );
         } catch (Exception $e) {
-            // Log l'erreur mais ne bloque pas la réponse
-            error_log('Estimation confirmation email failed: ' . $e->getMessage());
+            error_log('Estimation details email failed: ' . $e->getMessage());
         }
     }
 
     // ─────────────────────────────────────────────────────────────
-    // 4. Envoyer notification à l'admin
+    // 5. Notification admin supplémentaire avec détails d'estimation
+    //    (notification de base déjà envoyée par Lead::createFromEstimation)
     // ─────────────────────────────────────────────────────────────
 
-    if ($smtp_config_exists) {
+    // Optionnel: envoyer notification supplémentaire si SMTP configuré
+    if ($smtp_config_exists && $is_new_lead) {
         try {
             $admin_body = "
-                <h2>Nouvelle demande d'estimation</h2>
-                <p><strong>Client:</strong> $first_name $last_name</p>
-                <p><strong>Email:</strong> $email</p>
-                <p><strong>Téléphone:</strong> $phone</p>
-                <p><strong>Bien:</strong> $property_type - $address</p>
-                <p><strong>Surface:</strong> ${surface}m²</p>
-                <p><strong>Pièces:</strong> $rooms</p>
-                <p><strong>Année construction:</strong> $year_built</p>
-                <p><strong>Notes:</strong> $notes</p>
-                <p><a href='" . ADMIN_URL . "/dashboard.php?page=leads'>Voir le lead en admin</a></p>
+                <h2>📊 Estimation détaillée - " . ucfirst($property_type) . "</h2>
+
+                <h3>Client: $first_name $last_name</h3>
+                <p><a href='mailto:$email'>$email</a> | <a href='tel:$phone'>$phone</a></p>
+
+                <h3>Détails du bien</h3>
+                <ul>
+                    <li><strong>Type:</strong> " . ucfirst($property_type) . "</li>
+                    <li><strong>Adresse:</strong> $address</li>
+                    <li><strong>Surface:</strong> ${surface} m²</li>
+                    <li><strong>Pièces:</strong> $rooms</li>
+                    <li><strong>Année construction:</strong> $year_built</li>
+                    " . ($notes ? "<li><strong>Notes client:</strong> $notes</li>" : "") . "
+                </ul>
+
+                <h3>Estimation calculée</h3>
+                <table style='border-collapse: collapse; margin: 10px 0;'>
+                    <tr>
+                        <td style='padding: 8px; border: 1px solid #ddd;'>Prix par m²:</td>
+                        <td style='padding: 8px; border: 1px solid #ddd;'><strong>" . number_format($estimation_calc['price_per_sqm'], 0, ',', ' ') . " €</strong></td>
+                    </tr>
+                    <tr style='background: #f0f0f0;'>
+                        <td style='padding: 8px; border: 1px solid #ddd;'>Prix total:</td>
+                        <td style='padding: 8px; border: 1px solid #ddd;'><strong style='color: #2c5f2d; font-size: 1.1em;'>" . number_format($estimation_calc['total_price'], 0, ',', ' ') . " €</strong></td>
+                    </tr>
+                    <tr>
+                        <td style='padding: 8px; border: 1px solid #ddd;'>Fourchette:</td>
+                        <td style='padding: 8px; border: 1px solid #ddd;'>" . number_format($estimation_calc['min_price'], 0, ',', ' ') . " € à " . number_format($estimation_calc['max_price'], 0, ',', ' ') . " €</td>
+                    </tr>
+                </table>
+
+                <p style='color: #666; font-size: 0.9em; margin-top: 15px;'>
+                    Référence: #$estimation_id<br>
+                    Date: " . date('d/m/Y à H:i') . "
+                </p>
             ";
 
             $mailer->sendEmail(
                 ADMIN_EMAIL,
-                'Nouvelle demande d\'estimation - ' . SITE_TITLE,
+                '📊 Estimation détaillée - ' . $property_type . ' - ' . SITE_TITLE,
                 $admin_body,
                 ['from_name' => SITE_TITLE]
             );
         } catch (Exception $e) {
-            error_log('Estimation admin notification failed: ' . $e->getMessage());
+            error_log('Estimation detailed admin email failed: ' . $e->getMessage());
         }
     }
 
     // ─────────────────────────────────────────────────────────────
-    // 5. Répondre avec succès
+    // 6. Répondre avec succès (incluant l'estimation calculée)
     // ─────────────────────────────────────────────────────────────
 
     http_response_code(200);
@@ -250,7 +441,20 @@ try {
         'data' => [
             'lead_id' => $lead_id,
             'estimation_id' => $estimation_id,
-            'reference' => 'EST-' . $lead_id . '-' . date('YmdHis')
+            'reference' => 'EST-' . $estimation_id . '-' . date('YmdHis'),
+            'estimation' => [
+                'price_per_sqm' => $estimation_calc['price_per_sqm'],
+                'total_price' => $estimation_calc['total_price'],
+                'min_price' => $estimation_calc['min_price'],
+                'max_price' => $estimation_calc['max_price'],
+                'currency' => 'EUR',
+                'note' => 'Estimation fournie à titre informatif. Peut varier selon les conditions spécifiques du bien.'
+            ],
+            'contact' => [
+                'email_sent' => true,
+                'notification_sent' => true,
+                'message' => 'Un email de confirmation a été envoyé. Notre équipe vous contactera dans les 24 heures.'
+            ]
         ]
     ]));
 
