@@ -90,8 +90,9 @@ if (!empty($errors)) {
 // Connexion DB et traitement
 // ─────────────────────────────────────────────────────────────
 
+if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
 try {
-    $db = getDB();
+    $db = Database::getInstance();
 
     // Nettoyer les données
     $first_name = trim($data['first_name']);

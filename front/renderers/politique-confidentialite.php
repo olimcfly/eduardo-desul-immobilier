@@ -9,8 +9,9 @@ if (!defined('FRONT_ROUTER')) {
     exit('Accès direct interdit.');
 }
 
+if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
 global $db;
-if (!$db) $db = getDB();
+if (!$db) $db = Database::getInstance();
 
 // ── Header / Footer ──────────────────────────────────────
 if (!function_exists('_loadHF_v5')) {

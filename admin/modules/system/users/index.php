@@ -13,8 +13,9 @@ if (!isSuperUser()) {
     echo '<div class="es"><i class="fas fa-lock"></i><h3>Accès restreint</h3><p>Seul le Super Administrateur peut gérer les utilisateurs.</p></div>';
     return;
 }
+if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
 
-$pdo = getDB();
+$pdo = Database::getInstance();
 $message = '';
 $messageType = '';
 

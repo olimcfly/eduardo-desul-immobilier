@@ -29,8 +29,9 @@ if (!$isAuthenticated) {
     echo json_encode(['success' => false, 'message' => 'Non authentifié']);
     exit;
 }
+if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
 
-$pdo = getDB();
+$pdo = Database::getInstance();
 
 $rawInput = file_get_contents('php://input');
 $jsonInput = json_decode($rawInput ?: '', true);
