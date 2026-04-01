@@ -1,118 +1,115 @@
 <?php
 /**
- * Configuration SMTP / IMAP
- * config/smtp.php
+ * 📧 CONFIGURATION SMTP/IMAP
+ * /config/smtp.php
  *
- * Les credentials sont lues depuis .env
- * Charge par loadSmtpConfig() dans :
- *   - admin/modules/system/modules.php
- *   - admin/api/marketing/emails.php
+ * Configuration des emails et des serveurs mail
+ * À adapter selon votre hébergeur (OVH, Ionos, etc.)
  */
 
-// S'assurer que le .env est charge (sans fatal si helper absent)
-if (!function_exists('env')) {
-    $envHelper = dirname(dirname(__FILE__)) . '/core/env.php';
-    if (is_file($envHelper)) {
-        require_once $envHelper;
-        if (function_exists('loadEnv')) {
-            loadEnv(dirname(dirname(__FILE__)) . '/.env');
-        }
-    }
-}
-
-
-// Fallback minimal si core/env.php est absent ou vide
-if (!function_exists('loadEnv')) {
-    function loadEnv(string $path): void {
-        if (!is_file($path) || !is_readable($path)) {
-            return;
-        }
-
-        $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-        if ($lines === false) {
-            return;
-        }
-
-        foreach ($lines as $line) {
-            $line = trim($line);
-            if ($line === '' || strpos($line, '#') === 0) {
-                continue;
-            }
-
-            $pos = strpos($line, '=');
-            if ($pos === false) {
-                continue;
-            }
-
-            $key = trim(substr($line, 0, $pos));
-            $value = trim(substr($line, $pos + 1));
-            $value = trim($value, "\"'");
-
-            if ($key !== '' && getenv($key) === false) {
-                putenv($key . '=' . $value);
-                $_ENV[$key] = $value;
-                $_SERVER[$key] = $value;
-            }
-        }
-    }
-}
-
-if (!function_exists('env')) {
-    function env(string $key, $default = null) {
-        $value = getenv($key);
-        if ($value === false) {
-            return $default;
-        }
-
-        $lower = strtolower($value);
-        if ($lower === 'true') return true;
-        if ($lower === 'false') return false;
-        if ($lower === 'null') return null;
-
-        return $value;
-    }
-}
-
-loadEnv(dirname(dirname(__FILE__)) . '/.env');
-
-$domain = env('SITE_DOMAIN', 'localhost');
-
 return [
-    // SMTP (envoi)
-    'smtp_host'      => env('SMTP_HOST', $domain),
-    'smtp_port'      => (int) env('SMTP_PORT', 465),
-    'smtp_secure'    => env('SMTP_SECURE', 'ssl'),
-    'smtp_user'      => env('SMTP_USER', 'admin@' . $domain),
-    'smtp_pass'      => env('SMTP_PASS', ''),
-    'smtp_from'      => env('SMTP_FROM', 'contact@' . $domain),
-    'smtp_from_name' => env('SMTP_FROM_NAME', env('SITE_TITLE', 'Mon Site')),
+    // ═══════════════════════════════════════════════════════════
+    // 📤 SMTP (Envoi d'emails)
+    // ═══════════════════════════════════════════════════════════
 
-    // IMAP (reception)
-    'imap_host'   => env('IMAP_HOST', $domain),
-    'imap_port'   => (int) env('IMAP_PORT', 993),
-    'imap_secure' => env('IMAP_SECURE', 'ssl'),
-    'imap_user'   => env('IMAP_USER', 'admin@' . $domain),
-    'imap_pass'   => env('IMAP_PASS', ''),
+    'smtp_host'      => 'smtp.your-provider.com',    // ← À adapter (OVH, Ionos, etc.)
+    'smtp_port'      => 587,                         // 587 (TLS) ou 465 (SSL)
+    'smtp_secure'    => 'tls',                       // 'tls' ou 'ssl'
+    'smtp_user'      => 'noreply@eduardodesulimmobilier.fr',  // Email pour envoi
+    'smtp_pass'      => 'your_email_password',       // Mot de passe email
+    'smtp_from'      => 'noreply@eduardodesulimmobilier.fr',  // Email "from"
+    'smtp_from_name' => 'Eduardo Desul - Immobilier', // Nom qui s'affiche
 
-    // Comptes email du domaine
+    // ═══════════════════════════════════════════════════════════
+    // 📥 IMAP (Réception d'emails) - OPTIONNEL
+    // ═══════════════════════════════════════════════════════════
+
+    'imap_host'   => 'imap.your-provider.com',    // Serveur IMAP
+    'imap_port'   => 993,                         // Généralement 993
+    'imap_secure' => 'ssl',                       // 'ssl' ou 'tls'
+    'imap_user'   => 'contact@eduardodesulimmobilier.fr',
+    'imap_pass'   => 'your_email_password',
+
+    // ═══════════════════════════════════════════════════════════
+    // 📬 COMPTES EMAIL DU DOMAINE
+    // ═══════════════════════════════════════════════════════════
+
     'email_accounts' => [
-        'admin@' . $domain,
-        'contact@' . $domain,
-        'info@' . $domain,
-        'estimation@' . $domain,
-        'support@' . $domain,
-        'ne-pas-repondre@' . $domain,
-        'bounce@' . $domain,
+        'admin@eduardodesulimmobilier.fr',
+        'contact@eduardodesulimmobilier.fr',
+        'info@eduardodesulimmobilier.fr',
+        'estimation@eduardodesulimmobilier.fr',
+        'support@eduardodesulimmobilier.fr',
+        'noreply@eduardodesulimmobilier.fr',
+        'bounce@eduardodesulimmobilier.fr',
     ],
 
-    // Alias (optionnel)
-    'email_aliases' => [],
+    // ═══════════════════════════════════════════════════════════
+    // 📮 ALIAS EMAIL (Redirects) - OPTIONNEL
+    // ═══════════════════════════════════════════════════════════
 
-    // Roles
+    'email_aliases' => [
+        // 'contact@old-domain.fr' => 'contact@eduardodesulimmobilier.fr',
+    ],
+
+    // ═══════════════════════════════════════════════════════════
+    // 🎯 RÔLES EMAIL
+    // ═══════════════════════════════════════════════════════════
+
     'email_roles' => [
-        'primary' => 'contact@' . $domain,
-        'system'  => 'ne-pas-repondre@' . $domain,
-        'support' => 'support@' . $domain,
-        'bounce'  => 'bounce@' . $domain,
+        'primary'  => 'contact@eduardodesulimmobilier.fr',      // Email principal
+        'system'   => 'noreply@eduardodesulimmobilier.fr',       // Système (ne pas répondre)
+        'support'  => 'support@eduardodesulimmobilier.fr',       // Support client
+        'estimation' => 'estimation@eduardodesulimmobilier.fr',  // Demandes estimation
+        'bounce'   => 'bounce@eduardodesulimmobilier.fr',        // Erreurs de livraison
     ],
+
+    // ═══════════════════════════════════════════════════════════
+    // 🔧 OPTIONS ADDITIONNELLES
+    // ═══════════════════════════════════════════════════════════
+
+    'timeout'       => 30,          // Timeout connexion (secondes)
+    'verify_ssl'    => true,        // Vérifier certificat SSL
+    'dkim_enabled'  => false,       // DKIM (optionnel, demander à hébergeur)
+    'spf_enabled'   => false,       // SPF (vérifier DNS)
+
+    // ═══════════════════════════════════════════════════════════
+    // 📝 TEMPLATES EMAIL (Optionnel)
+    // ═══════════════════════════════════════════════════════════
+
+    'templates_enabled' => true,
+    'templates_path'    => dirname(__DIR__) . '/includes/email-templates',
+
 ];
+
+/**
+ * NOTES IMPORTANTES:
+ *
+ * 1. TROUVER LES PARAMÈTRES SMTP:
+ *    - OVH: smtp.ovh.net (port 587, TLS)
+ *    - Ionos: smtp.ionos.fr (port 587, TLS)
+ *    - Google Workspace: smtp.gmail.com (port 587, TLS)
+ *    - Godaddy: smtpout.secureserver.net (port 465, SSL)
+ *
+ * 2. EMAIL NOREPLY:
+ *    - Créer un email noreply@votredomaine.fr
+ *    - Ne pas utiliser pour réception
+ *    - Utiliser pour emails auto (système, confirmations, etc.)
+ *
+ * 3. SÉCURITÉ:
+ *    - Jamais commiter ce fichier en git
+ *    - Utiliser mot de passe FORT
+ *    - Changer régulièrement
+ *
+ * 4. SPF & DKIM:
+ *    - Configurer SPF dans DNS (ajouter +include:votrehebergeur.fr)
+ *    - Configurer DKIM si possible (meilleur délivrabilité)
+ *    - Vérifier dans diagnostic DKIM/SPF
+ *
+ * 5. TEST SMTP:
+ *    - Utiliser DIAGNOSTIC.php pour tester
+ *    - Envoyer email test
+ *    - Vérifier dossier spam
+ */
+
+?>
