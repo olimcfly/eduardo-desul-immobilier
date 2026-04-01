@@ -117,31 +117,94 @@ return [
             'icon' => 'fas fa-shopping-cart',
             'blocks' => [
                 'hero' => [
-                    'type' => 'hero',
+                    'type' => 'acheter_hero',
                     'label' => 'Hero principal',
+                    'description' => 'Section héro avec titre, sous-titre et 2 CTA',
                     'fields' => [
-                        'title' => ['type' => 'text', 'label' => 'Titre', 'required' => true],
+                        'title' => ['type' => 'text', 'label' => 'Titre principal', 'required' => true],
                         'subtitle' => ['type' => 'textarea', 'label' => 'Sous-titre'],
                         'background_image' => ['type' => 'image', 'label' => 'Image de fond'],
-                        'background_color' => ['type' => 'color', 'label' => 'Couleur fond'],
+                        'cta_primary_text' => ['type' => 'text', 'label' => 'CTA primaire - Texte'],
+                        'cta_primary_url' => ['type' => 'url', 'label' => 'CTA primaire - URL'],
+                        'cta_secondary_text' => ['type' => 'text', 'label' => 'CTA secondaire - Texte'],
+                        'cta_secondary_url' => ['type' => 'url', 'label' => 'CTA secondaire - URL'],
                     ]
                 ],
-                'filters' => [
-                    'type' => 'filters',
-                    'label' => 'Filtres de recherche',
-                    'description' => 'Affichage automatique via module Biens',
+                'pain_points' => [
+                    'type' => 'acheter_pain_points',
+                    'label' => 'Défis de l\'acheteur',
+                    'description' => 'Afficher les principaux défis avec solutions',
                     'fields' => [
-                        'description' => ['type' => 'textarea', 'label' => 'Texte d\'introduction'],
+                        'headline' => ['type' => 'text', 'label' => 'Titre section'],
+                        'items' => ['type' => 'repeater', 'label' => 'Défis', 'item_fields' => [
+                            'icon' => ['type' => 'text', 'label' => 'Icône'],
+                            'title' => ['type' => 'text', 'label' => 'Défi'],
+                            'solution' => ['type' => 'textarea', 'label' => 'Notre solution'],
+                        ]],
                     ]
                 ],
-                'cta' => [
-                    'type' => 'cta',
-                    'label' => 'Appel à l\'action final',
+                'advisor' => [
+                    'type' => 'acheter_advisor',
+                    'label' => 'Pourquoi nous choisir',
+                    'description' => 'Présentation du conseiller et de son approche',
                     'fields' => [
-                        'headline' => ['type' => 'text', 'label' => 'Titre'],
+                        'photo' => ['type' => 'image', 'label' => 'Photo du conseiller'],
+                        'name' => ['type' => 'text', 'label' => 'Nom du conseiller', 'required' => true],
+                        'title' => ['type' => 'text', 'label' => 'Titre/Fonction'],
+                        'intro' => ['type' => 'textarea', 'label' => 'Introduction courte'],
+                        'benefits' => ['type' => 'repeater', 'label' => 'Avantages', 'item_fields' => [
+                            'icon' => ['type' => 'text', 'label' => 'Icône'],
+                            'text' => ['type' => 'text', 'label' => 'Avantage'],
+                        ]],
+                        'cta_text' => ['type' => 'text', 'label' => 'CTA - Texte'],
+                        'cta_url' => ['type' => 'url', 'label' => 'CTA - URL'],
+                    ]
+                ],
+                'steps' => [
+                    'type' => 'acheter_steps',
+                    'label' => 'Processus d\'achat',
+                    'description' => 'Les étapes pour acheter un bien',
+                    'fields' => [
+                        'headline' => ['type' => 'text', 'label' => 'Titre section'],
+                        'items' => ['type' => 'repeater', 'label' => 'Étapes', 'item_fields' => [
+                            'title' => ['type' => 'text', 'label' => 'Titre étape'],
+                            'description' => ['type' => 'textarea', 'label' => 'Description'],
+                        ]],
+                    ]
+                ],
+                'listings' => [
+                    'type' => 'acheter_listings',
+                    'label' => 'Propriétés récentes',
+                    'description' => 'Aperçu des propriétés à vendre',
+                    'fields' => [
+                        'headline' => ['type' => 'text', 'label' => 'Titre section'],
                         'description' => ['type' => 'textarea', 'label' => 'Description'],
-                        'button_text' => ['type' => 'text', 'label' => 'Texte bouton'],
-                        'button_url' => ['type' => 'url', 'label' => 'URL bouton'],
+                        'cta_text' => ['type' => 'text', 'label' => 'CTA - Voir plus'],
+                        'cta_url' => ['type' => 'url', 'label' => 'CTA - URL'],
+                    ]
+                ],
+                'guide' => [
+                    'type' => 'acheter_guide',
+                    'label' => 'Guide du buyer',
+                    'description' => 'Ressources et guide pour l\'acheteur',
+                    'fields' => [
+                        'headline' => ['type' => 'text', 'label' => 'Titre section'],
+                        'items' => ['type' => 'repeater', 'label' => 'Ressources', 'item_fields' => [
+                            'icon' => ['type' => 'text', 'label' => 'Icône'],
+                            'title' => ['type' => 'text', 'label' => 'Titre'],
+                            'description' => ['type' => 'textarea', 'label' => 'Description'],
+                        ]],
+                    ]
+                ],
+                'cta_final' => [
+                    'type' => 'acheter_cta_final',
+                    'label' => 'Appel à l\'action final',
+                    'description' => 'CTA final pour contact/visite',
+                    'fields' => [
+                        'headline' => ['type' => 'text', 'label' => 'Titre principal', 'required' => true],
+                        'subtext' => ['type' => 'textarea', 'label' => 'Sous-texte'],
+                        'cta_text' => ['type' => 'text', 'label' => 'CTA - Texte'],
+                        'cta_url' => ['type' => 'url', 'label' => 'CTA - URL'],
                     ]
                 ],
             ]
