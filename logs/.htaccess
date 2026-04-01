@@ -1,0 +1,18 @@
+# 🔒 Protect logs from public access
+# P2-9: Deny all access to .log files
+
+<FilesMatch "\.log$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Additional protection: deny direct access to entire directory
+<IfModule mod_autoindex.c>
+    Options -Indexes
+</IfModule>
+
+# Deny access to all files by default
+<FilesMatch ".">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
