@@ -210,11 +210,16 @@ try {
                     $setParts = [];
                     foreach ($statsResetColumns as $col) {
                         if (hasColumn($pdo, $table, $col)) {
-                            $setParts[] = qident($col) . " = 0";
+                            // Validate column name is in whitelist to prevent SQL injection
+                            if (in_array($col, $statsResetColumns, true)) {
+                                $setParts[] = qident($col) . " = 0";
+                            }
                         }
                     }
                     if ($setParts) {
-                        $pdo->exec("UPDATE " . qident($table) . " SET " . implode(', ', $setParts));
+                        // Build and execute UPDATE with validated table and column names
+                        $updateSql = "UPDATE " . qident($table) . " SET " . implode(', ', $setParts);
+                        $pdo->exec($updateSql);
                         $affected[] = $table . ' (reset compteurs)';
                     }
                 }
