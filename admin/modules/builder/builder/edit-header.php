@@ -19,6 +19,7 @@ if (!$db) {
     try {
 if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
         if (!defined('DB_HOST')) require_once __DIR__ . '/../../../../config/config.php';
+    if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
         $db = Database::getInstance();
     } catch (Exception $e) {
         echo '<div style="padding:20px;color:#dc2626;background:#fee2e2;border-radius:8px;margin:20px">DB : '.htmlspecialchars($e->getMessage()).'</div>';
