@@ -121,8 +121,11 @@ class GmbEmailController
             ':hours' => $data['delay_hours'] ?? 0
         ]);
 
-        // Mettre à jour le compteur
-        $this->db->exec("UPDATE gmb_email_sequences SET total_steps = (SELECT COUNT(*) FROM gmb_sequence_steps WHERE sequence_id = {$sequenceId}) WHERE id = {$sequenceId}");
+        // Mettre à jour le compteur (P3.1: Use prepared statement)
+        $stmt = $this->db->prepare(
+            "UPDATE gmb_email_sequences SET total_steps = (SELECT COUNT(*) FROM gmb_sequence_steps WHERE sequence_id = ?) WHERE id = ?"
+        );
+        $stmt->execute([$sequenceId, $sequenceId]);
 
         return (int)$this->db->lastInsertId();
     }
@@ -152,12 +155,18 @@ class GmbEmailController
         $result = $stmt->execute([':id' => $stepId]);
 
         if ($seqId) {
-            // Renuméroter les étapes
-            $steps = $this->db->query("SELECT id FROM gmb_sequence_steps WHERE sequence_id = {$seqId} ORDER BY step_order ASC")->fetchAll(PDO::FETCH_COLUMN);
+            // Renuméroter les étapes (P3.1: Use prepared statements)
+            $stmt = $this->db->prepare("SELECT id FROM gmb_sequence_steps WHERE sequence_id = ? ORDER BY step_order ASC");
+            $stmt->execute([$seqId]);
+            $steps = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+            $updateStmt = $this->db->prepare("UPDATE gmb_sequence_steps SET step_order = ? WHERE id = ?");
             foreach ($steps as $order => $id) {
-                $this->db->exec("UPDATE gmb_sequence_steps SET step_order = " . ($order + 1) . " WHERE id = {$id}");
+                $updateStmt->execute([$order + 1, $id]);
             }
-            $this->db->exec("UPDATE gmb_email_sequences SET total_steps = " . count($steps) . " WHERE id = {$seqId}");
+
+            $countStmt = $this->db->prepare("UPDATE gmb_email_sequences SET total_steps = ? WHERE id = ?");
+            $countStmt->execute([count($steps), $seqId]);
         }
 
         return $result;

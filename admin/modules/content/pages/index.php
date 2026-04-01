@@ -83,7 +83,13 @@ $newCols = [
 ];
 foreach ($newCols as $col => $def) {
     if (!in_array($col, $availCols)) {
-        try { $pdo->exec("ALTER TABLE `pages` ADD COLUMN `{$col}` {$def}"); $availCols[] = $col; } catch (PDOException $e) {}
+        try {
+            // Validate against whitelist to prevent SQL injection
+            if (isset($newCols[$col]) && $def === $newCols[$col]) {
+                $pdo->exec("ALTER TABLE `pages` ADD COLUMN `" . $col . "` " . $def);
+                $availCols[] = $col;
+            }
+        } catch (PDOException $e) {}
     }
 }
 

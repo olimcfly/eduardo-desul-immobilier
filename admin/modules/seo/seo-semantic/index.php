@@ -89,6 +89,13 @@ function hasCol($pdo, $table, $col) {
 
 // ─── AUTO-MIGRATION ───
 function ensureSemCols($pdo, $table) {
+    // Whitelist of allowed tables to prevent SQL injection
+    $allowedTables = ['pages', 'articles', 'gmb_posts', 'gmb_publications', 'gmb_avis', 'gmb_questions'];
+    if (!in_array($table, $allowedTables)) {
+        error_log("[SemMigrate] Invalid table: $table");
+        return 0;
+    }
+
     $needed = [
         'seo_score'            => "INT DEFAULT NULL",
         'semantic_score'       => "INT DEFAULT NULL",
@@ -100,7 +107,13 @@ function ensureSemCols($pdo, $table) {
     $added = 0;
     foreach ($needed as $col => $def) {
         if (!in_array($col, $existing)) {
-            try { $pdo->exec("ALTER TABLE `$table` ADD COLUMN `$col` $def"); $added++; }
+            try {
+                // Validate against whitelist to prevent SQL injection
+                if (isset($needed[$col]) && $def === $needed[$col]) {
+                    $pdo->exec("ALTER TABLE `" . $table . "` ADD COLUMN `" . $col . "` " . $def);
+                    $added++;
+                }
+            }
             catch (Exception $e) { error_log("[SemMigrate] $table.$col: " . $e->getMessage()); }
         }
     }

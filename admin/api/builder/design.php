@@ -53,8 +53,11 @@ if ($action === 'delete' && $method === 'POST') {
 
 if ($action === 'set-default' && $method === 'POST') {
     $id = (int)($p['id']??0);
-    $pdo->exec("UPDATE `{$type}` SET is_default = 0");
-    $pdo->prepare("UPDATE `{$type}` SET is_default = 1 WHERE id=?")->execute([$id]);
+    // Use prepared statements with validated table name
+    $stmt1 = $pdo->prepare("UPDATE `" . $type . "` SET is_default = 0");
+    $stmt1->execute();
+    $stmt2 = $pdo->prepare("UPDATE `" . $type . "` SET is_default = 1 WHERE id=?");
+    $stmt2->execute([$id]);
     return ['success'=>true,'message'=>'Défini par défaut'];
 }
 

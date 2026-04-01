@@ -71,14 +71,18 @@ try {
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 } catch (PDOException $e) {}
 
-foreach ([
+$columnsToAdd = [
     'template_config_key' => "VARCHAR(120) DEFAULT NULL AFTER `template`",
     'template_data'       => "LONGTEXT DEFAULT NULL AFTER `template_config_key`",
-] as $col => $sqlDef) {
+];
+foreach ($columnsToAdd as $col => $sqlDef) {
     if (!in_array($col, $availCols, true)) {
         try {
-            $pdo->exec("ALTER TABLE pages ADD COLUMN `{$col}` {$sqlDef}");
-            $availCols[] = $col;
+            // Validate against whitelist to prevent SQL injection
+            if (isset($columnsToAdd[$col]) && $sqlDef === $columnsToAdd[$col]) {
+                $pdo->exec("ALTER TABLE pages ADD COLUMN `" . $col . "` " . $sqlDef);
+                $availCols[] = $col;
+            }
         } catch (PDOException $e) {}
     }
 }

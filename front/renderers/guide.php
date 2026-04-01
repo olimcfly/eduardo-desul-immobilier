@@ -27,6 +27,7 @@ if (!defined('FRONT_ROUTER')) {
 
 if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
 global $db;
+    if (!class_exists('Database')) require_once ROOT_PATH . '/includes/classes/Database.php';
 if (!$db) $db = Database::getInstance();
 
 // ── Charger le guide depuis l'URL ────────────────────────
