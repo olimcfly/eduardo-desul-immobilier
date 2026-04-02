@@ -1,40 +1,40 @@
 <?php
-namespace Admin\Controllers;
+// ============================================================
+// ADMIN — Dashboard Controller
+// ============================================================
 
-use Core\Controller;
-
-class DashboardController extends Controller
+class DashboardController
 {
     public function index(): void
     {
-        $this->requireAuth();
+        $adminUser = Auth::user();
 
-        $bienModel   = $this->model('Bien');
-        $gmbModel    = $this->model('GmbReview');
-        $seoModel    = $this->model('SeoKeyword');
-        $socialModel = $this->model('SocialPost');
-
+        // Stats de base (sans DB si tables pas encore créées)
         $stats = [
-            'biens_total'   => $bienModel->count(),
-            'biens_actifs'  => $bienModel->count(['statut' => 'actif']),
-            'biens_pending' => $bienModel->count(['statut' => 'pending']),
-            'gmb_note'      => $gmbModel->avgNote(),
-            'avis_total'    => $gmbModel->count(),
-            'keywords_top'  => $seoModel->countTop10(),
-            'social_queued' => $socialModel->countQueued(),
+            'biens_total'   => 0,
+            'biens_actifs'  => 0,
+            'contacts'      => 0,
+            'estimations'   => 0,
         ];
 
-        $biensRecents  = $bienModel->recent(5);
-        $topKeywords   = $seoModel->top(8);
-        $socialQueue   = $socialModel->nextScheduled(4);
-        $gmbRecent     = $gmbModel->recent(3);
+        try {
+            $db = Database::getInstance();
+            $stats['biens_total']  = (int) $db->query('SELECT COUNT(*) FROM biens')->fetchColumn();
+            $stats['biens_actifs'] = (int) $db->query("SELECT COUNT(*) FROM biens WHERE statut = 'actif'")->fetchColumn();
+            $stats['contacts']     = (int) $db->query('SELECT COUNT(*) FROM contacts')->fetchColumn();
+            $stats['estimations']  = (int) $db->query('SELECT COUNT(*) FROM estimations')->fetchColumn();
+        } catch (Exception $e) {
+            // Tables pas encore créées — on affiche des zéros
+        }
 
-        $this->view('dashboard/index', compact(
-            'stats',
-            'biensRecents',
-            'topKeywords',
-            'socialQueue',
-            'gmbRecent'
-        ));
+        adminLayout('dashboard/index', [
+            'pageTitle'    => 'Tableau de bord',
+            'stats'        => $stats,
+            'adminUser'    => $adminUser,
+            'biensRecents' => [],
+            'avisRecents'  => [],
+            'topKeywords'  => [],
+            'socialQueue'  => [],
+        ]);
     }
 }

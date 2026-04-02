@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $pageTitle ?? 'Admin' ?> — ImmoSite</title>
+    <title><?= $pageTitle ?? 'Admin' ?> — Eduardo Desul</title>
+    <meta name="robots" content="noindex, nofollow">
     <link rel="stylesheet" href="/admin/assets/css/admin.css">
     <?php if (!empty($extraCss)): ?>
         <?php foreach ($extraCss as $css): ?>

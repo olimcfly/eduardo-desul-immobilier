@@ -1,0 +1,15 @@
+Options -Indexes
+RewriteEngine On
+
+# Autoriser les fichiers réels (CSS, JS, images)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Tout router vers index.php
+RewriteRule ^ index.php [QSA,L]
+
+# Bloquer l'accès direct aux fichiers sensibles
+<FilesMatch "\.(env|log|sql|md)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
