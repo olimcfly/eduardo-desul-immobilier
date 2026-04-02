@@ -273,30 +273,49 @@ if (file_exists($msFile)) {
 
 // ── Welcome modules (page d'accueil standard) ───────────────
 $moduleWelcomeConfig = [];
-$moduleWelcomeFile = __DIR__ . '/../config/module-welcome.php';
+$moduleWelcomeFile = __DIR__ . '/config/module-welcome.php';
 if (file_exists($moduleWelcomeFile)) {
     $moduleWelcomeConfig = require $moduleWelcomeFile;
 }
+
+require_once __DIR__ . '/components/ModuleWelcomePage.php';
+$userModuleKey = (string)($_SESSION['auth_admin_id'] ?? $_SESSION['auth_admin_email'] ?? session_id() ?? 'guest');
+$moduleWelcome = new ModuleWelcomePage(__DIR__ . '/../storage/seen-modules.json', $userModuleKey);
+
 $showModuleWelcome = false;
 $moduleWelcomeContext = $_SESSION['module_welcome_context'][$module] ?? null;
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['module_welcome_form'] ?? '') === '1') {
     $postedModule = strtolower((string)($_POST['module_key'] ?? ''));
     if ($postedModule === $module && isset($moduleWelcomeConfig[$module])) {
-        $_SESSION['module_welcome_seen'][$module] = true;
         $action = (string)($_POST['welcome_action'] ?? 'start');
+        $choice = trim((string)($_POST['module_choice'] ?? ''));
+        $note = trim((string)($_POST['module_note'] ?? ''));
+
+        if ($action === 'start' || $action === 'direct') {
+            $moduleWelcome->markAsSeen($module);
+        }
+
         if ($action === 'start') {
             $_SESSION['module_welcome_context'][$module] = [
-                'choice' => trim((string)($_POST['module_choice'] ?? '')),
-                'note' => trim((string)($_POST['module_note'] ?? '')),
+                'choice' => $choice,
+                'note' => $note,
                 'at' => date('c'),
             ];
+
+            $routes = $moduleWelcomeConfig[$module]['action_routes'] ?? [];
+            $target = isset($routes[$choice]) ? (string)$routes[$choice] : (string)($_POST['welcome_url'] ?? ('?page=' . urlencode($module)));
+            header('Location: ' . $target);
+            exit;
         }
-        header('Location: ?page=' . urlencode($module));
+
+        $direct = (string)($_POST['dashboard_url'] ?? ('?page=' . urlencode($module)));
+        header('Location: ' . $direct);
         exit;
     }
 }
 
-$moduleSeen = !empty($_SESSION['module_welcome_seen'][$module]);
+$moduleSeen = $moduleWelcome->hasSeenModule($module);
 $forceWelcome = isset($_GET['welcome']) && $_GET['welcome'] === '1';
 if (
     $module !== 'dashboard'
@@ -370,10 +389,7 @@ require_once __DIR__ . '/layout/sidebar.php';
         </div>
     <?php elseif ($showModuleWelcome): ?>
         <?php
-            require_once __DIR__ . '/../components/modules/ModuleWelcomePage.php';
-            renderModuleWelcomePage($moduleWelcomeConfig[$module], $module, [
-                'context' => $moduleWelcomeContext,
-            ]);
+            $moduleWelcome->render($module, $moduleWelcomeConfig[$module], $moduleWelcomeContext ? $moduleWelcomeContext : []);
         ?>
     <?php elseif ($module_file): ?>
         <?php if (isset($moduleWelcomeConfig[$module])): ?>
