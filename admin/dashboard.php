@@ -345,6 +345,9 @@ require_once __DIR__ . '/layout/sidebar.php';
 
 <?php if ($module === 'dashboard'): ?>
 <?php
+    // Variables nécessaires pour le dashboard prestige
+    $pageTitle = 'Tableau de bord';
+
     // Inclure le nouveau dashboard prestige
     include __DIR__ . '/dashboard-prestige.php';
 ?>
