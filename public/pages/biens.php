@@ -86,17 +86,27 @@ $extraJs   = ['/assets/js/biens.js'];
             <?php
             // Données de démonstration
             $biens = [
-                ['id' => 1, 'titre' => 'Appartement T3 lumineux Chartrons', 'type' => 'Vente', 'prix' => '295 000', 'loc' => 'Bordeaux Chartrons', 'surface' => 72, 'pieces' => 3, 'img' => '/assets/images/placeholder-bien-1.jpg', 'badge' => 'vente'],
-                ['id' => 2, 'titre' => 'Maison familiale avec jardin', 'type' => 'Vente', 'prix' => '485 000', 'loc' => 'Mérignac', 'surface' => 145, 'pieces' => 5, 'img' => '/assets/images/placeholder-bien-2.jpg', 'badge' => 'vente'],
-                ['id' => 3, 'titre' => 'Studio meublé centre historique', 'type' => 'Location', 'prix' => '750 /mois', 'loc' => 'Bordeaux Centre', 'surface' => 28, 'pieces' => 1, 'img' => '/assets/images/placeholder-bien-3.jpg', 'badge' => 'location'],
-                ['id' => 4, 'titre' => 'T2 avec balcon et parking', 'type' => 'Vente', 'prix' => '189 000', 'loc' => 'Talence', 'surface' => 48, 'pieces' => 2, 'img' => '/assets/images/placeholder-bien-1.jpg', 'badge' => 'vente'],
-                ['id' => 5, 'titre' => 'Loft atypique Saint-Michel', 'type' => 'Vente', 'prix' => '320 000', 'loc' => 'Bordeaux Saint-Michel', 'surface' => 85, 'pieces' => 3, 'img' => '/assets/images/placeholder-bien-2.jpg', 'badge' => 'exclusif'],
-                ['id' => 6, 'titre' => 'Maison de ville avec patio', 'type' => 'Vente', 'prix' => '560 000', 'loc' => 'Bordeaux Victoire', 'surface' => 120, 'pieces' => 4, 'img' => '/assets/images/placeholder-bien-3.jpg', 'badge' => 'vente'],
+                ['id' => 1, 'titre' => 'Appartement T3 lumineux Chartrons', 'type' => 'Vente', 'typeBien' => 'appartement', 'prix' => '295 000', 'loc' => 'Bordeaux Chartrons', 'surface' => 72, 'pieces' => 3, 'img' => '/assets/images/bien-1.jpg', 'badge' => 'vente'],
+                ['id' => 2, 'titre' => 'Maison familiale avec jardin', 'type' => 'Vente', 'typeBien' => 'maison', 'prix' => '485 000', 'loc' => 'Mérignac', 'surface' => 145, 'pieces' => 5, 'img' => '/assets/images/bien-2.jpg', 'badge' => 'vente'],
+                ['id' => 3, 'titre' => 'Studio meublé centre historique', 'type' => 'Location', 'typeBien' => 'appartement', 'prix' => '750 /mois', 'loc' => 'Bordeaux Centre', 'surface' => 28, 'pieces' => 1, 'img' => '/assets/images/bien-3.jpg', 'badge' => 'location'],
+                ['id' => 4, 'titre' => 'T2 avec balcon et parking', 'type' => 'Vente', 'typeBien' => 'appartement', 'prix' => '189 000', 'loc' => 'Talence', 'surface' => 48, 'pieces' => 2, 'img' => '/assets/images/bien-4.jpg', 'badge' => 'vente'],
+                ['id' => 5, 'titre' => 'Loft atypique Saint-Michel', 'type' => 'Vente', 'typeBien' => 'appartement', 'prix' => '320 000', 'loc' => 'Bordeaux Saint-Michel', 'surface' => 85, 'pieces' => 3, 'img' => '/assets/images/bien-5.jpg', 'badge' => 'exclusif'],
+                ['id' => 6, 'titre' => 'Maison de ville avec patio', 'type' => 'Vente', 'typeBien' => 'maison', 'prix' => '560 000', 'loc' => 'Bordeaux Victoire', 'surface' => 120, 'pieces' => 4, 'img' => '/assets/images/bien-6.jpg', 'badge' => 'vente'],
             ];
-            foreach ($biens as $b): ?>
+            foreach ($biens as $b):
+                $imgFile = defined('PUBLIC_PATH') ? PUBLIC_PATH . $b['img'] : __DIR__ . '/..' . $b['img'];
+                if (file_exists($imgFile)) {
+                    $imgSrc = e($b['img']);
+                } else {
+                    $imgSrc = '/assets/images/placeholder.php?type=' . urlencode($b['typeBien'])
+                            . '&pieces=' . $b['pieces']
+                            . '&surface=' . $b['surface']
+                            . '&label=' . urlencode($b['type']);
+                }
+            ?>
             <article class="bien-card">
                 <a href="/biens/bien-<?= $b['id'] ?>" class="bien-card__img" tabindex="-1" aria-hidden="true">
-                    <img src="<?= e($b['img']) ?>" alt="<?= e($b['titre']) ?>" loading="lazy" width="400" height="300">
+                    <img src="<?= $imgSrc ?>" alt="<?= e($b['titre']) ?>" loading="lazy" width="400" height="300">
                     <span class="bien-card__badge badge--<?= e($b['badge']) ?>"><?= e($b['type']) ?></span>
                 </a>
                 <div class="bien-card__body">
