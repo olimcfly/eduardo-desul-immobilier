@@ -400,9 +400,9 @@ require_once __DIR__ . '/layout/sidebar.php';
 <?php endif; ?>
 
 </main>
-</div><!-- /.admin-wrapper -->
-</body>
-</html>
+
+<?php require_once __DIR__ . '/layout/footer.php'; ?>
+
 <?php
 echo ob_get_clean();
 ?>
