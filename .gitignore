@@ -1,7 +1,7 @@
 # ═══════════════════════════════════════════════════════════
-# CONFIGURATION (contient des credentials - NE PAS COMMITER)
+# CONFIGURATION (credentials dans .env uniquement)
 # ═══════════════════════════════════════════════════════════
-config/config.php
+# config/config.php est désormais commité (plus de credentials dedans)
 config/smtp.php
 config/license.json
 config/.installed
