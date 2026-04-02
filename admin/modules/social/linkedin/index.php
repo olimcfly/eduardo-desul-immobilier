@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $token = $_POST['csrf_token'] ?? '';
     if (!hash_equals($_SESSION['auth_csrf_token'] ?? '', $token)) {
         $_SESSION['auth_error_message'] = "Token CSRF invalide.";
-        header("Location: /admin/index.php?module=linkedin");
+        header("Location: /admin/dashboard.php?page=linkedin");
         exit;
     }
 
@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             break;
     }
 
-    header("Location: /admin/index.php?module=linkedin");
+    header("Location: /admin/dashboard.php?page=linkedin");
     exit;
 }
 
@@ -1022,10 +1022,10 @@ ob_start();
         <p>Développez votre réseau professionnel et votre crédibilité d'expert immobilier</p>
     </div>
     <div class="li-hero-right">
-        <a href="/admin/index.php?module=linkedin&action=create" class="li-hero-btn primary">
+        <a href="/admin/dashboard.php?page=linkedin&action=create" class="li-hero-btn primary">
             <i class="fas fa-plus"></i> Nouvelle publication
         </a>
-        <a href="/admin/index.php?module=reseaux-sociaux" class="li-hero-btn secondary">
+        <a href="/admin/dashboard.php?page=reseaux-sociaux" class="li-hero-btn secondary">
             <i class="fas fa-th-large"></i> Hub Réseaux
         </a>
     </div>
@@ -1106,22 +1106,22 @@ ob_start();
 <div class="li-quick-create">
     <h3><i class="fas fa-bolt" style="color: #0A66C2;"></i> Création rapide</h3>
     <div class="li-quick-types">
-        <a class="li-quick-type" href="/admin/index.php?module=linkedin&action=create&type=post">
+        <a class="li-quick-type" href="/admin/dashboard.php?page=linkedin&action=create&type=post">
             <i class="fas fa-comment-dots" style="color: #0A66C2;"></i>
             <span>Post texte</span>
             <small>Partage d'expertise, avis, conseil</small>
         </a>
-        <a class="li-quick-type" href="/admin/index.php?module=linkedin&action=create&type=article">
+        <a class="li-quick-type" href="/admin/dashboard.php?page=linkedin&action=create&type=article">
             <i class="fas fa-newspaper" style="color: #e67e22;"></i>
             <span>Article</span>
             <small>Analyse marché, guide complet</small>
         </a>
-        <a class="li-quick-type" href="/admin/index.php?module=linkedin&action=create&type=document">
+        <a class="li-quick-type" href="/admin/dashboard.php?page=linkedin&action=create&type=document">
             <i class="fas fa-file-pdf" style="color: #0A66C2;"></i>
             <span>Document PDF</span>
             <small>Carrousel LinkedIn, infographie</small>
         </a>
-        <a class="li-quick-type" href="/admin/index.php?module=linkedin&action=create&type=video">
+        <a class="li-quick-type" href="/admin/dashboard.php?page=linkedin&action=create&type=video">
             <i class="fas fa-video" style="color: #7c3aed;"></i>
             <span>Vidéo</span>
             <small>Témoignage, visite, coulisses</small>
@@ -1142,7 +1142,7 @@ ob_start();
         'videos'    => ['label' => 'Vidéos',     'icon' => 'fas fa-video',      'count' => $liStats['videos']],
     ];
     foreach ($tabs as $key => $tab): ?>
-        <a href="/admin/index.php?module=linkedin&tab=<?= $key ?>" 
+        <a href="/admin/dashboard.php?page=linkedin&tab=<?= $key ?>" 
            class="li-tab <?= $activeTab === $key ? 'active' : '' ?>">
             <i class="<?= $tab['icon'] ?>"></i>
             <?= $tab['label'] ?>
@@ -1171,7 +1171,7 @@ ob_start();
         <i class="fab fa-linkedin"></i>
         <h3>Aucune publication LinkedIn</h3>
         <p>Commencez par créer votre première publication pour LinkedIn.</p>
-        <a href="/admin/index.php?module=linkedin&action=create" class="li-hero-btn primary" 
+        <a href="/admin/dashboard.php?page=linkedin&action=create" class="li-hero-btn primary" 
            style="display: inline-flex; background: #0A66C2; color: #fff;">
             <i class="fas fa-plus"></i> Créer ma première publication
         </a>
@@ -1265,7 +1265,7 @@ ob_start();
 
                 <!-- Actions -->
                 <div class="li-pub-actions">
-                    <a href="/admin/index.php?module=linkedin&action=edit&id=<?= $pub['id'] ?>" 
+                    <a href="/admin/dashboard.php?page=linkedin&action=edit&id=<?= $pub['id'] ?>" 
                        class="li-pub-action" title="Modifier">
                         <i class="fas fa-pen"></i>
                     </a>
@@ -1300,7 +1300,7 @@ ob_start();
     <?php if ($totalPages > 1): ?>
         <div class="li-pagination">
             <?php if ($page > 1): ?>
-                <a href="/admin/index.php?module=linkedin&tab=<?= $activeTab ?>&p=<?= $page - 1 ?><?= $search ? '&search=' . urlencode($search) : '' ?>">
+                <a href="/admin/dashboard.php?page=linkedin&tab=<?= $activeTab ?>&p=<?= $page - 1 ?><?= $search ? '&search=' . urlencode($search) : '' ?>">
                     <i class="fas fa-chevron-left"></i>
                 </a>
             <?php endif; ?>
@@ -1312,14 +1312,14 @@ ob_start();
                 <?php if ($i === $page): ?>
                     <span class="current"><?= $i ?></span>
                 <?php else: ?>
-                    <a href="/admin/index.php?module=linkedin&tab=<?= $activeTab ?>&p=<?= $i ?><?= $search ? '&search=' . urlencode($search) : '' ?>">
+                    <a href="/admin/dashboard.php?page=linkedin&tab=<?= $activeTab ?>&p=<?= $i ?><?= $search ? '&search=' . urlencode($search) : '' ?>">
                         <?= $i ?>
                     </a>
                 <?php endif; ?>
             <?php endfor; ?>
 
             <?php if ($page < $totalPages): ?>
-                <a href="/admin/index.php?module=linkedin&tab=<?= $activeTab ?>&p=<?= $page + 1 ?><?= $search ? '&search=' . urlencode($search) : '' ?>">
+                <a href="/admin/dashboard.php?page=linkedin&tab=<?= $activeTab ?>&p=<?= $page + 1 ?><?= $search ? '&search=' . urlencode($search) : '' ?>">
                     <i class="fas fa-chevron-right"></i>
                 </a>
             <?php endif; ?>

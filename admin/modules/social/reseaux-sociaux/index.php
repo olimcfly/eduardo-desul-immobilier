@@ -658,10 +658,10 @@ ob_start();
             <p>Tableau de bord centralisé — gérez toutes vos plateformes depuis un seul endroit</p>
         </div>
         <div class="hub-hero-actions">
-            <a href="/admin/index.php?module=journal" class="hub-hero-btn primary">
+            <a href="/admin/dashboard.php?page=journal" class="hub-hero-btn primary">
                 <i class="fas fa-calendar-alt"></i> Journal Éditorial
             </a>
-            <a href="/admin/index.php?module=strategie-contenu" class="hub-hero-btn ghost">
+            <a href="/admin/dashboard.php?page=launchpad" class="hub-hero-btn ghost">
                 <i class="fas fa-chess"></i> Stratégie Contenu
             </a>
         </div>
@@ -753,32 +753,32 @@ ob_start();
 
 <!-- ===== Accès rapides ===== -->
 <div class="hub-quick-grid">
-    <a href="/admin/index.php?module=journal" class="hub-quick-card">
+    <a href="/admin/dashboard.php?page=journal" class="hub-quick-card">
         <i class="fas fa-calendar-alt" style="color: #7c3aed;"></i>
         <span>Journal Éditorial</span>
         <small><?= $journalStats['total'] ?> idées de contenu</small>
     </a>
-    <a href="/admin/index.php?module=strategie-contenu" class="hub-quick-card">
+    <a href="/admin/dashboard.php?page=launchpad" class="hub-quick-card">
         <i class="fas fa-chess" style="color: #e67e22;"></i>
         <span>Matrice Stratégique</span>
         <small>Planification par cible</small>
     </a>
-    <a href="/admin/index.php?module=tiktok&tab=scripts" class="hub-quick-card">
+    <a href="/admin/dashboard.php?page=tiktok&tab=scripts" class="hub-quick-card">
         <i class="fas fa-scroll" style="color: #000;"></i>
         <span>Scripts TikTok</span>
         <small><?= $tiktokScripts ?> scripts créés</small>
     </a>
-    <a href="/admin/index.php?module=articles" class="hub-quick-card">
+    <a href="/admin/dashboard.php?page=articles" class="hub-quick-card">
         <i class="fas fa-blog" style="color: #16a34a;"></i>
         <span>Blog / Articles</span>
         <small>Contenu SEO</small>
     </a>
-    <a href="/admin/index.php?module=gmb" class="hub-quick-card">
+    <a href="/admin/dashboard.php?page=local-seo" class="hub-quick-card">
         <i class="fas fa-map-marker-alt" style="color: #4285f4;"></i>
         <span>Google My Business</span>
         <small>Posts GMB locaux</small>
     </a>
-    <a href="/admin/index.php?module=ia" class="hub-quick-card">
+    <a href="/admin/dashboard.php?page=advisor-context" class="hub-quick-card">
         <i class="fas fa-robot" style="color: #833AB4;"></i>
         <span>Générateur IA</span>
         <small>Créer avec l'IA</small>

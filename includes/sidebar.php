@@ -32,7 +32,7 @@ $adminName = $currentAdmin['name'] ?? 'Administrator';
             </div>
             
             <div class="nav-item active">
-                <a href="/admin/index.php">
+                <a href="/admin/dashboard.php">
                     <i class="fas fa-home"></i>
                     <span class="nav-label">Dashboard</span>
                 </a>
@@ -48,16 +48,16 @@ $adminName = $currentAdmin['name'] ?? 'Administrator';
 
             <!-- Pages -->
             <div class="nav-item">
-                <a href="/admin/modules/pages/index.php" onclick="toggleSubmenu(this)">
+                <a href="/admin/dashboard.php?page=pages" onclick="toggleSubmenu(this)">
                     <i class="fas fa-file-alt"></i>
                     <span class="nav-label">Pages</span>
                     <i class="arrow fas fa-chevron-down"></i>
                 </a>
                 <div class="submenu">
-                    <a href="/admin/modules/pages/index.php" class="submenu-item">
+                    <a href="/admin/dashboard.php?page=pages" class="submenu-item">
                         <i class="fas fa-list"></i> Toutes les pages
                     </a>
-                    <a href="/admin/modules/pages/create.php" class="submenu-item">
+                    <a href="/admin/dashboard.php?page=pages-create" class="submenu-item">
                         <i class="fas fa-plus"></i> Créer page
                     </a>
                 </div>
@@ -65,22 +65,22 @@ $adminName = $currentAdmin['name'] ?? 'Administrator';
 
             <!-- Articles/Blog -->
             <div class="nav-item">
-                <a href="/admin/modules/articles/index.php" onclick="toggleSubmenu(this)">
+                <a href="/admin/dashboard.php?page=articles" onclick="toggleSubmenu(this)">
                     <i class="fas fa-newspaper"></i>
                     <span class="nav-label">Articles</span>
                     <i class="arrow fas fa-chevron-down"></i>
                 </a>
                 <div class="submenu">
-                    <a href="/admin/modules/articles/index.php" class="submenu-item">
+                    <a href="/admin/dashboard.php?page=articles" class="submenu-item">
                         <i class="fas fa-list"></i> Tous les articles
                     </a>
-                    <a href="/admin/modules/articles/create.php" class="submenu-item">
+                    <a href="/admin/dashboard.php?page=articles&action=create" class="submenu-item">
                         <i class="fas fa-plus"></i> Nouvel article
                     </a>
-                    <a href="/admin/modules/articles/index.php?status=draft" class="submenu-item">
+                    <a href="/admin/dashboard.php?page=articles&status=draft" class="submenu-item">
                         <i class="fas fa-edit"></i> Brouillons
                     </a>
-                    <a href="/admin/modules/articles/index.php?status=published" class="submenu-item">
+                    <a href="/admin/dashboard.php?page=articles&status=published" class="submenu-item">
                         <i class="fas fa-check"></i> Publiés
                     </a>
                 </div>
@@ -88,19 +88,19 @@ $adminName = $currentAdmin['name'] ?? 'Administrator';
 
             <!-- Capture Pages -->
             <div class="nav-item">
-                <a href="/admin/modules/captures/index.php" onclick="toggleSubmenu(this)">
+                <a href="/admin/dashboard.php?page=captures" onclick="toggleSubmenu(this)">
                     <i class="fas fa-bullseye"></i>
                     <span class="nav-label">Captures</span>
                     <i class="arrow fas fa-chevron-down"></i>
                 </a>
                 <div class="submenu">
-                    <a href="/admin/modules/captures/index.php" class="submenu-item">
+                    <a href="/admin/dashboard.php?page=captures" class="submenu-item">
                         <i class="fas fa-list"></i> Pages de capture
                     </a>
-                    <a href="/admin/modules/captures/create.php" class="submenu-item">
+                    <a href="/admin/dashboard.php?page=captures&action=create" class="submenu-item">
                         <i class="fas fa-plus"></i> Nouvelle capture
                     </a>
-                    <a href="/admin/modules/captures/performance.php" class="submenu-item">
+                    <a href="/admin/dashboard.php?page=captures&view=performance" class="submenu-item">
                         <i class="fas fa-chart-bar"></i> Performance
                     </a>
                 </div>
@@ -116,19 +116,19 @@ $adminName = $currentAdmin['name'] ?? 'Administrator';
 
             <!-- Leads -->
             <div class="nav-item">
-                <a href="/admin/modules/leads/index.php" onclick="toggleSubmenu(this)">
+                <a href="/admin/dashboard.php?page=leads" onclick="toggleSubmenu(this)">
                     <i class="fas fa-users"></i>
                     <span class="nav-label">Prospects</span>
                     <i class="arrow fas fa-chevron-down"></i>
                 </a>
                 <div class="submenu">
-                    <a href="/admin/modules/leads/index.php" class="submenu-item">
+                    <a href="/admin/dashboard.php?page=leads" class="submenu-item">
                         <i class="fas fa-list"></i> Tous les prospects
                     </a>
-                    <a href="/admin/modules/leads/index.php?status=new" class="submenu-item">
+                    <a href="/admin/dashboard.php?page=leads&status=new" class="submenu-item">
                         <i class="fas fa-star"></i> Nouveaux
                     </a>
-                    <a href="/admin/modules/leads/index.php?status=qualified" class="submenu-item">
+                    <a href="/admin/dashboard.php?page=leads&status=qualified" class="submenu-item">
                         <i class="fas fa-check"></i> Qualifiés
                     </a>
                 </div>
@@ -136,16 +136,16 @@ $adminName = $currentAdmin['name'] ?? 'Administrator';
 
             <!-- Contacts -->
             <div class="nav-item">
-                <a href="/admin/modules/contacts/index.php" onclick="toggleSubmenu(this)">
+                <a href="/admin/dashboard.php?page=crm" onclick="toggleSubmenu(this)">
                     <i class="fas fa-address-book"></i>
                     <span class="nav-label">Contacts</span>
                     <i class="arrow fas fa-chevron-down"></i>
                 </a>
                 <div class="submenu">
-                    <a href="/admin/modules/contacts/index.php" class="submenu-item">
+                    <a href="/admin/dashboard.php?page=crm" class="submenu-item">
                         <i class="fas fa-list"></i> Tous les contacts
                     </a>
-                    <a href="/admin/modules/contacts/import.php" class="submenu-item">
+                    <a href="/admin/dashboard.php?page=crm&action=import" class="submenu-item">
                         <i class="fas fa-upload"></i> Importer
                     </a>
                 </div>
@@ -161,19 +161,19 @@ $adminName = $currentAdmin['name'] ?? 'Administrator';
 
             <!-- Properties -->
             <div class="nav-item">
-                <a href="/admin/modules/properties/index.php" onclick="toggleSubmenu(this)">
+                <a href="/admin/dashboard.php?page=properties" onclick="toggleSubmenu(this)">
                     <i class="fas fa-building"></i>
                     <span class="nav-label">Biens</span>
                     <i class="arrow fas fa-chevron-down"></i>
                 </a>
                 <div class="submenu">
-                    <a href="/admin/modules/properties/index.php" class="submenu-item">
+                    <a href="/admin/dashboard.php?page=properties" class="submenu-item">
                         <i class="fas fa-list"></i> Tous les biens
                     </a>
-                    <a href="/admin/modules/properties/create.php" class="submenu-item">
+                    <a href="/admin/dashboard.php?page=properties&action=create" class="submenu-item">
                         <i class="fas fa-plus"></i> Ajouter bien
                     </a>
-                    <a href="/admin/modules/properties/index.php?status=available" class="submenu-item">
+                    <a href="/admin/dashboard.php?page=properties&status=available" class="submenu-item">
                         <i class="fas fa-check"></i> Disponibles
                     </a>
                 </div>
@@ -189,19 +189,19 @@ $adminName = $currentAdmin['name'] ?? 'Administrator';
 
             <!-- SEO Tools -->
             <div class="nav-item">
-                <a href="/admin/modules/seo/index.php" onclick="toggleSubmenu(this)">
+                <a href="/admin/dashboard.php?page=local-seo" onclick="toggleSubmenu(this)">
                     <i class="fas fa-search"></i>
                     <span class="nav-label">SEO</span>
                     <i class="arrow fas fa-chevron-down"></i>
                 </a>
                 <div class="submenu">
-                    <a href="/admin/modules/seo/analyzer.php" class="submenu-item">
+                    <a href="/admin/dashboard.php?page=local-seo&tab=analyzer" class="submenu-item">
                         <i class="fas fa-chart-line"></i> Analyseur
                     </a>
-                    <a href="/admin/modules/seo/keywords.php" class="submenu-item">
+                    <a href="/admin/dashboard.php?page=local-seo&tab=keywords" class="submenu-item">
                         <i class="fas fa-key"></i> Mots-clés
                     </a>
-                    <a href="/admin/modules/seo/sitemap.php" class="submenu-item">
+                    <a href="/admin/dashboard.php?page=local-seo&tab=sitemap" class="submenu-item">
                         <i class="fas fa-sitemap"></i> Sitemap
                     </a>
                 </div>
@@ -209,7 +209,7 @@ $adminName = $currentAdmin['name'] ?? 'Administrator';
 
             <!-- Media Library -->
             <div class="nav-item">
-                <a href="/admin/modules/media/index.php">
+                <a href="/admin/dashboard.php?page=media">
                     <i class="fas fa-images"></i>
                     <span class="nav-label">Médias</span>
                 </a>
@@ -217,7 +217,7 @@ $adminName = $currentAdmin['name'] ?? 'Administrator';
 
             <!-- Analytics -->
             <div class="nav-item">
-                <a href="/admin/modules/analytics/index.php">
+                <a href="/admin/dashboard.php?page=analytics">
                     <i class="fas fa-chart-bar"></i>
                     <span class="nav-label">Analytics</span>
                 </a>
@@ -233,7 +233,7 @@ $adminName = $currentAdmin['name'] ?? 'Administrator';
 
             <!-- Integrations -->
             <div class="nav-item">
-                <a href="/admin/modules/integrations/index.php">
+                <a href="/admin/dashboard.php?page=integrations">
                     <i class="fas fa-plug"></i>
                     <span class="nav-label">Intégrations</span>
                 </a>
@@ -241,22 +241,22 @@ $adminName = $currentAdmin['name'] ?? 'Administrator';
 
             <!-- Settings -->
             <div class="nav-item">
-                <a href="/admin/modules/settings/index.php" onclick="toggleSubmenu(this)">
+                <a href="/admin/dashboard.php?page=settings" onclick="toggleSubmenu(this)">
                     <i class="fas fa-cog"></i>
                     <span class="nav-label">Paramètres</span>
                     <i class="arrow fas fa-chevron-down"></i>
                 </a>
                 <div class="submenu">
-                    <a href="/admin/modules/settings/general.php" class="submenu-item">
+                    <a href="/admin/dashboard.php?page=settings&tab=general" class="submenu-item">
                         <i class="fas fa-sliders-h"></i> Général
                     </a>
-                    <a href="/admin/modules/settings/users.php" class="submenu-item">
+                    <a href="/admin/dashboard.php?page=settings&tab=users" class="submenu-item">
                         <i class="fas fa-user-cog"></i> Utilisateurs
                     </a>
-                    <a href="/admin/modules/settings/security.php" class="submenu-item">
+                    <a href="/admin/dashboard.php?page=settings&tab=security" class="submenu-item">
                         <i class="fas fa-shield-alt"></i> Sécurité
                     </a>
-                    <a href="/admin/modules/settings/backup.php" class="submenu-item">
+                    <a href="/admin/dashboard.php?page=settings&tab=backup" class="submenu-item">
                         <i class="fas fa-save"></i> Sauvegarde
                     </a>
                 </div>
@@ -264,7 +264,7 @@ $adminName = $currentAdmin['name'] ?? 'Administrator';
 
             <!-- Help & Docs -->
             <div class="nav-item">
-                <a href="/admin/help/" target="_blank">
+                <a href="/documentation" target="_blank">
                     <i class="fas fa-question-circle"></i>
                     <span class="nav-label">Aide</span>
                 </a>
@@ -286,7 +286,7 @@ $adminName = $currentAdmin['name'] ?? 'Administrator';
                 <div class="user-email"><?php echo escape(substr($_SESSION['auth_admin_email'] ?? '', 0, 20)); ?></div>
             </div>
         </div>
-        <a href="/admin/logout.php" class="logout-btn">
+        <a href="/admin/dashboard.php?action=logout" class="logout-btn">
             <i class="fas fa-sign-out-alt"></i>
             Déconnexion
         </a>
