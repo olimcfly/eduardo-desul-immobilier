@@ -133,10 +133,14 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.textContent = 'Inscription...';
 
             try {
+                const csrfToken = nlForm.querySelector('[name="csrf_token"]');
                 const res = await fetch('/api/newsletter-subscribe.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email }),
+                    body: JSON.stringify({
+                        email,
+                        csrf_token: csrfToken ? csrfToken.value : undefined,
+                    }),
                 });
                 const data = await res.json();
 
@@ -174,5 +178,109 @@ document.addEventListener('DOMContentLoaded', () => {
         div.textContent = msg;
         parent.prepend(div);
         setTimeout(() => div.remove(), 4000);
+    }
+
+    // ── 8. BARRE DE PROGRESSION DE LECTURE ─────────────────────
+    const article = document.querySelector('.article-content');
+    if (article) {
+        const progressBar = document.createElement('div');
+        progressBar.className = 'reading-progress';
+        progressBar.style.width = '0%';
+        document.body.prepend(progressBar);
+
+        const updateProgress = () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.documentElement.scrollHeight;
+            const winHeight = window.innerHeight;
+            const scrolled = (scrollTop / (docHeight - winHeight)) * 100;
+            progressBar.style.width = Math.min(scrolled, 100) + '%';
+        };
+
+        window.addEventListener('scroll', updateProgress, { passive: true });
+        updateProgress();
+    }
+
+    // ── 9. SOMMAIRE : HIGHLIGHT SECTION ACTIVE ─────────────────
+    const tocLinks = document.querySelectorAll('.toc-list a');
+    if (tocLinks.length && 'IntersectionObserver' in window) {
+        const headings = document.querySelectorAll('.article-content h2[id], .article-content h3[id]');
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    tocLinks.forEach(link => link.classList.remove('toc-active'));
+                    const activeLink = document.querySelector(`.toc-list a[href="#${entry.target.id}"]`);
+                    if (activeLink) activeLink.classList.add('toc-active');
+                }
+            });
+        }, { rootMargin: '-20% 0% -70% 0%' });
+
+        headings.forEach(heading => observer.observe(heading));
+    }
+
+    // ── 10. BOUTON COPIER LE LIEN ──────────────────────────────
+    const copyBtn = document.querySelector('.share-btn--copy');
+    if (copyBtn) {
+        copyBtn.addEventListener('click', async () => {
+            try {
+                await navigator.clipboard.writeText(window.location.href);
+                const originalHtml = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="fas fa-check"></i> Copié !';
+                copyBtn.style.background = '#16a34a';
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalHtml;
+                    copyBtn.style.background = '';
+                }, 2000);
+            } catch {
+                showAlert(copyBtn.parentElement || document.body, 'Impossible de copier le lien.', 'error');
+            }
+        });
+    }
+
+    // ── 11. SIDEBAR STICKY SUR ARTICLE ─────────────────────────
+    const sidebar = document.querySelector('.article-sidebar');
+    if (sidebar) {
+        const sidebarTop = sidebar.getBoundingClientRect().top + window.scrollY;
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > sidebarTop - 80) {
+                sidebar.style.position = 'sticky';
+                sidebar.style.top = '80px';
+                sidebar.style.alignSelf = 'start';
+            }
+        }, { passive: true });
+    }
+
+    // ── 12. LAZY-LOAD IMAGE AVEC data-src ──────────────────────
+    if ('IntersectionObserver' in window) {
+        const lazyImgs = document.querySelectorAll('img[loading="lazy"]');
+        const imgObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    if (img.dataset.src) img.src = img.dataset.src;
+                    imgObserver.unobserve(img);
+                }
+            });
+        });
+        lazyImgs.forEach(img => imgObserver.observe(img));
+    }
+
+    // ── 13. HOVER CARDS ARTICLE ────────────────────────────────
+    document.querySelectorAll('.article-card').forEach(card => {
+        card.addEventListener('mouseenter', function onMouseEnter() {
+            this.style.boxShadow = '0 20px 40px rgba(37,99,235,.12)';
+        });
+        card.addEventListener('mouseleave', function onMouseLeave() {
+            this.style.boxShadow = '';
+        });
+    });
+
+    // ── 14. TAB ACTIVE (MOBILE) ────────────────────────────────
+    const activeTab = document.querySelector('.filter-tab--active');
+    if (activeTab) {
+        activeTab.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+            inline: 'center',
+        });
     }
 });
