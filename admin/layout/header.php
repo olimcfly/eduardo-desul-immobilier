@@ -1,13 +1,13 @@
 <?php
 /**
- * HEADER — IMMO LOCAL+ (Mode Strict Minimaliste)
+ * HEADER — IMMO LOCAL+ (Version Minimaliste & Fonctionnelle)
  * /admin/layout/header.php
  *
  * Spécifications:
- * - Barre d'outils externe (liens WhatsApp, Webmail, etc.)
- * - Breadcrumb avec nom d'utilisateur + ville
- * - Champ de recherche
- * - Icônes d'action (notifications, assistant, etc.)
+ * - Logo + titre de la page
+ * - Bouton toggle sidebar (mobile)
+ * - Zone de notifications (badge dynamique)
+ * - Profil utilisateur (avatar + menu déroulant)
  */
 
 // Infos utilisateur (dynamiques)
@@ -31,15 +31,15 @@ try {
     error_log('Header: ' . $e->getMessage());
 }
 
-// Titre de la page (défini par le contrôleur)
+// Titre de la page
 $pageTitle = $pageTitle ?? 'Tableau de bord';
 
-// Liens d'accès rapide
-$quickLinks = [
-    ['url' => 'https://wa.me', 'icon' => 'fab fa-whatsapp', 'title' => 'WhatsApp', 'target' => '_blank'],
-    ['url' => 'https://webmail.ovh.com', 'icon' => 'fas fa-envelope', 'title' => 'Webmail', 'target' => '_blank'],
-    ['url' => 'https://calendar.google.com', 'icon' => 'fas fa-calendar-alt', 'title' => 'Calendrier', 'target' => '_blank'],
-    ['url' => 'https://gmail.com', 'icon' => 'fab fa-google', 'title' => 'Gmail', 'target' => '_blank'],
+// Notifications simulées (à remplacer par des vraies données)
+$notificationCount = 3;
+$notifications = [
+    ['icon' => 'fa-bell', 'title' => 'Nouveau lead captée', 'desc' => '123 Rue de Paris, Lyon', 'time' => 'Il y a 5 min'],
+    ['icon' => 'fa-calendar-alt', 'title' => 'RDV à confirmer', 'desc' => 'Mardi 14h - M. Martin', 'time' => 'Il y a 2h'],
+    ['icon' => 'fa-home', 'title' => 'Bien vendu', 'desc' => 'Appartement 3P - Villeurbanne', 'time' => 'Hier'],
 ];
 ?>
 
@@ -63,33 +63,20 @@ $quickLinks = [
 
     <style>
         /* ============================================
-           IMMO LOCAL+ HEADER — Mode Strict Minimaliste
+           IMMO LOCAL+ HEADER — Version Minimaliste & Fonctionnelle
            ============================================ */
 
         :root {
-            --color-primary: #6366F1;
-            --color-primary-light: #EEF2FF;
-            --color-white: #FFFFFF;
-            --color-gray-50: #F9FAFB;
-            --color-gray-100: #F3F4F6;
-            --color-gray-200: #E5E7EB;
-            --color-gray-600: #4B5563;
-            --color-text-primary: #1F2937;
-            --color-text-secondary: #6B7280;
-            --color-shadow: rgba(0, 0, 0, 0.1);
-
-            --spacing-xs: 0.25rem;
-            --spacing-sm: 0.5rem;
-            --spacing-md: 1rem;
-            --spacing-lg: 1.5rem;
-            --spacing-xl: 2rem;
-
-            --radius: 0.5rem;
-            --border: 1px solid var(--color-gray-200);
-            --shadow: 0 1px 3px var(--color-shadow);
-            --font-base: 14px;
-            --font-title: 16px;
-            --font-note: 12px;
+            --header-bg: #ffffff;
+            --header-text: #1f2937;
+            --header-text-secondary: #6b7280;
+            --header-border: #e5e7eb;
+            --header-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --primary: #4f7df3;
+            --primary-light: #eef2ff;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
         }
 
         * {
@@ -100,168 +87,295 @@ $quickLinks = [
 
         body {
             font-family: Inter, system-ui, -apple-system, sans-serif;
-            background: var(--color-gray-50);
-            color: var(--color-text-primary);
-            font-size: var(--font-base);
+            background: #f9fafb;
+            color: var(--header-text);
+            font-size: 14px;
             line-height: 1.5;
         }
 
         /* Header Container */
-        .header {
+        .app-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: var(--spacing-lg);
-            background: var(--color-white);
-            border-bottom: var(--border);
-            padding: var(--spacing-md) var(--spacing-xl);
-            box-shadow: var(--shadow);
+            gap: 1.5rem;
+            background: var(--header-bg);
+            border-bottom: 1px solid var(--header-border);
+            padding: 1rem 2rem;
+            box-shadow: var(--header-shadow);
             flex-wrap: wrap;
+            height: 60px;
         }
 
-        /* Breadcrumb */
-        .header-breadcrumb {
+        /* Header Left */
+        .header-left {
             display: flex;
             align-items: center;
-            gap: var(--spacing-sm);
-            font-size: var(--font-base);
-            color: var(--color-text-secondary);
+            gap: 1.5rem;
+            flex: 1;
             min-width: 200px;
         }
 
-        .header-breadcrumb-user {
-            font-weight: 600;
-            color: var(--color-primary);
-        }
-
-        .header-breadcrumb-sep {
-            color: var(--color-gray-200);
-        }
-
-        .header-breadcrumb-page {
-            font-weight: 500;
-            color: var(--color-text-primary);
-        }
-
-        /* Search Bar */
-        .header-search {
-            display: flex;
-            align-items: center;
-            gap: var(--spacing-sm);
-            background: var(--color-gray-100);
-            border: var(--border);
-            border-radius: var(--radius);
-            padding: var(--spacing-sm) var(--spacing-md);
-            min-width: 250px;
-            flex: 1;
-            max-width: 400px;
-        }
-
-        .header-search input {
+        /* Sidebar Toggle */
+        .sidebar-toggle {
+            display: none;
+            background: none;
             border: none;
-            background: transparent;
-            outline: none;
-            width: 100%;
-            font-size: var(--font-base);
-            font-family: inherit;
-            color: var(--color-text-primary);
+            color: var(--header-text);
+            font-size: 1.25rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            transition: color 0.2s ease;
         }
 
-        .header-search input::placeholder {
-            color: var(--color-text-secondary);
+        .sidebar-toggle:hover {
+            color: var(--primary);
         }
 
-        .header-search i {
-            color: var(--color-text-secondary);
-            font-size: 14px;
+        @media (max-width: 768px) {
+            .sidebar-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
         }
 
-        /* Quick Links */
-        .header-quick-links {
+        /* Page Title */
+        .page-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--header-text);
+            margin: 0;
+            white-space: nowrap;
+        }
+
+        /* Header Right */
+        .header-right {
             display: flex;
             align-items: center;
-            gap: var(--spacing-md);
-            padding-left: var(--spacing-lg);
-            border-left: var(--border);
+            gap: 1.5rem;
+            flex: 1;
+            justify-content: flex-end;
         }
 
-        .header-quick-link {
+        /* Notifications */
+        .notifications {
+            position: relative;
+        }
+
+        .notification-btn {
+            background: none;
+            border: none;
+            color: var(--header-text-secondary);
+            font-size: 1.25rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            position: relative;
+            transition: color 0.2s ease;
+        }
+
+        .notification-btn:hover {
+            color: var(--primary);
+        }
+
+        /* Badge */
+        .badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: var(--danger);
+            color: white;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 40px;
-            height: 40px;
-            border-radius: var(--radius);
-            background: var(--color-gray-100);
-            color: var(--color-text-secondary);
-            border: var(--border);
-            text-decoration: none;
-            transition: all 0.2s ease;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        /* Notification Dropdown */
+        .notification-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: -10px;
+            width: 320px;
+            background: var(--header-bg);
+            border: 1px solid var(--header-border);
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            margin-top: 0.75rem;
+            z-index: 1000;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .notification-dropdown.open {
+            display: block;
+        }
+
+        .notification-item {
+            padding: 1rem;
+            border-bottom: 1px solid var(--header-border);
             cursor: pointer;
-            font-size: 16px;
-        }
-
-        .header-quick-link:hover {
-            background: var(--color-primary);
-            color: var(--color-white);
-            border-color: var(--color-primary);
-        }
-
-        /* User Avatar */
-        .header-avatar {
+            transition: background 0.2s ease;
             display: flex;
-            align-items: center;
-            gap: var(--spacing-sm);
-            padding: var(--spacing-sm) var(--spacing-md);
-            border-radius: var(--radius);
-            background: var(--color-gray-100);
-            border: var(--border);
-            text-decoration: none;
-            color: var(--color-text-primary);
-            transition: all 0.2s ease;
-            cursor: pointer;
+            gap: 0.75rem;
+            align-items: flex-start;
         }
 
-        .header-avatar:hover {
-            background: var(--color-primary-light);
-            border-color: var(--color-primary);
+        .notification-item:last-child {
+            border-bottom: none;
         }
 
-        .header-avatar-icon {
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .notification-item:hover {
+            background: #f9fafb;
+        }
+
+        .notification-item-icon {
             width: 32px;
             height: 32px;
             border-radius: 50%;
-            background: var(--color-primary);
-            color: var(--color-white);
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .header-avatar-text {
+            background: var(--primary-light);
+            color: var(--primary);
             display: flex;
-            flex-direction: column;
-            gap: 2px;
-            font-size: var(--font-note);
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 0.875rem;
         }
 
-        .header-avatar-name {
-            font-weight: 600;
-            color: var(--color-text-primary);
+        .notification-item-content {
+            flex: 1;
+            min-width: 0;
         }
 
-        .header-avatar-role {
-            color: var(--color-text-secondary);
+        .notification-item-title {
+            font-weight: 500;
+            color: var(--header-text);
+            font-size: 13px;
+            margin-bottom: 0.25rem;
+        }
+
+        .notification-item-desc {
+            color: var(--header-text-secondary);
+            font-size: 12px;
+            margin-bottom: 0.25rem;
+        }
+
+        .notification-item-time {
+            color: var(--header-text-secondary);
             font-size: 11px;
+        }
+
+        /* User Profile */
+        .user-profile {
+            position: relative;
+        }
+
+        .profile-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            background: #f3f4f6;
+            border: 1px solid var(--header-border);
+            text-decoration: none;
+            color: var(--header-text);
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .profile-btn:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .profile-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        .profile-chevron {
+            font-size: 12px;
+            transition: transform 0.2s ease;
+        }
+
+        .profile-btn.open .profile-chevron {
+            transform: rotate(180deg);
+        }
+
+        /* Profile Dropdown */
+        .profile-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--header-bg);
+            border: 1px solid var(--header-border);
+            border-radius: 0.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            margin-top: 0.75rem;
+            z-index: 1000;
+            min-width: 160px;
+            overflow: hidden;
+        }
+
+        .profile-dropdown.open {
+            display: block;
+        }
+
+        .profile-dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--header-border);
+            text-decoration: none;
+            color: var(--header-text);
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .profile-dropdown-item:last-child {
+            border-bottom: none;
+        }
+
+        .profile-dropdown-item:hover {
+            background: #f3f4f6;
+            color: var(--primary);
+        }
+
+        .profile-dropdown-item.danger:hover {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+
+        .profile-dropdown-item i {
+            width: 16px;
+            text-align: center;
         }
 
         /* Layout Wrapper */
         .admin-wrapper {
             display: flex;
             height: 100vh;
-            background: var(--color-white);
+            background: var(--header-bg);
         }
 
         .admin-main {
@@ -274,39 +388,33 @@ $quickLinks = [
         .admin-content {
             flex: 1;
             overflow-y: auto;
-            padding: var(--spacing-xl);
-            background: var(--color-gray-50);
+            padding: 2rem;
+            background: #f9fafb;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 1024px) {
+            .app-header {
+                padding: 1rem 1.5rem;
+            }
         }
 
         @media (max-width: 768px) {
-            .header {
-                padding: var(--spacing-md);
-                gap: var(--spacing-md);
+            .app-header {
+                padding: 1rem;
+                gap: 1rem;
             }
 
-            .header-search {
-                min-width: auto;
-                max-width: 100%;
+            .header-left {
+                gap: 1rem;
             }
 
-            .header-quick-links {
-                display: none;
-            }
-        }
-
-        @media (max-width: 1024px) {
-            .header {
-                padding: var(--spacing-md) var(--spacing-lg);
-                gap: var(--spacing-md);
+            .page-title {
+                font-size: 16px;
             }
 
-            .header-quick-links {
-                display: none;
-            }
-
-            .header-search {
-                min-width: auto;
-                flex: 1;
+            .header-right {
+                gap: 1rem;
             }
         }
     </style>
@@ -318,50 +426,117 @@ $quickLinks = [
 
     <!-- HEADER -->
     <div class="admin-main">
-        <header class="header" role="banner">
+        <header class="app-header" role="banner">
 
-            <!-- Breadcrumb -->
-            <div class="header-breadcrumb">
-                <span class="header-breadcrumb-user"><?= $advisorName ?></span>
-                <?php if ($advisorCity): ?>
-                    <span class="header-breadcrumb-sep">·</span>
-                    <span class="header-breadcrumb-city"><?= $advisorCity ?></span>
-                <?php endif; ?>
-                <span class="header-breadcrumb-sep">›</span>
-                <span class="header-breadcrumb-page"><?= htmlspecialchars($pageTitle) ?></span>
+            <!-- Header Left -->
+            <div class="header-left">
+                <button class="sidebar-toggle" id="sidebarToggle" title="Basculer la barre latérale">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="page-title"><?= htmlspecialchars($pageTitle) ?></h1>
             </div>
 
-            <!-- Search Bar -->
-            <div class="header-search">
-                <i class="fas fa-search"></i>
-                <input type="text" id="globalSearch" placeholder="Rechercher…" aria-label="Recherche globale">
+            <!-- Header Right -->
+            <div class="header-right">
+
+                <!-- Notifications -->
+                <div class="notifications">
+                    <button class="notification-btn" id="notificationBtn" title="Notifications">
+                        <i class="fas fa-bell"></i>
+                        <?php if ($notificationCount > 0): ?>
+                            <span class="badge"><?= $notificationCount ?></span>
+                        <?php endif; ?>
+                    </button>
+                    <div class="notification-dropdown" id="notificationDropdown">
+                        <?php foreach ($notifications as $notification): ?>
+                            <div class="notification-item">
+                                <div class="notification-item-icon">
+                                    <i class="fas <?= $notification['icon'] ?>"></i>
+                                </div>
+                                <div class="notification-item-content">
+                                    <div class="notification-item-title"><?= htmlspecialchars($notification['title']) ?></div>
+                                    <div class="notification-item-desc"><?= htmlspecialchars($notification['desc']) ?></div>
+                                    <div class="notification-item-time"><?= htmlspecialchars($notification['time']) ?></div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+
+                <!-- User Profile -->
+                <div class="user-profile">
+                    <button class="profile-btn" id="profileBtn" title="Profil utilisateur">
+                        <div class="profile-avatar">
+                            <?= htmlspecialchars(strtoupper(mb_substr($advisorName, 0, 1))) ?>
+                        </div>
+                        <span><?= htmlspecialchars($advisorName) ?></span>
+                        <i class="fas fa-chevron-down profile-chevron"></i>
+                    </button>
+                    <div class="profile-dropdown" id="profileDropdown">
+                        <a href="?page=advisor-context" class="profile-dropdown-item">
+                            <i class="fas fa-user"></i>
+                            <span>Mon profil</span>
+                        </a>
+                        <a href="?page=settings" class="profile-dropdown-item">
+                            <i class="fas fa-cog"></i>
+                            <span>Paramètres</span>
+                        </a>
+                        <a href="?logout=1" class="profile-dropdown-item danger">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>Déconnexion</span>
+                        </a>
+                    </div>
+                </div>
+
             </div>
-
-            <!-- Quick Links -->
-            <nav class="header-quick-links" aria-label="Accès rapide">
-                <?php foreach ($quickLinks as $link): ?>
-                    <a href="<?= htmlspecialchars($link['url']) ?>"
-                       class="header-quick-link"
-                       title="<?= htmlspecialchars($link['title']) ?>"
-                       target="<?= $link['target'] ?? '_self' ?>"
-                       rel="noopener noreferrer">
-                        <i class="<?= $link['icon'] ?>"></i>
-                    </a>
-                <?php endforeach; ?>
-            </nav>
-
-            <!-- User Avatar -->
-            <a href="?section=parametres" class="header-avatar" title="Profil utilisateur">
-                <div class="header-avatar-icon">
-                    <?= strtoupper(mb_substr($advisorName, 0, 1)) ?>
-                </div>
-                <div class="header-avatar-text">
-                    <span class="header-avatar-name"><?= htmlspecialchars($advisorName) ?></span>
-                    <span class="header-avatar-role">Administrateur</span>
-                </div>
-            </a>
 
         </header>
 
         <!-- MAIN CONTENT -->
         <main class="admin-content">
+
+        </main>
+
+    </div><!-- /.admin-main -->
+
+</div><!-- /.admin-wrapper -->
+
+<script>
+// Gestion des menus déroulants
+document.addEventListener('DOMContentLoaded', function() {
+    // Notifications
+    const notificationBtn = document.getElementById('notificationBtn');
+    const notificationDropdown = document.getElementById('notificationDropdown');
+
+    notificationBtn?.addEventListener('click', function(e) {
+        e.stopPropagation();
+        notificationDropdown?.classList.toggle('open');
+        profileDropdown?.classList.remove('open');
+        profileBtn?.classList.remove('open');
+    });
+
+    // Profile
+    const profileBtn = document.getElementById('profileBtn');
+    const profileDropdown = document.getElementById('profileDropdown');
+
+    profileBtn?.addEventListener('click', function(e) {
+        e.stopPropagation();
+        profileDropdown?.classList.toggle('open');
+        notificationDropdown?.classList.remove('open');
+    });
+
+    // Fermer les dropdowns au clic hors
+    document.addEventListener('click', function() {
+        notificationDropdown?.classList.remove('open');
+        profileDropdown?.classList.remove('open');
+        profileBtn?.classList.remove('open');
+    });
+
+    // Sidebar toggle
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    sidebarToggle?.addEventListener('click', function() {
+        const sidebar = document.querySelector('.sb-prestige');
+        sidebar?.classList.toggle('collapsed');
+    });
+});
+</script>
