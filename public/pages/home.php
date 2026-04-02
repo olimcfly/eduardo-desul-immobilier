@@ -86,14 +86,21 @@ $metaDesc  = 'Eduardo Desul, conseiller immobilier indépendant à Bordeaux. Est
             <!-- Placeholder cards – remplacées dynamiquement -->
             <?php
             $biensVedette = [
-                ['titre' => 'Appartement T3 lumineux', 'type' => 'Vente', 'prix' => '295 000', 'loc' => 'Bordeaux Chartrons', 'surface' => '72', 'pieces' => '3', 'img' => '/assets/images/placeholder-bien-1.jpg'],
-                ['titre' => 'Maison avec jardin', 'type' => 'Vente', 'prix' => '485 000', 'loc' => 'Mérignac', 'surface' => '145', 'pieces' => '5', 'img' => '/assets/images/placeholder-bien-2.jpg'],
-                ['titre' => 'Studio centre-ville', 'type' => 'Location', 'prix' => '750 /mois', 'loc' => 'Bordeaux Centre', 'surface' => '28', 'pieces' => '1', 'img' => '/assets/images/placeholder-bien-3.jpg'],
+                ['titre' => 'Appartement T3 lumineux', 'typeBien' => 'appartement', 'type' => 'Vente', 'prix' => '295 000', 'loc' => 'Bordeaux Chartrons', 'surface' => '72', 'pieces' => '3', 'img' => '/assets/images/bien-1.jpg'],
+                ['titre' => 'Maison avec jardin', 'typeBien' => 'maison', 'type' => 'Vente', 'prix' => '485 000', 'loc' => 'Mérignac', 'surface' => '145', 'pieces' => '5', 'img' => '/assets/images/bien-2.jpg'],
+                ['titre' => 'Studio centre-ville', 'typeBien' => 'appartement', 'type' => 'Location', 'prix' => '750 /mois', 'loc' => 'Bordeaux Centre', 'surface' => '28', 'pieces' => '1', 'img' => '/assets/images/bien-3.jpg'],
             ];
-            foreach ($biensVedette as $b): ?>
+            foreach ($biensVedette as $b):
+                $imgFile = defined('PUBLIC_PATH') ? PUBLIC_PATH . $b['img'] : __DIR__ . '/..' . $b['img'];
+                $imgSrc = file_exists($imgFile)
+                    ? e($b['img'])
+                    : '/assets/images/placeholder.php?type=' . urlencode($b['typeBien'])
+                      . '&pieces=' . $b['pieces'] . '&surface=' . $b['surface']
+                      . '&label=' . urlencode($b['type']);
+            ?>
             <article class="bien-card">
                 <div class="bien-card__img">
-                    <img src="<?= e($b['img']) ?>" alt="<?= e($b['titre']) ?>" loading="lazy" width="400" height="300">
+                    <img src="<?= $imgSrc ?>" alt="<?= e($b['titre']) ?>" loading="lazy" width="400" height="300">
                     <span class="bien-card__badge badge--<?= strtolower($b['type']) === 'vente' ? 'vente' : 'location' ?>"><?= e($b['type']) ?></span>
                 </div>
                 <div class="bien-card__body">
