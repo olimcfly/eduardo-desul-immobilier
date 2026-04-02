@@ -33,6 +33,7 @@ function closeNav() {
   navMobile?.setAttribute('aria-hidden', 'true');
   burger?.setAttribute('aria-expanded', 'false');
   document.body.style.overflow = '';
+  burger?.focus();
 }
 
 burger?.addEventListener('click', openNav);
@@ -54,7 +55,8 @@ document.querySelectorAll('a[href^="#"]').forEach(link => {
     const target = document.querySelector(link.getAttribute('href'));
     if (target) {
       e.preventDefault();
-      const offset = (parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 72) + 16;
+      const hVal = getComputedStyle(document.documentElement).getPropertyValue('--header-h').trim();
+      const offset = (parseInt(hVal) || 72) + 16;
       window.scrollTo({ top: target.getBoundingClientRect().top + window.scrollY - offset, behavior: 'smooth' });
     }
   });
@@ -80,8 +82,14 @@ const cookieBanner = document.getElementById('cookie-banner');
 const cookieAccept = document.getElementById('cookie-accept');
 const cookieRefuse = document.getElementById('cookie-refuse');
 
-if (cookieBanner && !localStorage.getItem(COOKIE_KEY)) {
-  cookieBanner.style.display = 'block';
+// Initialiser cookie banner correctement
+if (cookieBanner) {
+  if (!localStorage.getItem(COOKIE_KEY)) {
+    cookieBanner.removeAttribute('style'); // enlever le style="display:none" inline
+    cookieBanner.style.display = 'flex';
+  } else {
+    cookieBanner.style.display = 'none';
+  }
 }
 cookieAccept?.addEventListener('click', () => {
   localStorage.setItem(COOKIE_KEY, '1');
@@ -90,4 +98,27 @@ cookieAccept?.addEventListener('click', () => {
 cookieRefuse?.addEventListener('click', () => {
   localStorage.setItem(COOKIE_KEY, '0');
   cookieBanner.style.display = 'none';
+});
+
+// ── Partage social ────────────────────────────────────────────
+document.querySelectorAll('[data-share]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const network = btn.dataset.share;
+    const url   = encodeURIComponent(window.location.href);
+    const title = encodeURIComponent(document.title);
+    const urls = {
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}`,
+      linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${url}`,
+      twitter:  `https://twitter.com/intent/tweet?url=${url}&text=${title}`,
+    };
+    if (network === 'copy') {
+      navigator.clipboard?.writeText(window.location.href).then(() => {
+        const orig = btn.textContent;
+        btn.textContent = '✓ Lien copié !';
+        setTimeout(() => btn.textContent = orig, 2000);
+      });
+    } else if (urls[network]) {
+      window.open(urls[network], '_blank', 'noopener,width=600,height=400');
+    }
+  });
 });
