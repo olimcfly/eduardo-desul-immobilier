@@ -137,10 +137,12 @@ $metaDesc  = 'Eduardo Desul, conseiller immobilier indépendant à Bordeaux. Est
                 <a href="/a-propos" class="btn btn--primary">En savoir plus sur moi</a>
             </div>
             <div data-animate style="position:relative">
-                <div style="background:var(--clr-primary);border-radius:var(--radius-xl);aspect-ratio:4/5;display:flex;align-items:center;justify-content:center;font-size:6rem;overflow:hidden">
-                    <!-- Remplacer par la vraie photo -->
-                    <img src="/assets/images/eduardo-portrait.jpg" alt="Eduardo Desul, conseiller immobilier à Bordeaux" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">
-                    <span style="position:absolute">👤</span>
+                <div style="background:linear-gradient(135deg,var(--clr-primary),#0f2644);border-radius:var(--radius-xl);aspect-ratio:4/5;display:flex;align-items:center;justify-content:center;font-size:5rem;overflow:hidden;position:relative">
+                    <?php if (file_exists(PUBLIC_PATH . '/assets/images/eduardo-portrait.jpg')): ?>
+                    <img src="/assets/images/eduardo-portrait.jpg" alt="Eduardo Desul, conseiller immobilier Bordeaux" style="width:100%;height:100%;object-fit:cover">
+                    <?php else: ?>
+                    <span aria-hidden="true" style="font-size:6rem">👤</span>
+                    <?php endif; ?>
                 </div>
                 <div style="position:absolute;bottom:-1rem;right:-1rem;background:var(--clr-accent);color:var(--clr-primary);border-radius:var(--radius-lg);padding:1.25rem;font-weight:700;text-align:center;box-shadow:var(--shadow-lg)">
                     <div style="font-size:1.5rem;font-family:var(--font-display)">N°1</div>
@@ -191,13 +193,13 @@ $metaDesc  = 'Eduardo Desul, conseiller immobilier indépendant à Bordeaux. Est
         <div class="villes-grid" data-animate>
             <?php
             $villes = [
-                ['nom' => 'Bordeaux Centre', 'biens' => 12, 'img' => '/assets/images/bordeaux-centre.jpg'],
-                ['nom' => 'Chartrons', 'biens' => 8, 'img' => '/assets/images/chartrons.jpg'],
-                ['nom' => 'Mérignac', 'biens' => 6, 'img' => '/assets/images/merignac.jpg'],
-                ['nom' => 'Pessac', 'biens' => 5, 'img' => '/assets/images/pessac.jpg'],
+                ['slug' => 'bordeaux-centre',    'nom' => 'Bordeaux Centre', 'biens' => 12, 'img' => '/assets/images/bordeaux-centre.jpg'],
+                ['slug' => 'bordeaux-chartrons', 'nom' => 'Chartrons', 'biens' => 8, 'img' => '/assets/images/chartrons.jpg'],
+                ['slug' => 'merignac',           'nom' => 'Mérignac', 'biens' => 6, 'img' => '/assets/images/merignac.jpg'],
+                ['slug' => 'pessac',             'nom' => 'Pessac', 'biens' => 5, 'img' => '/assets/images/pessac.jpg'],
             ];
             foreach ($villes as $v): ?>
-            <a href="/guide-local/<?= e(slugify($v['nom'])) ?>" class="ville-card">
+            <a href="/guide-local/<?= e($v['slug']) ?>" class="ville-card">
                 <img src="<?= e($v['img']) ?>" alt="Immobilier <?= e($v['nom']) ?>" loading="lazy" width="400" height="300">
                 <div class="ville-card__overlay">
                     <div class="ville-card__name"><?= e($v['nom']) ?></div>
@@ -262,8 +264,30 @@ $metaDesc  = 'Eduardo Desul, conseiller immobilier indépendant à Bordeaux. Est
     </div>
 </section>
 
+<!-- ── JSON-LD LocalBusiness ─────────────────────────────────── -->
+<?php
+$jsonLdPage = json_encode([
+    '@context' => 'https://schema.org',
+    '@type' => 'RealEstateAgent',
+    'name' => APP_NAME,
+    'image' => APP_URL . '/assets/images/eduardo-portrait.jpg',
+    'url' => APP_URL,
+    'telephone' => APP_PHONE,
+    'address' => [
+        '@type' => 'PostalAddress',
+        'streetAddress' => '',
+        'addressLocality' => 'Bordeaux',
+        'postalCode' => '33000',
+        'addressCountry' => 'FR',
+    ],
+    'geo' => ['@type' => 'GeoCoordinates', 'latitude' => 44.8378, 'longitude' => -0.5792],
+    'aggregateRating' => ['@type' => 'AggregateRating', 'ratingValue' => '4.9', 'reviewCount' => '87'],
+], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+?>
+<script type="application/ld+json"><?= $jsonLdPage ?></script>
+
 <!-- ── Cookie banner ────────────────────────────────────────── -->
-<div id="cookie-banner" style="display:none;position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);z-index:999;background:var(--clr-white);border:1px solid var(--clr-border);border-radius:var(--radius-lg);padding:1.25rem 1.75rem;box-shadow:var(--shadow-lg);max-width:600px;width:calc(100% - 2rem);display:none">
+<div id="cookie-banner" style="display:none;position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);z-index:999;background:var(--clr-white);border:1px solid var(--clr-border);border-radius:var(--radius-lg);padding:1.25rem 1.75rem;box-shadow:var(--shadow-lg);max-width:600px;width:calc(100% - 2rem)">
     <p style="font-size:.875rem;margin-bottom:1rem">🍪 Ce site utilise des cookies pour améliorer votre expérience. <a href="/politique-cookies" style="color:var(--clr-primary);font-weight:600">En savoir plus</a></p>
     <div style="display:flex;gap:.75rem;justify-content:flex-end">
         <button id="cookie-refuse" class="btn btn--outline btn--sm">Refuser</button>

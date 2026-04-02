@@ -1,7 +1,6 @@
 <?php
 $pageTitle  = 'Estimation gratuite de votre bien — Eduardo Desul';
 $metaDesc   = 'Estimez gratuitement votre bien immobilier à Bordeaux. Résultat personnalisé sous 48h par Eduardo Desul.';
-$metaRobots = 'noindex';
 $extraCss   = ['/assets/css/estimation.css'];
 $extraJs    = ['/assets/js/estimation.js'];
 $bodyClass  = 'page-capture';

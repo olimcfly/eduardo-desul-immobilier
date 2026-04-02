@@ -39,22 +39,22 @@ $extraJs   = ['/assets/js/estimation.js'];
                     <div class="estimation-step">
                         <h3 style="margin-bottom:1.25rem">Quel type de bien souhaitez-vous estimer ?</h3>
                         <div class="type-buttons">
-                            <button type="button" class="type-btn" data-value="appartement">
+                            <button type="button" class="type-btn" data-value="appartement" onclick="document.getElementById('type-bien').value=this.dataset.value; document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('selected')); this.classList.add('selected')">
                                 <span>🏢</span>Appartement
                             </button>
-                            <button type="button" class="type-btn" data-value="maison">
+                            <button type="button" class="type-btn" data-value="maison" onclick="document.getElementById('type-bien').value=this.dataset.value; document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('selected')); this.classList.add('selected')">
                                 <span>🏠</span>Maison
                             </button>
-                            <button type="button" class="type-btn" data-value="terrain">
+                            <button type="button" class="type-btn" data-value="terrain" onclick="document.getElementById('type-bien').value=this.dataset.value; document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('selected')); this.classList.add('selected')">
                                 <span>🌿</span>Terrain
                             </button>
-                            <button type="button" class="type-btn" data-value="local">
+                            <button type="button" class="type-btn" data-value="local" onclick="document.getElementById('type-bien').value=this.dataset.value; document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('selected')); this.classList.add('selected')">
                                 <span>🏪</span>Local comm.
                             </button>
-                            <button type="button" class="type-btn" data-value="immeuble">
+                            <button type="button" class="type-btn" data-value="immeuble" onclick="document.getElementById('type-bien').value=this.dataset.value; document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('selected')); this.classList.add('selected')">
                                 <span>🏗️</span>Immeuble
                             </button>
-                            <button type="button" class="type-btn" data-value="autre">
+                            <button type="button" class="type-btn" data-value="autre" onclick="document.getElementById('type-bien').value=this.dataset.value; document.querySelectorAll('.type-btn').forEach(b=>b.classList.remove('selected')); this.classList.add('selected')">
                                 <span>📦</span>Autre
                             </button>
                         </div>
@@ -76,7 +76,7 @@ $extraJs   = ['/assets/js/estimation.js'];
                                 <span>Surface habitable</span>
                                 <span class="range-val" id="surface-val">80 m²</span>
                             </div>
-                            <input type="range" id="surface" name="surface" min="10" max="500" value="80" data-format="surface">
+                            <input type="range" id="surface" name="surface" min="10" max="500" value="80" data-format="surface" aria-valuetext="80 m²">
                         </div>
 
                         <div class="range-group">
@@ -84,7 +84,7 @@ $extraJs   = ['/assets/js/estimation.js'];
                                 <span>Nombre de pièces</span>
                                 <span class="range-val" id="pieces-val">3</span>
                             </div>
-                            <input type="range" id="pieces" name="pieces" min="1" max="15" value="3" data-format="count">
+                            <input type="range" id="pieces" name="pieces" min="1" max="15" value="3" data-format="count" aria-valuetext="3">
                         </div>
 
                         <div class="form-row" style="margin-top:1.5rem">
@@ -113,15 +113,17 @@ $extraJs   = ['/assets/js/estimation.js'];
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label">État général</label>
-                            <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem">
-                                <?php foreach (['À rénover', 'Passable', 'Bon état', 'Neuf / Refait'] as $etat): ?>
-                                <label style="display:flex;flex-direction:column;align-items:center;gap:.4rem;padding:.75rem;border:1.5px solid var(--clr-border);border-radius:var(--radius);cursor:pointer;font-size:.8rem;font-weight:500;transition:var(--transition)">
-                                    <input type="radio" name="etat" value="<?= e($etat) ?>" style="accent-color:var(--clr-primary)">
-                                    <?= e($etat) ?>
-                                </label>
-                                <?php endforeach; ?>
-                            </div>
+                            <fieldset>
+                                <legend class="form-label">État général</legend>
+                                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem">
+                                    <?php foreach (['À rénover', 'Passable', 'Bon état', 'Neuf / Refait'] as $etat): ?>
+                                    <label style="display:flex;flex-direction:column;align-items:center;gap:.4rem;padding:.75rem;border:1.5px solid var(--clr-border);border-radius:var(--radius);cursor:pointer;font-size:.8rem;font-weight:500;transition:var(--transition)">
+                                        <input type="radio" name="etat" value="<?= e($etat) ?>" style="accent-color:var(--clr-primary)">
+                                        <?= e($etat) ?>
+                                    </label>
+                                    <?php endforeach; ?>
+                                </div>
+                            </fieldset>
                         </div>
 
                         <div style="display:flex;justify-content:space-between;margin-top:1rem">

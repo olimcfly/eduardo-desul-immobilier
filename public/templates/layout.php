@@ -5,17 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($pageTitle ?? APP_NAME) ?></title>
     <meta name="description" content="<?= e($metaDesc ?? 'Conseiller immobilier indépendant à Bordeaux — Eduardo Desul vous accompagne dans tous vos projets immobiliers.') ?>">
-    <?php if (!empty($metaRobots)): ?><meta name="robots" content="<?= e($metaRobots) ?>"><?php endif; ?>
-    <link rel="canonical" href="<?= e($canonical ?? APP_URL . $_SERVER['REQUEST_URI']) ?>">
+    <meta name="robots" content="<?= e($metaRobots ?? 'index, follow') ?>">
+    <link rel="canonical" href="<?= e($canonical ?? APP_URL . strtok($_SERVER['REQUEST_URI'], '?')) ?>">
 
     <!-- Open Graph -->
     <meta property="og:title"       content="<?= e($pageTitle ?? APP_NAME) ?>">
-    <meta property="og:description" content="<?= e($metaDesc ?? '') ?>">
-    <meta property="og:type"        content="website">
+    <meta property="og:description" content="<?= e($metaDesc ?? 'Conseiller immobilier à Bordeaux') ?>">
+    <meta property="og:type"        content="<?= e($ogType ?? 'website') ?>">
     <meta property="og:url"         content="<?= e(APP_URL . $_SERVER['REQUEST_URI']) ?>">
+    <meta property="og:locale"      content="fr_FR">
+    <meta property="og:site_name"   content="<?= e(APP_NAME) ?>">
     <?php if (!empty($ogImage)): ?>
     <meta property="og:image"       content="<?= e($ogImage) ?>">
+    <meta property="og:image:alt"   content="<?= e($pageTitle ?? APP_NAME) ?>">
     <?php endif; ?>
+
+    <!-- Pagination SEO -->
+    <?php if (!empty($prevPage)): ?><link rel="prev" href="<?= e($prevPage) ?>"><?php endif; ?>
+    <?php if (!empty($nextPage)): ?><link rel="next" href="<?= e($nextPage) ?>"><?php endif; ?>
+
+    <!-- JSON-LD : Organisation -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "RealEstateAgent",
+        "name": "<?= e(APP_NAME) ?>",
+        "description": "Conseiller immobilier indépendant à Bordeaux",
+        "url": "<?= e(APP_URL) ?>",
+        "telephone": "<?= e(APP_PHONE) ?>",
+        "email": "<?= e(APP_EMAIL) ?>",
+        "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Bordeaux",
+            "addressCountry": "FR"
+        },
+        "areaServed": {
+            "@type": "City",
+            "name": "Bordeaux"
+        }
+        <?php if (!empty($jsonLd)): ?>,<?= $jsonLd ?><?php endif; ?>
+    }
+    </script>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -36,9 +66,9 @@
     <?php
     $flash = Session::getFlash();
     if ($flash): ?>
-    <div class="flash flash--<?= e($flash['type']) ?>" role="alert">
+    <div class="flash flash--<?= e($flash['type']) ?>" role="alert" aria-live="assertive" aria-atomic="true">
         <span><?= e($flash['message']) ?></span>
-        <button class="flash__close" onclick="this.parentElement.remove()">×</button>
+        <button class="flash__close" onclick="this.parentElement.remove()" aria-label="Fermer">×</button>
     </div>
     <?php endif; ?>
 
