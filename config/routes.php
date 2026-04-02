@@ -6,7 +6,7 @@
 /** @var Router $router */
 
 // ── Accueil ──────────────────────────────────────────────────
-$router->get('/', fn() => page('home'), 'home');
+$router->get('/', fn() => page('pages/home'), 'home');
 
 // ── Pages statiques ──────────────────────────────────────────
 $router->get('/a-propos',   fn() => page('pages/a-propos'),   'a-propos');

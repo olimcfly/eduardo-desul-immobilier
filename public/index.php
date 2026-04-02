@@ -4,6 +4,7 @@
 // ============================================================
 
 define('ROOT_PATH', dirname(__DIR__));
+define('ROOT', ROOT_PATH); // Alias pour compatibilité avec les anciens fichiers core
 
 // Charger les variables d'environnement
 $envFile = ROOT_PATH . '/.env';
