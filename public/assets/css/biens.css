@@ -1,0 +1,148 @@
+/* ── Biens / Annonces ──────────────────────────────────────── */
+
+/* Filtres */
+.biens-filters {
+  background: var(--clr-white);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  border: 1px solid var(--clr-border);
+  margin-bottom: 2rem;
+  box-shadow: var(--shadow-sm);
+}
+.filters-row { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end; }
+.filter-group { flex: 1; min-width: 150px; }
+.filter-label { font-size: .8rem; font-weight: 600; color: var(--clr-text-muted); margin-bottom: .4rem; text-transform: uppercase; letter-spacing: .06em; }
+.filter-select {
+  width: 100%;
+  padding: .6rem .9rem;
+  border: 1.5px solid var(--clr-border);
+  border-radius: var(--radius);
+  font-size: .9rem;
+  background: var(--clr-bg);
+  cursor: pointer;
+  transition: border-color var(--transition);
+}
+.filter-select:focus { outline: none; border-color: var(--clr-primary); }
+.filter-btn { align-self: flex-end; }
+
+/* Grille biens */
+.biens-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.75rem; }
+.biens-count { font-size: .875rem; color: var(--clr-text-muted); margin-bottom: 1rem; }
+
+/* Carte bien */
+.bien-card {
+  background: var(--clr-white);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--clr-border);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition), transform var(--transition);
+}
+.bien-card:hover { box-shadow: var(--shadow); transform: translateY(-4px); }
+
+.bien-card__img {
+  position: relative;
+  aspect-ratio: 4/3;
+  overflow: hidden;
+}
+.bien-card__img img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s ease; }
+.bien-card:hover .bien-card__img img { transform: scale(1.04); }
+.bien-card__badge {
+  position: absolute;
+  top: .75rem;
+  left: .75rem;
+  padding: .3rem .75rem;
+  border-radius: 20px;
+  font-size: .75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+.badge--vente { background: var(--clr-primary); color: white; }
+.badge--location { background: var(--clr-accent); color: var(--clr-primary); }
+.badge--exclusif { background: #7c3aed; color: white; }
+.badge--vendu { background: var(--clr-text-muted); color: white; }
+
+.bien-card__body { padding: 1.25rem; }
+.bien-card__prix {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--clr-primary);
+  margin-bottom: .25rem;
+}
+.bien-card__titre { font-size: 1rem; font-weight: 600; margin-bottom: .4rem; color: var(--clr-text); }
+.bien-card__loc { font-size: .85rem; color: var(--clr-text-muted); margin-bottom: .75rem; }
+.bien-card__loc::before { content: '📍 '; }
+
+.bien-card__specs {
+  display: flex;
+  gap: 1rem;
+  padding-top: .75rem;
+  border-top: 1px solid var(--clr-border);
+  font-size: .85rem;
+  color: var(--clr-text-muted);
+}
+.spec-item { display: flex; align-items: center; gap: .3rem; }
+
+/* Page détail bien */
+.bien-detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 2.5rem;
+  align-items: start;
+}
+.bien-gallery { border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 2rem; }
+.bien-gallery__main { aspect-ratio: 16/9; overflow: hidden; }
+.bien-gallery__main img { width: 100%; height: 100%; object-fit: cover; }
+.bien-gallery__thumbs { display: grid; grid-template-columns: repeat(4, 1fr); gap: .5rem; margin-top: .5rem; }
+.bien-gallery__thumbs img { aspect-ratio: 1; object-fit: cover; border-radius: var(--radius-sm); cursor: pointer; opacity: .7; transition: opacity var(--transition); }
+.bien-gallery__thumbs img:hover, .bien-gallery__thumbs img.active { opacity: 1; }
+
+.bien-prix-box {
+  background: var(--clr-primary);
+  color: white;
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  position: sticky;
+  top: calc(var(--header-h) + 1rem);
+}
+.bien-prix-box .prix { font-family: var(--font-display); font-size: 2rem; font-weight: 700; color: var(--clr-accent); }
+.bien-prix-box .type { font-size: .85rem; opacity: .7; margin-bottom: 1.5rem; }
+.bien-specs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0; }
+.bien-spec { background: rgba(255,255,255,.1); border-radius: var(--radius); padding: .75rem; text-align: center; }
+.bien-spec .spec-val { font-family: var(--font-display); font-size: 1.25rem; font-weight: 600; display: block; }
+.bien-spec .spec-name { font-size: .75rem; opacity: .7; }
+
+/* Contact sidebar */
+.contact-sidebar {
+  background: var(--clr-white);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  border: 1px solid var(--clr-border);
+}
+.contact-sidebar h3 { font-size: 1rem; margin-bottom: 1rem; }
+
+/* Pagination */
+.pagination { display: flex; justify-content: center; gap: .5rem; margin-top: 3rem; }
+.page-btn {
+  display: flex; align-items: center; justify-content: center;
+  width: 40px; height: 40px;
+  border-radius: var(--radius);
+  border: 1.5px solid var(--clr-border);
+  font-size: .875rem;
+  font-weight: 500;
+  color: var(--clr-text);
+  transition: var(--transition);
+}
+.page-btn:hover { border-color: var(--clr-primary); color: var(--clr-primary); }
+.page-btn.active { background: var(--clr-primary); border-color: var(--clr-primary); color: white; }
+
+@media (max-width: 900px) {
+  .bien-detail-grid { grid-template-columns: 1fr; }
+  .bien-prix-box { position: static; }
+}
+@media (max-width: 600px) {
+  .filters-row { flex-direction: column; }
+  .biens-grid { grid-template-columns: 1fr; }
+}
