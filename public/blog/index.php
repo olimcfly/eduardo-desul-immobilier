@@ -34,10 +34,15 @@ $articles = [
         </div>
 
         <div class="blog-grid">
-            <?php foreach ($articles as $art): ?>
+            <?php foreach ($articles as $art):
+                $imgFile = defined('PUBLIC_PATH') ? PUBLIC_PATH . $art['img'] : __DIR__ . '/../..' . $art['img'];
+                $imgSrc  = file_exists($imgFile)
+                    ? e($art['img'])
+                    : '/assets/images/placeholder.php?type=article&label=' . urlencode($art['cat']);
+            ?>
             <article class="article-card">
                 <div class="article-card__img">
-                    <img src="<?= e($art['img']) ?>" alt="<?= e($art['titre']) ?>" loading="lazy" width="400" height="225">
+                    <img src="<?= $imgSrc ?>" alt="<?= e($art['titre']) ?>" loading="lazy" width="400" height="225">
                 </div>
                 <div class="article-card__body">
                     <span class="article-card__cat"><?= e($art['cat']) ?></span>

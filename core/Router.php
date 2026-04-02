@@ -54,6 +54,10 @@ class Router
             $uri = substr($uri, strlen($base));
         }
         $uri = '/' . ltrim($uri, '/');
+        // Supprimer le slash final (sauf pour la racine "/")
+        if ($uri !== '/') {
+            $uri = rtrim($uri, '/');
+        }
 
         foreach ($this->routes as $route) {
             if ($route['method'] !== $method) continue;
