@@ -345,11 +345,17 @@ require_once __DIR__ . '/layout/sidebar.php';
 
 <?php if ($module === 'dashboard'): ?>
 <?php
-    // Variables nécessaires pour le dashboard prestige
-    $pageTitle = 'Tableau de bord';
-
-    // Inclure le nouveau dashboard prestige
-    include __DIR__ . '/dashboard-prestige.php';
+    // Dashboard prestige avec fallback
+    if (file_exists(__DIR__ . '/dashboard-prestige.php')) {
+        include __DIR__ . '/dashboard-prestige.php';
+    } else {
+        // Fallback si le fichier n'existe pas
+        echo '<div style="padding: 2rem; text-align: center; color: #666;">';
+        echo '<h2>Tableau de bord IMMO LOCAL+</h2>';
+        echo '<p>Bienvenue, ' . htmlspecialchars($firstName ?? 'Utilisateur') . ' 👋</p>';
+        echo '<p style="color: #999; font-size: 12px;">Dashboard prestige en cours de déploiement...</p>';
+        echo '</div>';
+    }
 ?>
 
 <?php else: ?>
