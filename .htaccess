@@ -1,4 +1,6 @@
 # .htaccess
+DirectoryIndex index.php
+
 RewriteEngine On
 RewriteBase /
 
