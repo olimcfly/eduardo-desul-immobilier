@@ -29,13 +29,13 @@ $menu = [
     <div class="sidebar-footer">
         <div class="user-info">
             <div class="user-avatar">
-                <?= strtoupper(substr($_SESSION['admin_name'] ?? 'A', 0, 1)) ?>
+                <?= strtoupper(substr($_SESSION['user_name'] ?? 'A', 0, 1)) ?>
             </div>
             <div class="user-meta">
-                <div class="user-name"><?= htmlspecialchars($_SESSION['admin_name'] ?? 'Admin') ?></div>
+                <div class="user-name"><?= htmlspecialchars($_SESSION['user_name'] ?? 'Admin') ?></div>
                 <div class="user-role">Administrateur</div>
             </div>
         </div>
-        <a href="/admin/logout.php" class="logout-btn" title="Déconnexion">⏻</a>
+        <a href="/admin/logout" class="logout-btn" title="Déconnexion">&#x23FB;</a>
     </div>
 </aside>

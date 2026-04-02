@@ -1,5 +1,5 @@
 <footer class="admin-footer">
-    <span>© <?= date('Y') ?> ImmoSite</span>
+    <span>© <?= date('Y') ?> Eduardo Desul Immobilier</span>
     <span class="footer-sep">·</span>
     <span>v1.0.0</span>
     <span class="footer-sep">·</span>
