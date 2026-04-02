@@ -16,6 +16,7 @@ $icons = [
     'maison'      => 'M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z M9 21V12h6v9',
     'terrain'     => 'M3 20h18M5 20V10l7-7 7 7v10M10 20v-5h4v5',
     'local'       => 'M3 21h18M5 21V7l8-4 8 4v14M9 21v-4h2v4m4 0v-4h2v4',
+    'article'     => 'M4 6h16M4 10h16M4 14h10M4 18h7',
     'default'     => 'M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z M9 21V12h6v9',
 ];
 $iconPath = $icons[$type] ?? $icons['default'];
@@ -33,6 +34,7 @@ $typeLabels = [
     'maison'      => 'Maison',
     'terrain'     => 'Terrain',
     'local'       => 'Local commercial',
+    'article'     => 'Article',
 ];
 $typeLabel = $typeLabels[$type] ?? 'Bien immobilier';
 
