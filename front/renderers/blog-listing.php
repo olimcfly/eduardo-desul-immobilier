@@ -10,6 +10,7 @@ if (!isset($db)) { http_response_code(403); exit('Accès direct interdit.'); }
 
 $page      = max(1, intval($_GET['page']   ?? 1));
 $catFilter = trim($_GET['categorie']       ?? $_GET['cat'] ?? '');
+$search    = trim($_GET['search']          ?? '');
 $perPage   = 9;
 $offset    = ($page - 1) * $perPage;
 
@@ -32,6 +33,13 @@ $articles = []; $total = 0;
 try {
     $whereBase = "(statut='publie' OR status='published')"; $params = [];
     if ($catFilter) { $whereBase .= " AND category=?"; $params[] = $catFilter; }
+    if ($search !== '') {
+        $whereBase .= " AND (titre LIKE ? OR extrait LIKE ? OR contenu LIKE ?)";
+        $searchLike = '%'.$search.'%';
+        $params[] = $searchLike;
+        $params[] = $searchLike;
+        $params[] = $searchLike;
+    }
     $countStmt = $db->prepare("SELECT COUNT(*) FROM articles WHERE $whereBase");
     $countStmt->execute($params); $total = intval($countStmt->fetchColumn());
     $stmt = $db->prepare("
@@ -45,15 +53,22 @@ try {
     $articles = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) { error_log("Blog listing: ".$e->getMessage()); }
 
-$featured   = (!$catFilter && $page===1 && !empty($articles)) ? array_shift($articles) : null;
+$featured   = (!$catFilter && $search === '' && $page===1 && !empty($articles)) ? array_shift($articles) : null;
 $totalPages = $total > 0 ? ceil($total / $perPage) : 1;
 $hf         = getHeaderFooter($db, 'blog');
 $_siteUrl   = siteUrl();
 $_siteName  = siteName();
 $pageTitle  = $catFilter ? 'Blog · '.$catFilter : 'Conseils immobiliers Bordeaux';
+if ($search !== '') {
+    $pageTitle .= ' · Recherche: '.$search;
+}
 $metaTitle  = htmlspecialchars(($hubPage['meta_title'] ?? $pageTitle).' | '.$_siteName);
 $metaDesc   = htmlspecialchars($hubPage['meta_description'] ?? 'Conseils immobiliers, guides d\'achat, vente et investissement. Retrouvez nos articles et analyses du marché.');
-$canonical  = $_siteUrl.'/blog'.($catFilter ? '?categorie='.urlencode($catFilter) : '').($page > 1 ? ($catFilter?'&':'?').'page='.$page : '');
+$queryParts = [];
+if ($catFilter) { $queryParts[] = 'categorie='.urlencode($catFilter); }
+if ($search !== '') { $queryParts[] = 'search='.urlencode($search); }
+if ($page > 1) { $queryParts[] = 'page='.$page; }
+$canonical  = $_siteUrl.'/blog'.(!empty($queryParts) ? '?'.implode('&', $queryParts) : '');
 
 function getCatIcon(string $cat): string {
     $map = ['achat'=>'fa-home','vente'=>'fa-tag','investis'=>'fa-chart-line','marché'=>'fa-chart-bar','financement'=>'fa-piggy-bank','conseil'=>'fa-lightbulb','bordeaux'=>'fa-map-marker-alt','quartier'=>'fa-map','fiscal'=>'fa-file-invoice','guide'=>'fa-book-open','secteur'=>'fa-map-marker-alt'];
@@ -186,6 +201,21 @@ img{display:block;max-width:100%}
 .bl-hero__sub{
   font-size:17px;opacity:.82;line-height:1.7;
   max-width:540px;margin:0 auto 32px;
+}
+.bl-search{
+  max-width:580px;margin:0 auto 30px;
+  display:flex;gap:10px;align-items:center;justify-content:center;
+}
+.bl-search__input{
+  flex:1;min-width:220px;
+  border:1px solid rgba(255,255,255,.35);
+  background:rgba(255,255,255,.12);
+  color:#fff;border-radius:10px;padding:12px 14px;
+}
+.bl-search__input::placeholder{color:rgba(255,255,255,.75)}
+.bl-search__btn{
+  border:1px solid rgba(255,255,255,.5);background:#fff;color:var(--blue-dk);
+  border-radius:10px;padding:12px 16px;font-weight:700;cursor:pointer;
 }
 .bl-hero__stats{display:flex;justify-content:center;gap:40px;flex-wrap:wrap}
 .bl-hero__stat-num{font-family:var(--ff-h);font-size:30px;font-weight:800;color:var(--gold-lt)}
@@ -523,6 +553,22 @@ img{display:block;max-width:100%}
                 ? 'Tous les articles sur <strong>'.htmlspecialchars($catFilter).'</strong>.'
                 : 'Achat, vente, investissement, marché bordelais — les conseils d\'un expert local à votre service.' ?>
         </p>
+        <form method="GET" action="/blog" class="bl-search" role="search">
+            <?php if ($catFilter): ?>
+                <input type="hidden" name="categorie" value="<?= htmlspecialchars($catFilter) ?>">
+            <?php endif; ?>
+            <input
+                class="bl-search__input"
+                type="text"
+                name="search"
+                value="<?= htmlspecialchars($search) ?>"
+                placeholder="Rechercher un article…"
+                aria-label="Rechercher dans le blog"
+            >
+            <button class="bl-search__btn" type="submit">
+                <i class="fas fa-search"></i> Rechercher
+            </button>
+        </form>
         <?php if (!$catFilter && $total > 0): ?>
         <div class="bl-hero__stats">
             <div>
@@ -555,11 +601,11 @@ img{display:block;max-width:100%}
 <?php if (!empty($categories)): ?>
 <nav class="bl-cats-bar" aria-label="Filtrer par catégorie">
     <div class="bl-cats-inner">
-        <a href="/blog" class="bl-cat <?= !$catFilter ? 'bl-cat--all' : 'bl-cat--item' ?>">
+        <a href="/blog<?= $search !== '' ? '?search='.urlencode($search) : '' ?>" class="bl-cat <?= !$catFilter ? 'bl-cat--all' : 'bl-cat--item' ?>">
             <i class="fas fa-th-large"></i> Tous
         </a>
         <?php foreach ($categories as $cat): ?>
-        <a href="/blog?categorie=<?= urlencode($cat['cat']) ?>"
+        <a href="/blog?categorie=<?= urlencode($cat['cat']) ?><?= $search !== '' ? '&search='.urlencode($search) : '' ?>"
            class="bl-cat <?= $catFilter===$cat['cat'] ? 'bl-cat--active' : 'bl-cat--item' ?>">
             <i class="fas <?= getCatIcon($cat['cat']) ?>"></i>
             <?= htmlspecialchars($cat['cat']) ?>
@@ -571,7 +617,7 @@ img{display:block;max-width:100%}
 <?php endif; ?>
 
 <!-- ══ HUB CONTENT ══ -->
-<?php if ($hubPage && !empty($hubPage['content']) && $page===1 && !$catFilter): ?>
+<?php if ($hubPage && !empty($hubPage['content']) && $page===1 && !$catFilter && $search === ''): ?>
 <div class="bl-hub"><?= $hubPage['content'] ?></div>
 <?php endif; ?>
 
@@ -681,16 +727,22 @@ img{display:block;max-width:100%}
         <h2 class="bl-empty__title">Aucun article trouvé</h2>
         <p class="bl-empty__text">
             <?= $catFilter ? 'Aucun article publié dans « '.htmlspecialchars($catFilter).' ».' : 'Aucun article publié pour l\'instant.' ?>
+            <?php if ($search !== ''): ?>
+                Recherche: « <?= htmlspecialchars($search) ?> ».
+            <?php endif; ?>
         </p>
-        <?php if ($catFilter): ?>
-        <a href="/blog" class="bl-empty__btn"><i class="fas fa-arrow-left"></i> Voir tous les articles</a>
+        <?php if ($catFilter || $search !== ''): ?>
+        <a href="/blog" class="bl-empty__btn"><i class="fas fa-arrow-left"></i> Réinitialiser les filtres</a>
         <?php endif; ?>
     </div>
     <?php endif; ?>
 
     <!-- Pagination -->
     <?php if ($totalPages > 1):
-        $base = '/blog'.($catFilter ? '?categorie='.urlencode($catFilter).'&' : '?').'page=';
+        $baseParams = [];
+        if ($catFilter) { $baseParams[] = 'categorie='.urlencode($catFilter); }
+        if ($search !== '') { $baseParams[] = 'search='.urlencode($search); }
+        $base = '/blog?'.(!empty($baseParams) ? implode('&', $baseParams).'&' : '').'page=';
     ?>
     <nav class="bl-pagination" aria-label="Pagination">
         <a href="<?= $base.($page-1) ?>" class="bl-pag-btn <?= $page<=1?'bl-pag-btn--disabled':'' ?>" aria-label="Page précédente">
