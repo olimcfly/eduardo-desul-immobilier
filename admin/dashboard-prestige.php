@@ -10,6 +10,11 @@
  * - Section 4: Activités récentes
  */
 
+// Défaut des variables si non définies
+if (!isset($advisorName)) $advisorName = 'Utilisateur';
+if (!isset($pdo)) $pdo = null;
+if (!isset($IMMO_VERSION)) $IMMO_VERSION = '8.6';
+
 // Récupérer les données KPI
 $kpi = [
     'revenue' => 15500,
@@ -75,6 +80,7 @@ try {
 }
 
 $firstName = explode(' ', $advisorName ?? 'Utilisateur')[0];
+$IMMO_VERSION = defined('IMMO_VERSION') ? IMMO_VERSION : '2.1';
 ?>
 
 <style>
