@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     $token = $_POST['csrf_token'] ?? '';
     if (!hash_equals($_SESSION['auth_csrf_token'] ?? '', $token)) {
         $_SESSION['auth_error_message'] = "Token CSRF invalide.";
-        header("Location: /admin/index.php?module=instagram");
+        header("Location: /admin/dashboard.php?page=instagram");
         exit;
     }
 
@@ -59,7 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             break;
     }
 
-    header("Location: /admin/index.php?module=instagram");
+    header("Location: /admin/dashboard.php?page=instagram");
     exit;
 }
 
@@ -934,10 +934,10 @@ ob_start();
         <p>Gérez vos publications, Reels, Stories et carrousels pour Instagram</p>
     </div>
     <div class="ig-hero-right">
-        <a href="/admin/index.php?module=instagram&action=create" class="ig-hero-btn primary">
+        <a href="/admin/dashboard.php?page=instagram&action=create" class="ig-hero-btn primary">
             <i class="fas fa-plus"></i> Nouvelle publication
         </a>
-        <a href="/admin/index.php?module=reseaux-sociaux" class="ig-hero-btn secondary">
+        <a href="/admin/dashboard.php?page=reseaux-sociaux" class="ig-hero-btn secondary">
             <i class="fas fa-th-large"></i> Hub Réseaux
         </a>
     </div>
@@ -1018,19 +1018,19 @@ ob_start();
 <div class="ig-quick-create">
     <h3><i class="fas fa-bolt" style="color: #F77737;"></i> Création rapide</h3>
     <div class="ig-quick-types">
-        <a class="ig-quick-type" href="/admin/index.php?module=instagram&action=create&type=post">
+        <a class="ig-quick-type" href="/admin/dashboard.php?page=instagram&action=create&type=post">
             <i class="fas fa-image" style="color: #833AB4;"></i>
             <span>Post photo</span>
         </a>
-        <a class="ig-quick-type" href="/admin/index.php?module=instagram&action=create&type=carousel">
+        <a class="ig-quick-type" href="/admin/dashboard.php?page=instagram&action=create&type=carousel">
             <i class="fas fa-images" style="color: #1877F2;"></i>
             <span>Carrousel</span>
         </a>
-        <a class="ig-quick-type" href="/admin/index.php?module=instagram&action=create&type=reel">
+        <a class="ig-quick-type" href="/admin/dashboard.php?page=instagram&action=create&type=reel">
             <i class="fas fa-film" style="color: #833AB4;"></i>
             <span>Reel</span>
         </a>
-        <a class="ig-quick-type" href="/admin/index.php?module=instagram&action=create&type=story">
+        <a class="ig-quick-type" href="/admin/dashboard.php?page=instagram&action=create&type=story">
             <i class="fas fa-circle-notch" style="color: #F77737;"></i>
             <span>Story</span>
         </a>
@@ -1050,7 +1050,7 @@ ob_start();
         'carousels' => ['label' => 'Carrousels',  'icon' => 'fas fa-images',      'count' => $igStats['carousels']],
     ];
     foreach ($tabs as $key => $tab): ?>
-        <a href="/admin/index.php?module=instagram&tab=<?= $key ?>" 
+        <a href="/admin/dashboard.php?page=instagram&tab=<?= $key ?>" 
            class="ig-tab <?= $activeTab === $key ? 'active' : '' ?>">
             <i class="<?= $tab['icon'] ?>"></i>
             <?= $tab['label'] ?>
@@ -1079,7 +1079,7 @@ ob_start();
         <i class="fab fa-instagram"></i>
         <h3>Aucune publication Instagram</h3>
         <p>Commencez par créer votre première publication pour Instagram.</p>
-        <a href="/admin/index.php?module=instagram&action=create" class="ig-hero-btn primary" 
+        <a href="/admin/dashboard.php?page=instagram&action=create" class="ig-hero-btn primary" 
            style="display: inline-flex; background: #833AB4; color: #fff;">
             <i class="fas fa-plus"></i> Créer ma première publication
         </a>
@@ -1166,7 +1166,7 @@ ob_start();
 
                 <!-- Actions -->
                 <div class="ig-pub-actions">
-                    <a href="/admin/index.php?module=instagram&action=edit&id=<?= $pub['id'] ?>" 
+                    <a href="/admin/dashboard.php?page=instagram&action=edit&id=<?= $pub['id'] ?>" 
                        class="ig-pub-action" title="Modifier">
                         <i class="fas fa-pen"></i>
                     </a>
@@ -1201,7 +1201,7 @@ ob_start();
     <?php if ($totalPages > 1): ?>
         <div class="ig-pagination">
             <?php if ($page > 1): ?>
-                <a href="/admin/index.php?module=instagram&tab=<?= $activeTab ?>&p=<?= $page - 1 ?><?= $search ? '&search=' . urlencode($search) : '' ?>">
+                <a href="/admin/dashboard.php?page=instagram&tab=<?= $activeTab ?>&p=<?= $page - 1 ?><?= $search ? '&search=' . urlencode($search) : '' ?>">
                     <i class="fas fa-chevron-left"></i>
                 </a>
             <?php endif; ?>
@@ -1213,14 +1213,14 @@ ob_start();
                 <?php if ($i === $page): ?>
                     <span class="current"><?= $i ?></span>
                 <?php else: ?>
-                    <a href="/admin/index.php?module=instagram&tab=<?= $activeTab ?>&p=<?= $i ?><?= $search ? '&search=' . urlencode($search) : '' ?>">
+                    <a href="/admin/dashboard.php?page=instagram&tab=<?= $activeTab ?>&p=<?= $i ?><?= $search ? '&search=' . urlencode($search) : '' ?>">
                         <?= $i ?>
                     </a>
                 <?php endif; ?>
             <?php endfor; ?>
 
             <?php if ($page < $totalPages): ?>
-                <a href="/admin/index.php?module=instagram&tab=<?= $activeTab ?>&p=<?= $page + 1 ?><?= $search ? '&search=' . urlencode($search) : '' ?>">
+                <a href="/admin/dashboard.php?page=instagram&tab=<?= $activeTab ?>&p=<?= $page + 1 ?><?= $search ? '&search=' . urlencode($search) : '' ?>">
                     <i class="fas fa-chevron-right"></i>
                 </a>
             <?php endif; ?>

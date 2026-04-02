@@ -2,7 +2,7 @@
 /**
  * ══════════════════════════════════════════════════════════════
  * BUILDER PRO — Bibliothèque de Templates
- * /admin/modules/builder/templates.php
+ * /admin/dashboard.php?page=builder&section=templates
  * ══════════════════════════════════════════════════════════════
  */
 
@@ -120,14 +120,14 @@ ob_start();
         <div style="<?= $st ?>">Navigation</div>
         <a href="/admin/dashboard.php"              style="<?= $ns ?>"><i class="fas fa-home"         style="<?= $is ?>"></i> Dashboard</a>
         <a href="/admin/dashboard.php?page=articles" style="<?= $ns ?>"><i class="fas fa-newspaper"   style="<?= $is ?>"></i> Articles</a>
-        <a href="/admin/dashboard.php?page=contacts" style="<?= $ns ?>"><i class="fas fa-address-book" style="<?= $is ?>"></i> Contacts</a>
+        <a href="/admin/dashboard.php?page=crm" style="<?= $ns ?>"><i class="fas fa-address-book" style="<?= $is ?>"></i> Contacts</a>
         <a href="/admin/dashboard.php?page=leads"    style="<?= $ns ?>"><i class="fas fa-funnel-dollar" style="<?= $is ?>"></i> Leads</a>
     </div>
     <div style="height:1px;background:rgba(255,255,255,.06);margin:8px 20px;"></div>
     <div style="padding:16px 12px 8px;">
         <div style="<?= $st ?>">Builder Pro</div>
-        <a href="/admin/modules/builder/layouts.php"   style="<?= $ns ?>"><i class="fas fa-layer-group" style="<?= $is ?>"></i> Layouts</a>
-        <a href="/admin/modules/builder/templates.php" style="<?= $na ?>">
+        <a href="/admin/dashboard.php?page=builder&section=layouts"   style="<?= $ns ?>"><i class="fas fa-layer-group" style="<?= $is ?>"></i> Layouts</a>
+        <a href="/admin/dashboard.php?page=builder&section=templates" style="<?= $na ?>">
             <i class="fas fa-swatchbook" style="<?= $is ?>"></i> Templates
             <span style="margin-left:auto;background:rgba(139,92,246,.2);color:#a78bfa;font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:10px;"><?= count($templates) ?></span>
         </a>
@@ -137,7 +137,7 @@ ob_start();
     <div style="padding:16px 12px 8px;">
         <div style="<?= $st ?>">Paramètres</div>
         <a href="/admin/dashboard.php?page=settings" style="<?= $ns ?>"><i class="fas fa-cog"          style="<?= $is ?>"></i> Paramètres</a>
-        <a href="/admin/logout.php"                  style="<?= $ns ?>"><i class="fas fa-sign-out-alt" style="<?= $is ?>"></i> Déconnexion</a>
+        <a href="/admin/dashboard.php?action=logout"                  style="<?= $ns ?>"><i class="fas fa-sign-out-alt" style="<?= $is ?>"></i> Déconnexion</a>
     </div>
     <div style="margin-top:auto;padding:16px 20px;border-top:1px solid rgba(255,255,255,.07);font-size:.78rem;color:#475569;">Builder Pro v2.0</div>
 </aside>
