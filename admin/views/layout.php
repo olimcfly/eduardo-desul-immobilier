@@ -6,6 +6,8 @@
     <title><?= $pageTitle ?? 'Admin' ?> — Eduardo Desul</title>
     <meta name="robots" content="noindex, nofollow">
     <link rel="stylesheet" href="/admin/assets/css/admin.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
     <?php if (!empty($extraCss)): ?>
         <?php foreach ($extraCss as $css): ?>
             <link rel="stylesheet" href="<?= $css ?>">
@@ -32,7 +34,7 @@
     <?php include __DIR__ . '/partials/footer.php'; ?>
 </div>
 
-<script src="/admin/assets/js/admin.js"></script>
+<script src="/admin/assets/js/admin.js" defer></script>
 <?php if (!empty($extraJs)): ?>
     <?php foreach ($extraJs as $js): ?>
         <script src="<?= $js ?>"></script>

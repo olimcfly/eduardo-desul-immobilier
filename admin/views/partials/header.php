@@ -21,7 +21,7 @@
         </div>
 
         <div class="topbar-user">
-            <?= htmlspecialchars($_SESSION['admin_name'] ?? 'Admin') ?>
+            <?= htmlspecialchars($_SESSION['user_name'] ?? 'Admin') ?>
         </div>
     </div>
 </header>

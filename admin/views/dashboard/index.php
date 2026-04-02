@@ -41,6 +41,7 @@
         </div>
     </section>
 
+    <div class="dash-cols">
     <!-- Colonne gauche -->
     <div class="dash-col-left">
 
@@ -169,7 +170,8 @@
         </div>
 
     </div>
+    </div><!-- /.dash-cols -->
 
-</div>
+</div><!-- /.dashboard-grid -->
 
 <script src="/admin/assets/js/dashboard.js"></script>
