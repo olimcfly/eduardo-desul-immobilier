@@ -423,9 +423,6 @@ $notifications = [
 <body>
 
 <div class="admin-wrapper">
-
-    <!-- HEADER -->
-    <div class="admin-main">
         <header class="app-header" role="banner">
 
             <!-- Header Left -->
@@ -494,12 +491,6 @@ $notifications = [
 
         <!-- MAIN CONTENT -->
         <main class="admin-content">
-
-        </main>
-
-    </div><!-- /.admin-main -->
-
-</div><!-- /.admin-wrapper -->
 
 <script>
 // Gestion des menus déroulants

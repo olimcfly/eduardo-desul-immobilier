@@ -341,7 +341,61 @@ require_once __DIR__ . '/layout/header.php';
 require_once __DIR__ . '/layout/sidebar.php';
 ?>
 
-<main class="main">
+<!-- admin-main starts here -->
+<div class="admin-main">
+    <header class="app-header" role="banner">
+
+        <!-- Header Left -->
+        <div class="header-left">
+            <button class="sidebar-toggle" id="sidebarToggle" title="Basculer la barre latérale">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1 class="page-title"><?= htmlspecialchars($pageTitle ?? 'Tableau de bord') ?></h1>
+        </div>
+
+        <!-- Header Right -->
+        <div class="header-right">
+
+            <!-- Notifications -->
+            <div class="notifications">
+                <button class="notification-btn" id="notificationBtn" title="Notifications">
+                    <i class="fas fa-bell"></i>
+                    <?php if (isset($notificationCount) && $notificationCount > 0): ?>
+                        <span class="badge"><?= $notificationCount ?></span>
+                    <?php endif; ?>
+                </button>
+            </div>
+
+            <!-- User Profile -->
+            <div class="user-profile">
+                <button class="profile-btn" id="profileBtn" title="Profil utilisateur">
+                    <div class="profile-avatar">
+                        <?= htmlspecialchars(strtoupper(mb_substr($advisorName ?? 'Admin', 0, 1))) ?>
+                    </div>
+                    <span><?= htmlspecialchars($advisorName ?? 'Admin') ?></span>
+                    <i class="fas fa-chevron-down profile-chevron"></i>
+                </button>
+                <div class="profile-dropdown" id="profileDropdown">
+                    <a href="?page=advisor-context" class="profile-dropdown-item">
+                        <i class="fas fa-user"></i>
+                        <span>Mon profil</span>
+                    </a>
+                    <a href="?page=settings" class="profile-dropdown-item">
+                        <i class="fas fa-cog"></i>
+                        <span>Paramètres</span>
+                    </a>
+                    <a href="?logout=1" class="profile-dropdown-item danger">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Déconnexion</span>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+    </header>
+
+    <main class="admin-content">
 
 <?php if ($module === 'dashboard'): ?>
 <?php
@@ -397,10 +451,12 @@ require_once __DIR__ . '/layout/sidebar.php';
     <?php endif; ?>
 </div>
 
-<?php endif; ?>
+    </main><!-- /.admin-content -->
 
-</main>
+</div><!-- /.admin-main -->
+
 </div><!-- /.admin-wrapper -->
+
 </body>
 </html>
 <?php
