@@ -24,6 +24,9 @@ if (!file_exists($configPath)) {
 }
 require_once $configPath;
 
+// ─── Bootstrap CRM (constantes, storage, helpers) ───
+require_once __DIR__ . '/bootstrap.php';
+
 // ─── Vérifier la session admin ───
 if (empty($_SESSION['auth_admin_id'])) {
     // Si c'est un appel AJAX/API, retourner du JSON au lieu de rediriger

@@ -1,197 +1,341 @@
 <?php
-
-declare(strict_types=1);
-
 /**
- * Composant réutilisable pour les pages d'accueil module (3R + MERE + Action).
+ * Composant ModuleWelcomePage
+ * Gère l'affichage et le suivi des pages de bienvenue des modules
  */
+
 class ModuleWelcomePage
 {
-    private string $storageFile;
-    private string $userKey;
+    private string $moduleKey;
+    private array $config;
+    private string $seenModulesFile;
+    private array $seenModules;
+    private string $userId;
 
-    public function __construct(string $storageFile, string $userKey)
+    public function __construct(string $moduleKey)
     {
-        $this->storageFile = $storageFile;
-        $this->userKey = $userKey;
+        $this->moduleKey = $moduleKey;
+        $this->seenModulesFile = STORAGE_PATH . '/seen-modules.json';
+        $this->userId = $this->resolveUserId();
+        $this->seenModules = $this->loadSeenModules();
+        $this->config = $this->loadConfig($moduleKey);
     }
 
-    /**
-     * @param array<string,mixed> $config
-     */
-    public function render(string $moduleKey, array $config, array $context = []): void
+    public function hasSeenModule(): bool
     {
-        $title = (string)($config['title'] ?? ucfirst($moduleKey));
-        $subtitle = (string)($config['subtitle'] ?? 'Démarrez avec un plan clair et actionnable.');
-        $threeR = $config['3r'] ?? $config['three_r'] ?? [];
-        $mere = $config['mere'] ?? [];
-        $actions = $config['actions'] ?? $config['choices'] ?? [];
-        $hasFreeField = (bool)($config['has_free_field'] ?? $config['free_text'] ?? false);
-        $welcomeUrl = (string)($config['welcome_url'] ?? ('?page=' . urlencode($moduleKey)));
-        $dashboardUrl = (string)($config['dashboard_url'] ?? ('?page=' . urlencode($moduleKey)));
+        return isset($this->seenModules[$this->userId][$this->moduleKey])
+            && $this->seenModules[$this->userId][$this->moduleKey] === true;
+    }
+
+    public function markAsSeen(): void
+    {
+        if (!isset($this->seenModules[$this->userId])) {
+            $this->seenModules[$this->userId] = [];
+        }
+        $this->seenModules[$this->userId][$this->moduleKey] = true;
+        $this->seenModules[$this->userId]['_last_seen_' . $this->moduleKey] = date('Y-m-d H:i:s');
+        $this->saveSeenModules();
+    }
+
+    public function resetSeen(): void
+    {
+        if (isset($this->seenModules[$this->userId][$this->moduleKey])) {
+            unset($this->seenModules[$this->userId][$this->moduleKey]);
+            unset($this->seenModules[$this->userId]['_last_seen_' . $this->moduleKey]);
+            $this->saveSeenModules();
+        }
+    }
+
+    public function handleRequest(): bool
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            return false;
+        }
+
+        $action = $_POST['welcome_action'] ?? '';
+
+        if ($action === 'mark_seen') {
+            $this->markAsSeen();
+            $this->saveUserChoice();
+            redirect($this->config['dashboard_url']);
+            return true;
+        }
+
+        if ($action === 'skip') {
+            $this->markAsSeen();
+            redirect($this->config['dashboard_url']);
+            return true;
+        }
+
+        if ($action === 'reset') {
+            $this->resetSeen();
+            redirect($this->config['welcome_url']);
+            return true;
+        }
+
+        if ($action === 'choose') {
+            $this->markAsSeen();
+            $this->saveUserChoice();
+            $choiceValue = $_POST['action_choice'] ?? '';
+            $redirectUrl = $this->resolveActionUrl($choiceValue);
+            redirect($redirectUrl);
+            return true;
+        }
+
+        return false;
+    }
+
+    public function shouldShowWelcome(): bool
+    {
+        if (isset($_GET['force']) && $_GET['force'] === '1') {
+            $this->resetSeen();
+            return true;
+        }
+
+        return !$this->hasSeenModule();
+    }
+
+    public function render(): string
+    {
+        ob_start();
         ?>
-        <section class="mw-page">
-            <style>
-                .mw-page{max-width:1100px;margin:0 auto;padding:18px 10px 32px}
-                .mw-hero{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px;display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between;align-items:flex-end}
-                .mw-over{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);font-weight:800}
-                .mw-title{margin:6px 0 4px;font-size:34px;line-height:1.1}
-                .mw-sub{margin:0;color:var(--text-2);font-size:16px}
-                .mw-hero-actions{display:flex;gap:10px;flex-wrap:wrap}
-                .mw-btn{border:none;border-radius:10px;padding:10px 14px;font-weight:700;cursor:pointer;text-decoration:none;display:inline-flex;gap:7px;align-items:center}
-                .mw-btn-primary{background:#4f46e5;color:#fff}
-                .mw-btn-secondary{background:#eef2ff;color:#3730a3}
-                .mw-block{margin-top:16px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px}
-                .mw-grid-3,.mw-grid-4{display:grid;gap:12px}
-                .mw-grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
-                .mw-grid-4{grid-template-columns:repeat(4,minmax(0,1fr))}
-                .mw-card{background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:12px}
-                .mw-card h3{margin:0 0 5px;font-size:13px;text-transform:uppercase;letter-spacing:.04em}
-                .mw-card p{margin:0;color:#475569;font-size:14px}
-                .mw-choice{display:flex;flex-direction:column;gap:12px}
-                .mw-choice-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-                .mw-choice-item{display:flex;gap:9px;align-items:flex-start;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px}
-                .mw-choice-item input{margin-top:2px}
-                .mw-choice-item span{font-weight:600}
-                .mw-textarea{width:100%;min-height:74px;border:1px solid #d1d5db;border-radius:10px;padding:10px;font:inherit}
-                .mw-actions{display:flex;gap:10px;flex-wrap:wrap}
-                .mw-context{margin-top:12px;font-size:12px;color:var(--text-3)}
-                @media (max-width:900px){.mw-grid-3,.mw-grid-4,.mw-choice-grid{grid-template-columns:1fr}.mw-title{font-size:28px}}
-            </style>
-
-            <div class="mw-hero">
-                <div>
-                    <div class="mw-over">Module</div>
-                    <h1 class="mw-title"><?= htmlspecialchars($title, ENT_QUOTES, 'UTF-8') ?></h1>
-                    <p class="mw-sub"><?= htmlspecialchars($subtitle, ENT_QUOTES, 'UTF-8') ?></p>
-                </div>
-                <div class="mw-hero-actions">
-                    <button type="submit" form="module-welcome-form" name="welcome_action" value="start" class="mw-btn mw-btn-primary">Commencer</button>
-                    <a href="<?= htmlspecialchars($dashboardUrl, ENT_QUOTES, 'UTF-8') ?>" class="mw-btn mw-btn-secondary">Accéder directement</a>
-                </div>
-            </div>
-
-            <div class="mw-block">
-                <div class="mw-over">3R</div>
-                <div class="mw-grid-3">
-                    <?php foreach ($threeR as $item): ?>
-                        <article class="mw-card">
-                            <h3><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
-                            <p><?= htmlspecialchars((string)($item['text'] ?? ''), ENT_QUOTES, 'UTF-8') ?></p>
-                        </article>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-
-            <div class="mw-block">
-                <div class="mw-over">MERE</div>
-                <div class="mw-grid-4">
-                    <?php foreach ($mere as $item): ?>
-                        <article class="mw-card">
-                            <h3><?= htmlspecialchars((string)($item['title'] ?? ''), ENT_QUOTES, 'UTF-8') ?></h3>
-                            <p><?= htmlspecialchars((string)($item['text'] ?? ''), ENT_QUOTES, 'UTF-8') ?></p>
-                        </article>
-                    <?php endforeach; ?>
-                </div>
-            </div>
-
-            <form method="post" class="mw-block mw-choice" id="module-welcome-form">
-                <input type="hidden" name="module_welcome_form" value="1">
-                <input type="hidden" name="module_key" value="<?= htmlspecialchars($moduleKey, ENT_QUOTES, 'UTF-8') ?>">
-                <input type="hidden" name="welcome_url" value="<?= htmlspecialchars($welcomeUrl, ENT_QUOTES, 'UTF-8') ?>">
-                <input type="hidden" name="dashboard_url" value="<?= htmlspecialchars($dashboardUrl, ENT_QUOTES, 'UTF-8') ?>">
-
-                <div class="mw-over">Action</div>
-                <p style="margin:0;color:var(--text-2)">Choisissez comment vous souhaitez commencer.</p>
-
-                <div class="mw-choice-grid">
-                    <?php foreach ($actions as $idx => $action): ?>
-                        <?php
-                            $choiceId = is_array($action)
-                                ? (string)($action['id'] ?? ('choice_' . $idx))
-                                : ('choice_' . $idx);
-                            $choiceLabel = is_array($action)
-                                ? (string)($action['label'] ?? $choiceId)
-                                : (string)$action;
-                        ?>
-                        <label class="mw-choice-item">
-                            <input type="radio" name="module_choice" value="<?= htmlspecialchars($choiceId, ENT_QUOTES, 'UTF-8') ?>" <?= $idx === 0 ? 'checked' : '' ?>>
-                            <div><span><?= htmlspecialchars($choiceLabel, ENT_QUOTES, 'UTF-8') ?></span></div>
-                        </label>
-                    <?php endforeach; ?>
-                </div>
-
-                <?php if ($hasFreeField): ?>
-                    <div>
-                        <label for="module_note" style="font-size:13px;font-weight:700">Décrivez votre situation en une phrase</label>
-                        <textarea id="module_note" name="module_note" class="mw-textarea" placeholder="Ex : j’ai déjà un pipeline, mais pas de suivi régulier."></textarea>
-                    </div>
-                <?php endif; ?>
-
-                <div class="mw-actions">
-                    <button type="submit" name="welcome_action" value="start" class="mw-btn mw-btn-primary">Continuer</button>
-                    <button type="submit" name="welcome_action" value="direct" class="mw-btn mw-btn-secondary">Ignorer pour l’instant</button>
-                </div>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?= e($this->config['title']) ?> - Bienvenue | CRM Immobilier</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="/admin/assets/css/module-welcome.css">
+    <style>
+        :root {
+            --module-color: <?= e($this->config['color']) ?>;
+            --module-gradient: <?= e($this->config['gradient']) ?>;
+        }
+    </style>
+</head>
+<body class="welcome-body">
+<nav class="welcome-nav">
+    <div class="welcome-nav__inner">
+        <div class="welcome-nav__brand">
+            <i class="fa-solid fa-building-columns"></i>
+            <span>CRM Immobilier</span>
+        </div>
+        <div class="welcome-nav__actions">
+            <a href="<?= e($this->config['dashboard_url']) ?>" class="btn btn--ghost btn--sm">
+                <i class="fa-solid fa-gauge"></i>
+                Accéder directement
+            </a>
+            <form method="POST" style="display:inline;">
+                <input type="hidden" name="welcome_action" value="skip">
+                <button type="submit" class="btn btn--outline btn--sm">
+                    <i class="fa-solid fa-forward"></i>
+                    Ignorer
+                </button>
             </form>
+        </div>
+    </div>
+</nav>
 
-            <?php if (!empty($context)): ?>
-                <div class="mw-context">
-                    Dernier contexte : <?= htmlspecialchars((string)($context['choice'] ?? 'n/a'), ENT_QUOTES, 'UTF-8') ?><?= !empty($context['note']) ? ' — ' . htmlspecialchars((string)$context['note'], ENT_QUOTES, 'UTF-8') : '' ?>.
+<section class="welcome-hero" style="background: var(--module-gradient);">
+    <div class="welcome-hero__overlay"></div>
+    <div class="welcome-hero__content">
+        <div class="welcome-hero__badge">
+            <i class="fa-solid <?= e($this->config['icon']) ?>"></i>
+            <span>Module <?= e($this->config['title']) ?></span>
+        </div>
+
+        <h1 class="welcome-hero__title">Bienvenue dans <span class="welcome-hero__title--accent"><?= e($this->config['title']) ?></span></h1>
+        <p class="welcome-hero__subtitle"><?= e($this->config['subtitle']) ?></p>
+
+        <div class="welcome-hero__cta">
+            <a href="#section-action" class="btn btn--primary btn--lg"><i class="fa-solid fa-play"></i>Commencer</a>
+            <a href="<?= e($this->config['dashboard_url']) ?>" class="btn btn--white btn--lg"><i class="fa-solid fa-gauge-high"></i>Accéder au tableau de bord</a>
+        </div>
+    </div>
+</section>
+
+<section class="welcome-section welcome-3r" id="section-3r">
+    <div class="welcome-container">
+        <div class="section-header">
+            <span class="section-header__tag">Comprendre le contexte</span>
+            <h2 class="section-header__title">Les 3 points clés à connaître</h2>
+        </div>
+
+        <div class="cards-3r">
+            <?php foreach (['realite', 'resultat', 'risque'] as $cardKey): ?>
+                <?php $card = $this->config['3r'][$cardKey]; ?>
+                <div class="card-3r card-3r--<?= e($cardKey) ?>" style="--card-color: <?= e($card['color'] ?? '#333') ?>">
+                    <div class="card-3r__icon"><i class="fa-solid <?= e($card['icon'] ?? 'fa-circle') ?>"></i></div>
+                    <h3 class="card-3r__title"><?= e($card['title']) ?></h3>
+                    <p class="card-3r__text"><?= e($card['text']) ?></p>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
+
+<section class="welcome-section welcome-mere" id="section-mere">
+    <div class="welcome-container">
+        <div class="section-header">
+            <span class="section-header__tag">Ce que vous allez apprendre</span>
+            <h2 class="section-header__title">Le cadre complet du module</h2>
+        </div>
+
+        <div class="cards-mere">
+            <?php foreach (['motivation', 'explication', 'resultat', 'exercice'] as $mereKey): ?>
+                <?php $block = $this->config['mere'][$mereKey]; ?>
+                <div class="card-mere card-mere--<?= e($mereKey) ?>">
+                    <div class="card-mere__icon"><i class="fa-solid <?= e($block['icon'] ?? 'fa-circle') ?>"></i></div>
+                    <div class="card-mere__content">
+                        <h3 class="card-mere__title"><?= e($block['title']) ?></h3>
+                        <p class="card-mere__text"><?= e($block['text']) ?></p>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
+
+<section class="welcome-section welcome-action" id="section-action">
+    <div class="welcome-container">
+        <div class="section-header">
+            <span class="section-header__tag">Passez à l'action</span>
+            <h2 class="section-header__title">Choisissez comment vous souhaitez commencer</h2>
+        </div>
+
+        <form method="POST" class="action-form" id="action-form-<?= e($this->moduleKey) ?>">
+            <input type="hidden" name="welcome_action" value="choose">
+            <input type="hidden" name="action_choice" id="action-choice-hidden" value="">
+
+            <div class="action-choices">
+                <?php foreach ($this->config['actions'] as $actionItem): ?>
+                    <button type="button" class="action-choice-btn" data-value="<?= e($actionItem['value']) ?>" onclick="selectAction(this, '<?= e($actionItem['value']) ?>')">
+                        <?= e($actionItem['label']) ?>
+                    </button>
+                <?php endforeach; ?>
+            </div>
+
+            <?php if (!empty($this->config['has_free_field'])): ?>
+                <div class="action-free-field" id="free-field-wrapper">
+                    <label class="action-free-field__label" for="free-field-input">
+                        <?= e($this->config['free_field_label'] ?? 'Décrivez votre situation') ?>
+                    </label>
+                    <textarea id="free-field-input" name="free_field_text" class="action-free-field__textarea" placeholder="<?= e($this->config['free_field_placeholder'] ?? '') ?>" rows="3" maxlength="500"></textarea>
                 </div>
             <?php endif; ?>
-        </section>
+
+            <div class="action-submit">
+                <button type="submit" class="btn btn--primary btn--xl btn--module" id="btn-continuer" disabled>
+                    Continuer avec mon choix
+                </button>
+                <a href="<?= e($this->config['dashboard_url']) ?>" class="btn btn--ghost btn--lg">Accéder directement au tableau de bord</a>
+            </div>
+        </form>
+    </div>
+</section>
+
+<footer class="welcome-footer">
+    <div class="welcome-container">
+        <div class="welcome-footer__actions">
+            <form method="POST" style="display:inline;">
+                <input type="hidden" name="welcome_action" value="reset">
+                <button type="submit" class="btn btn--ghost btn--xs">Relancer l'introduction</button>
+            </form>
+        </div>
+    </div>
+</footer>
+
+<script src="/admin/assets/js/module-welcome.js"></script>
+<script>
+    ModuleWelcome.init({
+        moduleKey: '<?= e($this->moduleKey) ?>',
+        dashboardUrl: '<?= e($this->config['dashboard_url']) ?>',
+        hasFreeField: <?= !empty($this->config['has_free_field']) ? 'true' : 'false' ?>
+    });
+</script>
+</body>
+</html>
         <?php
+        return ob_get_clean();
     }
 
-    public function hasSeenModule(string $moduleKey): bool
+    private function loadConfig(string $moduleKey): array
     {
-        $seen = $this->readSeenData();
-        return !empty($seen[$this->userKey][$moduleKey]);
-    }
+        $allConfigs = require CONFIG_PATH . '/module-welcome.php';
 
-    public function markAsSeen(string $moduleKey): void
-    {
-        $seen = $this->readSeenData();
-        if (!isset($seen[$this->userKey]) || !is_array($seen[$this->userKey])) {
-            $seen[$this->userKey] = [];
+        if (!isset($allConfigs[$moduleKey])) {
+            throw new \InvalidArgumentException("Module '{$moduleKey}' non trouvé dans la configuration.");
         }
-        $seen[$this->userKey][$moduleKey] = true;
-        $this->writeSeenData($seen);
+
+        return $allConfigs[$moduleKey];
     }
 
-    /**
-     * @return array<string,mixed>
-     */
-    private function readSeenData(): array
+    private function loadSeenModules(): array
     {
-        $file = $this->storageFile;
-        if (!file_exists($file)) {
+        if (!file_exists($this->seenModulesFile)) {
             return [];
         }
 
-        $raw = file_get_contents($file);
-        if ($raw === false || trim($raw) === '') {
-            return [];
-        }
+        $json = file_get_contents($this->seenModulesFile);
+        $data = json_decode($json, true);
 
-        $decoded = json_decode($raw, true);
-        return is_array($decoded) ? $decoded : [];
+        return is_array($data) ? $data : [];
     }
 
-    /**
-     * @param array<string,mixed> $data
-     */
-    private function writeSeenData(array $data): void
+    private function saveSeenModules(): void
     {
-        $dir = dirname($this->storageFile);
+        $dir = dirname($this->seenModulesFile);
         if (!is_dir($dir)) {
-            mkdir($dir, 0775, true);
+            mkdir($dir, 0755, true);
         }
 
         file_put_contents(
-            $this->storageFile,
-            json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
+            $this->seenModulesFile,
+            json_encode($this->seenModules, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE),
             LOCK_EX
         );
+    }
+
+    private function resolveUserId(): string
+    {
+        if (isset($_SESSION['auth_admin_id'])) {
+            return (string)$_SESSION['auth_admin_id'];
+        }
+
+        if (isset($_SESSION['user_id'])) {
+            return (string)$_SESSION['user_id'];
+        }
+
+        if (!isset($_SESSION['anonymous_id'])) {
+            $_SESSION['anonymous_id'] = 'anon_' . bin2hex(random_bytes(8));
+        }
+
+        return (string)$_SESSION['anonymous_id'];
+    }
+
+    private function resolveActionUrl(string $choiceValue): string
+    {
+        foreach ($this->config['actions'] as $action) {
+            if (($action['value'] ?? '') === $choiceValue) {
+                return (string)$action['url'];
+            }
+        }
+
+        return (string)$this->config['dashboard_url'];
+    }
+
+    private function saveUserChoice(): void
+    {
+        $choice = $_POST['action_choice'] ?? null;
+        $freeField = $_POST['free_field_text'] ?? null;
+
+        if ($choice) {
+            $_SESSION['module_choices'][$this->moduleKey] = [
+                'choice' => $choice,
+                'free_text' => $freeField,
+                'chosen_at' => date('Y-m-d H:i:s')
+            ];
+        }
     }
 }

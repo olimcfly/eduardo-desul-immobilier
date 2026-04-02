@@ -273,58 +273,34 @@ if (file_exists($msFile)) {
 
 // ── Welcome modules (page d'accueil standard) ───────────────
 $moduleWelcomeConfig = [];
-$moduleWelcomeFile = __DIR__ . '/config/module-welcome.php';
+$moduleWelcomeFile = CONFIG_PATH . '/module-welcome.php';
 if (file_exists($moduleWelcomeFile)) {
     $moduleWelcomeConfig = require $moduleWelcomeFile;
 }
 
-require_once __DIR__ . '/components/ModuleWelcomePage.php';
-$userModuleKey = (string)($_SESSION['auth_admin_id'] ?? $_SESSION['auth_admin_email'] ?? session_id() ?? 'guest');
-$moduleWelcome = new ModuleWelcomePage(__DIR__ . '/../storage/seen-modules.json', $userModuleKey);
+$moduleWelcomeAliases = [
+    'launchpad' => 'construire',
+    'seo' => 'attirer',
+];
+$moduleWelcomeKey = $moduleWelcomeAliases[$module] ?? $module;
 
 $showModuleWelcome = false;
-$moduleWelcomeContext = $_SESSION['module_welcome_context'][$module] ?? null;
+$moduleWelcome = null;
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['module_welcome_form'] ?? '') === '1') {
-    $postedModule = strtolower((string)($_POST['module_key'] ?? ''));
-    if ($postedModule === $module && isset($moduleWelcomeConfig[$module])) {
-        $action = (string)($_POST['welcome_action'] ?? 'start');
-        $choice = trim((string)($_POST['module_choice'] ?? ''));
-        $note = trim((string)($_POST['module_note'] ?? ''));
-
-        if ($action === 'start' || $action === 'direct') {
-            $moduleWelcome->markAsSeen($module);
-        }
-
-        if ($action === 'start') {
-            $_SESSION['module_welcome_context'][$module] = [
-                'choice' => $choice,
-                'note' => $note,
-                'at' => date('c'),
-            ];
-
-            $routes = $moduleWelcomeConfig[$module]['action_routes'] ?? [];
-            $target = isset($routes[$choice]) ? (string)$routes[$choice] : (string)($_POST['welcome_url'] ?? ('?page=' . urlencode($module)));
-            header('Location: ' . $target);
-            exit;
-        }
-
-        $direct = (string)($_POST['dashboard_url'] ?? ('?page=' . urlencode($module)));
-        header('Location: ' . $direct);
-        exit;
-    }
-}
-
-$moduleSeen = $moduleWelcome->hasSeenModule($module);
-$forceWelcome = isset($_GET['welcome']) && $_GET['welcome'] === '1';
 if (
     $module !== 'dashboard'
     && empty($permissionDenied)
     && $module_file
-    && isset($moduleWelcomeConfig[$module])
-    && (!$moduleSeen || $forceWelcome)
+    && isset($moduleWelcomeConfig[$moduleWelcomeKey])
 ) {
-    $showModuleWelcome = true;
+    $moduleWelcome = new ModuleWelcomePage($moduleWelcomeKey);
+
+    if (isset($_GET['welcome']) && $_GET['welcome'] === '1') {
+        $_GET['force'] = '1';
+    }
+
+    $moduleWelcome->handleRequest();
+    $showModuleWelcome = $moduleWelcome->shouldShowWelcome();
 }
 
 // ── Vérification des permissions ─────────────────────────────
@@ -349,6 +325,12 @@ if (isset($_GET['ajax']) && $_GET['ajax'] == '1') {
         include $module_file;
         exit;
     }
+}
+
+
+if ($showModuleWelcome && $moduleWelcome instanceof ModuleWelcomePage) {
+    echo $moduleWelcome->render();
+    exit;
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -387,12 +369,8 @@ require_once __DIR__ . '/layout/sidebar.php';
             <p><?= !empty($permissionDeniedReason) && $permissionDeniedReason === 'superuser_required' ? 'Ce module est réservé au Super Administrateur.' : "Vous n'avez pas accès à ce module. Contactez le Super Administrateur pour obtenir l'accès." ?></p>
             <a href="?page=dashboard" class="es-btn">&larr; Retour au tableau de bord</a>
         </div>
-    <?php elseif ($showModuleWelcome): ?>
-        <?php
-            $moduleWelcome->render($module, $moduleWelcomeConfig[$module], $moduleWelcomeContext ? $moduleWelcomeContext : []);
-        ?>
     <?php elseif ($module_file): ?>
-        <?php if (isset($moduleWelcomeConfig[$module])): ?>
+        <?php if (isset($moduleWelcomeConfig[$moduleWelcomeKey])): ?>
             <div style="display:flex;justify-content:flex-end;margin:0 0 10px">
                 <a href="?page=<?= urlencode($module) ?>&welcome=1" class="btn btn-s btn-sm">
                     <i class="fas fa-compass"></i> Relancer le guidage

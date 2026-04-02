@@ -1,76 +1,146 @@
 <?php
-/**
- * FOOTER DYNAMIQUE
- * /front/templates/footer.php
- * 
- * Charge le template "footer" depuis la table `templates`
- */
+$advisor = $advisor ?? [];
+$siteName = $siteName ?? ($advisor['trade_name'] ?? 'Conseiller Immobilier');
+$siteLogo = $siteLogo ?? ($advisor['logo_url'] ?? '/assets/img/logo-default.svg');
+$sitePhone = $sitePhone ?? ($advisor['phone'] ?? '');
+$siteEmail = $siteEmail ?? ($advisor['email'] ?? '');
 
-// Éviter les inclusions multiples
-if (defined('FOOTER_LOADED')) return;
-define('FOOTER_LOADED', true);
+$footerLinks = [
+    'Informations' => [
+        ['label' => 'Guide local',          'url' => '/guide-local'],
+        ['label' => 'Actualités',           'url' => '/actualites'],
+        ['label' => 'Ressources vendeurs',  'url' => '/ressources/vendeurs'],
+        ['label' => 'Ressources acheteurs', 'url' => '/ressources/acheteurs'],
+    ],
+    'Services' => [
+        ['label' => 'Estimation gratuite',  'url' => '/estimation'],
+        ['label' => 'Vendre mon bien',      'url' => '/ressources/vendeurs'],
+        ['label' => 'Acheter un bien',      'url' => '/ressources/acheteurs'],
+        ['label' => 'Me contacter',         'url' => '/contact'],
+    ],
+    'Légal' => [
+        ['label' => 'Mentions légales',              'url' => '/mentions-legales'],
+        ['label' => 'Politique de confidentialité',  'url' => '/politique-confidentialite'],
+        ['label' => 'CGV',                           'url' => '/cgv'],
+    ],
+];
+?>
+<footer class="site-footer">
+    <div class="footer-main">
+        <div class="container">
+            <div class="footer-grid">
 
-// Connexion DB si pas déjà faite
-if (!isset($pdo) && !isset($db)) {
-    require_once dirname(dirname(__DIR__)) . '/config/config.php';
-    try {
-        $pdo = new PDO(
-            'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4',
-            DB_USER, DB_PASS,
-            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-        );
-    } catch (PDOException $e) {
-        return;
-    }
-}
+                <div class="footer-about">
+                    <img src="<?= htmlspecialchars($siteLogo) ?>"
+                         alt="<?= htmlspecialchars($siteName) ?>"
+                         class="footer-logo" width="150" height="48" loading="lazy">
 
-// Utiliser $db si disponible (singleton)
-$conn = $pdo ?? $db ?? null;
-if (!$conn) return;
+                    <?php if (!empty($advisor['bio'])): ?>
+                    <p class="footer-bio">
+                        <?= htmlspecialchars(mb_substr($advisor['bio'], 0, 180)) ?>...
+                    </p>
+                    <?php endif; ?>
 
-// Charger le template footer
-try {
-    $stmt = $conn->prepare("SELECT content, custom_css, custom_js FROM templates WHERE slug = 'footer' AND is_active = 1 LIMIT 1");
-    $stmt->execute();
-    $template = $stmt->fetch(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    $template = null;
-}
+                    <address class="footer-address">
+                        <?php if ($sitePhone): ?>
+                        <a href="tel:<?= preg_replace('/\s/', '', $sitePhone) ?>" class="footer-contact-link">
+                            <i class="fas fa-phone" aria-hidden="true"></i>
+                            <?= htmlspecialchars($sitePhone) ?>
+                        </a>
+                        <?php endif; ?>
+                        <?php if ($siteEmail): ?>
+                        <a href="mailto:<?= htmlspecialchars($siteEmail) ?>" class="footer-contact-link">
+                            <i class="fas fa-envelope" aria-hidden="true"></i>
+                            <?= htmlspecialchars($siteEmail) ?>
+                        </a>
+                        <?php endif; ?>
+                        <?php if (!empty($advisor['address'])): ?>
+                        <span class="footer-contact-link">
+                            <i class="fas fa-map-marker-alt" aria-hidden="true"></i>
+                            <?= htmlspecialchars($advisor['address']) ?>,
+                            <?= htmlspecialchars($advisor['zip'] ?? '') ?>
+                            <?= htmlspecialchars($advisor['city'] ?? '') ?>
+                        </span>
+                        <?php endif; ?>
+                    </address>
 
-// Si template trouvé, l'afficher
-if ($template) {
-    // CSS du template
-    if (!empty($template['custom_css'])) {
-        echo '<style>' . $template['custom_css'] . '</style>';
-    }
-    
-    // Contenu HTML (avec année dynamique)
-    $content = str_replace(['2024', '2025'], date('Y'), $template['content']);
-    echo $content;
-    
-    // JS du template
-    if (!empty($template['custom_js'])) {
-        echo '<script>' . $template['custom_js'] . '</script>';
-    }
-} else {
-    // Fallback: footer par défaut si pas de template en DB
-    ?>
-    <style>
-    .footer-fallback {
-        background: #1e3a5f;
-        color: white;
-        padding: 40px 20px;
-        text-align: center;
-        margin-top: 60px;
-    }
-    .footer-fallback a {
-        color: rgba(255,255,255,0.8);
-        text-decoration: none;
-    }
-    </style>
-    <footer class="footer-fallback">
-        <p style="margin-bottom: 10px;"><strong><?= htmlspecialchars(_ss('site_name', 'Mon entreprise')) ?></strong></p>
-        <p style="opacity: 0.7; font-size: 0.9rem;">© <?= date('Y') ?> Tous droits réservés</p>
-    </footer>
-    <?php
-}
+                    <div class="footer-social">
+                        <?php foreach ([
+                            'facebook_url'  => ['fab fa-facebook-f', 'Facebook'],
+                            'instagram_url' => ['fab fa-instagram',  'Instagram'],
+                            'linkedin_url'  => ['fab fa-linkedin-in','LinkedIn'],
+                            'youtube_url'   => ['fab fa-youtube',    'YouTube'],
+                        ] as $key => [$icon, $label]): ?>
+                            <?php if (!empty($advisor[$key])): ?>
+                            <a href="<?= htmlspecialchars($advisor[$key]) ?>"
+                               target="_blank" rel="noopener noreferrer"
+                               class="footer-social__link" aria-label="<?= $label ?>">
+                                <i class="<?= $icon ?>"></i>
+                            </a>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+
+                <?php foreach ($footerLinks as $title => $links): ?>
+                <div class="footer-nav-col">
+                    <h3 class="footer-col-title"><?= htmlspecialchars($title) ?></h3>
+                    <ul class="footer-nav-list" role="list">
+                        <?php foreach ($links as $link): ?>
+                        <li>
+                            <a href="<?= htmlspecialchars($link['url']) ?>"
+                               class="footer-nav-link">
+                                <?= htmlspecialchars($link['label']) ?>
+                            </a>
+                        </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+                <?php endforeach; ?>
+
+                <div class="footer-newsletter">
+                    <h3 class="footer-col-title">Restez informé</h3>
+                    <p>Recevez les dernières actualités immobilières de votre secteur.</p>
+                    <form class="newsletter-form" id="footer-newsletter-form"
+                          action="/api/newsletter-subscribe.php" method="post"
+                          novalidate>
+                        <div class="newsletter-input-group">
+                            <input type="email" name="email"
+                                   placeholder="Votre email"
+                                   required
+                                   class="newsletter-input"
+                                   autocomplete="email">
+                            <button type="submit" class="newsletter-btn">
+                                <i class="fas fa-paper-plane" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                        <p class="newsletter-rgpd">
+                            <i class="fas fa-lock"></i>
+                            Vos données sont protégées. Désinscription à tout moment.
+                        </p>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <div class="container">
+            <div class="footer-bottom__inner">
+                <p class="footer-copyright">
+                    © <?= date('Y') ?> <?= htmlspecialchars($siteName) ?>.
+                    Tous droits réservés.
+                    <?php if (!empty($advisor['carte_t'])): ?>
+                    — Carte T n° <?= htmlspecialchars($advisor['carte_t']) ?>
+                    <?php endif; ?>
+                </p>
+                <div class="footer-legal-links">
+                    <a href="/mentions-legales">Mentions légales</a>
+                    <a href="/politique-confidentialite">Confidentialité</a>
+                    <a href="/cgv">CGV</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
