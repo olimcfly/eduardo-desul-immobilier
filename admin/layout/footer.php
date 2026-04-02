@@ -1,21 +1,37 @@
 <?php
 /**
- * FOOTER — IMMO LOCAL+ (Mode Strict Minimaliste)
+ * FOOTER — IMMO LOCAL+ (Version Épurée & Conforme RGPD)
  * /admin/layout/footer.php
  */
 ?>
         </main>
 
         <!-- FOOTER -->
-        <footer class="footer" role="contentinfo">
+        <footer class="app-footer" role="contentinfo">
             <div class="footer-content">
                 <div class="footer-left">
-                    <span class="footer-version">IMMO LOCAL+ v<?= htmlspecialchars(defined('IMMO_VERSION') ? IMMO_VERSION : '2.1') ?></span>
-                    <span class="footer-sep">|</span>
-                    <a href="?section=mentions-legales" class="footer-link">Mentions légales</a>
+                    <span class="footer-copyright">&copy; <?= date('Y') ?> IMMO LOCAL+</span>
+                    <span class="footer-version">v<?= htmlspecialchars(defined('IMMO_VERSION') ? IMMO_VERSION : '2.1') ?></span>
+                </div>
+                <div class="footer-center">
+                    <span class="footer-separator">·</span>
                 </div>
                 <div class="footer-right">
-                    <a href="?section=support" class="footer-link">Support</a>
+                    <a href="?page=legal" class="footer-link" title="Mentions légales">
+                        <i class="fas fa-file-alt"></i> Mentions légales
+                    </a>
+                    <span class="footer-separator">·</span>
+                    <a href="?page=privacy" class="footer-link" title="Politique de confidentialité">
+                        <i class="fas fa-shield-alt"></i> Confidentialité
+                    </a>
+                    <span class="footer-separator">·</span>
+                    <a href="?page=cookies" class="footer-link" title="Gestion des cookies">
+                        <i class="fas fa-cookie"></i> Cookies
+                    </a>
+                    <span class="footer-separator">·</span>
+                    <a href="?page=support" class="footer-link" title="Support">
+                        <i class="fas fa-headset"></i> Support
+                    </a>
                 </div>
             </div>
         </footer>
@@ -25,95 +41,146 @@
 </div><!-- /.admin-wrapper -->
 
 <style>
-    /* ============================================
-       IMMO LOCAL+ FOOTER — Mode Strict Minimaliste
-       ============================================ */
+/* ============================================
+   IMMO LOCAL+ FOOTER — Version Épurée & RGPD
+   ============================================ */
 
-    :root {
-        --color-primary: #6366F1;
-        --color-primary-light: #EEF2FF;
-        --color-white: #FFFFFF;
-        --color-gray-50: #F9FAFB;
-        --color-gray-100: #F3F4F6;
-        --color-gray-200: #E5E7EB;
-        --color-gray-600: #4B5563;
-        --color-text-primary: #1F2937;
-        --color-text-secondary: #6B7280;
-        --color-shadow: rgba(0, 0, 0, 0.1);
+:root {
+    --footer-bg: #ffffff;
+    --footer-text: #6b7280;
+    --footer-border: #e5e7eb;
+    --footer-link-color: #4f7df3;
+}
 
-        --spacing-xs: 0.25rem;
-        --spacing-sm: 0.5rem;
-        --spacing-md: 1rem;
-        --spacing-lg: 1.5rem;
-        --spacing-xl: 2rem;
+.app-footer {
+    background: var(--footer-bg);
+    border-top: 1px solid var(--footer-border);
+    padding: 1rem 2rem;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.05);
+    font-size: 12px;
+    color: var(--footer-text);
+    margin-top: auto;
+}
 
-        --radius: 0.5rem;
-        --border: 1px solid var(--color-gray-200);
-        --shadow: 0 1px 3px var(--color-shadow);
-        --font-base: 14px;
-        --font-note: 12px;
-    }
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    max-width: 100%;
+    flex-wrap: wrap;
+}
 
-    .footer {
-        background: var(--color-white);
-        border-top: var(--border);
-        padding: var(--spacing-md) var(--spacing-xl);
-        box-shadow: var(--shadow);
-        font-size: var(--font-note);
-        color: var(--color-text-secondary);
+.footer-left,
+.footer-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.footer-center {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.footer-copyright {
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.footer-version {
+    color: var(--footer-text);
+}
+
+.footer-separator {
+    color: var(--footer-border);
+}
+
+.footer-link {
+    color: var(--footer-link-color);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.footer-link:hover {
+    color: #1f2937;
+    text-decoration: underline;
+}
+
+.footer-link i {
+    font-size: 11px;
+}
+
+/* Mobile Responsive */
+@media (max-width: 1024px) {
+    .app-footer {
+        padding: 1rem 1.5rem;
     }
 
     .footer-content {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: var(--spacing-lg);
-        max-width: 100%;
+        gap: 0.5rem;
     }
 
     .footer-left,
     .footer-right {
-        display: flex;
-        align-items: center;
-        gap: var(--spacing-sm);
+        gap: 0.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .app-footer {
+        padding: 1rem;
+        font-size: 11px;
     }
 
-    .footer-version {
-        font-weight: 600;
-        color: var(--color-text-primary);
+    .footer-content {
+        flex-direction: column;
+        gap: 0.75rem;
+        text-align: center;
     }
 
-    .footer-sep {
-        color: var(--color-gray-200);
+    .footer-left,
+    .footer-right {
+        justify-content: center;
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 100%;
+    }
+
+    .footer-center {
+        display: none;
     }
 
     .footer-link {
-        color: var(--color-primary);
-        text-decoration: none;
-        transition: color 0.2s ease;
+        font-size: 10px;
     }
 
-    .footer-link:hover {
-        color: var(--color-text-primary);
-        text-decoration: underline;
+    .footer-separator {
+        display: none;
     }
+}
 
-    @media (max-width: 768px) {
-        .footer {
-            padding: var(--spacing-md);
-        }
+/* Footer at bottom of page */
+.admin-main {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
 
-        .footer-content {
-            flex-direction: column;
-            gap: var(--spacing-sm);
-            text-align: center;
-        }
+.admin-content {
+    flex: 1;
+    overflow-y: auto;
+}
 
-        .footer-left,
-        .footer-right {
-            justify-content: center;
-        }
-    }
+.app-footer {
+    flex-shrink: 0;
+}
 </style>
 
 </body>

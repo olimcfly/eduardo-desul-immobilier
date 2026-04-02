@@ -1,61 +1,83 @@
 <?php
 /**
- * SIDEBAR — IMMO LOCAL+ (Mode Strict - 7 entrées)
+ * SIDEBAR — IMMO LOCAL+ (Version Prestige SaaS)
  * /admin/layout/sidebar.php
  *
  * Spécifications:
- * - 7 entrées MAXIMUM (+ 1 Paramètres en bas)
- * - Icônes emoji + FontAwesome
- * - Responsive: 72px sur <1024px (icônes uniquement + tooltips CSS)
- * - Tooltips CSS pur
- * - État "active" : fond #EEF2FF, texte #6366F1
+ * - 7 entrées de menu principales avec sous-menus
+ * - Icônes FontAwesome 6
+ * - État "actif" basé sur l'URL courante
+ * - Responsive: Collapse en icônes sur mobile (<768px)
+ * - Badge "Nouveau" pour les fonctionnalités récentes
  */
 
-$currentSection = $_GET['section'] ?? 'dashboard';
+$currentModule = $_GET['page'] ?? $_GET['module'] ?? 'dashboard';
 
-// Sidebar items: 7 sections principales
-$sidebarSections = [
+// Menu principal avec sous-menus
+$sidebarMenu = [
     [
-        'emoji' => '🧱',
-        'label' => 'Construire',
-        'description' => 'Configurer votre activité',
-        'url' => '?section=construire',
+        'id'    => 'dashboard',
+        'label' => 'Tableau de bord',
+        'icon'  => 'fa-tachometer-alt',
+        'url'   => '?page=dashboard',
+        'badge' => null,
     ],
     [
-        'emoji' => '🧲',
-        'label' => 'Attirer',
-        'description' => 'Générer des leads vendeurs',
-        'url' => '?section=attirer',
+        'id'    => 'properties',
+        'label' => 'Biens Immobiliers',
+        'icon'  => 'fa-building',
+        'url'   => '?page=properties',
+        'badge' => null,
+        'submenu' => [
+            ['label' => 'Liste des biens', 'url' => '?page=properties', 'icon' => 'fa-list'],
+            ['label' => 'Ajouter un bien', 'url' => '?page=properties-edit', 'icon' => 'fa-plus'],
+            ['label' => 'Prise de RDV', 'url' => '?page=rdv', 'icon' => 'fa-calendar-alt'],
+        ],
     ],
     [
-        'emoji' => '🔄',
-        'label' => 'Convertir',
-        'description' => 'Transformer en mandats',
-        'url' => '?section=convertir',
+        'id'    => 'marketing',
+        'label' => 'Marketing',
+        'icon'  => 'fa-bullhorn',
+        'url'   => '?page=leads',
+        'badge' => null,
+        'submenu' => [
+            ['label' => 'Prospects', 'url' => '?page=leads', 'icon' => 'fa-user-tie'],
+            ['label' => 'Campagnes email', 'url' => '?page=campagnes', 'icon' => 'fa-envelope'],
+            ['label' => 'CRM', 'url' => '?page=crm', 'icon' => 'fa-address-book'],
+        ],
     ],
     [
-        'emoji' => '🏠',
-        'label' => 'Vendre',
-        'description' => 'Finaliser les transactions',
-        'url' => '?section=vendre',
+        'id'    => 'seo',
+        'label' => 'SEO',
+        'icon'  => 'fa-search',
+        'url'   => '?page=seo',
+        'badge' => 'Nouveau',
     ],
     [
-        'emoji' => '⚡',
-        'label' => 'Automatiser',
-        'description' => 'Automatiser les tâches répétitives',
-        'url' => '?section=automatiser',
+        'id'    => 'social',
+        'label' => 'Réseaux Sociaux',
+        'icon'  => 'fa-share-alt',
+        'url'   => '?page=reseaux-sociaux',
+        'badge' => null,
+        'submenu' => [
+            ['label' => 'Google My Business', 'url' => '?page=gmb', 'icon' => 'fa-map-marker-alt'],
+            ['label' => 'TikTok', 'url' => '?page=tiktok', 'icon' => 'fa-music'],
+            ['label' => 'Facebook', 'url' => '?page=facebook', 'icon' => 'fab fa-facebook'],
+        ],
     ],
     [
-        'emoji' => '📊',
-        'label' => 'Analyser',
-        'description' => 'Piloter vos performances',
-        'url' => '?section=analyser',
+        'id'    => 'estimation',
+        'label' => 'Estimation',
+        'icon'  => 'fa-calculator',
+        'url'   => '?page=estimation',
+        'badge' => null,
     ],
     [
-        'emoji' => '🎯',
-        'label' => 'Optimiser',
-        'description' => 'Améliorer en continu',
-        'url' => '?section=optimiser',
+        'id'    => 'settings',
+        'label' => 'Paramètres',
+        'icon'  => 'fa-cog',
+        'url'   => '?page=settings',
+        'badge' => null,
     ],
 ];
 
@@ -83,384 +105,444 @@ try {
 
 <style>
 /* ============================================
-   IMMO LOCAL+ SIDEBAR — Mode Strict Minimaliste
+   IMMO LOCAL+ SIDEBAR — Version Prestige
    ============================================ */
 
 :root {
-    --color-primary: #6366F1;
-    --color-primary-light: #EEF2FF;
-    --color-white: #FFFFFF;
-    --color-gray-50: #F9FAFB;
-    --color-gray-100: #F3F4F6;
-    --color-gray-200: #E5E7EB;
-    --color-gray-600: #4B5563;
-    --color-text-primary: #1F2937;
-    --color-text-secondary: #6B7280;
-    --color-shadow: rgba(0, 0, 0, 0.1);
-
-    --spacing-xs: 0.25rem;
-    --spacing-sm: 0.5rem;
-    --spacing-md: 1rem;
-    --spacing-lg: 1.5rem;
-    --spacing-xl: 2rem;
-
-    --radius: 0.5rem;
-    --border: 1px solid var(--color-gray-200);
-    --shadow: 0 1px 3px var(--color-shadow);
+    --sidebar-bg: #ffffff;
+    --sidebar-border: #e5e7eb;
+    --sidebar-text: #1f2937;
+    --sidebar-text-secondary: #6b7280;
+    --sidebar-hover-bg: #f3f4f6;
+    --sidebar-active-bg: #eef2ff;
+    --sidebar-active-border: #4f7df3;
+    --sidebar-active-text: #4f7df3;
+    --sidebar-width: 280px;
+    --sidebar-width-mobile: 72px;
 }
 
 /* Sidebar Container */
-.sidebar {
+.sb-prestige {
     display: flex;
     flex-direction: column;
-    width: 280px;
+    width: var(--sidebar-width);
     height: 100vh;
-    background: var(--color-white);
-    border-right: var(--border);
-    padding: var(--spacing-md) 0;
-    box-shadow: var(--shadow);
+    background: var(--sidebar-bg);
+    border-right: 1px solid var(--sidebar-border);
+    padding: 1rem 0;
     overflow-y: auto;
+    overflow-x: hidden;
     transition: width 0.3s ease;
 }
 
-@media (max-width: 1024px) {
-    .sidebar {
-        width: 72px;
-    }
-}
-
 @media (max-width: 768px) {
-    .sidebar {
-        width: 100%;
+    .sb-prestige {
+        width: var(--sidebar-width-mobile);
         height: auto;
-        border-right: none;
-        border-bottom: var(--border);
         flex-direction: row;
-        padding: var(--spacing-sm) var(--spacing-md);
+        border-right: none;
+        border-bottom: 1px solid var(--sidebar-border);
+        padding: 0.5rem;
         overflow-x: auto;
         overflow-y: hidden;
     }
 }
 
-/* Logo / Branding */
-.sidebar-logo {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-md) var(--spacing-md);
-    margin-bottom: var(--spacing-lg);
-    text-decoration: none;
-    color: var(--color-primary);
-    font-weight: 600;
-    font-size: 14px;
-    font-family: Inter, system-ui, -apple-system, sans-serif;
+/* Header */
+.sb-header {
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--sidebar-border);
 }
 
-@media (max-width: 1024px) {
-    .sidebar-logo {
-        font-size: 0;
-        margin-bottom: var(--spacing-md);
-    }
+.sb-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-decoration: none;
+    color: var(--sidebar-active-text);
+    font-weight: 600;
+    font-size: 14px;
+    transition: opacity 0.2s ease;
+}
 
-    .sidebar-logo::before {
-        content: '🏠';
-        font-size: 1.5rem;
-    }
+.sb-logo:hover {
+    opacity: 0.8;
+}
+
+.sb-logo i {
+    font-size: 1.5rem;
 }
 
 @media (max-width: 768px) {
-    .sidebar-logo {
+    .sb-header {
         order: -1;
         flex-shrink: 0;
+        padding: 0.5rem;
         margin-bottom: 0;
+        border-bottom: none;
+    }
+
+    .sb-logo {
+        font-size: 0;
+    }
+
+    .sb-logo i {
+        font-size: 1.25rem;
     }
 }
 
-/* Navigation Container */
-.sidebar-nav {
+/* Navigation */
+.sb-menu {
     flex: 1;
-    padding: 0 var(--spacing-sm);
+    padding: 0 0.5rem;
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-sm);
+    gap: 0.5rem;
 }
 
 @media (max-width: 768px) {
-    .sidebar-nav {
+    .sb-menu {
         flex-direction: row;
-        flex: 1;
-        padding: 0;
-        gap: var(--spacing-sm);
-        overflow-x: auto;
+        gap: 0.25rem;
     }
 }
 
-/* Navigation Items */
-.sidebar-item {
+.sb-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+@media (max-width: 768px) {
+    .sb-menu ul {
+        flex-direction: row;
+    }
+}
+
+/* Menu Item */
+.sb-item {
     display: flex;
     align-items: center;
-    gap: var(--spacing-md);
-    padding: var(--spacing-md);
-    border-radius: var(--radius);
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid transparent;
     text-decoration: none;
-    color: var(--color-text-primary);
+    color: var(--sidebar-text);
     font-size: 14px;
     font-weight: 500;
-    font-family: Inter, system-ui, -apple-system, sans-serif;
-    border: var(--border);
-    background: var(--color-white);
+    background: var(--sidebar-bg);
     transition: all 0.2s ease;
-    cursor: pointer;
     position: relative;
-    white-space: nowrap;
+    cursor: pointer;
 }
 
-.sidebar-item:hover {
-    background: var(--color-gray-50);
-    border-color: var(--color-primary);
-    color: var(--color-primary);
+.sb-item:hover {
+    background: var(--sidebar-hover-bg);
+    border-color: var(--sidebar-border);
+    color: var(--sidebar-active-text);
 }
 
-.sidebar-item.active {
-    background: var(--color-primary-light);
-    border-color: var(--color-primary);
-    color: var(--color-primary);
+.sb-item.active {
+    background: var(--sidebar-active-bg);
+    border-left: 4px solid var(--sidebar-active-border);
+    color: var(--sidebar-active-text);
     font-weight: 600;
+    padding-left: calc(1rem - 4px);
 }
 
-/* Item Icon (Emoji) */
-.sidebar-item-icon {
+/* Item Icon */
+.sb-item-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.5rem;
-    width: 2rem;
-    height: 2rem;
+    width: 24px;
+    height: 24px;
     flex-shrink: 0;
+    font-size: 1rem;
 }
 
 /* Item Label */
-.sidebar-item-label {
+.sb-item-label {
     flex: 1;
     display: flex;
-    flex-direction: column;
-    gap: var(--spacing-xs);
-    min-width: 0;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
 }
 
-.sidebar-item-name {
-    font-size: 14px;
+.sb-item-label-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.sb-item-name {
     font-weight: 500;
 }
 
-.sidebar-item-desc {
+/* Badge */
+.sb-badge {
+    display: inline-block;
+    background: #ef4444;
+    color: white;
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* Submenu Toggle */
+.sb-submenu-toggle {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
     font-size: 12px;
-    color: var(--color-text-secondary);
-    display: none;
-}
-
-@media (min-width: 1025px) {
-    .sidebar-item-desc {
-        display: block;
-    }
-}
-
-/* Tooltip for mobile (CSS-only) */
-@media (max-width: 1024px) {
-    .sidebar-item {
-        width: 40px;
-        height: 40px;
-        padding: var(--spacing-sm);
-        justify-content: center;
-        gap: 0;
-        border: none;
-        background: transparent;
-    }
-
-    .sidebar-item-label {
-        display: none;
-    }
-
-    .sidebar-item::after {
-        content: attr(data-tooltip);
-        position: absolute;
-        left: 100%;
-        top: 50%;
-        transform: translateY(-50%);
-        margin-left: var(--spacing-md);
-        white-space: nowrap;
-        background: var(--color-gray-600);
-        color: var(--color-white);
-        padding: var(--spacing-xs) var(--spacing-sm);
-        border-radius: var(--radius);
-        font-size: 12px;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.2s ease;
-        z-index: 1000;
-    }
-
-    .sidebar-item:hover::after {
-        opacity: 1;
-    }
-}
-
-@media (max-width: 768px) {
-    .sidebar-item {
-        width: auto;
-        height: auto;
-        padding: var(--spacing-sm);
-        flex-direction: column;
-    }
-
-    .sidebar-item::after {
-        content: attr(data-tooltip);
-        position: absolute;
-        bottom: 100%;
-        left: 50%;
-        transform: translateX(-50%);
-        margin-bottom: var(--spacing-sm);
-        white-space: nowrap;
-        background: var(--color-gray-600);
-        color: var(--color-white);
-        padding: var(--spacing-xs) var(--spacing-sm);
-        border-radius: var(--radius);
-        font-size: 12px;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.2s ease;
-        z-index: 1000;
-    }
-
-    .sidebar-item:hover::after {
-        opacity: 1;
-    }
-}
-
-/* Settings Item (bottom) */
-.sidebar-footer {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-lg) var(--spacing-sm);
-    margin-top: auto;
-    border-top: var(--border);
-    padding-top: var(--spacing-lg);
-}
-
-@media (max-width: 768px) {
-    .sidebar-footer {
-        display: none;
-    }
-}
-
-.sidebar-settings {
+    padding: 0;
     display: flex;
     align-items: center;
-    gap: var(--spacing-md);
-    padding: var(--spacing-md);
-    border-radius: var(--radius);
+    transition: transform 0.2s ease;
+}
+
+.sb-submenu-toggle.open {
+    transform: rotate(90deg);
+}
+
+/* Submenu */
+.sb-submenu {
+    display: none;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin: 0.5rem 0 0 0;
+    padding-left: 2.5rem;
+    list-style: none;
+}
+
+.sb-submenu.open {
+    display: flex;
+}
+
+.sb-submenu-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.375rem;
     text-decoration: none;
-    color: var(--color-text-secondary);
-    font-size: 14px;
-    font-weight: 500;
-    border: var(--border);
-    background: var(--color-gray-50);
+    color: var(--sidebar-text-secondary);
+    font-size: 13px;
+    font-weight: 400;
+    background: transparent;
+    border: none;
     transition: all 0.2s ease;
+    cursor: pointer;
 }
 
-.sidebar-settings:hover {
-    background: var(--color-gray-100);
-    color: var(--color-primary);
-    border-color: var(--color-primary);
+.sb-submenu-item:hover {
+    background: var(--sidebar-hover-bg);
+    color: var(--sidebar-active-text);
 }
 
-.sidebar-settings-icon {
+.sb-submenu-item.active {
+    background: var(--sidebar-active-bg);
+    color: var(--sidebar-active-text);
+    font-weight: 500;
+}
+
+.sb-submenu-item i {
+    width: 16px;
+    text-align: center;
+    font-size: 0.875rem;
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .sb-item {
+        width: 50px;
+        height: 50px;
+        padding: 0.5rem;
+        justify-content: center;
+        gap: 0;
+        border-radius: 0.375rem;
+    }
+
+    .sb-item.active {
+        padding: 0.5rem;
+        border-left: none;
+        border-bottom: 3px solid var(--sidebar-active-border);
+    }
+
+    .sb-item-label {
+        display: none;
+    }
+
+    .sb-submenu-toggle {
+        display: none;
+    }
+
+    .sb-submenu {
+        display: none !important;
+    }
+}
+
+/* Footer */
+.sb-footer {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.5rem 0.5rem;
+    margin-top: auto;
+    border-top: 1px solid var(--sidebar-border);
+}
+
+@media (max-width: 768px) {
+    .sb-footer {
+        display: none;
+    }
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    font-size: 12px;
+    color: var(--sidebar-text-secondary);
+}
+
+.user-info i {
+    font-size: 1.5rem;
+    color: var(--sidebar-active-text);
+}
+
+.logout-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.2rem;
-    width: 2rem;
-    height: 2rem;
+    gap: 0.75rem;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--sidebar-border);
+    background: var(--sidebar-hover-bg);
+    color: var(--sidebar-text);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
 }
 
-@media (max-width: 1024px) {
-    .sidebar-settings {
-        width: 40px;
-        height: 40px;
-        padding: var(--spacing-sm);
-        border: none;
-        background: transparent;
-    }
-
-    .sidebar-settings span {
-        display: none;
-    }
-
-    .sidebar-settings::after {
-        content: 'Paramètres';
-        position: absolute;
-        left: 100%;
-        top: 50%;
-        transform: translateY(-50%);
-        margin-left: var(--spacing-md);
-        white-space: nowrap;
-        background: var(--color-gray-600);
-        color: var(--color-white);
-        padding: var(--spacing-xs) var(--spacing-sm);
-        border-radius: var(--radius);
-        font-size: 12px;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.2s ease;
-    }
-
-    .sidebar-settings:hover::after {
-        opacity: 1;
-    }
+.logout-btn:hover {
+    background: #fee2e2;
+    color: #dc2626;
+    border-color: #fca5a5;
 }
 </style>
 
-<aside class="sidebar" role="navigation" aria-label="Navigation principale">
+<aside class="sb-prestige" role="navigation" aria-label="Navigation principale">
 
     <!-- Logo -->
-    <a href="?section=dashboard" class="sidebar-logo" title="IMMO LOCAL+ Dashboard">
-        <span>🏠 IMMO LOCAL+</span>
-    </a>
+    <div class="sb-header">
+        <a href="?page=dashboard" class="sb-logo" title="IMMO LOCAL+ Dashboard">
+            <i class="fas fa-home"></i>
+            <span>IMMO LOCAL+</span>
+        </a>
+    </div>
 
-    <!-- Navigation principale (7 sections) -->
-    <nav class="sidebar-nav">
-        <?php foreach ($sidebarSections as $section):
-            $sectionName = str_replace('?section=', '', $section['url']);
-            $isActive = ($currentSection === $sectionName);
-            $activeClass = $isActive ? ' active' : '';
-        ?>
-            <a href="<?= htmlspecialchars($section['url']) ?>"
-               class="sidebar-item<?= $activeClass ?>"
-               data-tooltip="<?= htmlspecialchars($section['description']) ?>"
-               title="<?= htmlspecialchars($section['label']) ?> — <?= htmlspecialchars($section['description']) ?>">
-                <span class="sidebar-item-icon"><?= $section['emoji'] ?></span>
-                <div class="sidebar-item-label">
-                    <span class="sidebar-item-name"><?= htmlspecialchars($section['label']) ?></span>
-                    <span class="sidebar-item-desc"><?= htmlspecialchars($section['description']) ?></span>
-                </div>
-            </a>
-        <?php endforeach; ?>
+    <!-- Navigation principale -->
+    <nav class="sb-menu">
+        <ul>
+            <?php foreach ($sidebarMenu as $item):
+                $isActive = ($currentModule === $item['id'] ||
+                           (isset($item['submenu']) && in_array($currentModule, array_column($item['submenu'], 'url'))) ||
+                           strpos($_GET['page'] ?? '', $item['id']) === 0);
+                $hasSubmenu = isset($item['submenu']);
+            ?>
+                <li>
+                    <?php if ($hasSubmenu): ?>
+                        <button class="sb-item <?= $isActive ? 'active' : '' ?>"
+                                data-toggle="submenu-<?= $item['id'] ?>">
+                            <i class="fas <?= $item['icon'] ?> sb-item-icon"></i>
+                            <div class="sb-item-label">
+                                <div class="sb-item-label-text">
+                                    <span class="sb-item-name"><?= htmlspecialchars($item['label']) ?></span>
+                                </div>
+                                <?php if ($item['badge']): ?>
+                                    <span class="sb-badge"><?= htmlspecialchars($item['badge']) ?></span>
+                                <?php endif; ?>
+                            </div>
+                            <i class="fas fa-chevron-right sb-submenu-toggle <?= $isActive ? 'open' : '' ?>"></i>
+                        </button>
+                        <ul class="sb-submenu <?= $isActive ? 'open' : '' ?>" id="submenu-<?= $item['id'] ?>">
+                            <?php foreach ($item['submenu'] as $subitem):
+                                $subActive = (isset($_GET['page']) && $_GET['page'] === ltrim($subitem['url'], '?page='));
+                            ?>
+                                <li>
+                                    <a href="<?= htmlspecialchars($subitem['url']) ?>"
+                                       class="sb-submenu-item <?= $subActive ? 'active' : '' ?>">
+                                        <i class="fas <?= $subitem['icon'] ?>"></i>
+                                        <span><?= htmlspecialchars($subitem['label']) ?></span>
+                                    </a>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php else: ?>
+                        <a href="<?= htmlspecialchars($item['url']) ?>"
+                           class="sb-item <?= $isActive ? 'active' : '' ?>"
+                           title="<?= htmlspecialchars($item['label']) ?>">
+                            <i class="fas <?= $item['icon'] ?> sb-item-icon"></i>
+                            <div class="sb-item-label">
+                                <div class="sb-item-label-text">
+                                    <span class="sb-item-name"><?= htmlspecialchars($item['label']) ?></span>
+                                </div>
+                                <?php if ($item['badge']): ?>
+                                    <span class="sb-badge"><?= htmlspecialchars($item['badge']) ?></span>
+                                <?php endif; ?>
+                            </div>
+                        </a>
+                    <?php endif; ?>
+                </li>
+            <?php endforeach; ?>
+        </ul>
     </nav>
 
-    <!-- Footer: Utilisateur + Paramètres -->
-    <div class="sidebar-footer">
-        <div style="padding: 0 var(--spacing-md); font-size: 12px; color: var(--color-text-secondary);">
-            <?php if ($advisorCity): ?>
-                <strong><?= $advisorCity ?></strong>
-            <?php endif; ?>
+    <!-- Footer: Utilisateur + Déconnexion -->
+    <div class="sb-footer">
+        <div class="user-info">
+            <i class="fas fa-user-circle"></i>
+            <div>
+                <div><?= htmlspecialchars($advisorName) ?></div>
+                <?php if ($advisorCity): ?>
+                    <div style="font-size: 11px; color: var(--sidebar-text-secondary);"><?= htmlspecialchars($advisorCity) ?></div>
+                <?php endif; ?>
+            </div>
         </div>
-
-        <a href="?section=parametres" class="sidebar-settings" title="Paramètres">
-            <span class="sidebar-settings-icon">⚙️</span>
-            <span>Paramètres</span>
+        <a href="?logout=1" class="logout-btn" title="Déconnexion">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Déconnexion</span>
         </a>
     </div>
 
 </aside>
+
+<script>
+// Gestion des sous-menus
+document.addEventListener('DOMContentLoaded', function() {
+    const toggles = document.querySelectorAll('[data-toggle]');
+    toggles.forEach(toggle => {
+        toggle.addEventListener('click', function(e) {
+            const targetId = this.getAttribute('data-toggle');
+            const submenu = document.getElementById(targetId);
+            if (submenu) {
+                submenu.classList.toggle('open');
+                this.querySelector('.sb-submenu-toggle').classList.toggle('open');
+            }
+        });
+    });
+});
+</script>
