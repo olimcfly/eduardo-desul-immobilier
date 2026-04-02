@@ -28,13 +28,13 @@ if ($label)       $infoParts[] = $label;
 $infoLine = implode('  •  ', $infoParts);
 
 // Label type formaté
-$typeLabel = match($type) {
+$typeLabels = [
     'appartement' => 'Appartement',
     'maison'      => 'Maison',
     'terrain'     => 'Terrain',
     'local'       => 'Local commercial',
-    default       => 'Bien immobilier',
-};
+];
+$typeLabel = $typeLabels[$type] ?? 'Bien immobilier';
 
 header('Content-Type: image/svg+xml');
 header('Cache-Control: public, max-age=86400');
