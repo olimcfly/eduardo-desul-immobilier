@@ -1,4 +1,10 @@
-<?php $pageTitle = 'Dashboard'; $breadcrumb = '📊 Dashboard'; ?>
+<?php
+$pageTitle = 'Dashboard';
+$breadcrumb = '📊 Dashboard';
+$moduleConfig = require ROOT_PATH . '/admin/data/marketing_modules.php';
+$marketingModules = $moduleConfig['ecosystem_modules'] ?? [];
+$estimationModule = $moduleConfig['estimation_module'] ?? [];
+?>
 
 <div class="dashboard-grid">
 
@@ -171,6 +177,97 @@
 
     </div>
     </div><!-- /.dash-cols -->
+
+    <section class="card modules-section">
+        <div class="card-header">
+            <h2>🚀 Modules marketing SaaS prêts à intégrer</h2>
+            <p class="modules-subtitle">7 modules structurés en 3R + MERE pour générer plus de leads, de mandats et de ROI.</p>
+        </div>
+
+        <div class="modules-grid">
+            <?php foreach ($marketingModules as $module): ?>
+                <article class="module-card">
+                    <p class="module-name"><?= htmlspecialchars($module['name']) ?></p>
+                    <h3 class="module-title"><?= htmlspecialchars($module['title']) ?></h3>
+
+                    <div class="module-block">
+                        <h4>🔴 MOTIVATION</h4>
+                        <p><?= htmlspecialchars($module['motivation']) ?></p>
+                    </div>
+
+                    <div class="module-block">
+                        <h4>🔵 EXPLICATION</h4>
+                        <p><?= htmlspecialchars($module['explanation']) ?></p>
+                    </div>
+
+                    <div class="module-block">
+                        <h4>🟢 RECETTE</h4>
+                        <ol>
+                            <?php foreach ($module['recipe'] as $step): ?>
+                                <li><?= htmlspecialchars($step) ?></li>
+                            <?php endforeach; ?>
+                        </ol>
+                    </div>
+
+                    <div class="module-block">
+                        <h4>🟠 EXERCICE</h4>
+                        <p><?= htmlspecialchars($module['exercise']) ?></p>
+                    </div>
+                </article>
+            <?php endforeach; ?>
+        </div>
+    </section>
+
+    <section class="card estimation-module-section">
+        <div class="card-header">
+            <h2>🏡 Module Estimation IA — modèle validé</h2>
+            <p class="modules-subtitle">Structure de prompt prête à brancher dans l’assistant pour générer une estimation pédagogique et orientée conversion.</p>
+        </div>
+
+        <article class="estimation-module-card">
+            <p class="module-name"><?= htmlspecialchars($estimationModule['name'] ?? '') ?></p>
+            <p class="estimation-role"><strong>Rôle :</strong> <?= htmlspecialchars($estimationModule['role'] ?? '') ?></p>
+            <p><strong>Objectif :</strong> <?= htmlspecialchars($estimationModule['objective'] ?? '') ?></p>
+
+            <div class="module-block">
+                <h4>📥 Données à analyser</h4>
+                <ul>
+                    <?php foreach (($estimationModule['inputs'] ?? []) as $input): ?>
+                        <li><?= htmlspecialchars($input) ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+
+            <div class="module-block">
+                <h4>⚙️ Méthodologie</h4>
+                <ol>
+                    <?php foreach (($estimationModule['method'] ?? []) as $method): ?>
+                        <li><?= htmlspecialchars($method) ?></li>
+                    <?php endforeach; ?>
+                </ol>
+            </div>
+
+            <div class="module-block">
+                <h4>📊 Structure de sortie attendue</h4>
+                <ul>
+                    <?php foreach (($estimationModule['output'] ?? []) as $output): ?>
+                        <li><?= htmlspecialchars($output) ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+
+            <div class="module-block">
+                <h4>🧠 Messages obligatoires</h4>
+                <blockquote>
+                    <?php foreach (($estimationModule['required_messages'] ?? []) as $message): ?>
+                        <p><?= htmlspecialchars($message) ?></p>
+                    <?php endforeach; ?>
+                </blockquote>
+            </div>
+
+            <p><strong>Ton attendu :</strong> <?= htmlspecialchars($estimationModule['style'] ?? '') ?></p>
+        </article>
+    </section>
 
 </div><!-- /.dashboard-grid -->
 
