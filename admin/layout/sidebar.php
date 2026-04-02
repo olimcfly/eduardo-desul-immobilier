@@ -13,71 +13,72 @@
 
 $currentModule = $_GET['page'] ?? $_GET['module'] ?? 'dashboard';
 
-// Menu principal avec sous-menus
+// Menu principal avec sous-menus (7 entrées max selon spécifications)
 $sidebarMenu = [
     [
-        'id'    => 'dashboard',
-        'label' => 'Tableau de bord',
-        'icon'  => 'fa-tachometer-alt',
-        'url'   => '?page=dashboard',
-        'badge' => null,
+        'id'          => 'dashboard',
+        'label'       => 'Tableau de bord',
+        'icon'        => 'fa-tachometer-alt',
+        'url'         => '?page=dashboard',
+        'description' => 'Vue d\'ensemble de vos activités',
+        'badge'       => null,
     ],
     [
-        'id'    => 'properties',
-        'label' => 'Biens Immobiliers',
-        'icon'  => 'fa-building',
-        'url'   => '?page=properties',
-        'badge' => null,
-        'submenu' => [
+        'id'          => 'estimation',
+        'label'       => 'Estimations',
+        'icon'        => 'fa-calculator',
+        'url'         => '?page=estimation',
+        'description' => 'Créer et gérer des estimations immobilières',
+        'badge'       => null,
+    ],
+    [
+        'id'          => 'properties',
+        'label'       => 'Biens',
+        'icon'        => 'fa-home',
+        'url'         => '?page=properties',
+        'description' => 'Liste des biens en gestion',
+        'badge'       => null,
+        'submenu'     => [
             ['label' => 'Liste des biens', 'url' => '?page=properties', 'icon' => 'fa-list'],
             ['label' => 'Ajouter un bien', 'url' => '?page=properties-edit', 'icon' => 'fa-plus'],
             ['label' => 'Prise de RDV', 'url' => '?page=rdv', 'icon' => 'fa-calendar-alt'],
         ],
     ],
     [
-        'id'    => 'marketing',
-        'label' => 'Marketing',
-        'icon'  => 'fa-bullhorn',
-        'url'   => '?page=leads',
-        'badge' => null,
-        'submenu' => [
+        'id'          => 'crm',
+        'label'       => 'Clients',
+        'icon'        => 'fa-users',
+        'url'         => '?page=crm',
+        'description' => 'Gestion des propriétaires et locataires',
+        'badge'       => null,
+        'submenu'     => [
+            ['label' => 'Liste des clients', 'url' => '?page=crm', 'icon' => 'fa-list'],
             ['label' => 'Prospects', 'url' => '?page=leads', 'icon' => 'fa-user-tie'],
-            ['label' => 'Campagnes email', 'url' => '?page=campagnes', 'icon' => 'fa-envelope'],
-            ['label' => 'CRM', 'url' => '?page=crm', 'icon' => 'fa-address-book'],
         ],
     ],
     [
-        'id'    => 'seo',
-        'label' => 'SEO',
-        'icon'  => 'fa-search',
-        'url'   => '?page=seo',
-        'badge' => 'Nouveau',
+        'id'          => 'calendar',
+        'label'       => 'Agenda',
+        'icon'        => 'fa-calendar-alt',
+        'url'         => '?page=calendar',
+        'description' => 'Rendez-vous et tâches',
+        'badge'       => null,
     ],
     [
-        'id'    => 'social',
-        'label' => 'Réseaux Sociaux',
-        'icon'  => 'fa-share-alt',
-        'url'   => '?page=reseaux-sociaux',
-        'badge' => null,
-        'submenu' => [
-            ['label' => 'Google My Business', 'url' => '?page=gmb', 'icon' => 'fa-map-marker-alt'],
-            ['label' => 'TikTok', 'url' => '?page=tiktok', 'icon' => 'fa-music'],
-            ['label' => 'Facebook', 'url' => '?page=facebook', 'icon' => 'fab fa-facebook'],
-        ],
+        'id'          => 'reports',
+        'label'       => 'Rapports',
+        'icon'        => 'fa-chart-line',
+        'url'         => '?page=reports',
+        'description' => 'Statistiques et exports',
+        'badge'       => null,
     ],
     [
-        'id'    => 'estimation',
-        'label' => 'Estimation',
-        'icon'  => 'fa-calculator',
-        'url'   => '?page=estimation',
-        'badge' => null,
-    ],
-    [
-        'id'    => 'settings',
-        'label' => 'Paramètres',
-        'icon'  => 'fa-cog',
-        'url'   => '?page=settings',
-        'badge' => null,
+        'id'          => 'settings',
+        'label'       => 'Paramètres',
+        'icon'        => 'fa-cog',
+        'url'         => '?page=settings',
+        'description' => 'Configuration du compte',
+        'badge'       => null,
     ],
 ];
 
@@ -228,7 +229,7 @@ try {
     display: flex;
     align-items: center;
     gap: 1rem;
-    padding: 1rem;
+    padding: 1rem 1.5rem;
     border-radius: 0.5rem;
     border: 1px solid transparent;
     text-decoration: none;
@@ -239,6 +240,7 @@ try {
     transition: all 0.2s ease;
     position: relative;
     cursor: pointer;
+    margin: 0.75rem 0.5rem;
 }
 
 .sb-item:hover {
@@ -283,6 +285,20 @@ try {
 
 .sb-item-name {
     font-weight: 500;
+}
+
+.sb-item-description {
+    font-size: 12px;
+    color: var(--sidebar-text-secondary);
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: opacity 0.2s ease, max-height 0.2s ease;
+}
+
+.sb-item:hover .sb-item-description {
+    opacity: 1;
+    max-height: 60px;
 }
 
 /* Badge */
@@ -466,11 +482,15 @@ try {
                 <li>
                     <?php if ($hasSubmenu): ?>
                         <button class="sb-item <?= $isActive ? 'active' : '' ?>"
-                                data-toggle="submenu-<?= $item['id'] ?>">
+                                data-toggle="submenu-<?= $item['id'] ?>"
+                                title="<?= htmlspecialchars($item['description'] ?? '') ?>">
                             <i class="fas <?= $item['icon'] ?> sb-item-icon"></i>
                             <div class="sb-item-label">
                                 <div class="sb-item-label-text">
                                     <span class="sb-item-name"><?= htmlspecialchars($item['label']) ?></span>
+                                    <?php if (!empty($item['description'])): ?>
+                                        <span class="sb-item-description"><?= htmlspecialchars($item['description']) ?></span>
+                                    <?php endif; ?>
                                 </div>
                                 <?php if ($item['badge']): ?>
                                     <span class="sb-badge"><?= htmlspecialchars($item['badge']) ?></span>
@@ -494,11 +514,14 @@ try {
                     <?php else: ?>
                         <a href="<?= htmlspecialchars($item['url']) ?>"
                            class="sb-item <?= $isActive ? 'active' : '' ?>"
-                           title="<?= htmlspecialchars($item['label']) ?>">
+                           title="<?= htmlspecialchars($item['description'] ?? $item['label']) ?>">
                             <i class="fas <?= $item['icon'] ?> sb-item-icon"></i>
                             <div class="sb-item-label">
                                 <div class="sb-item-label-text">
                                     <span class="sb-item-name"><?= htmlspecialchars($item['label']) ?></span>
+                                    <?php if (!empty($item['description'])): ?>
+                                        <span class="sb-item-description"><?= htmlspecialchars($item['description']) ?></span>
+                                    <?php endif; ?>
                                 </div>
                                 <?php if ($item['badge']): ?>
                                     <span class="sb-badge"><?= htmlspecialchars($item['badge']) ?></span>

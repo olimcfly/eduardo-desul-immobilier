@@ -66,9 +66,11 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 1rem;
+    gap: 2rem;
     max-width: 100%;
     flex-wrap: wrap;
+    margin: 0 auto;
+    max-width: 1200px;
 }
 
 .footer-left,
