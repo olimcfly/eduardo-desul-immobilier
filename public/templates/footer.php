@@ -27,7 +27,7 @@
             <ul class="footer__links">
                 <li><a href="/services">Tous les services</a></li>
                 <li><a href="/estimation-gratuite">Estimation gratuite</a></li>
-                <li><a href="/pages/biens">Annonces immobilières</a></li>
+                <li><a href="/biens">Annonces immobilières</a></li>
                 <li><a href="/ressources/guide-vendeur">Guide vendeur</a></li>
                 <li><a href="/ressources/guide-acheteur">Guide acheteur</a></li>
             </ul>

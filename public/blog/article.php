@@ -30,6 +30,20 @@ $metaDesc  = 'Conseils d\'Eduardo Desul : ' . mb_strimwidth($article['titre'], 0
     </div>
 </div>
 
+<?php
+$jsonLdArticle = json_encode([
+    '@context' => 'https://schema.org',
+    '@type' => 'BlogPosting',
+    'headline' => $article['titre'],
+    'author' => ['@type' => 'Person', 'name' => $article['auteur']],
+    'datePublished' => $article['date'],
+    'publisher' => ['@type' => 'Organization', 'name' => APP_NAME, 'url' => APP_URL],
+    'image' => APP_URL . $article['img'],
+    'url' => APP_URL . '/blog/' . $slug,
+], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+?>
+<script type="application/ld+json"><?= $jsonLdArticle ?></script>
+
 <section class="section" style="padding-top:2rem">
     <div class="container">
         <!-- Progress bar -->

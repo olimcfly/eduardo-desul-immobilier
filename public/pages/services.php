@@ -45,8 +45,8 @@ $metaDesc  = 'Vente, achat, estimation, investissement locatif : Eduardo Desul v
             ], '/contact', 'Étudier mon investissement'],
         ];
         foreach ($services as $i => [$icon, $titre, $desc, $items, $href, $cta]): ?>
-        <div class="grid-2" style="gap:4rem;align-items:center;margin-bottom:5rem<?= $i % 2 === 0 ? '' : ';direction:rtl' ?>" data-animate>
-            <div style="direction:ltr">
+        <div class="grid-2 <?= $i % 2 !== 0 ? 'grid-2--reverse' : '' ?>" style="gap:4rem;align-items:center;margin-bottom:5rem" data-animate>
+            <div>
                 <span class="section-label">Service <?= $i + 1 ?></span>
                 <h2 class="section-title"><?= $icon ?> <?= e($titre) ?></h2>
                 <p style="color:var(--clr-text-muted);margin-bottom:1.5rem"><?= e($desc) ?></p>
@@ -60,7 +60,7 @@ $metaDesc  = 'Vente, achat, estimation, investissement locatif : Eduardo Desul v
                 </ul>
                 <a href="<?= e($href) ?>" class="btn btn--primary"><?= e($cta) ?></a>
             </div>
-            <div style="direction:ltr">
+            <div>
                 <div style="background:linear-gradient(135deg,var(--clr-primary),#0f2644);border-radius:var(--radius-xl);aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;font-size:5rem">
                     <?= $icon ?>
                 </div>

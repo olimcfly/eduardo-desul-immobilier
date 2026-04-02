@@ -28,13 +28,13 @@ $extraJs   = ['/assets/js/contact.js'];
                     <?= csrfField() ?>
                     <div class="form-row">
                         <div class="form-group">
-                            <label class="form-label" for="prenom">Prénom <span>*</span></label>
-                            <input type="text" id="prenom" name="prenom" class="form-control" placeholder="Jean" required autocomplete="given-name">
+                            <label class="form-label" for="prenom">Prénom <span aria-hidden="true">*</span></label>
+                            <input type="text" id="prenom" name="prenom" class="form-control" placeholder="Jean" required autocomplete="given-name" aria-describedby="prenom-err">
                             <div class="form-error" id="prenom-err"></div>
                         </div>
                         <div class="form-group">
-                            <label class="form-label" for="nom">Nom <span>*</span></label>
-                            <input type="text" id="nom" name="nom" class="form-control" placeholder="Dupont" required autocomplete="family-name">
+                            <label class="form-label" for="nom">Nom <span aria-hidden="true">*</span></label>
+                            <input type="text" id="nom" name="nom" class="form-control" placeholder="Dupont" required autocomplete="family-name" aria-describedby="nom-err">
                             <div class="form-error" id="nom-err"></div>
                         </div>
                     </div>
