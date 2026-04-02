@@ -1,0 +1,37 @@
+Options -Indexes
+RewriteEngine On
+
+# Forcer HTTPS (décommenter en production)
+# RewriteCond %{HTTPS} off
+# RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Autoriser les fichiers et dossiers réels
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Tout passer à index.php
+RewriteRule ^ index.php [QSA,L]
+
+# Sécurité : cacher les fichiers sensibles
+<FilesMatch "\.(env|log|sql|git|md)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Headers de sécurité
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set X-XSS-Protection "1; mode=block"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# Cache statique
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/webp       "access plus 1 year"
+    ExpiresByType image/jpeg       "access plus 1 year"
+    ExpiresByType image/png        "access plus 1 year"
+    ExpiresByType text/css         "access plus 1 month"
+    ExpiresByType text/javascript  "access plus 1 month"
+</IfModule>

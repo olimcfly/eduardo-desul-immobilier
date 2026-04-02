@@ -1,0 +1,38 @@
+<?php
+$currentUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+function isActive(string $path, string $current): string {
+    return ($path !== '/' ? str_starts_with($current, $path) : $current === '/') ? 'active' : '';
+}
+?>
+<header class="site-header" id="site-header">
+    <div class="container header__inner">
+
+        <!-- Logo -->
+        <a href="/" class="header__logo" aria-label="Eduardo Desul Immobilier — Accueil">
+            <span class="logo__icon">🏡</span>
+            <span class="logo__text">
+                <strong>Eduardo Desul</strong>
+                <em>Immobilier</em>
+            </span>
+        </a>
+
+        <!-- Navigation principale -->
+        <?php require __DIR__ . '/nav.php'; ?>
+
+        <!-- CTA header -->
+        <div class="header__actions">
+            <?php if (APP_PHONE): ?>
+            <a href="tel:<?= e(preg_replace('/\s+/', '', APP_PHONE)) ?>" class="btn btn--phone">
+                📞 <?= e(APP_PHONE) ?>
+            </a>
+            <?php endif; ?>
+            <a href="/estimation-gratuite" class="btn btn--primary">Estimation gratuite</a>
+        </div>
+
+        <!-- Burger mobile -->
+        <button class="burger" id="burger" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="nav-mobile">
+            <span></span><span></span><span></span>
+        </button>
+
+    </div>
+</header>

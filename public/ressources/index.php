@@ -1,0 +1,77 @@
+<?php
+$pageTitle = 'Ressources immobilières — Eduardo Desul';
+$metaDesc  = 'Guides gratuits pour acheter ou vendre votre bien immobilier : guide vendeur, guide acheteur, check-lists, simulateurs.';
+$extraCss  = ['/assets/css/guide.css'];
+?>
+
+<div class="page-header">
+    <div class="container">
+        <nav class="breadcrumb"><a href="/">Accueil</a><span>Ressources</span></nav>
+        <h1>Ressources gratuites</h1>
+        <p>Guides pratiques, check-lists et conseils pour réussir votre projet immobilier.</p>
+    </div>
+</div>
+
+<section class="section">
+    <div class="container">
+        <div class="section__header text-center">
+            <span class="section-label">Gratuit & sans engagement</span>
+            <h2 class="section-title">Tout ce qu'il vous faut</h2>
+        </div>
+
+        <div class="ressources-grid" data-animate>
+            <a href="/ressources/guide-vendeur" class="ressource-card" style="text-decoration:none;color:inherit">
+                <div class="ressource-card__icon">🏠</div>
+                <h3 class="ressource-card__title">Guide vendeur</h3>
+                <p class="ressource-card__desc">Les 10 étapes clés pour vendre votre bien au meilleur prix et dans les meilleurs délais.</p>
+                <span class="btn btn--primary btn--sm">Lire le guide →</span>
+            </a>
+            <a href="/ressources/guide-acheteur" class="ressource-card" style="text-decoration:none;color:inherit">
+                <div class="ressource-card__icon">🔑</div>
+                <h3 class="ressource-card__title">Guide acheteur</h3>
+                <p class="ressource-card__desc">De la recherche à la remise des clés : tout ce qu'il faut savoir pour acheter sereinement.</p>
+                <span class="btn btn--primary btn--sm">Lire le guide →</span>
+            </a>
+            <a href="/capture/estimation-gratuite" class="ressource-card" style="text-decoration:none;color:inherit">
+                <div class="ressource-card__icon">📊</div>
+                <h3 class="ressource-card__title">Estimation gratuite</h3>
+                <p class="ressource-card__desc">Découvrez la valeur réelle de votre bien grâce à une évaluation personnalisée par Eduardo.</p>
+                <span class="btn btn--accent btn--sm">Estimer maintenant →</span>
+            </a>
+            <a href="/capture/guide-offert" class="ressource-card" style="text-decoration:none;color:inherit">
+                <div class="ressource-card__icon">📧</div>
+                <h3 class="ressource-card__title">Newsletter & alertes</h3>
+                <p class="ressource-card__desc">Recevez les nouvelles annonces et les actualités du marché bordelais directement dans votre boîte mail.</p>
+                <span class="btn btn--outline btn--sm">S'inscrire →</span>
+            </a>
+        </div>
+    </div>
+</section>
+
+<section class="section section--alt">
+    <div class="container">
+        <div class="section__header text-center">
+            <h2 class="section-title">Questions fréquentes</h2>
+        </div>
+        <div style="max-width:750px;margin:0 auto" data-animate>
+            <?php
+            $faqs = [
+                ['Combien coûte une estimation immobilière ?', 'L\'estimation de votre bien par Eduardo Desul est entièrement gratuite et sans engagement. Vous recevrez un rapport détaillé sous 48h.'],
+                ['Combien de temps prend une vente immobilière à Bordeaux ?', 'En moyenne, une vente se conclut en 60 à 90 jours à Bordeaux. Avec un bien bien préparé et au bon prix, certaines ventes se font en moins de 4 semaines.'],
+                ['Quels sont les honoraires d\'un conseiller immobilier ?', 'Mes honoraires de vente représentent entre 4% et 6% du prix de vente TTC. Ils ne sont dus qu\'en cas de vente réussie. L\'estimation est toujours gratuite.'],
+                ['Puis-je acheter et vendre en même temps ?', 'Oui, c\'est ce qu\'on appelle une "vente-achat" ou achat en chaîne. Eduardo vous accompagne pour coordonner les deux transactions et éviter le prêt-relais si possible.'],
+            ];
+            foreach ($faqs as $i => $faq): ?>
+            <details style="background:var(--clr-white);border:1px solid var(--clr-border);border-radius:var(--radius-lg);margin-bottom:.75rem;overflow:hidden">
+                <summary style="padding:1.25rem 1.5rem;cursor:pointer;font-weight:600;list-style:none;display:flex;justify-content:space-between;align-items:center">
+                    <?= e($faq[0]) ?>
+                    <span style="font-size:1.25rem;color:var(--clr-text-muted);flex-shrink:0;margin-left:1rem">▾</span>
+                </summary>
+                <div style="padding:0 1.5rem 1.25rem;color:var(--clr-text-muted);font-size:.95rem;line-height:1.7">
+                    <?= e($faq[1]) ?>
+                </div>
+            </details>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
