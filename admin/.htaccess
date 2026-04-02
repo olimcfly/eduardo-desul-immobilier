@@ -1,4 +1,6 @@
 # admin/.htaccess
+DirectoryIndex login.php
+
 RewriteEngine On
 RewriteBase /
 
