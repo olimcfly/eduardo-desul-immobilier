@@ -24,6 +24,8 @@ require_once ROOT_PATH . '/config/config.php';
 require_once ROOT_PATH . '/core/Session.php';
 require_once ROOT_PATH . '/core/Database.php';
 require_once ROOT_PATH . '/core/Auth.php';
+require_once ROOT_PATH . '/core/services/MailService.php';
+require_once ROOT_PATH . '/core/services/OtpAuthService.php';
 
 Session::start();
 
@@ -48,6 +50,12 @@ function adminLayout(string $view, array $data = []): void
     require_once ROOT_PATH . '/admin/views/layout.php';
 }
 
+function clientIp(): string
+{
+    $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+    return mb_substr($ip, 0, 45);
+}
+
 // ── Router simple ────────────────────────────────────────────
 $uri    = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $base   = '/admin';
@@ -57,45 +65,77 @@ $method = $_SERVER['REQUEST_METHOD'];
 
 // ── Routes publiques (sans auth) ─────────────────────────────
 
-// Login GET
+// Login GET (demande OTP)
 if ($path === '/login' && $method === 'GET') {
     if (Auth::isAdmin()) { header('Location: /admin'); exit; }
     adminView('login');
     exit;
 }
 
-// Login POST
+// Login POST (envoi OTP)
 if ($path === '/login' && $method === 'POST') {
-    $email    = trim($_POST['email']    ?? '');
-    $password = trim($_POST['password'] ?? '');
+    $email = trim($_POST['email'] ?? '');
 
-    if (empty($email) || empty($password)) {
-        Session::flash('error', 'Email et mot de passe requis.');
-        header('Location: /admin/login'); exit;
+    if (empty($email)) {
+        Session::flash('error', 'Adresse email requise.');
+        header('Location: /admin/login');
+        exit;
     }
 
     try {
-        $db   = Database::getInstance();
-        $stmt = $db->prepare('SELECT id, email, password, role, name FROM users WHERE email = ? LIMIT 1');
-        $stmt->execute([$email]);
-        $user = $stmt->fetch();
+        $result = OtpAuthService::requestCode(
+            $email,
+            clientIp(),
+            $_SERVER['HTTP_USER_AGENT'] ?? ''
+        );
 
-        if ($user && Auth::verifyPassword($password, $user['password'])) {
-            if ($user['role'] !== 'admin') {
-                Session::flash('error', 'Accès réservé aux administrateurs.');
-                header('Location: /admin/login'); exit;
-            }
-            Auth::login($user);
-            Session::flash('success', 'Bienvenue, ' . $user['name'] . ' !');
-            header('Location: /admin'); exit;
+        Session::flash($result['ok'] ? 'success' : 'error', $result['message']);
+
+        if ($result['ok']) {
+            header('Location: /admin/verify');
         } else {
-            Session::flash('error', 'Email ou mot de passe incorrect.');
-            header('Location: /admin/login'); exit;
+            header('Location: /admin/login');
         }
-    } catch (Exception $e) {
+        exit;
+    } catch (Throwable $e) {
         $msg = APP_DEBUG ? $e->getMessage() : 'Erreur serveur. Réessayez.';
         Session::flash('error', $msg);
-        header('Location: /admin/login'); exit;
+        header('Location: /admin/login');
+        exit;
+    }
+}
+
+// Verify OTP GET
+if ($path === '/verify' && $method === 'GET') {
+    if (Auth::isAdmin()) { header('Location: /admin'); exit; }
+    $pendingEmail = OtpAuthService::getPendingEmail();
+    adminView('verify-otp', ['pendingEmail' => $pendingEmail]);
+    exit;
+}
+
+// Verify OTP POST
+if ($path === '/verify' && $method === 'POST') {
+    $email = trim($_POST['email'] ?? OtpAuthService::getPendingEmail() ?? '');
+    $code  = trim($_POST['otp_code'] ?? '');
+
+    try {
+        $result = OtpAuthService::verifyCode($email, $code, clientIp());
+
+        if (!$result['ok']) {
+            Session::flash('error', $result['message']);
+            header('Location: /admin/verify');
+            exit;
+        }
+
+        Auth::login($result['user']);
+        Session::flash('success', 'Bienvenue, ' . ($result['user']['name'] ?? 'admin') . ' !');
+        header('Location: /admin');
+        exit;
+    } catch (Throwable $e) {
+        $msg = APP_DEBUG ? $e->getMessage() : 'Erreur serveur. Réessayez.';
+        Session::flash('error', $msg);
+        header('Location: /admin/verify');
+        exit;
     }
 }
 
