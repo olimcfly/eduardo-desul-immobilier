@@ -1,43 +1,52 @@
-# .htaccess
-DirectoryIndex index.php
-
+Options -Indexes
 RewriteEngine On
 RewriteBase /
 
-# Fichiers réels
-RewriteCond %{REQUEST_FILENAME} -f
-RewriteRule ^ - [L]
+# Sécurité — bloquer accès dossiers sensibles
+RewriteRule ^(admin|core|storage|includes|vendor)/ - [F,L]
 
+# HTTPS forcé
+RewriteCond %{HTTPS} off
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# WWW → non-WWW
+RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L]
+
+# Fichiers statiques — pas de réécriture
+RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
 
-# Zones protégées
-RewriteRule ^admin(/.*)?$ - [L]
-RewriteRule ^api(/.*)?$ - [L]
-RewriteRule ^assets(/.*)?$ - [L]
-RewriteRule ^uploads(/.*)?$ - [L]
+# Articles
+RewriteRule ^articles/([a-z0-9-]+)/?$ /public/articles/single.php?slug=$1 [L,QSA]
 
-# Sécurité : bloquer fichiers sensibles
-RewriteRule ^(config|logs|vendor)(/.*)?$ - [F,L]
+# Guides
+RewriteRule ^guides/([a-z0-9-]+)/?$ /public/pages/guide-single.php?slug=$1 [L,QSA]
 
-# Router front
-RewriteRule ^(.*)$ /front/page.php?slug=$1 [L,QSA]
+# Landing pages
+RewriteRule ^lp/([a-z0-9-]+)/?$      /public/landing/render.php?slug=$1    [L,QSA]
+RewriteRule ^merci/([a-z0-9-]+)/?$   /public/landing/thankyou.php?slug=$1  [L,QSA]
 
-# Cache
-<IfModule mod_expires.c>
-    ExpiresActive On
-    ExpiresByType image/jpeg "access plus 1 month"
-    ExpiresByType image/png "access plus 1 month"
-    ExpiresByType text/css "access plus 1 week"
-    ExpiresByType application/javascript "access plus 1 week"
-</IfModule>
+# Tracking email
+RewriteRule ^track/open/([0-9]+)/pixel\.gif$ /public/api/track-open.php?id=$1 [L]
+RewriteRule ^track/click/([0-9]+)/?$         /public/api/track-click.php?id=$1 [L,QSA]
+RewriteRule ^unsubscribe/?$                  /public/api/unsubscribe.php [L,QSA]
 
-# Compression
-<IfModule mod_deflate.c>
-    AddOutputFilterByType DEFLATE text/html text/plain text/css application/javascript
-</IfModule>
+# Pages
+RewriteRule ^estimation/?$               /public/pages/estimation.php              [L]
+RewriteRule ^contact/?$                  /public/pages/contact.php                 [L]
+RewriteRule ^actualites/?$               /public/pages/actualites.php              [L]
+RewriteRule ^guide-local/?$              /public/pages/guide-local.php             [L]
+RewriteRule ^ressources/vendeurs/?$      /public/pages/ressources-vendeurs.php     [L]
+RewriteRule ^ressources/acheteurs/?$     /public/pages/ressources-acheteurs.php    [L]
+RewriteRule ^mentions-legales/?$         /public/pages/mentions-legales.php        [L]
+RewriteRule ^politique-confidentialite/? /public/pages/politique-confidentialite.php [L]
+RewriteRule ^cgv/?$                      /public/pages/cgv.php                     [L]
 
-# Erreurs
-ErrorDocument 404 /front/renderers/404.php
-ErrorDocument 404 /front/page.php
-ErrorDocument 500 /front/500.php
+# Sitemap & Robots
+RewriteRule ^sitemap\.xml$  /public/api/sitemap.php  [L]
+RewriteRule ^robots\.txt$   /public/api/robots.php   [L]
+
+# Tout le reste → index
+RewriteRule ^ /public/index.php [L]
