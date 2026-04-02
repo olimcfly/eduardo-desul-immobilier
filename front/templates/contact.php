@@ -26,6 +26,7 @@ unset($_SESSION['contact_old']);
 
 // Traitement POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+<<<<<<< codex/refactor-contact-form-submission-logic
     // CSRF
     $csrfToken = (string)($_POST['csrf_token'] ?? '');
     if (empty($_SESSION['contact_csrf_token']) || !hash_equals($_SESSION['contact_csrf_token'], $csrfToken)) {
@@ -82,17 +83,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'info' => 'Autre demande',
     ];
     $subjectLabel = $subjectLabels[$subject] ?? 'Autre demande';
+=======
+    $name    = trim($_POST['name']    ?? '');
+    $mail    = trim($_POST['email']   ?? '');
+    $tel     = trim($_POST['phone']   ?? '');
+    $subject = trim($_POST['subject'] ?? 'Contact site');
+    $message = trim($_POST['message'] ?? '');
+    $rgpd    = !empty($_POST['rgpd']);
+>>>>>>> Dev
 
     if (!$name || !$mail || !$message) {
         $error = 'Veuillez remplir tous les champs obligatoires.';
     } elseif (!filter_var($mail, FILTER_VALIDATE_EMAIL)) {
         $error = 'Adresse email invalide.';
+<<<<<<< codex/refactor-contact-form-submission-logic
     } elseif (mb_strlen($message) < 10) {
         $error = 'Message trop court.';
     } elseif (mb_strlen($message) > 1000) {
         $error = 'Message trop long (1000 caractères max).';
     } elseif (!$rgpd) {
         $error = 'Veuillez accepter la politique de confidentialité.';
+=======
+    } elseif (!$rgpd) {
+        $error = 'Vous devez accepter la politique de confidentialité.';
+>>>>>>> Dev
     } else {
         $rootPath = defined('ROOT_PATH') ? ROOT_PATH : dirname(__DIR__, 2);
         $sent = false;
@@ -148,6 +162,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       <!-- Formulaire -->
       <div class="card card-body">
+<<<<<<< codex/refactor-contact-form-submission-logic
         <form method="POST" action="/contact" autocomplete="on">
           <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['contact_csrf_token'] ?? '') ?>">
           <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;opacity:0;height:0;width:0;pointer-events:none;">
@@ -158,6 +173,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <div class="form-group">
             <label>Email *</label>
             <input type="email" name="email" placeholder="votre@email.com" required value="<?= htmlspecialchars($old['email'] ?? '') ?>">
+=======
+        <form id="contactForm" method="POST" action="" novalidate>
+          <div class="form-group">
+            <label>Nom complet *</label>
+            <input type="text" id="name" name="name" placeholder="Votre nom" required value="<?= htmlspecialchars($_POST['name']??'') ?>">
+            <div class="form-error" data-for="name" aria-live="polite"></div>
+          </div>
+          <div class="form-group">
+            <label>Email *</label>
+            <input type="email" id="email" name="email" placeholder="votre@email.com" required value="<?= htmlspecialchars($_POST['email']??'') ?>">
+            <div class="form-error" data-for="email" aria-live="polite"></div>
+>>>>>>> Dev
           </div>
           <div class="form-group">
             <label>Téléphone</label>
@@ -175,6 +202,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           </div>
           <div class="form-group">
             <label>Message *</label>
+<<<<<<< codex/refactor-contact-form-submission-logic
             <textarea name="message" placeholder="Décrivez votre projet en quelques mots…" required minlength="10" maxlength="1000"><?= htmlspecialchars($old['message'] ?? '') ?></textarea>
           </div>
           <div class="form-group">
@@ -182,10 +210,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               <input type="checkbox" name="rgpd" value="1" required <?= !empty($old['rgpd']) ? 'checked' : '' ?>>
               J'accepte la politique de confidentialité *
             </label>
+=======
+            <textarea id="message" name="message" placeholder="Décrivez votre projet en quelques mots…" required maxlength="1000"><?= htmlspecialchars($_POST['message']??'') ?></textarea>
+            <small class="form-help-text">Caractères: <span id="charCount">0</span>/1000</small>
+            <div class="form-error" data-for="message" aria-live="polite"></div>
+>>>>>>> Dev
           </div>
-          <button type="submit" class="btn btn-primary contact-submit-btn">
-            <i class="fas fa-paper-plane"></i> Envoyer le message
+          <button id="submitBtn" type="submit" class="btn btn-primary contact-submit-btn">
+            <span class="btn-contact-submit__text">
+            <i class="fas fa-paper-plane"></i> Envoyer le message</span>
+            <span class="btn-contact-submit__loading" hidden>Envoi en cours...</span>
           </button>
+          <div class="form-group">
+            <label>
+              <input type="checkbox" name="rgpd" value="1" <?= !empty($_POST['rgpd']) ? "checked" : "" ?>>
+              J'accepte la politique de confidentialité
+            </label>
+            <div class="form-error" data-for="rgpd" aria-live="polite"></div>
+          </div>
           <p class="contact-legal-note">
             Vos données sont utilisées uniquement pour traiter votre demande — <a href="/mentions-legales">Mentions légales</a>
           </p>
@@ -236,3 +278,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
   </div>
 </section>
+<script src="<?= SITE_URL ?>/front/assets/js/contact-form.js"></script>
