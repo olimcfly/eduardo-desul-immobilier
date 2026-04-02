@@ -149,6 +149,43 @@ $notifications = [
             white-space: nowrap;
         }
 
+        /* Search Bar */
+        .search-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: #f3f4f6;
+            border: 1px solid var(--header-border);
+            border-radius: 0.5rem;
+            flex: 0 1 300px;
+            transition: all 0.2s ease;
+        }
+
+        .search-bar:focus-within {
+            background: var(--header-bg);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 125, 243, 0.1);
+        }
+
+        .search-bar input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            color: var(--header-text);
+            font-size: 14px;
+            outline: none;
+        }
+
+        .search-bar input::placeholder {
+            color: var(--header-text-secondary);
+        }
+
+        .search-bar i {
+            color: var(--header-text-secondary);
+            font-size: 14px;
+        }
+
         /* Header Right */
         .header-right {
             display: flex;
@@ -399,6 +436,12 @@ $notifications = [
             }
         }
 
+        @media (max-width: 1024px) {
+            .search-bar {
+                flex: 0 1 200px;
+            }
+        }
+
         @media (max-width: 768px) {
             .app-header {
                 padding: 1rem;
@@ -411,6 +454,10 @@ $notifications = [
 
             .page-title {
                 font-size: 16px;
+            }
+
+            .search-bar {
+                display: none;
             }
 
             .header-right {
@@ -434,6 +481,12 @@ $notifications = [
                     <i class="fas fa-bars"></i>
                 </button>
                 <h1 class="page-title"><?= htmlspecialchars($pageTitle) ?></h1>
+            </div>
+
+            <!-- Search Bar -->
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Rechercher un bien, un client..." class="search-input">
             </div>
 
             <!-- Header Right -->
