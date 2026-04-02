@@ -32,6 +32,15 @@ $excerpt   = $article['extrait']        ?? '';
 $ogImage   = $article['featured_image'] ?? $article['image'] ?? '';
 $author    = $article['author']         ?? _ss('agent_name', '');
 $category  = $article['category']       ?? '';
+$catLabels = [
+    'vendre'    => ['label' => 'Vendre', 'icon' => 'fas fa-sign-hanging', 'color' => '#2563eb'],
+    'acheter'   => ['label' => 'Acheter', 'icon' => 'fas fa-home', 'color' => '#16a34a'],
+    'marche'    => ['label' => 'Marché immo', 'icon' => 'fas fa-chart-line', 'color' => '#d97706'],
+    'conseils'  => ['label' => 'Conseils pratiques', 'icon' => 'fas fa-lightbulb', 'color' => '#9333ea'],
+    'local'     => ['label' => 'Vie locale', 'icon' => 'fas fa-map-marker-alt', 'color' => '#db2777'],
+    'fiscalite' => ['label' => 'Fiscalité', 'icon' => 'fas fa-receipt', 'color' => '#0891b2'],
+];
+$catMeta   = $catLabels[$category] ?? ['label' => ($category ?: 'Immobilier'), 'icon' => 'fas fa-tag', 'color' => '#2563eb'];
 $pubDate   = $article['published_at']   ?? $article['date_publication'] ?? $article['created_at'] ?? '';
 $readTime  = $article['reading_time']   ?? readingTime($content);
 $canonical = $_siteUrl . '/blog/' . $articleSlug;
@@ -44,7 +53,7 @@ $phone     = _ss('phone','');
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title><?= htmlspecialchars($metaTitle . ' | ' . $_siteName) ?></title>
 <?php if ($metaDesc): ?><meta name="description" content="<?= htmlspecialchars($metaDesc) ?>"><?php endif; ?>
-<meta name="robots" content="<?= $article['noindex'] ? 'noindex,nofollow' : 'index,follow' ?>">
+<meta name="robots" content="<?= !empty($article['noindex']) ? 'noindex,nofollow' : 'index,follow' ?>">
 <link rel="canonical" href="<?= htmlspecialchars($article['canonical'] ?: $canonical) ?>">
 <meta property="og:title" content="<?= htmlspecialchars($metaTitle) ?>">
 <meta property="og:type" content="article">
@@ -123,7 +132,7 @@ $phone     = _ss('phone','');
 <section class="art-hero">
     <div class="art-hero__inner">
         <nav class="art-hero__bc"><a href="/">Accueil</a> › <a href="/blog">Blog</a> › <span><?= htmlspecialchars($title) ?></span></nav>
-        <?php if ($category): ?><div class="art-hero__cat"><i class="fas fa-tag"></i> <?= htmlspecialchars($category) ?></div><?php endif; ?>
+        <?php if ($category): ?><div class="art-hero__cat" style="background: <?= htmlspecialchars($catMeta['color']) ?>1a; border-color: <?= htmlspecialchars($catMeta['color']) ?>66; color: <?= htmlspecialchars($catMeta['color']) ?>;"><i class="<?= htmlspecialchars($catMeta['icon']) ?>"></i> <?= htmlspecialchars($catMeta['label']) ?></div><?php endif; ?>
         <h1 class="art-hero__title"><?= htmlspecialchars($title) ?></h1>
         <div class="art-hero__meta">
             <?php if ($author): ?><span><i class="fas fa-user-circle"></i> <?= htmlspecialchars($author) ?></span><?php endif; ?>
@@ -167,7 +176,8 @@ $phone     = _ss('phone','');
                     <?php if ($ri): ?><img src="<?=htmlspecialchars($ri)?>" alt="<?=htmlspecialchars($r['titre'])?>" class="art-related__img" loading="lazy">
                     <?php else: ?><div class="art-related__img" style="background:linear-gradient(135deg,var(--ed-primary-dk),var(--ed-primary));display:flex;align-items:center;justify-content:center;color:white;font-size:32px"><i class="fas fa-home"></i></div><?php endif; ?>
                     <div class="art-related__body">
-                        <div class="art-related__cat"><?= htmlspecialchars($r['category']??'Immobilier') ?></div>
+                        <?php $relCategory = $r['category'] ?? ''; $relCatMeta = $catLabels[$relCategory] ?? ['label' => ($relCategory ?: 'Immobilier'), 'icon' => 'fas fa-tag', 'color' => '#2563eb']; ?>
+                        <div class="art-related__cat" style="color: <?= htmlspecialchars($relCatMeta['color']) ?>"><i class="<?= htmlspecialchars($relCatMeta['icon']) ?>" style="margin-right:6px"></i><?= htmlspecialchars($relCatMeta['label']) ?></div>
                         <div class="art-related__name"><?= htmlspecialchars($r['titre']) ?></div>
                     </div>
                 </a>
