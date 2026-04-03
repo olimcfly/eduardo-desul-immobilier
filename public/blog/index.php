@@ -1,6 +1,6 @@
 <?php
 $pageTitle = 'Blog immobilier — Eduardo Desul';
-$metaDesc  = 'Conseils, actualités et tendances du marché immobilier bordelais par Eduardo Desul.';
+$metaDesc  = 'Conseils pratiques, analyses du marché et guides immobiliers pour vendre, acheter et investir à Bordeaux.';
 $extraCss  = ['/assets/css/guide.css'];
 $extraJs   = ['/assets/js/guide.js'];
 
@@ -12,25 +12,42 @@ $articles = [
     ['slug' => 'negocier-prix-achat', 'cat' => 'Achat', 'titre' => '7 techniques pour négocier le prix d\'achat', 'excerpt' => 'Comment obtenir le meilleur prix lors de l\'achat d\'un bien immobilier sans vexer le vendeur.', 'date' => '10 février 2026', 'lecture' => '5 min', 'img' => '/assets/images/blog-2.jpg'],
     ['slug' => 'diagnostics-obligatoires-vente', 'cat' => 'Vente', 'titre' => 'Les diagnostics obligatoires avant de vendre', 'excerpt' => 'Liste complète des diagnostics immobiliers exigés lors d\'une vente et comment les organiser.', 'date' => '1er février 2026', 'lecture' => '4 min', 'img' => '/assets/images/blog-3.jpg'],
 ];
+
+$categories = ['Tous', 'Vente', 'Achat', 'Investissement', 'Financement', 'Réglementation'];
+$activeCat = trim((string) ($_GET['cat'] ?? ''));
 ?>
 
-<div class="page-header">
-    <div class="container">
-        <nav class="breadcrumb"><a href="/">Accueil</a><span>Blog</span></nav>
-        <h1>Blog immobilier</h1>
-        <p>Conseils d'expert, tendances du marché et actualités immobilières à Bordeaux.</p>
+<section class="blog-hero">
+    <div class="container blog-hero__grid">
+        <div>
+            <nav class="breadcrumb"><a href="/">Accueil</a><span>Blog</span></nav>
+            <span class="section-label">Conseils immobiliers</span>
+            <h1>Le blog immobilier d'Eduardo Desul</h1>
+            <p>Retrouvez des conseils concrets, des analyses locales et des réponses simples pour réussir votre projet immobilier à Bordeaux.</p>
+            <div class="blog-hero__actions">
+                <a href="/estimation-gratuite" class="btn btn--accent">Demander une estimation</a>
+                <a href="/contact" class="btn btn--outline">Poser une question</a>
+            </div>
+        </div>
+        <div class="blog-hero__card" aria-hidden="true">
+            <div class="blog-hero__metric"><strong>+120</strong><span>articles & guides</span></div>
+            <div class="blog-hero__metric"><strong>4.9/5</strong><span>avis lecteurs</span></div>
+            <div class="blog-hero__metric"><strong>100%</strong><span>contenu terrain</span></div>
+        </div>
     </div>
-</div>
+</section>
 
 <section class="section">
     <div class="container">
-
-        <!-- Catégories -->
-        <div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:2rem">
-            <a href="/blog" class="tag" style="background:var(--clr-primary);color:white;border-color:var(--clr-primary)">Tous</a>
-            <?php foreach (['Vente', 'Achat', 'Investissement', 'Financement', 'Réglementation'] as $cat): ?>
-            <a href="/blog?cat=<?= e(strtolower($cat)) ?>" class="tag"><?= $cat ?></a>
-            <?php endforeach; ?>
+        <div class="blog-toolbar">
+            <div class="tags">
+                <?php foreach ($categories as $cat):
+                    $isActive = ($cat === 'Tous' && $activeCat === '') || strcasecmp($activeCat, $cat) === 0;
+                    $href = $cat === 'Tous' ? '/blog' : '/blog?cat=' . urlencode(strtolower($cat));
+                ?>
+                    <a href="<?= e($href) ?>" class="tag <?= $isActive ? 'tag--active' : '' ?>"><?= e($cat) ?></a>
+                <?php endforeach; ?>
+            </div>
         </div>
 
         <div class="blog-grid">
@@ -40,7 +57,7 @@ $articles = [
                     ? e($art['img'])
                     : '/assets/images/placeholder.php?type=article&label=' . urlencode($art['cat']);
             ?>
-            <article class="article-card">
+            <article class="article-card" data-animate>
                 <div class="article-card__img">
                     <img src="<?= $imgSrc ?>" alt="<?= e($art['titre']) ?>" loading="lazy" width="400" height="225">
                 </div>
@@ -59,10 +76,12 @@ $articles = [
             <?php endforeach; ?>
         </div>
 
-        <nav class="pagination" style="margin-top:3rem">
-            <a href="?page=1" class="page-btn active">1</a>
-            <a href="?page=2" class="page-btn">2</a>
-            <a href="?page=2" class="page-btn">→</a>
-        </nav>
+        <div class="blog-cta" data-animate>
+            <div>
+                <h3>Vous avez un projet immobilier en 2026 ?</h3>
+                <p>Parlez de votre situation avec Eduardo Desul et recevez des conseils personnalisés en moins de 24h.</p>
+            </div>
+            <a href="/contact" class="btn btn--accent">Être rappelé</a>
+        </div>
     </div>
 </section>
