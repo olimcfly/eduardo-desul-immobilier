@@ -2,6 +2,7 @@
 $pageTitle = 'Ressources immobilières — Eduardo Desul';
 $metaDesc  = 'Guides gratuits pour acheter ou vendre votre bien immobilier : guide vendeur, guide acheteur, check-lists, simulateurs.';
 $extraCss  = ['/assets/css/guide.css'];
+$guidesByPersona = require __DIR__ . '/guides-data.php';
 ?>
 
 <div class="page-header">
@@ -15,23 +16,34 @@ $extraCss  = ['/assets/css/guide.css'];
 <section class="section">
     <div class="container">
         <div class="section__header text-center">
-            <span class="section-label">Gratuit & sans engagement</span>
-            <h2 class="section-title">Tout ce qu'il vous faut</h2>
+            <span class="section-label">Ressources par persona</span>
+            <h2 class="section-title">Choisissez votre profil</h2>
+            <p>Chaque guide dispose d'une page dédiée avec formulaire de contact intégré.</p>
         </div>
 
-        <div class="ressources-grid" data-animate>
-            <a href="/ressources/guide-vendeur" class="ressource-card" style="text-decoration:none;color:inherit">
-                <div class="ressource-card__icon">🏠</div>
-                <h3 class="ressource-card__title">Guide vendeur</h3>
-                <p class="ressource-card__desc">Les 10 étapes clés pour vendre votre bien au meilleur prix et dans les meilleurs délais.</p>
-                <span class="btn btn--primary btn--sm">Lire le guide →</span>
-            </a>
-            <a href="/ressources/guide-acheteur" class="ressource-card" style="text-decoration:none;color:inherit">
-                <div class="ressource-card__icon">🔑</div>
-                <h3 class="ressource-card__title">Guide acheteur</h3>
-                <p class="ressource-card__desc">De la recherche à la remise des clés : tout ce qu'il faut savoir pour acheter sereinement.</p>
-                <span class="btn btn--primary btn--sm">Lire le guide →</span>
-            </a>
+        <?php foreach ($guidesByPersona as $persona => $catalog): ?>
+        <div class="persona-guides" data-animate>
+            <div class="persona-guides__head">
+                <div class="ressource-card__icon"><?= e($catalog['icon']) ?></div>
+                <div>
+                    <h3><?= e($catalog['label']) ?></h3>
+                    <p><?= e($catalog['description']) ?></p>
+                </div>
+            </div>
+
+            <div class="ressources-grid">
+                <?php foreach ($catalog['guides'] as $guide): ?>
+                <a href="/ressources/guides/<?= e($persona) ?>/<?= e($guide['slug']) ?>" class="ressource-card" style="text-decoration:none;color:inherit">
+                    <h3 class="ressource-card__title"><?= e($guide['title']) ?></h3>
+                    <p class="ressource-card__desc"><?= e($guide['excerpt']) ?></p>
+                    <span class="btn btn--primary btn--sm">Voir le guide →</span>
+                </a>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <?php endforeach; ?>
+
+        <div class="ressources-grid" data-animate style="margin-top:2rem">
             <a href="/capture/estimation-gratuite" class="ressource-card" style="text-decoration:none;color:inherit">
                 <div class="ressource-card__icon">📊</div>
                 <h3 class="ressource-card__title">Estimation gratuite</h3>
