@@ -1,20 +1,48 @@
 <?php
-declare(strict_types=1);
-
-require_once __DIR__ . '/../../core/bootstrap.php';
-require_once __DIR__ . '/includes/PerformanceAudit.php';
-
-if (!Auth::check()) {
-    header('Location: /admin/login.php');
-    exit;
-}
-
-$userId = (int)($_SESSION['user_id'] ?? 0);
-$audit = new PerformanceAudit(db(), $userId);
-$audits = $audit->listAudits(10);
+$userId = (int)(Auth::user()['id'] ?? 0);
+$pdo = db();
+$stmt = $pdo->prepare('SELECT * FROM seo_performance_audits WHERE user_id = ? ORDER BY created_at DESC LIMIT 20');
+$stmt->execute([$userId]);
+$audits = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 ?>
-<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Performance SEO</title><link rel="stylesheet" href="/modules/seo/assets/seo.css"></head>
-<body><div class="seo-wrap"><h1>Audit performance technique</h1>
-<form id="audit-form"><input name="url_tested" value="<?= htmlspecialchars((string)setting('site_url', 'https://example.com', $userId)) ?>" required><button type="submit">Lancer audit</button></form>
-<table><thead><tr><th>Date</th><th>URL</th><th>Perf</th><th>SEO</th></tr></thead><tbody><?php foreach ($audits as $row): ?><tr><td><?= htmlspecialchars((string)$row['created_at']) ?></td><td><?= htmlspecialchars((string)$row['url_tested']) ?></td><td><?= (int)$row['score_perf'] ?></td><td><?= (int)$row['score_seo'] ?></td></tr><?php endforeach; ?></tbody></table>
-</div><script src="/modules/seo/assets/seo.js"></script></body></html>
+<section class="seo-section">
+    <div class="seo-breadcrumb"><a href="/admin?module=seo">Accueil</a> &gt; SEO &gt; Performance</div>
+    <h2>Performance technique</h2>
+
+    <form class="inline-form" onsubmit="event.preventDefault();runPerformanceAudit(this.url.value,this.device.value)">
+        <input type="url" name="url" placeholder="https://votre-site.fr" required>
+        <select name="device"><option value="mobile">Mobile</option><option value="desktop">Desktop</option></select>
+        <button type="submit">Lancer audit</button>
+    </form>
+
+    <div class="score-circles">
+        <div id="score-perf"></div>
+        <div id="score-seo"></div>
+        <div id="score-access"></div>
+        <div id="score-bp"></div>
+    </div>
+
+    <div id="cwv-results" class="grid-two"></div>
+    <div id="opportunities"></div>
+    <div id="diagnostics"></div>
+
+    <h3>Historique des audits</h3>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Date</th><th>URL</th><th>Device</th><th>Perf</th><th>SEO</th><th>Access</th><th>BP</th></tr></thead>
+            <tbody>
+            <?php foreach ($audits as $audit): ?>
+                <tr>
+                    <td><?= htmlspecialchars((string)$audit['created_at']) ?></td>
+                    <td><?= htmlspecialchars((string)$audit['audited_url']) ?></td>
+                    <td><?= htmlspecialchars((string)$audit['device']) ?></td>
+                    <td><?= (int)$audit['perf_score'] ?></td>
+                    <td><?= (int)$audit['seo_score'] ?></td>
+                    <td><?= (int)$audit['access_score'] ?></td>
+                    <td><?= (int)$audit['bp_score'] ?></td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+</section>

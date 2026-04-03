@@ -1,31 +1,29 @@
 <?php
+
 declare(strict_types=1);
 
-require_once __DIR__ . '/../../../core/bootstrap.php';
-require_once __DIR__ . '/../includes/SitemapGenerator.php';
+require_once dirname(__DIR__, 3) . '/core/bootstrap.php';
+require_once dirname(__DIR__) . '/services/SitemapGenerator.php';
 
-header('Content-Type: application/json');
+Auth::requireAuth('/admin/login');
+header('Content-Type: application/json; charset=utf-8');
 
-if (!Auth::check()) {
-    http_response_code(401);
-    echo json_encode(['success' => false, 'error' => 'Non autorisé']);
-    exit;
-}
+$userId = (int)(Auth::user()['id'] ?? 0);
+$generator = new SitemapGenerator(db(), $userId);
 
 try {
-    $userId = (int)$_SESSION['user_id'];
-    $generator = new SitemapGenerator(db(), $userId);
-    $baseUrl = (string)setting('site_url', '', $userId);
-    if ($baseUrl === '') {
-        $baseUrl = ((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://') . ($_SERVER['HTTP_HOST'] ?? 'localhost');
-    }
+    verifyCsrf();
+    $generator->autoDiscoverUrls($userId);
+    $xml = $generator->generate($userId);
+    $saved = $generator->save($xml);
+    $pinged = $saved ? $generator->ping() : false;
 
-    $xml = $generator->generateXml($baseUrl);
-    $target = __DIR__ . '/../../../public/sitemap.xml';
-    file_put_contents($target, $xml);
+    $stmt = db()->prepare('INSERT INTO seo_sitemap_logs (user_id, generated_at, urls_count, ping_status, submitted_to_gsc, xml_size, created_at) VALUES (?, NOW(), ?, ?, ?, ?, NOW())');
+    $stmt->execute([$userId, count($generator->getUrls($userId)), $pinged ? 1 : 0, !empty($_POST['submit_gsc']) ? 1 : 0, strlen($xml)]);
 
-    echo json_encode(['success' => true, 'path' => '/sitemap.xml', 'count' => count($generator->listUrls())]);
+    echo json_encode(['success' => $saved, 'pinged' => $pinged, 'xml' => $xml]);
 } catch (Throwable $e) {
-    http_response_code(500);
-    echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+    error_log('[' . date('Y-m-d H:i:s') . '] sitemap: ' . $e->getMessage() . PHP_EOL, 3, dirname(__DIR__, 3) . '/logs/seo.log');
+    http_response_code(400);
+    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 }

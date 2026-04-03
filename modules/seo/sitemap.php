@@ -1,20 +1,35 @@
 <?php
-declare(strict_types=1);
-
-require_once __DIR__ . '/../../core/bootstrap.php';
-require_once __DIR__ . '/includes/SitemapGenerator.php';
-
-if (!Auth::check()) {
-    header('Location: /admin/login.php');
-    exit;
-}
-
-$userId = (int)($_SESSION['user_id'] ?? 0);
+$userId = (int)(Auth::user()['id'] ?? 0);
 $generator = new SitemapGenerator(db(), $userId);
-$urls = $generator->listUrls();
+$generator->autoDiscoverUrls($userId);
+$urls = $generator->getUrls($userId);
 ?>
-<!doctype html><html lang="fr"><head><meta charset="utf-8"><title>Sitemap SEO</title><link rel="stylesheet" href="/modules/seo/assets/seo.css"></head>
-<body><div class="seo-wrap"><h1>Sitemap XML</h1>
-<button id="generate-sitemap" type="button">Générer le sitemap</button>
-<ul><?php foreach ($urls as $url): ?><li><?= htmlspecialchars((string)$url['url']) ?> — <?= (int)$url['included'] ? 'Incluse' : 'Exclue' ?></li><?php endforeach; ?></ul>
-</div><script src="/modules/seo/assets/seo.js"></script></body></html>
+<section class="seo-section">
+    <div class="seo-breadcrumb"><a href="/admin?module=seo">Accueil</a> &gt; SEO &gt; Sitemap</div>
+    <h2>Sitemap</h2>
+
+    <div class="actions">
+        <button type="button" onclick="generateSitemap()">Générer sitemap.xml</button>
+        <button type="button" onclick="generateSitemap(true)">Soumettre à GSC</button>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>URL</th><th>Priorité</th><th>Fréquence</th><th>lastmod</th><th>Inclure</th></tr></thead>
+            <tbody>
+            <?php foreach ($urls as $url): ?>
+                <tr>
+                    <td><?= htmlspecialchars((string)$url['url']) ?></td>
+                    <td><?= htmlspecialchars((string)$url['priority']) ?></td>
+                    <td><?= htmlspecialchars((string)$url['changefreq']) ?></td>
+                    <td><?= htmlspecialchars((string)$url['lastmod']) ?></td>
+                    <td>✅</td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+
+    <h3>Prévisualisation XML</h3>
+    <pre id="sitemap-xml-preview"><?= htmlspecialchars($generator->generate($userId)) ?></pre>
+</section>
