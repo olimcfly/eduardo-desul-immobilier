@@ -2,7 +2,6 @@
 $pageTitle = "Paramètres";
 $pageDescription = "Configurez votre compte et vos préférences";
 
-require_once '../../admin/views/layout.php';
 
 function renderContent() {
     ?>

@@ -2,7 +2,6 @@
 $pageTitle = "Optimiser";
 $pageDescription = "Analysez et améliorez en continu vos performances";
 
-require_once '../../admin/views/layout.php';
 
 function renderContent() {
     ?>

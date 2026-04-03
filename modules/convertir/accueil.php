@@ -2,7 +2,6 @@
 $pageTitle = "Convertir";
 $pageDescription = "Transformez vos contacts en clients signés";
 
-require_once '../../admin/views/layout.php';
 
 function renderContent() {
     ?>
