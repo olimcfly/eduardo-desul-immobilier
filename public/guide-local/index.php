@@ -22,10 +22,10 @@ $extraCss  = ['/assets/css/guide.css'];
 
         <?php
         $villes = [
-            ['slug' => 'bordeaux-chartrons',     'nom' => 'Chartrons',         'prix' => '4 600 €/m²', 'desc' => 'Quartier bohème et branché, très prisé des jeunes actifs et des familles.', 'biens' => 8, 'img' => '/assets/images/chartrons.jpg'],
+            ['slug' => 'merignac',                'nom' => 'Mérignac',          'prix' => '3 200 €/m²', 'desc' => 'Secteur prioritaire Bordeaux Métropole : habitat familial, accès tram et proximité aéroport.', 'biens' => 6, 'img' => '/assets/images/merignac.jpg'],
             ['slug' => 'bordeaux-centre',         'nom' => 'Bordeaux Centre',   'prix' => '4 800 €/m²', 'desc' => 'Le cœur historique de Bordeaux, classé UNESCO. Animation et prestige.', 'biens' => 12, 'img' => '/assets/images/bordeaux-centre.jpg'],
             ['slug' => 'bordeaux-cauderan',       'nom' => 'Cauderan',          'prix' => '3 900 €/m²', 'desc' => 'Quartier résidentiel calme, idéal pour les familles avec maisons et jardins.', 'biens' => 6, 'img' => '/assets/images/pessac.jpg'],
-            ['slug' => 'merignac',                'nom' => 'Mérignac',          'prix' => '3 200 €/m²', 'desc' => 'Dynamique commune de l\'agglomération, proche aéroport et tram.', 'biens' => 6, 'img' => '/assets/images/merignac.jpg'],
+            ['slug' => 'bordeaux-chartrons',     'nom' => 'Chartrons',         'prix' => '4 600 €/m²', 'desc' => 'Quartier bohème et branché, très prisé des jeunes actifs et des familles.', 'biens' => 8, 'img' => '/assets/images/chartrons.jpg'],
             ['slug' => 'pessac',                  'nom' => 'Pessac',            'prix' => '2 900 €/m²', 'desc' => 'Ville universitaire avec une belle diversité de biens et une vraie vie de quartier.', 'biens' => 5, 'img' => '/assets/images/pessac.jpg'],
             ['slug' => 'talence',                 'nom' => 'Talence',           'prix' => '3 100 €/m²', 'desc' => 'Résidentielle et verte, proche des campus et bien desservie par le tram.', 'biens' => 4, 'img' => '/assets/images/bordeaux-centre.jpg'],
         ];
