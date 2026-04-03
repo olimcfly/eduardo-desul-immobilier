@@ -2,7 +2,6 @@
 $pageTitle = "SEO";
 $pageDescription = "Optimisez votre positionnement sur Google";
 
-require_once '../../admin/views/layout.php';
 
 function renderContent() {
     ?>

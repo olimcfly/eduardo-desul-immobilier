@@ -2,7 +2,6 @@
 $pageTitle = "Mon profil";
 $pageDescription = "Gérez votre identité de conseiller";
 
-require_once '../../admin/views/layout.php';
 
 function renderContent() {
     $user = Auth::user();

@@ -2,7 +2,6 @@
 $pageTitle = "Google My Business";
 $pageDescription = "Gérez votre fiche Google et vos avis clients";
 
-require_once '../../admin/views/layout.php';
 
 function renderContent() {
     ?>
