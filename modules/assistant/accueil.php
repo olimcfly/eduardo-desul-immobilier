@@ -2,7 +2,6 @@
 $pageTitle       = 'Noah — Assistant Stratégique';
 $pageDescription = 'Votre assistant IA pour structurer votre activité immobilière';
 
-require_once '../../admin/views/layout.php';
 
 function renderContent()
 {

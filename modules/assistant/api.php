@@ -3,32 +3,38 @@
 // NOAH API — Endpoint AJAX pour les outils IA
 // ============================================================
 
-require_once '../../core/bootstrap.php';
-require_once '../../core/services/AiService.php';
+require_once __DIR__ . '/../../core/bootstrap.php';
+require_once __DIR__ . '/../../core/services/AiService.php';
 
 header('Content-Type: application/json');
 
 // Auth obligatoire
 if (!Auth::check()) {
     http_response_code(401);
-    echo json_encode(['error' => 'Non autorisé']);
+    echo json_encode(['success' => false, 'error' => 'Non autorisé']);
     exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
-    echo json_encode(['error' => 'Méthode non autorisée']);
+    echo json_encode(['success' => false, 'error' => 'Méthode non autorisée']);
     exit;
 }
 
-$tool = trim($_POST['tool'] ?? '');
-$data = $_POST;
+$csrfToken = (string) ($_POST['csrf_token'] ?? '');
+if (!hash_equals(csrfToken(), $csrfToken)) {
+    http_response_code(403);
+    echo json_encode(['success' => false, 'error' => 'Token CSRF invalide']);
+    exit;
+}
+
+$tool = preg_replace('/[^a-z_]/', '', (string) ($_POST['tool'] ?? ''));
+$data = array_map(static fn ($value) => trim((string) $value), $_POST);
 
 $systemPrompt = "Tu es Noah, assistant stratégique intégré dans une application immobilière. Tu n'es pas un chatbot conversationnel. Tu vas directement à l'essentiel. Tu utilises un langage simple, clair et professionnel. Tu ne dis jamais bonjour et tu ne poses pas de questions. Tes réponses sont directement affichables dans une interface.";
 
 try {
-    $userMessage = match($tool) {
-
+    $userMessage = match ($tool) {
         'positionnement' => buildPrompt(
             "Ta mission est de proposer un positionnement clair et directement exploitable.\n\n" .
             "Données :\n" .
@@ -94,17 +100,16 @@ try {
             "Format :\n\nActions du jour :\n\n1.\n2.\n3.\n4.\n\nObjectif :\n..."
         ),
 
-        default => throw new InvalidArgumentException('Outil inconnu : ' . $tool),
+        default => throw new InvalidArgumentException('Outil inconnu'),
     };
 
     $result = AiService::ask($systemPrompt, $userMessage);
 
     echo json_encode(['success' => true, 'result' => $result]);
-
 } catch (Exception $e) {
     error_log('Noah API error: ' . $e->getMessage());
     http_response_code(500);
-    echo json_encode(['error' => $e->getMessage()]);
+    echo json_encode(['success' => false, 'error' => 'Une erreur est survenue.']);
 }
 
 function buildPrompt(string $content): string

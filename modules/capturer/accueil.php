@@ -2,7 +2,6 @@
 $pageTitle = "Capturer";
 $pageDescription = "Transformez vos visiteurs en contacts qualifiés";
 
-require_once '../../admin/views/layout.php';
 
 function renderContent() {
     ?>

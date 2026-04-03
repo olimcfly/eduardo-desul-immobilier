@@ -4,8 +4,6 @@
 // ============================================================
 require_once __DIR__ . '/../../includes/settings.php';
 
-$pageTitle       = 'Paramètres';
-$pageDescription = 'Gérez votre compte, vos intégrations et vos préférences';
 
 require_once __DIR__ . '/../../admin/views/layout.php';
 

@@ -2,7 +2,6 @@
 $pageTitle = "Attirer";
 $pageDescription = "Générez des vendeurs qualifiés sur votre territoire";
 
-require_once '../../admin/views/layout.php';
 
 function renderContent() {
     ?>

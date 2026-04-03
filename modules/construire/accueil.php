@@ -15,9 +15,6 @@ $actionTitles = [
 $pageTitle       = $action === 'index' ? 'Construire' : ($actionTitles[$action] ?? 'Construire');
 $pageDescription = 'Posez les bases solides de votre activité';
 
-require_once '../../admin/views/layout.php';
-require_once '../../core/services/AiService.php';
-
 function renderContent()
 {
     global $action;
@@ -31,71 +28,35 @@ function renderContent()
     }
     ?>
     <div class="page-header">
-        <h1><i class="fas fa-layer-group page-icon"></i> HUB <span class="page-title-accent">Construire</span></h1>
+        <h1><i class="fas fa-layer-group page-icon"></i> HUB<span class="page-title-accent">Construire</span></h1>
         <p>Posez les bases solides de votre activité avec Noah IA</p>
     </div>
 
-    <div class="cards-container">
+    <div class="noah-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.25rem;margin-top:1.5rem;">
 
-        <div class="card" style="--card-accent:#e74c3c; --card-icon-bg:#fdedec;">
-            <div class="card-header">
-                <div class="card-icon"><i class="fas fa-anchor"></i></div>
-                <h3 class="card-title">Méthode ANCRE+</h3>
+        <?php
+        $cards = [
+            ['id'=>'positionnement','title'=>'Méthode ANCRE+','desc'=>"Générez 3 formulations d'accroche claires.",'icon'=>'fa-anchor','color'=>'#e74c3c','href'=>'?module=construire&action=ancre'],
+            ['id'=>'profils','title'=>'NeuroPersona','desc'=>'Identifiez vos 3 profils clients prioritaires.','icon'=>'fa-brain','color'=>'#3498db','href'=>'?module=construire&action=profils'],
+            ['id'=>'offre','title'=>'Offre Conseiller','desc'=>'Construisez votre pitch en 3 versions.','icon'=>'fa-briefcase','color'=>'#27ae60','href'=>'?module=construire&action=offre'],
+            ['id'=>'zone','title'=>'Zone de Prospection','desc'=>'Délimitez votre territoire en 3 niveaux.','icon'=>'fa-map-marked-alt','color'=>'#8e44ad','href'=>'?module=construire&action=zone'],
+            ['id'=>'synthese','title'=>'Synthèse Stratégique','desc'=>'Résumé de votre situation en 100 mots.','icon'=>'fa-layer-group','color'=>'#e67e22','href'=>'?module=construire&action=synthese'],
+            ['id'=>'actions','title'=>'Actions du Jour','desc'=>'3 à 5 actions concrètes pour aujourd\'hui.','icon'=>'fa-bolt','color'=>'#16a085','href'=>'?module=construire&action=actions'],
+        ];
+        foreach ($cards as $c): ?>
+        <div style="background:#1a3c5e;border-radius:14px;border:1.5px solid rgba(255,255,255,.07);padding:1.25rem;">
+            <div style="display:flex;align-items:center;gap:.85rem;margin-bottom:.75rem;">
+                <div style="width:40px;height:40px;border-radius:10px;background:<?= $c['color'] ?>22;display:flex;align-items:center;justify-content:center;color:<?= $c['color'] ?>;">
+                    <i class="fas <?= $c['icon'] ?>"></i>
+                </div>
+                <strong style="color:#e8f1f9;"><?= $c['title'] ?></strong>
             </div>
-            <p class="card-description">Générez 3 formulations d'accroche claires pour votre positionnement conseiller.</p>
-            <div class="card-tags"><span class="tag">Noah IA</span><span class="tag">Positionnement</span></div>
-            <a href="?module=construire&action=ancre" class="card-action"><i class="fas fa-arrow-right"></i> Accéder</a>
+            <p style="color:#7a9ab8;font-size:.85rem;margin:0 0 1rem;"><?= $c['desc'] ?></p>
+            <a href="<?= $c['href'] ?>" style="display:inline-flex;align-items:center;gap:.4rem;background:<?= $c['color'] ?>;color:#fff;padding:.5rem 1rem;border-radius:8px;font-size:.85rem;font-weight:700;text-decoration:none;">
+                <i class="fas fa-arrow-right"></i> Accéder
+            </a>
         </div>
-
-        <div class="card" style="--card-accent:#3498db; --card-icon-bg:#e3f2fd;">
-            <div class="card-header">
-                <div class="card-icon"><i class="fas fa-brain"></i></div>
-                <h3 class="card-title">NeuroPersona</h3>
-            </div>
-            <p class="card-description">Identifiez vos 3 profils clients prioritaires sur votre territoire.</p>
-            <div class="card-tags"><span class="tag">Noah IA</span><span class="tag">Profils clients</span></div>
-            <a href="?module=construire&action=profils" class="card-action"><i class="fas fa-arrow-right"></i> Accéder</a>
-        </div>
-
-        <div class="card" style="--card-accent:#27ae60; --card-icon-bg:#eafaf1;">
-            <div class="card-header">
-                <div class="card-icon"><i class="fas fa-briefcase"></i></div>
-                <h3 class="card-title">Offre Conseiller</h3>
-            </div>
-            <p class="card-description">Construisez votre pitch commercial en 3 versions adaptées à vos personas.</p>
-            <div class="card-tags"><span class="tag">Noah IA</span><span class="tag">Pitch</span></div>
-            <a href="?module=construire&action=offre" class="card-action"><i class="fas fa-arrow-right"></i> Accéder</a>
-        </div>
-
-        <div class="card" style="--card-accent:#8e44ad; --card-icon-bg:#f5eef8;">
-            <div class="card-header">
-                <div class="card-icon"><i class="fas fa-map-marked-alt"></i></div>
-                <h3 class="card-title">Zone de Prospection</h3>
-            </div>
-            <p class="card-description">Délimitez votre territoire de prospection en 3 niveaux stratégiques.</p>
-            <div class="card-tags"><span class="tag">Noah IA</span><span class="tag">Territoire</span></div>
-            <a href="?module=construire&action=zone" class="card-action"><i class="fas fa-arrow-right"></i> Accéder</a>
-        </div>
-
-        <div class="card" style="--card-accent:#e67e22; --card-icon-bg:#fef5e7;">
-            <div class="card-header">
-                <div class="card-icon"><i class="fas fa-layer-group"></i></div>
-                <h3 class="card-title">Synthèse Stratégique</h3>
-            </div>
-            <p class="card-description">Résumez votre situation et votre stratégie en 100 mots percutants.</p>
-            <div class="card-tags"><span class="tag">Noah IA</span><span class="tag">Stratégie</span></div>
-            <a href="?module=construire&action=synthese" class="card-action"><i class="fas fa-arrow-right"></i> Accéder</a>
-        </div>
-
-        <div class="card" style="--card-accent:#16a085; --card-icon-bg:#e8f8f5;">
-            <div class="card-header">
-                <div class="card-icon"><i class="fas fa-bolt"></i></div>
-                <h3 class="card-title">Actions du Jour</h3>
-            </div>
-            <p class="card-description">Obtenez 3 à 5 actions concrètes et mesurables pour aujourd'hui.</p>
-            <div class="card-tags"><span class="tag">Noah IA</span><span class="tag">Plan d'action</span></div>
-            <a href="?module=construire&action=actions" class="card-action"><i class="fas fa-arrow-right"></i> Accéder</a>
-        </div>
+        <?php endforeach; ?>
 
     </div>
     <?php

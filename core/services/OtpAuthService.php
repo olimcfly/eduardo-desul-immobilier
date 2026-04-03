@@ -103,6 +103,8 @@ class OtpAuthService
              FROM admin_login_otps o
              INNER JOIN users u ON u.id = o.user_id
              WHERE o.email = :email
+               AND o.consumed_at IS NULL
+               AND o.expires_at > NOW()
              ORDER BY o.id DESC
              LIMIT 1'
         );
@@ -110,20 +112,18 @@ class OtpAuthService
         $row = $stmt->fetch();
 
         if (!$row) {
-            return ['ok' => false, 'message' => 'Code invalide ou expiré.'];
-        }
-
-        if ($row['consumed_at'] !== null || strtotime($row['expires_at']) < time()) {
-            return ['ok' => false, 'message' => 'Code expiré. Demandez un nouveau code.'];
+            return ['ok' => false, 'message' => 'Aucun code valide trouvé. Veuillez en demander un nouveau.'];
         }
 
         if ((int) $row['attempt_count'] >= (int) $row['max_attempts']) {
-            return ['ok' => false, 'message' => 'Trop d\'erreurs sur ce code. Demandez-en un nouveau.'];
+            return ['ok' => false, 'message' => 'Trop de tentatives. Demandez un nouveau code.'];
         }
 
+        // Incrémenter le compteur de tentatives
+        $incr = $db->prepare('UPDATE admin_login_otps SET attempt_count = attempt_count + 1 WHERE id = :id');
+        $incr->execute(['id' => $row['id']]);
+
         if (!password_verify($code, $row['code_hash'])) {
-            $fail = $db->prepare('UPDATE admin_login_otps SET attempt_count = attempt_count + 1 WHERE id = :id');
-            $fail->execute(['id' => $row['id']]);
             return ['ok' => false, 'message' => 'Code incorrect.'];
         }
 

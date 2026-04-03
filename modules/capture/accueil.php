@@ -2,7 +2,6 @@
 $pageTitle = "Capture";
 $pageDescription = "Pages et formulaires de capture de leads";
 
-require_once '../../admin/views/layout.php';
 
 function renderContent() {
     ?>
