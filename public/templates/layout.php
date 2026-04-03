@@ -81,6 +81,13 @@ $siteMetaDescription = setting('site_meta_description', 'Conseiller immobilier i
 
 <?php require __DIR__ . '/footer.php'; ?>
 
+<script>
+window.__APP_SETTINGS__ = {
+    advisorName: <?= json_encode(trim((string) setting('advisor_firstname', '') . ' ' . (string) setting('advisor_lastname', '')) ?: (ADVISOR_NAME ?: APP_NAME), JSON_UNESCAPED_UNICODE) ?>,
+    zoneCity: <?= json_encode((string) setting('zone_city', APP_CITY), JSON_UNESCAPED_UNICODE) ?>
+};
+</script>
+
 <!-- JS -->
 <script src="/assets/js/main.js" defer></script>
 <?php foreach ($extraJs ?? [] as $js): ?>

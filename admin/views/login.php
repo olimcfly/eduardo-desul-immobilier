@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion OTP — Admin Eduardo Desul</title>
+    <title>Connexion OTP — Admin <?= htmlspecialchars(trim((string) setting('advisor_firstname', '') . ' ' . (string) setting('advisor_lastname', '')) ?: (ADVISOR_NAME ?: APP_NAME)) ?></title>
     <meta name="robots" content="noindex, nofollow">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -91,7 +91,7 @@
                 <path d="M9 21V12h6v9"/>
             </svg>
         </div>
-        <h1>Eduardo Desul</h1>
+        <h1><?= htmlspecialchars(trim((string) setting('advisor_firstname', '') . ' ' . (string) setting('advisor_lastname', '')) ?: (ADVISOR_NAME ?: APP_NAME)) ?></h1>
         <p>Espace d'administration (OTP sans mot de passe)</p>
     </div>
 

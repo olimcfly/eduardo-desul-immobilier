@@ -30,7 +30,6 @@ CREATE TABLE settings (
     'password'
   ) DEFAULT 'text',
   setting_group VARCHAR(50),
-  is_encrypted TINYINT(1) DEFAULT 0,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   UNIQUE KEY unique_setting (user_id, setting_key),
   KEY idx_settings_user_group (user_id, setting_group),

@@ -45,6 +45,9 @@ function page(string $template, array $data = []): void
     ob_start();
     require $tplFile;
     $pageContent = ob_get_clean();
+    $pageContent = replacePlaceholders($pageContent);
+    if (isset($pageTitle)) { $pageTitle = replacePlaceholders((string)$pageTitle); }
+    if (isset($metaDesc)) { $metaDesc = replacePlaceholders((string)$metaDesc); }
     require ROOT_PATH . '/public/templates/layout.php';
 }
 

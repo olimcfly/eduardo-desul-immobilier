@@ -123,18 +123,19 @@ if (!function_exists('saveSetting')) {
             }
 
             $stmt = $pdo->prepare(
-                'SELECT setting_type, is_encrypted
+                'SELECT setting_type
                  FROM settings_templates
                  WHERE setting_key = ?
                  LIMIT 1'
             );
             $stmt->execute([$key]);
-            $template = $stmt->fetch(PDO::FETCH_ASSOC) ?: ['setting_type' => 'text', 'is_encrypted' => 0];
+            $template = $stmt->fetch(PDO::FETCH_ASSOC) ?: ['setting_type' => 'text'];
 
             $preparedValue = prepareSettingValue($value, (string)$template['setting_type']);
             $oldValue = setting($key, '', $userId);
 
-            if ((int)$template['is_encrypted'] === 1 && $preparedValue !== '') {
+            $isEncrypted = (($template['setting_type'] ?? 'text') === 'password') ? 1 : 0;
+            if ($isEncrypted === 1 && $preparedValue !== '') {
                 $preparedValue = encryptSetting($preparedValue);
             }
 
@@ -152,7 +153,7 @@ if (!function_exists('saveSetting')) {
                 $key,
                 $preparedValue,
                 $template['setting_type'],
-                (int)$template['is_encrypted'],
+                $isEncrypted,
             ]);
 
             logSettingChange($userId, $key, $oldValue, $preparedValue);
@@ -369,3 +370,50 @@ if (!function_exists('settingsPdo')) {
         return $pdo instanceof PDO ? $pdo : null;
     }
 }
+
+
+if (!function_exists('replacePlaceholders')) {
+    function replacePlaceholders(string $template, int $userId = 0): string
+    {
+        $userId = resolveSettingsUserId($userId);
+
+        $advisorFirst = (string)setting('advisor_firstname', '', $userId);
+        $advisorLast = (string)setting('advisor_lastname', '', $userId);
+        $advisorFull = trim($advisorFirst . ' ' . $advisorLast);
+        if ($advisorFull === '') {
+            $advisorFull = ADVISOR_NAME ?: APP_NAME;
+        }
+
+        $zoneCity = (string)setting('zone_city', APP_CITY, $userId);
+        $zoneNeighborhoods = setting('zone_neighborhoods', [], $userId);
+        $neighborhoodA = is_array($zoneNeighborhoods) && isset($zoneNeighborhoods[0]) ? (string)$zoneNeighborhoods[0] : 'Centre';
+        $neighborhoodB = is_array($zoneNeighborhoods) && isset($zoneNeighborhoods[1]) ? (string)$zoneNeighborhoods[1] : 'Quartier 2';
+
+        $map = [
+            '{{advisor_name}}' => $advisorFull,
+            '{{agency_name}}' => (string)setting('agency_name', APP_NAME, $userId),
+            '{{advisor_email}}' => (string)setting('advisor_email', APP_EMAIL, $userId),
+            '{{advisor_phone}}' => (string)setting('advisor_phone', APP_PHONE, $userId),
+            '{{zone_city}}' => $zoneCity,
+            '{{zone_neighborhood_1}}' => $neighborhoodA,
+            '{{zone_neighborhood_2}}' => $neighborhoodB,
+            '{{app_url}}' => (string)setting('tech_app_url', APP_URL, $userId),
+            '{{advisor_photo}}' => (string)setting('advisor_photo', '/assets/images/eduardo-portrait.jpg', $userId),
+
+            // migration legacy hardcodes
+            'Eduardo Desul' => $advisorFull,
+            'Eduardo De Sul' => $advisorFull,
+            'Eduardo Desul Immobilier' => (string)setting('agency_name', APP_NAME, $userId),
+            'contact@eduardo-desul-immobilier.fr' => (string)setting('advisor_email', APP_EMAIL, $userId),
+            'https://eduardo-desul-immobilier.fr' => (string)setting('tech_app_url', APP_URL, $userId),
+            '/assets/images/eduardo-portrait.jpg' => (string)setting('advisor_photo', '/assets/images/eduardo-portrait.jpg', $userId),
+            'Bordeaux' => $zoneCity,
+            'Chartrons' => $neighborhoodA,
+            'Mérignac' => $neighborhoodB,
+            'Pessac' => (is_array($zoneNeighborhoods) && isset($zoneNeighborhoods[2])) ? (string)$zoneNeighborhoods[2] : $neighborhoodB,
+        ];
+
+        return strtr($template, $map);
+    }
+}
+

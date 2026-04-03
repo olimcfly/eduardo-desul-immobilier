@@ -1,9 +1,15 @@
+<?php
+$advisorDisplayName = trim((string) setting('advisor_firstname', '') . ' ' . (string) setting('advisor_lastname', ''));
+if ($advisorDisplayName === '') {
+    $advisorDisplayName = ADVISOR_NAME ?: APP_NAME;
+}
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= htmlspecialchars($pageTitle ?? 'IMMO LOCAL+') ?> — Eduardo De Sul</title>
+    <title><?= htmlspecialchars(replacePlaceholders((string)($pageTitle ?? 'IMMO LOCAL+'))) ?> — <?= htmlspecialchars($advisorDisplayName) ?></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="/admin/assets/css/dashboard.css?v=<?= filemtime($_SERVER['DOCUMENT_ROOT'] . '/admin/assets/css/dashboard.css') ?>">
 </head>
@@ -19,7 +25,7 @@
             </div>
             <div class="brand-text">
                 <span class="brand-name">IMMO LOCAL<span class="brand-plus">+</span></span>
-                <span class="brand-sub">Eduardo De Sul</span>
+                <span class="brand-sub"><?= htmlspecialchars($advisorDisplayName) ?></span>
             </div>
         </div>
 
@@ -29,7 +35,7 @@
             <?php $user = Auth::user(); ?>
             <div class="user-profile">
                 <div class="user-initials"><?= htmlspecialchars(strtoupper(substr($user['name'] ?? 'ED', 0, 2))) ?></div>
-                <span class="user-name"><?= htmlspecialchars($user['name'] ?? 'Eduardo De Sul') ?> Conseiller</span>
+                <span class="user-name"><?= htmlspecialchars($user['name'] ?? $advisorDisplayName) ?> Conseiller</span>
             </div>
             <button class="collapse-btn" id="sidebar-toggle" type="button">
                 <i class="fas fa-chevron-left" id="toggle-icon"></i>
@@ -54,7 +60,7 @@
                         <i class="fas fa-house"></i>
                     </a>
                     <i class="fas fa-chevron-right breadcrumb-sep"></i>
-                    <span class="breadcrumb-current"><?= htmlspecialchars($pageTitle ?? '') ?></span>
+                    <span class="breadcrumb-current"><?= htmlspecialchars(replacePlaceholders((string)($pageTitle ?? ''))) ?></span>
                 </nav>
             </div>
 
@@ -87,7 +93,7 @@
                     <button class="user-menu-trigger" id="user-menu-trigger" type="button">
                         <div class="user-avatar"><?= htmlspecialchars(strtoupper(substr($user['name'] ?? 'ED', 0, 2))) ?></div>
                         <div class="user-menu-info">
-                            <span class="user-menu-name"><?= htmlspecialchars($user['name'] ?? 'Eduardo De Sul') ?></span>
+                            <span class="user-menu-name"><?= htmlspecialchars($user['name'] ?? $advisorDisplayName) ?></span>
                             <span class="user-menu-role">Conseiller</span>
                         </div>
                         <i class="fas fa-chevron-down user-menu-arrow"></i>
@@ -97,7 +103,7 @@
                         <div class="dropdown-header">
                             <div class="dropdown-avatar"><?= htmlspecialchars(strtoupper(substr($user['name'] ?? 'ED', 0, 2))) ?></div>
                             <div>
-                                <div class="dropdown-name"><?= htmlspecialchars($user['name'] ?? 'Eduardo De Sul') ?></div>
+                                <div class="dropdown-name"><?= htmlspecialchars($user['name'] ?? $advisorDisplayName) ?></div>
                                 <div class="dropdown-email"><?= htmlspecialchars($user['email'] ?? '') ?></div>
                             </div>
                         </div>
@@ -124,7 +130,7 @@
         <!-- CONTENU -->
         <main class="main-content">
             <div id="main-content">
-                <?php renderContent(); ?>
+                <?php ob_start(); renderContent(); $adminContent = ob_get_clean(); echo replacePlaceholders($adminContent); ?>
             </div>
         </main>
 
