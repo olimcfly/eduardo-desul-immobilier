@@ -56,7 +56,7 @@ if ($advisorDisplayName === '') {
                     <i class="fas fa-bars"></i>
                 </button>
                 <nav class="topbar-breadcrumb" aria-label="Fil d'Ariane">
-                    <a href="#" class="breadcrumb-home" data-module="construire" title="Accueil">
+                    <a href="/admin?module=construire" class="breadcrumb-home" data-module="construire" title="Accueil">
                         <i class="fas fa-house"></i>
                     </a>
                     <i class="fas fa-chevron-right breadcrumb-sep"></i>
@@ -108,11 +108,11 @@ if ($advisorDisplayName === '') {
                             </div>
                         </div>
                         <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item" data-module="profil">
+                        <a href="/admin?module=profil" class="dropdown-item" data-module="profil">
                             <i class="fas fa-user"></i>
                             Mon profil
                         </a>
-                        <a href="#" class="dropdown-item" data-module="parametres">
+                        <a href="/admin?module=parametres" class="dropdown-item" data-module="parametres">
                             <i class="fas fa-gear"></i>
                             Paramètres
                         </a>
