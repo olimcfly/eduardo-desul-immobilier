@@ -141,6 +141,6 @@ if ($advisorDisplayName === '') {
 
 </div>
 
-<script src="/admin/assets/js/dashboard.js"></script>
+<script src="/admin/assets/js/dashboard.js?v=<?= filemtime($_SERVER['DOCUMENT_ROOT'] . '/admin/assets/js/dashboard.js') ?>"></script>
 </body>
 </html>

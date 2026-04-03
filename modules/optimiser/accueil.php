@@ -7,14 +7,10 @@ require_once '../../admin/views/layout.php';
 function renderContent() {
     ?>
     <div class="page-header">
-        <div class="breadcrumb"><a href="/admin/">Accueil</a> &rsaquo; Optimiser</div>
         <h1><i class="fas fa-chart-line page-icon"></i> HUB <span class="page-title-accent">Optimiser</span></h1>
         <p>Analysez et améliorez en continu vos performances</p>
     </div>
-    <div class="search-container">
-        <i class="fas fa-search search-icon"></i>
-        <input type="text" class="search-input" placeholder="Rechercher…">
-    </div>
+
     <div class="cards-container">
 
         <div class="card" style="--card-accent:#3498db; --card-icon-bg:#e3f2fd;">
@@ -24,7 +20,7 @@ function renderContent() {
             </div>
             <p class="card-description">Vue consolidée de vos KPIs : leads, mandats, trafic, conversions.</p>
             <div class="card-tags"><span class="tag">KPIs</span><span class="tag">Reporting</span></div>
-            <a href="#" class="card-action"><i class="fas fa-play"></i> Consulter</a>
+            <span class="card-soon"><i class="fas fa-clock"></i> Arrivée bientôt</span>
         </div>
 
         <div class="card" style="--card-accent:#f39c12; --card-icon-bg:#fef9e7;">
@@ -34,7 +30,7 @@ function renderContent() {
             </div>
             <p class="card-description">Testez vos pages, emails et messages pour maximiser les taux de conversion.</p>
             <div class="card-tags"><span class="tag">Tests</span><span class="tag">Conversion</span></div>
-            <a href="#" class="card-action"><i class="fas fa-play"></i> Configurer</a>
+            <span class="card-soon"><i class="fas fa-clock"></i> Arrivée bientôt</span>
         </div>
 
         <div class="card" style="--card-accent:#27ae60; --card-icon-bg:#eafaf1;">
@@ -44,7 +40,7 @@ function renderContent() {
             </div>
             <p class="card-description">Suggestions personnalisées pour améliorer vos actions chaque semaine.</p>
             <div class="card-tags"><span class="tag">IA</span><span class="tag">Insights</span></div>
-            <a href="#" class="card-action"><i class="fas fa-play"></i> Voir</a>
+            <span class="card-soon"><i class="fas fa-clock"></i> Arrivée bientôt</span>
         </div>
 
         <div class="card" style="--card-accent:#e74c3c; --card-icon-bg:#fdedec;">
@@ -54,7 +50,7 @@ function renderContent() {
             </div>
             <p class="card-description">Générez votre rapport de performance mensuel en un clic.</p>
             <div class="card-tags"><span class="tag">Rapport</span><span class="tag">Export PDF</span></div>
-            <a href="#" class="card-action"><i class="fas fa-play"></i> Générer</a>
+            <span class="card-soon"><i class="fas fa-clock"></i> Arrivée bientôt</span>
         </div>
 
     </div>

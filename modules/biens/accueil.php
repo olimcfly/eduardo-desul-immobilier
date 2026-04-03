@@ -7,14 +7,10 @@ require_once '../../admin/views/layout.php';
 function renderContent() {
     ?>
     <div class="page-header">
-        <div class="breadcrumb"><a href="/admin/">Accueil</a> &rsaquo; Biens</div>
         <h1><i class="fas fa-house page-icon"></i> HUB <span class="page-title-accent">Biens</span></h1>
         <p>Gérez votre portefeuille de biens immobiliers</p>
     </div>
-    <div class="search-container">
-        <i class="fas fa-search search-icon"></i>
-        <input type="text" class="search-input" placeholder="Rechercher un bien…">
-    </div>
+
     <div class="cards-container">
 
         <div class="card" style="--card-accent:#3498db; --card-icon-bg:#e3f2fd;">
@@ -44,7 +40,7 @@ function renderContent() {
             </div>
             <p class="card-description">Gérez les photos, plans et vidéos de vos biens.</p>
             <div class="card-tags"><span class="tag">Photos</span><span class="tag">Plans</span><span class="tag">Vidéos</span></div>
-            <a href="#" class="card-action"><i class="fas fa-arrow-right"></i> Gérer</a>
+            <span class="card-soon"><i class="fas fa-clock"></i> Arrivée bientôt</span>
         </div>
 
         <div class="card" style="--card-accent:#e74c3c; --card-icon-bg:#fdedec;">
@@ -54,7 +50,7 @@ function renderContent() {
             </div>
             <p class="card-description">Publiez vos biens sur les portails immobiliers en un clic.</p>
             <div class="card-tags"><span class="tag">SeLoger</span><span class="tag">LeBonCoin</span></div>
-            <a href="#" class="card-action"><i class="fas fa-arrow-right"></i> Diffuser</a>
+            <span class="card-soon"><i class="fas fa-clock"></i> Arrivée bientôt</span>
         </div>
 
     </div>

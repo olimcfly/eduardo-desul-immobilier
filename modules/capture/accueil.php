@@ -7,14 +7,10 @@ require_once '../../admin/views/layout.php';
 function renderContent() {
     ?>
     <div class="page-header">
-        <div class="breadcrumb"><a href="/admin/">Accueil</a> &rsaquo; Capture</div>
         <h1><i class="fas fa-magnet page-icon"></i> HUB <span class="page-title-accent">Capture</span></h1>
         <p>Pages et formulaires de capture de leads</p>
     </div>
-    <div class="search-container">
-        <i class="fas fa-search search-icon"></i>
-        <input type="text" class="search-input" placeholder="Rechercher…">
-    </div>
+
     <div class="cards-container">
 
         <div class="card" style="--card-accent:#3498db; --card-icon-bg:#e3f2fd;">
@@ -54,7 +50,7 @@ function renderContent() {
             </div>
             <p class="card-description">Taux de conversion, sources de trafic et performance des formulaires.</p>
             <div class="card-tags"><span class="tag">Taux de conv.</span><span class="tag">Sources</span></div>
-            <a href="#" class="card-action"><i class="fas fa-arrow-right"></i> Analyser</a>
+            <span class="card-soon"><i class="fas fa-clock"></i> Arrivée bientôt</span>
         </div>
 
     </div>
