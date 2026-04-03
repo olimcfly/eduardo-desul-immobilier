@@ -1,3 +1,6 @@
+const APP_SETTINGS = window.__APP_SETTINGS__ || {};
+const ADVISOR_NAME = APP_SETTINGS.advisorName || 'votre conseiller';
+
 /* ── Biens JS ────────────────────────────────────────────────── */
 
 'use strict';
@@ -38,7 +41,7 @@ contactBien?.addEventListener('submit', async e => {
     });
     const json = await res.json();
     if (json.success) {
-      contactBien.innerHTML = '<p class="text-center" style="padding:2rem;color:var(--clr-success)">✅ Message envoyé ! Eduardo vous contactera sous 24h.</p>';
+      contactBien.innerHTML = `<p class="text-center" style="padding:2rem;color:var(--clr-success)">✅ Message envoyé ! ${ADVISOR_NAME} vous contactera sous 24h.</p>`;
     } else {
       btn.disabled = false;
       btn.textContent = 'Envoyer';

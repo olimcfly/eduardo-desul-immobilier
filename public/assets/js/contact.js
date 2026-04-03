@@ -1,3 +1,6 @@
+const APP_SETTINGS = window.__APP_SETTINGS__ || {};
+const ADVISOR_NAME = APP_SETTINGS.advisorName || 'votre conseiller';
+
 /* ── Contact JS ──────────────────────────────────────────────── */
 
 'use strict';
@@ -42,7 +45,7 @@ contactForm?.addEventListener('submit', async e => {
         <div style="text-align:center;padding:3rem 1rem">
           <div style="font-size:3rem;margin-bottom:1rem">✅</div>
           <h2>Message envoyé !</h2>
-          <p style="color:var(--clr-text-muted);margin-top:.75rem">Eduardo vous répondra dans les plus brefs délais, généralement sous 24h.</p>
+          <p style="color:var(--clr-text-muted);margin-top:.75rem">${ADVISOR_NAME} vous répondra dans les plus brefs délais, généralement sous 24h.</p>
         </div>`;
     } else {
       btn.disabled = false;
