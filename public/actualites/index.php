@@ -57,7 +57,7 @@ $extraCss  = ['/assets/css/guide.css'];
                 <div style="background:var(--clr-primary);color:white;border-radius:var(--radius-lg);padding:1.5rem;text-align:center">
                     <h4 style="color:white;margin-bottom:.75rem">Newsletter</h4>
                     <p style="font-size:.8rem;opacity:.8;margin-bottom:1rem">Recevez les actualités immobilières bordelaises chaque semaine.</p>
-                    <a href="/capture/guide-offert" class="btn btn--accent btn--sm btn--full">S'abonner gratuitement</a>
+                    <a href="/guide-offert" class="btn btn--accent btn--sm btn--full">S'abonner gratuitement</a>
                 </div>
             </aside>
         </div>

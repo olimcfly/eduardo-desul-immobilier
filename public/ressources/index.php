@@ -44,13 +44,13 @@ $guidesByPersona = require __DIR__ . '/guides-data.php';
         <?php endforeach; ?>
 
         <div class="ressources-grid" data-animate style="margin-top:2rem">
-            <a href="/capture/estimation-gratuite" class="ressource-card" style="text-decoration:none;color:inherit">
+            <a href="/estimation-gratuite" class="ressource-card" style="text-decoration:none;color:inherit">
                 <div class="ressource-card__icon">📊</div>
                 <h3 class="ressource-card__title">Estimation gratuite</h3>
                 <p class="ressource-card__desc">Découvrez la valeur réelle de votre bien grâce à une évaluation personnalisée par Eduardo.</p>
                 <span class="btn btn--accent btn--sm">Estimer maintenant →</span>
             </a>
-            <a href="/capture/guide-offert" class="ressource-card" style="text-decoration:none;color:inherit">
+            <a href="/guide-offert" class="ressource-card" style="text-decoration:none;color:inherit">
                 <div class="ressource-card__icon">📧</div>
                 <h3 class="ressource-card__title">Newsletter & alertes</h3>
                 <p class="ressource-card__desc">Recevez les nouvelles annonces et les actualités du marché bordelais directement dans votre boîte mail.</p>
