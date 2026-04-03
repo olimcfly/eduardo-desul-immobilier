@@ -12,7 +12,7 @@ function isActive(string $path, string $current): string {
     <div class="container header__inner">
 
         <!-- Logo -->
-        <a href="/" class="header__logo" aria-label="<?= e($advisorName) ?> — Accueil">
+        <a href="<?= e(url('/')) ?>" class="header__logo" aria-label="<?= e($advisorName) ?> — Accueil">
             <span class="logo__icon">🏡</span>
             <span class="logo__text">
                 <strong><?= e($advisorName) ?></strong>
@@ -30,7 +30,7 @@ function isActive(string $path, string $current): string {
                 📞 <?= e(APP_PHONE) ?>
             </a>
             <?php endif; ?>
-            <a href="/estimation-gratuite" class="btn btn--primary">Estimation gratuite</a>
+            <a href="<?= e(url('/estimation-gratuite')) ?>" class="btn btn--primary">Estimation gratuite</a>
         </div>
 
         <!-- Burger mobile -->

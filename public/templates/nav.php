@@ -2,25 +2,25 @@
 $currentUri = $currentUri ?? parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 $navItems = [
-    ['href' => '/',         'label' => 'Accueil'],
-    ['href' => '/biens',    'label' => 'Biens'],
-    ['href' => '/services', 'label' => 'Services'],
-    ['href' => '/blog',     'label' => 'Contenu',
+    ['path' => '/',         'href' => url('/'),         'label' => 'Accueil'],
+    ['path' => '/biens',    'href' => url('/biens'),    'label' => 'Biens'],
+    ['path' => '/services', 'href' => url('/services'), 'label' => 'Services'],
+    ['path' => '/blog',     'href' => url('/blog'),     'label' => 'Contenu',
      'sub' => [
-        ['href' => '/blog',         'label' => 'Blog'],
-        ['href' => '/actualites',   'label' => 'Actualités'],
-        ['href' => '/guide-local',  'label' => 'Guide local'],
-        ['href' => '/ressources',   'label' => 'Ressources'],
+        ['path' => '/blog',        'href' => url('/blog'),        'label' => 'Blog'],
+        ['path' => '/actualites',  'href' => url('/actualites'),  'label' => 'Actualités'],
+        ['path' => '/guide-local', 'href' => url('/guide-local'), 'label' => 'Guide local'],
+        ['path' => '/ressources',  'href' => url('/ressources'),  'label' => 'Ressources'],
      ]
     ],
-    ['href' => '/a-propos', 'label' => 'À propos'],
-    ['href' => '/contact',  'label' => 'Contact'],
+    ['path' => '/a-propos', 'href' => url('/a-propos'), 'label' => 'À propos'],
+    ['path' => '/contact',  'href' => url('/contact'),  'label' => 'Contact'],
 ];
 ?>
 <nav class="site-nav" id="site-nav" role="navigation" aria-label="Navigation principale">
     <ul class="nav__list">
         <?php foreach ($navItems as $item): ?>
-        <?php $active = isActive($item['href'], $currentUri); ?>
+        <?php $active = isActive($item['path'], $currentUri); ?>
         <li class="nav__item <?= !empty($item['sub']) ? 'has-dropdown' : '' ?> <?= $active ?>">
             <a href="<?= e($item['href']) ?>" class="nav__link <?= $active ?>"
                <?= !empty($item['sub']) ? 'aria-haspopup="true" aria-expanded="false"' : '' ?>>
@@ -49,7 +49,7 @@ $navItems = [
     <ul>
         <?php foreach ($navItems as $item): ?>
         <li>
-            <a href="<?= e($item['href']) ?>" class="<?= isActive($item['href'], $currentUri) ?>">
+            <a href="<?= e($item['href']) ?>" class="<?= isActive($item['path'], $currentUri) ?>">
                 <?= e($item['label']) ?>
             </a>
             <?php if (!empty($item['sub'])): ?>
@@ -61,7 +61,7 @@ $navItems = [
             <?php endif; ?>
         </li>
         <?php endforeach; ?>
-        <li><a href="/estimation-gratuite" class="btn btn--primary btn--full">Estimation gratuite</a></li>
+        <li><a href="<?= e(url('/estimation-gratuite')) ?>" class="btn btn--primary btn--full">Estimation gratuite</a></li>
     </ul>
 </div>
 <div class="nav-overlay" id="nav-overlay"></div>
