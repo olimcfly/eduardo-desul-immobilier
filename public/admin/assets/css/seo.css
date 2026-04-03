@@ -1,0 +1,23 @@
+.seo-hub,.seo-section{background:#f8fafc;padding:20px;border-radius:14px}
+.seo-breadcrumb{font-size:13px;color:#64748b;margin-bottom:8px}.seo-breadcrumb a{text-decoration:none}
+.seo-subtitle{color:#475569;margin-bottom:14px}
+.seo-search-wrap input{width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:10px;background:#fff}
+.seo-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.seo-card{background:#fff;border-left:4px solid var(--accent);border-radius:12px;padding:16px;box-shadow:0 1px 2px rgba(15,23,42,.08);transition:all .2s}
+.seo-card:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(15,23,42,.12)}
+.seo-card-head{display:flex;align-items:center;gap:10px}.seo-card .icon{background:var(--icon-bg);width:34px;height:34px;display:grid;place-items:center;border-radius:9px}
+.badges{display:flex;gap:8px;margin:8px 0}.badges span,.pill{background:#e2e8f0;color:#0f172a;border-radius:999px;padding:3px 10px;font-size:12px}
+.seo-card a{font-weight:600;display:inline-block;margin:4px 0 8px}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:12px 0}
+.kpi{background:#fff;padding:12px;border-radius:10px;border:1px solid #e2e8f0}.kpi strong{font-size:24px;display:block}
+.inline-form{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}.inline-form input,.inline-form select,.inline-form textarea,.city-form input,.city-form textarea{border:1px solid #cbd5e1;border-radius:8px;padding:8px;background:#fff}
+.inline-form button,.actions button{background:#0f172a;color:#fff;border:none;border-radius:8px;padding:8px 12px;cursor:pointer}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0}
+.table-wrap{overflow:auto;background:#fff;border-radius:10px;border:1px solid #e2e8f0}
+table{width:100%;border-collapse:collapse}th,td{padding:10px;border-bottom:1px solid #e2e8f0;text-align:left}tbody tr:nth-child(even){background:#f8fafc}
+.difficulty{background:#f1f5f9;border-radius:999px;overflow:hidden;height:8px;min-width:80px}.difficulty i{display:block;height:100%;background:linear-gradient(90deg,#22c55e,#f59e0b,#ef4444)}
+.chart-card, .serp-preview, pre#sitemap-xml-preview{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:12px;margin-top:12px}
+.grid-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.score-circles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:14px 0}
+.score-circle{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:8px;text-align:center}
+@media (max-width: 860px){.seo-grid,.kpi-grid,.score-circles,.grid-two{grid-template-columns:1fr}}

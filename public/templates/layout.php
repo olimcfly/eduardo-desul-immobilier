@@ -1,16 +1,20 @@
+<?php
+$zoneCity = setting('zone_city', APP_CITY);
+$siteMetaDescription = setting('site_meta_description', 'Conseiller immobilier indépendant dans votre secteur.');
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($pageTitle ?? APP_NAME) ?></title>
-    <meta name="description" content="<?= e($metaDesc ?? 'Conseiller immobilier indépendant à Bordeaux — Eduardo Desul vous accompagne dans tous vos projets immobiliers.') ?>">
+    <meta name="description" content="<?= e($metaDesc ?? $siteMetaDescription) ?>">
     <meta name="robots" content="<?= e($metaRobots ?? 'index, follow') ?>">
     <link rel="canonical" href="<?= e($canonical ?? APP_URL . strtok($_SERVER['REQUEST_URI'], '?')) ?>">
 
     <!-- Open Graph -->
     <meta property="og:title"       content="<?= e($pageTitle ?? APP_NAME) ?>">
-    <meta property="og:description" content="<?= e($metaDesc ?? 'Conseiller immobilier à Bordeaux') ?>">
+    <meta property="og:description" content="<?= e($metaDesc ?? ('Conseiller immobilier à ' . ($zoneCity ?: 'votre secteur'))) ?>">
     <meta property="og:type"        content="<?= e($ogType ?? 'website') ?>">
     <meta property="og:url"         content="<?= e(APP_URL . $_SERVER['REQUEST_URI']) ?>">
     <meta property="og:locale"      content="fr_FR">
@@ -30,18 +34,18 @@
         "@context": "https://schema.org",
         "@type": "RealEstateAgent",
         "name": "<?= e(APP_NAME) ?>",
-        "description": "Conseiller immobilier indépendant à Bordeaux",
+        "description": "<?= e($siteMetaDescription) ?>",
         "url": "<?= e(APP_URL) ?>",
         "telephone": "<?= e(APP_PHONE) ?>",
         "email": "<?= e(APP_EMAIL) ?>",
         "address": {
             "@type": "PostalAddress",
-            "addressLocality": "Bordeaux",
+            "addressLocality": "<?= e($zoneCity) ?>",
             "addressCountry": "FR"
         },
         "areaServed": {
             "@type": "City",
-            "name": "Bordeaux"
+            "name": "<?= e($zoneCity) ?>"
         }
         <?php if (!empty($jsonLd)): ?>,<?= $jsonLd ?><?php endif; ?>
     }
@@ -76,6 +80,13 @@
 </main>
 
 <?php require __DIR__ . '/footer.php'; ?>
+
+<script>
+window.__APP_SETTINGS__ = {
+    advisorName: <?= json_encode(trim((string) setting('advisor_firstname', '') . ' ' . (string) setting('advisor_lastname', '')) ?: (ADVISOR_NAME ?: APP_NAME), JSON_UNESCAPED_UNICODE) ?>,
+    zoneCity: <?= json_encode((string) setting('zone_city', APP_CITY), JSON_UNESCAPED_UNICODE) ?>
+};
+</script>
 
 <!-- JS -->
 <script src="/assets/js/main.js" defer></script>

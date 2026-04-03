@@ -25,6 +25,7 @@ require ROOT_PATH . '/core/Controller.php';
 require ROOT_PATH . '/core/Model.php';
 require ROOT_PATH . '/core/Router.php';
 require ROOT_PATH . '/core/helpers/helpers.php';
+require_once ROOT_PATH . '/includes/settings.php';
 
 // Démarrer la session
 Session::start();
@@ -44,6 +45,9 @@ function page(string $template, array $data = []): void
     ob_start();
     require $tplFile;
     $pageContent = ob_get_clean();
+    $pageContent = replacePlaceholders($pageContent);
+    if (isset($pageTitle)) { $pageTitle = replacePlaceholders((string)$pageTitle); }
+    if (isset($metaDesc)) { $metaDesc = replacePlaceholders((string)$metaDesc); }
     require ROOT_PATH . '/public/templates/layout.php';
 }
 
