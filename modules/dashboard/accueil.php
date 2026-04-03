@@ -2,7 +2,6 @@
 $pageTitle = "Tableau de bord";
 $pageDescription = "Vue d'ensemble de votre activité immobilière";
 
-require_once '../../admin/views/layout.php';
 
 function renderContent() {
     ?>

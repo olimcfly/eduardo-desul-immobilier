@@ -1,2 +1,2 @@
 <?php
-require_once '../../../modules/assistant/api.php';
+require_once __DIR__ . '/../../../modules/assistant/api.php';

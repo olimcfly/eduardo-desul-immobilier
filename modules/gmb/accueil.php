@@ -8,7 +8,6 @@ if (!in_array($view, $allowedViews, true)) {
     $view = 'index';
 }
 
-require_once '../../admin/views/layout.php';
 
 function renderContent(): void
 {
