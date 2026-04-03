@@ -1,5 +1,7 @@
 <?php
 require_once '../../core/bootstrap.php';
+require_once '../../core/Database.php';
+require_once '../../core/services/ModuleService.php';
 
 // Protège l'accès — redirige vers /admin/login si non connecté
 Auth::requireAuth('/admin/login');
@@ -9,6 +11,14 @@ $action = isset($_GET['action']) ? $_GET['action'] : 'index';
 
 // Sécurisation : n'accepter que des noms de modules valides
 $module = preg_replace('/[^a-z0-9_-]/', '', $module);
+
+$user = Auth::user();
+$role = (string) ($user['role'] ?? 'user');
+
+if (!ModuleService::isEnabledForRole($module, $role)) {
+    ModuleService::renderUnavailablePage($module);
+    exit;
+}
 
 $modulePath = "../../modules/{$module}/accueil.php";
 

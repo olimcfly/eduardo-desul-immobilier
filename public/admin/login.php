@@ -20,8 +20,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $pdo = db();
 
-            // Vérifier que l'email correspond à un admin
-            $stmt = $pdo->prepare("SELECT id, name, role FROM users WHERE email = ? AND role = 'admin' LIMIT 1");
+            // Vérifier que l'email correspond à un admin ou superadmin
+            $stmt = $pdo->prepare("SELECT id, name, role FROM users WHERE email = ? AND role IN ('admin', 'superadmin') LIMIT 1");
             $stmt->execute([$email]);
             $user = $stmt->fetch();
 
