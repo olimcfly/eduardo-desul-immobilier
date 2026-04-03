@@ -6,19 +6,8 @@ $pageDescription = "Générez des vendeurs qualifiés sur votre territoire";
 function renderContent() {
     ?>
     <div class="page-header">
-        <div class="breadcrumb">
-            <a href="/admin/">Accueil</a> &rsaquo; Attirer
-        </div>
-        <h1>
-            <i class="fas fa-bullseye page-icon"></i>
-            HUB <span class="page-title-accent">Attirer</span>
-        </h1>
+        <h1><i class="fas fa-bullseye page-icon"></i> HUB <span class="page-title-accent">Attirer</span></h1>
         <p>Générez des vendeurs qualifiés sur votre territoire</p>
-    </div>
-
-    <div class="search-container">
-        <i class="fas fa-search search-icon"></i>
-        <input type="text" class="search-input" placeholder="Rechercher…">
     </div>
 
     <div class="cards-container">
@@ -34,7 +23,7 @@ function renderContent() {
                 <span class="tag">Mots-clés</span>
                 <span class="tag">Fiche ville</span>
             </div>
-            <a href="#" class="card-action"><i class="fas fa-play"></i> Configurer</a>
+            <a href="?module=seo" class="card-action"><i class="fas fa-arrow-right"></i> Accéder</a>
         </div>
 
         <div class="card" style="--card-accent:#e74c3c; --card-icon-bg:#fdedec;">
@@ -47,7 +36,7 @@ function renderContent() {
                 <span class="tag">Wizard 5 étapes</span>
                 <span class="tag">Perplexity IA</span>
             </div>
-            <a href="#" class="card-action"><i class="fas fa-play"></i> Configurer</a>
+            <span class="card-soon"><i class="fas fa-clock"></i> Arrivée bientôt</span>
         </div>
 
         <div class="card" style="--card-accent:#3b5998; --card-icon-bg:#eaf0fb;">
@@ -60,7 +49,7 @@ function renderContent() {
                 <span class="tag">Ciblage local</span>
                 <span class="tag">Lookalike</span>
             </div>
-            <a href="#" class="card-action"><i class="fas fa-play"></i> Configurer</a>
+            <span class="card-soon"><i class="fas fa-clock"></i> Arrivée bientôt</span>
         </div>
 
         <div class="card" style="--card-accent:#f39c12; --card-icon-bg:#fef9e7;">
@@ -74,7 +63,7 @@ function renderContent() {
                 <span class="tag">Blog</span>
                 <span class="tag">Autorité</span>
             </div>
-            <a href="#" class="card-action"><i class="fas fa-play"></i> Configurer</a>
+            <span class="card-soon"><i class="fas fa-clock"></i> Arrivée bientôt</span>
         </div>
 
     </div>

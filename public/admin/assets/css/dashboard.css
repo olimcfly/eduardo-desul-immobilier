@@ -785,6 +785,21 @@ body {
 .badge-danger  { background: #fdedec; color: #e74c3c; }
 .badge-muted   { background: #ecf0f1; color: #7f8c8d; }
 
+.card-soon {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #f39c12;
+    background: #fef9e7;
+    border: 1px solid #f9d56e;
+    border-radius: 20px;
+    padding: 4px 10px;
+    cursor: default;
+    width: fit-content;
+}
+
 /* ============================================================
    DATA TABLE
 ============================================================ */

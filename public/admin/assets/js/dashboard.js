@@ -79,6 +79,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 const inner  = doc.getElementById('main-content');
                 if (inner) {
                     mainContent.innerHTML = inner.innerHTML;
+
+                    // Mettre à jour le breadcrumb de la topbar avec le titre du module chargé
+                    const pageTitle = doc.title ? doc.title.split(' — ')[0].trim() : module;
+                    const breadcrumbCurrent = document.querySelector('.breadcrumb-current');
+                    if (breadcrumbCurrent) breadcrumbCurrent.textContent = pageTitle;
+
+                    // Mettre à jour le titre de la page
+                    document.title = doc.title || document.title;
                 } else {
                     // Sécurité : ne jamais injecter le HTML complet (évite le layout imbriqué)
                     mainContent.innerHTML = '<div class="loading-spinner"><i class="fas fa-triangle-exclamation"></i>&nbsp;Impossible de charger ce module.</div>';

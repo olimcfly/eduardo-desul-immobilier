@@ -1,15 +1,36 @@
 <?php
-$pageTitle       = 'Construire';
+$allowedActions = ['index', 'ancre', 'profils', 'offre', 'zone', 'synthese', 'actions'];
+$action = isset($_GET['action']) ? preg_replace('/[^a-z_-]/', '', (string)$_GET['action']) : 'index';
+if (!in_array($action, $allowedActions, true)) $action = 'index';
+
+$actionTitles = [
+    'ancre'    => 'Méthode ANCRE+ — Positionnement',
+    'profils'  => 'NeuroPersona — Profils Clients',
+    'offre'    => 'Offre Conseiller — Formulation',
+    'zone'     => 'Zone de Prospection',
+    'synthese' => 'Synthèse Stratégique',
+    'actions'  => 'Actions du Jour',
+];
+
+$pageTitle       = $action === 'index' ? 'Construire' : ($actionTitles[$action] ?? 'Construire');
 $pageDescription = 'Posez les bases solides de votre activité';
 
 
 function renderContent()
 {
+    global $action;
+
+    if ($action !== 'index') {
+        $file = __DIR__ . '/' . $action . '.php';
+        if (is_file($file)) {
+            include $file;
+            return;
+        }
+    }
     ?>
     <div class="page-header">
-        <div class="breadcrumb"><a href="/admin/">Accueil</a> &rsaquo; Construire</div>
         <h1><i class="fas fa-layer-group page-icon"></i> HUB <span class="page-title-accent">Construire</span></h1>
-        <p>Posez les bases solides de votre activité</p>
+        <p>Posez les bases solides de votre activité avec Noah IA</p>
     </div>
 
     <style>
@@ -137,35 +158,25 @@ function renderContent()
             ['name' => 'zone',           'label' => 'Zone',              'placeholder' => 'ex : Mérignac, Pessac, Talence'],
         ]); ?>
 
-        <?php noahCard('actions', 'Actions du Jour', '3 à 5 actions concrètes et mesurables', '#16a085', '#e8f8f5', 'fa-bolt', [
-            ['name' => 'experience', 'label' => 'Niveau d\'expérience',  'placeholder' => 'ex : 2 ans en immobilier'],
-            ['name' => 'objectif',   'label' => 'Objectif mensuel',      'placeholder' => 'ex : 3 mandats signés'],
-            ['name' => 'biens',      'label' => 'Biens en portefeuille', 'placeholder' => 'ex : 8 biens actifs'],
-            ['name' => 'activite',   'label' => 'Activité actuelle',     'placeholder' => 'ex : peu de prospection terrain'],
-        ]); ?>
+        <div class="card" style="--card-accent:#e74c3c; --card-icon-bg:#fdedec;">
+            <div class="card-header">
+                <div class="card-icon"><i class="fas fa-anchor"></i></div>
+                <h3 class="card-title">Méthode ANCRE+</h3>
+            </div>
+            <p class="card-description">Générez 3 formulations d'accroche claires pour votre positionnement conseiller.</p>
+            <div class="card-tags"><span class="tag">Noah IA</span><span class="tag">Positionnement</span></div>
+            <a href="?module=construire&action=ancre" class="card-action"><i class="fas fa-arrow-right"></i> Accéder</a>
+        </div>
 
-    </div>
-
-    <script>
-    document.querySelectorAll('.noah-card-header').forEach(header => {
-        header.addEventListener('click', () => {
-            header.closest('.noah-card').classList.toggle('open');
-        });
-    });
-
-    document.querySelectorAll('.noah-form').forEach(form => {
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const card   = form.closest('.noah-card');
-            const btn    = form.querySelector('.noah-btn');
-            const result = card.querySelector('.noah-result');
-            const errBox = card.querySelector('.noah-error');
-            const icon   = btn.querySelector('i');
-
-            btn.disabled = true;
-            icon.className = 'fas fa-spinner noah-spinner';
-            result.classList.remove('visible');
-            errBox.classList.remove('visible');
+        <div class="card" style="--card-accent:#3498db; --card-icon-bg:#e3f2fd;">
+            <div class="card-header">
+                <div class="card-icon"><i class="fas fa-brain"></i></div>
+                <h3 class="card-title">NeuroPersona</h3>
+            </div>
+            <p class="card-description">Identifiez vos 3 profils clients prioritaires sur votre territoire.</p>
+            <div class="card-tags"><span class="tag">Noah IA</span><span class="tag">Profils clients</span></div>
+            <a href="?module=construire&action=profils" class="card-action"><i class="fas fa-arrow-right"></i> Accéder</a>
+        </div>
 
             try {
                 const controller = new AbortController();
@@ -201,20 +212,24 @@ function renderContent()
     <?php
 }
 
-function noahCard(string $tool, string $title, string $sub, string $color, string $iconBg, string $icon, array $fields): void
-{
-    ?>
-    <div class="noah-card">
-        <div class="noah-card-header">
-            <div class="noah-card-icon" style="background:<?= $iconBg ?>; color:<?= $color ?>">
-                <i class="fas <?= $icon ?>"></i>
+        <div class="card" style="--card-accent:#e67e22; --card-icon-bg:#fef5e7;">
+            <div class="card-header">
+                <div class="card-icon"><i class="fas fa-layer-group"></i></div>
+                <h3 class="card-title">Synthèse Stratégique</h3>
             </div>
-            <div>
-                <div class="noah-card-title"><?= htmlspecialchars($title) ?></div>
-                <div class="noah-card-sub"><?= htmlspecialchars($sub) ?></div>
+            <p class="card-description">Résumez votre situation et votre stratégie en 100 mots percutants.</p>
+            <div class="card-tags"><span class="tag">Noah IA</span><span class="tag">Stratégie</span></div>
+            <a href="?module=construire&action=synthese" class="card-action"><i class="fas fa-arrow-right"></i> Accéder</a>
+        </div>
+
+        <div class="card" style="--card-accent:#16a085; --card-icon-bg:#e8f8f5;">
+            <div class="card-header">
+                <div class="card-icon"><i class="fas fa-bolt"></i></div>
+                <h3 class="card-title">Actions du Jour</h3>
             </div>
-            <span class="noah-card-badge">Noah IA</span>
-            <i class="fas fa-chevron-down noah-card-chevron"></i>
+            <p class="card-description">Obtenez 3 à 5 actions concrètes et mesurables pour aujourd'hui.</p>
+            <div class="card-tags"><span class="tag">Noah IA</span><span class="tag">Plan d'action</span></div>
+            <a href="?module=construire&action=actions" class="card-action"><i class="fas fa-arrow-right"></i> Accéder</a>
         </div>
         <form class="noah-form" method="POST">
             <input type="hidden" name="tool" value="<?= htmlspecialchars($tool) ?>">

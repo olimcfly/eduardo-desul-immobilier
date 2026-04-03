@@ -7,10 +7,10 @@ function renderContent() {
     $user = Auth::user();
     ?>
     <div class="page-header">
-        <div class="breadcrumb"><a href="/admin/">Accueil</a> &rsaquo; Mon profil</div>
         <h1><i class="fas fa-user page-icon"></i> <span class="page-title-accent">Mon profil</span></h1>
         <p>Gérez votre identité de conseiller</p>
     </div>
+
     <div class="cards-container">
 
         <div class="card" style="--card-accent:#3498db; --card-icon-bg:#e3f2fd;">
