@@ -58,13 +58,13 @@ const SOCIAL_PLATFORMS = [
 
 // ── Emails ───────────────────────────────────────────────────
 const SMTP = [
-    'host'     => 'arbre.o2switch.net',
+    'host'     => '',
     'port'     => 587,
     'secure'   => 'tls',
-    'user'     => 'contact@eduardo-desul-immobilier.fr',
-    'pass'     => 'h2rq71k8fdl5q5a9',
-    'from'     => 'contact@eduardo-desul-immobilier.fr',
-    'name'     => 'Eduardo Desul Immobilier',
+    'user'     => '',
+    'pass'     => '',
+    'from'     => '',
+    'name'     => '',
 ];
 
 // ── Clés API (à remplir) ─────────────────────────────────────
