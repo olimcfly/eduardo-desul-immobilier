@@ -1,3 +1,12 @@
+<?php
+$advisorName = trim((string) setting('advisor_firstname', '') . ' ' . (string) setting('advisor_lastname', ''));
+if ($advisorName === '') {
+    $advisorName = ADVISOR_NAME ?: APP_NAME;
+}
+$advisorTitle = setting('advisor_title', 'Conseiller Immobilier');
+$advisorTagline = setting('advisor_tagline', '');
+$zoneCity = setting('zone_city', APP_CITY);
+?>
 <footer class="site-footer">
     <div class="container footer__grid">
 
@@ -5,9 +14,9 @@
         <div class="footer__col footer__brand">
             <a href="/" class="footer__logo">
                 <span>🏡</span>
-                <span><strong>Eduardo Desul</strong><br><em>Conseiller Immobilier</em></span>
+                <span><strong><?= e($advisorName) ?></strong><br><em><?= e((string)$advisorTitle) ?></em></span>
             </a>
-            <p class="footer__tagline">Expert immobilier indépendant à Bordeaux. Je vous accompagne dans l'achat, la vente et l'estimation de votre bien avec transparence et proximité.</p>
+            <p class="footer__tagline"><?= e($advisorTagline ?: "Expert immobilier indépendant. Je vous accompagne dans l'achat, la vente et l'estimation de votre bien avec transparence et proximité.") ?></p>
             <div class="footer__social">
                 <a href="#" class="social-link" aria-label="Facebook" rel="noopener noreferrer">
                     <svg viewBox="0 0 24 24" width="20" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
@@ -40,7 +49,7 @@
                 <li><a href="/a-propos">À propos</a></li>
                 <li><a href="/blog">Blog immobilier</a></li>
                 <li><a href="/actualites">Actualités</a></li>
-                <li><a href="/guide-local">Guide local Bordeaux</a></li>
+                <li><a href="/guide-local">Guide local <?= e($zoneCity ?: "local") ?></a></li>
                 <li><a href="/avis">Avis clients</a></li>
             </ul>
         </div>

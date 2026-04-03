@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vérification OTP — Admin Eduardo Desul</title>
+    <title>Vérification OTP — Admin <?= htmlspecialchars(trim((string) setting('advisor_firstname', '') . ' ' . (string) setting('advisor_lastname', '')) ?: (ADVISOR_NAME ?: APP_NAME)) ?></title>
     <meta name="robots" content="noindex, nofollow">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }

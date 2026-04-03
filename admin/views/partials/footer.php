@@ -5,7 +5,7 @@
             IMMO LOCAL+
         </span>
         <span class="footer-sep">·</span>
-        <span>&copy; <?= date('Y') ?> Eduardo De Sul Immobilier. Tous droits réservés.</span>
+        <span>&copy; <?= date('Y') ?> <?= htmlspecialchars(trim((string) setting('advisor_firstname', '') . ' ' . (string) setting('advisor_lastname', '')) ?: (ADVISOR_NAME ?: APP_NAME)) ?> Immobilier. Tous droits réservés.</span>
     </div>
     <div class="footer-center">
         <a href="#" class="footer-link">Support</a>

@@ -1,5 +1,9 @@
 <?php
 $currentUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$advisorName = trim((string) setting('advisor_firstname', '') . ' ' . (string) setting('advisor_lastname', ''));
+if ($advisorName === '') {
+    $advisorName = ADVISOR_NAME ?: APP_NAME;
+}
 function isActive(string $path, string $current): string {
     return ($path !== '/' ? str_starts_with($current, $path) : $current === '/') ? 'active' : '';
 }
@@ -8,10 +12,10 @@ function isActive(string $path, string $current): string {
     <div class="container header__inner">
 
         <!-- Logo -->
-        <a href="/" class="header__logo" aria-label="Eduardo Desul Immobilier — Accueil">
+        <a href="/" class="header__logo" aria-label="<?= e($advisorName) ?> — Accueil">
             <span class="logo__icon">🏡</span>
             <span class="logo__text">
-                <strong>Eduardo Desul</strong>
+                <strong><?= e($advisorName) ?></strong>
                 <em>Immobilier</em>
             </span>
         </a>
