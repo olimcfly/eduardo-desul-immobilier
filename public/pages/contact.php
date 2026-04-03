@@ -1,4 +1,31 @@
 <?php
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    verifyCsrf();
+
+    $email = trim((string)($_POST['email'] ?? ''));
+    $prenom = trim((string)($_POST['prenom'] ?? ''));
+
+    if ($email !== '' && $prenom !== '' && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        LeadService::capture([
+            'source_type' => LeadService::SOURCE_CONTACT,
+            'pipeline' => LeadService::SOURCE_CONTACT,
+            'stage' => 'a_traiter',
+            'first_name' => $prenom,
+            'last_name' => trim((string)($_POST['nom'] ?? '')),
+            'email' => $email,
+            'phone' => trim((string)($_POST['telephone'] ?? '')),
+            'intent' => trim((string)($_POST['sujet'] ?? 'Contact général')),
+            'notes' => trim((string)($_POST['message'] ?? '')),
+            'consent' => !empty($_POST['rgpd']),
+            'metadata' => [
+                'origin_path' => $_SERVER['REQUEST_URI'] ?? '/contact',
+            ],
+        ]);
+
+        redirect('/merci');
+    }
+}
+
 $pageTitle = 'Contact — Eduardo Desul Immobilier';
 $metaDesc  = 'Contactez Eduardo Desul, conseiller immobilier à Bordeaux. Réponse sous 24h.';
 $extraCss  = ['/assets/css/contact.css'];

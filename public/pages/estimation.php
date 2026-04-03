@@ -158,6 +158,22 @@ $extraJs   = ['/assets/js/estimation.js'];
                         </div>
                         <div class="form-group">
                             <label style="display:flex;gap:.6rem;align-items:flex-start;font-size:.85rem;cursor:pointer">
+                                <input type="checkbox" name="demande_rdv" value="1" style="margin-top:.2rem;flex-shrink:0">
+                                <span>Je souhaite un rendez-vous après réception de mon estimation.</span>
+                            </label>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="est-creneau">Créneau préféré (optionnel)</label>
+                            <select id="est-creneau" name="creneau_prefere" class="form-control">
+                                <option value="">— Sélectionner —</option>
+                                <option value="matin">Matin (9h - 12h)</option>
+                                <option value="midi">Midi (12h - 14h)</option>
+                                <option value="apres-midi">Après-midi (14h - 18h)</option>
+                                <option value="soir">Soir (18h - 20h)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label style="display:flex;gap:.6rem;align-items:flex-start;font-size:.85rem;cursor:pointer">
                                 <input type="checkbox" name="rgpd" required style="margin-top:.2rem;flex-shrink:0">
                                 <span>J'accepte la <a href="/politique-confidentialite" target="_blank" style="color:var(--clr-primary)">politique de confidentialité</a>. <span style="color:var(--clr-danger)">*</span></span>
                             </label>

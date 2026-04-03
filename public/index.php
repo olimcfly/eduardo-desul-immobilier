@@ -26,6 +26,7 @@ require ROOT_PATH . '/core/Model.php';
 require ROOT_PATH . '/core/Router.php';
 require ROOT_PATH . '/core/helpers/helpers.php';
 require ROOT_PATH . '/core/services/ModuleService.php';
+require ROOT_PATH . '/core/services/LeadService.php';
 require_once ROOT_PATH . '/includes/settings.php';
 
 // Démarrer la session

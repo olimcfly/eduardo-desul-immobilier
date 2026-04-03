@@ -1,4 +1,30 @@
 <?php
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    verifyCsrf();
+
+    $email = trim((string)($_POST['email'] ?? ''));
+    $prenom = trim((string)($_POST['prenom'] ?? ''));
+
+    if ($email !== '' && $prenom !== '' && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        LeadService::capture([
+            'source_type' => LeadService::SOURCE_RESSOURCE,
+            'pipeline' => LeadService::SOURCE_RESSOURCE,
+            'stage' => 'nurturing',
+            'first_name' => $prenom,
+            'email' => $email,
+            'intent' => 'Téléchargement de ressource',
+            'consent' => !empty($_POST['rgpd']),
+            'metadata' => [
+                'profil' => trim((string)($_POST['profil'] ?? '')),
+                'ressource' => 'Guide Complet de l\'Immobilier Bordelais',
+                'origin_path' => $_SERVER['REQUEST_URI'] ?? '/guide-offert',
+            ],
+        ]);
+
+        redirect('/merci');
+    }
+}
+
 $pageTitle  = 'Guide immobilier gratuit — Eduardo Desul';
 $metaDesc   = 'Recevez gratuitement le guide immobilier de Eduardo Desul : conseils, tendances, stratégies pour réussir votre projet.';
 $metaRobots = 'noindex';
