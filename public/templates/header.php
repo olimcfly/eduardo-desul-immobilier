@@ -11,7 +11,7 @@ function isActive(string $path, string $current): string {
         <a href="/" class="header__logo" aria-label="Eduardo Desul Immobilier — Accueil">
             <span class="logo__icon">🏡</span>
             <span class="logo__text">
-                <strong>Eduardo Desul</strong>
+                <strong>Eduardo De Sul</strong>
                 <em>Immobilier</em>
             </span>
         </a>
