@@ -6,6 +6,9 @@ RewriteRule ^login$       login.php [L]
 RewriteRule ^logout$      logout.php [L]
 RewriteRule ^verify-otp$  verify-otp.php [L]
 
+# API endpoints
+RewriteRule ^api/noah$    api/noah.php [L]
+
 # Autoriser les fichiers réels (CSS, JS, images)
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
