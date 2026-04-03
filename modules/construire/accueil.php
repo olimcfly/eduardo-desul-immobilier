@@ -2,8 +2,6 @@
 $pageTitle       = 'Construire';
 $pageDescription = 'Posez les bases solides de votre activité';
 
-require_once '../../admin/views/layout.php';
-require_once '../../core/services/AiService.php';
 
 function renderContent()
 {
@@ -73,7 +71,7 @@ function renderContent()
         }
         .noah-input:focus { border-color: #c9a84c; }
         .noah-btn {
-            width: 100%; padding: .7rem;
+            width: 100%; min-height: 44px; padding: .7rem;
             background: #c9a84c; color: #0f2237;
             border: none; border-radius: 8px;
             font-weight: 700; font-size: .9rem;
@@ -170,7 +168,15 @@ function renderContent()
             errBox.classList.remove('visible');
 
             try {
-                const res  = await fetch('/admin/api/noah', { method: 'POST', body: new FormData(form) });
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 20000);
+
+                const res  = await fetch('/admin/api/noah', {
+                    method: 'POST',
+                    body: new FormData(form),
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
                 const json = await res.json();
 
                 if (json.success) {
@@ -181,7 +187,9 @@ function renderContent()
                     errBox.classList.add('visible');
                 }
             } catch (err) {
-                errBox.textContent = 'Impossible de contacter le serveur.';
+                errBox.textContent = err.name === 'AbortError'
+                    ? 'Le service IA met trop de temps à répondre. Réessayez dans quelques secondes.'
+                    : 'Impossible de contacter le serveur.';
                 errBox.classList.add('visible');
             } finally {
                 btn.disabled = false;
@@ -210,10 +218,12 @@ function noahCard(string $tool, string $title, string $sub, string $color, strin
         </div>
         <form class="noah-form" method="POST">
             <input type="hidden" name="tool" value="<?= htmlspecialchars($tool) ?>">
+            <?= csrfField() ?>
             <?php foreach ($fields as $field): ?>
+                <?php $inputId = 'noah-' . $tool . '-' . $field['name']; ?>
                 <div class="noah-field">
-                    <label class="noah-label"><?= htmlspecialchars($field['label']) ?></label>
-                    <input class="noah-input" type="text" name="<?= htmlspecialchars($field['name']) ?>"
+                    <label class="noah-label" for="<?= htmlspecialchars($inputId) ?>"><?= htmlspecialchars($field['label']) ?></label>
+                    <input id="<?= htmlspecialchars($inputId) ?>" class="noah-input" type="text" name="<?= htmlspecialchars($field['name']) ?>"
                            placeholder="<?= htmlspecialchars($field['placeholder']) ?>" required>
                 </div>
             <?php endforeach; ?>

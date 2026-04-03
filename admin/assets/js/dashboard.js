@@ -144,10 +144,67 @@ const Dashboard = {
         }
     },
 
+
+
+    initNavigation() {
+        const container = document.getElementById('dashboard-container');
+        const desktopToggle = document.getElementById('sidebar-toggle');
+        const mobileToggle = document.getElementById('mobile-sidebar-toggle');
+        const menuTrigger = document.getElementById('user-menu-trigger');
+        const userDropdown = document.getElementById('user-dropdown');
+
+        if (desktopToggle && container) {
+            desktopToggle.addEventListener('click', () => {
+                container.classList.toggle('collapsed');
+            });
+        }
+
+        if (mobileToggle && container) {
+            mobileToggle.addEventListener('click', () => {
+                container.classList.toggle('mobile-sidebar-open');
+            });
+        }
+
+        if (menuTrigger && userDropdown) {
+            menuTrigger.addEventListener('click', () => {
+                userDropdown.classList.toggle('open');
+            });
+        }
+
+        document.addEventListener('click', (event) => {
+            if (!menuTrigger || !userDropdown) {
+                return;
+            }
+            if (!menuTrigger.contains(event.target) && !userDropdown.contains(event.target)) {
+                userDropdown.classList.remove('open');
+            }
+        });
+
+        document.querySelectorAll('[data-module]').forEach((element) => {
+            element.addEventListener('click', (event) => {
+                const module = element.getAttribute('data-module');
+                if (!module) {
+                    return;
+                }
+
+                const href = element.getAttribute('href') || '';
+                if (href === '#' || href === '') {
+                    event.preventDefault();
+                    window.location.href = '/admin/?module=' + encodeURIComponent(module);
+                }
+
+                if (container) {
+                    container.classList.remove('mobile-sidebar-open');
+                }
+            });
+        });
+    },
+
     /* --- Init --- */
     init() {
         this.animateCounters();
         this.loadStats();
+        this.initNavigation();
 
         // Graphiques par défaut (données statiques de démo)
         const mois = ['Jan','Fév','Mar','Avr','Mai','Jun',

@@ -2,7 +2,6 @@
 $pageTitle = "Social";
 $pageDescription = "Gérez vos publications et réseaux sociaux";
 
-require_once '../../admin/views/layout.php';
 
 function renderContent() {
     ?>
