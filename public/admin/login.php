@@ -73,9 +73,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
-            // Email inconnu : on affiche le même message pour ne pas révéler les comptes
-            Session::flash('success', 'Si cet email est enregistré, vous recevrez un code.');
-            header('Location: /admin/verify-otp');
+            // Email inconnu / non-admin : même message neutre pour ne pas révéler les comptes
+            Session::flash('success', 'Si cet email admin est enregistré, vous recevrez un code.');
+            header('Location: /admin/login');
             exit;
 
         } catch (Exception $e) {
