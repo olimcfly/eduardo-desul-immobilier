@@ -1,0 +1,10 @@
+body{font-family:Arial,sans-serif;background:#f6f8fb;margin:0;color:#0f172a}
+.seo-wrap{max-width:1100px;margin:24px auto;padding:0 16px}
+.seo-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.seo-card{display:block;background:#fff;padding:16px;border-radius:10px;text-decoration:none;color:inherit;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.seo-card:hover{transform:translateY(-1px)}
+form{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+input,button,textarea{padding:10px;border:1px solid #cbd5e1;border-radius:8px}
+button{background:#0ea5e9;border-color:#0284c7;color:#fff;cursor:pointer}
+table{width:100%;border-collapse:collapse;background:#fff}
+th,td{padding:10px;border-bottom:1px solid #e2e8f0;text-align:left}
