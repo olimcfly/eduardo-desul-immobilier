@@ -21,11 +21,15 @@ require_once dirname(__DIR__) . '/includes/settings.php';
 // ── Session ──────────────────────────────────────────────────
 if (session_status() === PHP_SESSION_NONE) {
     session_name(SESSION_NAME);
+    $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (isset($_SERVER['SERVER_PORT']) && (int) $_SERVER['SERVER_PORT'] === 443)
+        || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
+
     session_set_cookie_params([
         'lifetime' => SESSION_LIFE,
         'path'     => '/',
         'domain'   => '',
-        'secure'   => true,
+        'secure'   => $isHttps,
         'httponly' => true,
         'samesite' => 'Strict',
     ]);

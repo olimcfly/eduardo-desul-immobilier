@@ -61,10 +61,27 @@ $siteMetaDescription = setting('site_meta_description', 'Conseiller immobilier i
     <?php foreach ($extraCss ?? [] as $css): ?>
     <link rel="stylesheet" href="<?= e($css) ?>">
     <?php endforeach; ?>
+
+    <style>
+        .role-topbar { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; padding: 8px 20px; font-weight: 700; font-family: Inter, Arial, sans-serif; font-size: 14px; }
+        .topbar-admin { background: #1a73e8; color: #fff; }
+        .topbar-superadmin { background: linear-gradient(90deg, #b8860b, #ffd700); color: #1a1a1a; }
+        .role-topbar a { color: inherit; text-decoration: underline; }
+        body.has-role-topbar { padding-top: 42px; }
+
+        .session-access-modal { position: fixed; inset: 0; z-index: 10000; background: rgba(15, 23, 42, .45); display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .session-access-modal__card { background: #fff; border-radius: 12px; padding: 18px; max-width: 420px; width: 100%; box-shadow: 0 15px 45px rgba(0,0,0,.25); }
+        .session-access-modal__card h3 { margin: 0 0 8px; }
+        .session-access-modal__card p { margin: 0 0 14px; color: #334155; }
+        .session-access-modal__actions { display: flex; gap: 10px; }
+        .session-access-modal__actions button { border: 0; border-radius: 8px; padding: 10px 14px; cursor: pointer; font-weight: 600; background: #2563eb; color: #fff; }
+        .session-access-modal__actions button.danger { background: #dc2626; }
+    </style>
+
 </head>
 <body class="<?= e($bodyClass ?? '') ?>">
 
-<?php require __DIR__ . '/header.php'; ?>
+<?php require ROOT_PATH . '/includes/layout/header.php'; ?>
 
 <main id="main-content">
     <?php
@@ -80,6 +97,14 @@ $siteMetaDescription = setting('site_meta_description', 'Conseiller immobilier i
 </main>
 
 <?php require __DIR__ . '/footer.php'; ?>
+
+<script>
+(function(){
+    var hasRoleTopbar = !!document.querySelector('.role-topbar');
+    if (hasRoleTopbar) document.body.classList.add('has-role-topbar');
+})();
+</script>
+
 
 <script>
 window.__APP_SETTINGS__ = {

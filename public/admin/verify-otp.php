@@ -9,6 +9,7 @@ if (Auth::check()) {
 
 // Pas d'OTP en attente → retour login
 if (empty($_SESSION['otp_pending_id']) || empty($_SESSION['otp_pending_email'])) {
+    Session::flash('error', 'Session OTP introuvable. Reconnectez-vous et redemandez un code.');
     header('Location: /admin/login');
     exit;
 }
@@ -40,6 +41,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $otp = $stmt->fetch();
 
             if ($otp && password_verify($code, $otp['code_hash'])) {
+                if (!in_array($otp['role'], ['admin', 'superadmin'], true)) {
+                    $error = 'Accès réservé aux administrateurs.';
+                } else {
                 // Marquer l'OTP comme consommé
                 $pdo->prepare("UPDATE admin_login_otps SET consumed_at = NOW() WHERE id = ?")
                     ->execute([$otpId]);
@@ -57,6 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 header('Location: /admin/');
                 exit;
+                }
 
             } else {
                 // Incrémenter le compteur d'essais

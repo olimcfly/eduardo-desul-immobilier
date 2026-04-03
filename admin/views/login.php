@@ -105,7 +105,7 @@
 
         <form method="POST" action="/admin/login" novalidate>
             <div class="form-group">
-                <label class="form-label" for="email">Adresse e-mail admin</label>
+                <label class="form-label" for="email">Adresse e-mail admin/superadmin</label>
                 <input
                     id="email"
                     name="email"
