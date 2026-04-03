@@ -25,6 +25,7 @@ require ROOT_PATH . '/core/Controller.php';
 require ROOT_PATH . '/core/Model.php';
 require ROOT_PATH . '/core/Router.php';
 require ROOT_PATH . '/core/helpers/helpers.php';
+require ROOT_PATH . '/core/services/ModuleService.php';
 require_once ROOT_PATH . '/includes/settings.php';
 
 // Démarrer la session
@@ -34,6 +35,24 @@ Session::start();
 function page(string $template, array $data = []): void
 {
     extract($data);
+
+    $user = Auth::user();
+    $role = (string) ($user['role'] ?? 'guest');
+    $parts = explode('/', $template);
+    $moduleName = $parts[0] ?? '';
+    if ($moduleName === 'pages' && isset($parts[1])) {
+        $moduleName = $parts[1];
+    }
+
+    if (in_array($role, ['user', 'admin'], true) && !ModuleService::isEnabledForRole($moduleName, $role)) {
+        ModuleService::renderUnavailablePage($moduleName);
+        return;
+    }
+
+    if ($role === 'user') {
+        ModuleService::trackUserPagePresence((int) ($user['id'] ?? 0), $_SERVER['REQUEST_URI'] ?? '/');
+    }
+
     $tplFile = ROOT_PATH . '/public/' . $template . '.php';
     if (!file_exists($tplFile)) {
         http_response_code(404);
