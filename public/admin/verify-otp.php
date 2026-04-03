@@ -9,6 +9,7 @@ if (Auth::check()) {
 
 // Pas d'OTP en attente → retour login
 if (empty($_SESSION['otp_pending_id']) || empty($_SESSION['otp_pending_email'])) {
+    Session::flash('error', 'Session OTP introuvable. Reconnectez-vous et redemandez un code.');
     header('Location: /admin/login');
     exit;
 }

@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['otp_pending_email'] = $email;
 
                 // Envoyer le code par email
-                MailService::send(
+                $sent = MailService::send(
                     $email,
                     'Votre code de connexion — Eduardo Desul Admin',
                     "Bonjour {$user['name']},\n\nVotre code de connexion est : {$code}\n\nIl est valable 10 minutes.\n\nSi vous n'avez pas demandé ce code, ignorez cet email.",
@@ -65,8 +65,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <p style='color:#999;font-size:12px'>Si vous n'avez pas demandé ce code, ignorez cet email.</p>"
                 );
 
-                header('Location: /admin/verify-otp');
-                exit;
+                if (!$sent) {
+                    $error = 'Email OTP non envoyé. Vérifiez la configuration mail.';
+                } else {
+                    header('Location: /admin/verify-otp');
+                    exit;
+                }
             }
 
             // Email inconnu : on affiche le même message pour ne pas révéler les comptes

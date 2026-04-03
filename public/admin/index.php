@@ -29,6 +29,14 @@ if (!ModuleService::isEnabledForRole($module, $role)) {
     exit;
 }
 
+$user = Auth::user();
+$role = (string) ($user['role'] ?? 'user');
+
+if (!ModuleService::isEnabledForRole($module, $role)) {
+    ModuleService::renderUnavailablePage($module);
+    exit;
+}
+
 $modulePath = "../../modules/{$module}/accueil.php";
 
 if (!is_file($modulePath)) {
