@@ -1,6 +1,11 @@
 Options -Indexes
 RewriteEngine On
 
+# Pages d'authentification (sans extension .php dans l'URL)
+RewriteRule ^login$       login.php [L]
+RewriteRule ^logout$      logout.php [L]
+RewriteRule ^verify-otp$  verify-otp.php [L]
+
 # Autoriser les fichiers réels (CSS, JS, images)
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d

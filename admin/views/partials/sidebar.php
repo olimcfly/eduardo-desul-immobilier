@@ -1,41 +1,102 @@
-<?php
-$current = $_SERVER['REQUEST_URI'];
+<nav class="sidebar-nav">
+    <ul class="sidebar-menu">
 
-$menu = [
-    ['icon' => '📊', 'label' => 'Dashboard',   'href' => '/admin/',                'match' => '/admin/$'],
-    ['icon' => '🏠', 'label' => 'Biens',        'href' => '/admin/biens/',          'match' => '/biens/'],
-    ['icon' => '⭐', 'label' => 'Google My B.', 'href' => '/admin/gmb/',            'match' => '/gmb/'],
-    ['icon' => '🔍', 'label' => 'SEO',          'href' => '/admin/seo/',            'match' => '/seo/'],
-    ['icon' => '📱', 'label' => 'Social',       'href' => '/admin/social/',         'match' => '/social/'],
-    ['icon' => '⚙️',  'label' => 'Paramètres',  'href' => '/admin/settings/',       'match' => '/settings/'],
-];
-?>
-<aside class="sidebar" id="sidebar">
-    <div class="sidebar-logo">
-        <span class="logo-icon">🏡</span>
-        <span class="logo-text">ImmoAdmin</span>
-    </div>
+        <li class="nav-section-label">Pilotage</li>
 
-    <nav class="sidebar-nav">
-        <?php foreach ($menu as $item): ?>
-            <?php $active = str_contains($current, $item['match']) ? 'active' : ''; ?>
-            <a href="<?= $item['href'] ?>" class="nav-item <?= $active ?>">
-                <span class="nav-icon"><?= $item['icon'] ?></span>
-                <span class="nav-label"><?= $item['label'] ?></span>
+        <li>
+            <a href="#" class="menu-item active" data-module="construire" data-tooltip="Construire">
+                <span class="menu-icon"><i class="fas fa-layer-group"></i></span>
+                <span class="menu-label">Construire
+                    <small class="menu-hint">Poser les bases</small>
+                </span>
             </a>
-        <?php endforeach; ?>
-    </nav>
+        </li>
+        <li>
+            <a href="#" class="menu-item" data-module="attirer" data-tooltip="Attirer">
+                <span class="menu-icon"><i class="fas fa-bullseye"></i></span>
+                <span class="menu-label">Attirer
+                    <small class="menu-hint">Générer des vendeurs</small>
+                </span>
+            </a>
+        </li>
+        <li>
+            <a href="#" class="menu-item" data-module="capturer" data-tooltip="Capturer">
+                <span class="menu-icon"><i class="fas fa-inbox"></i></span>
+                <span class="menu-label">Capturer
+                    <small class="menu-hint">Transformer en contacts</small>
+                </span>
+            </a>
+        </li>
+        <li>
+            <a href="#" class="menu-item" data-module="convertir" data-tooltip="Convertir">
+                <span class="menu-icon"><i class="fas fa-arrow-trend-up"></i></span>
+                <span class="menu-label">Convertir
+                    <small class="menu-hint">Transformer en clients</small>
+                </span>
+            </a>
+        </li>
+        <li>
+            <a href="#" class="menu-item" data-module="optimiser" data-tooltip="Optimiser">
+                <span class="menu-icon"><i class="fas fa-chart-line"></i></span>
+                <span class="menu-label">Optimiser
+                    <small class="menu-hint">Améliorer les résultats</small>
+                </span>
+            </a>
+        </li>
 
-    <div class="sidebar-footer">
-        <div class="user-info">
-            <div class="user-avatar">
-                <?= strtoupper(substr($_SESSION['user_name'] ?? 'A', 0, 1)) ?>
-            </div>
-            <div class="user-meta">
-                <div class="user-name"><?= htmlspecialchars($_SESSION['user_name'] ?? 'Admin') ?></div>
-                <div class="user-role">Administrateur</div>
-            </div>
-        </div>
-        <a href="/admin/logout" class="logout-btn" title="Déconnexion">&#x23FB;</a>
-    </div>
-</aside>
+        <li class="nav-section-label">Outils</li>
+
+        <li>
+            <a href="#" class="menu-item" data-module="assistant" data-tooltip="Assistant IA">
+                <span class="menu-icon"><i class="fas fa-robot"></i></span>
+                <span class="menu-label">Assistant IA
+                    <small class="menu-hint">IA à votre service</small>
+                </span>
+            </a>
+        </li>
+        <li>
+            <a href="#" class="menu-item" data-module="biens" data-tooltip="Biens">
+                <span class="menu-icon"><i class="fas fa-house"></i></span>
+                <span class="menu-label">Biens
+                    <small class="menu-hint">Gestion du portefeuille</small>
+                </span>
+            </a>
+        </li>
+        <li>
+            <a href="#" class="menu-item" data-module="gmb" data-tooltip="Google My Business">
+                <span class="menu-icon"><i class="fab fa-google"></i></span>
+                <span class="menu-label">Google My Business
+                    <small class="menu-hint">Avis et visibilité</small>
+                </span>
+            </a>
+        </li>
+        <li>
+            <a href="#" class="menu-item" data-module="seo" data-tooltip="SEO">
+                <span class="menu-icon"><i class="fas fa-magnifying-glass-chart"></i></span>
+                <span class="menu-label">SEO
+                    <small class="menu-hint">Positionnement Google</small>
+                </span>
+            </a>
+        </li>
+        <li>
+            <a href="#" class="menu-item" data-module="social" data-tooltip="Social">
+                <span class="menu-icon"><i class="fas fa-share-nodes"></i></span>
+                <span class="menu-label">Social
+                    <small class="menu-hint">Publications & réseaux</small>
+                </span>
+            </a>
+        </li>
+
+        <li class="nav-section-label">Compte</li>
+
+        <li>
+            <a href="#" class="menu-item" data-module="parametres" data-tooltip="Paramètres">
+                <span class="menu-icon"><i class="fas fa-gear"></i></span>
+                <span class="menu-label">Paramètres
+                    <small class="menu-hint">Compte et préférences</small>
+                </span>
+            </a>
+        </li>
+
+    </ul>
+</nav>

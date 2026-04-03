@@ -87,20 +87,18 @@
 <body>
 <div class="box">
     <h1>Vérification OTP</h1>
-    <p>Entrez le code à 6 chiffres envoyé à <strong><?= e($pendingEmail ?? '') ?></strong>.</p>
+    <p>Entrez le code à 6 chiffres envoyé à <strong><?= e($email ?? '') ?></strong>.</p>
 
-    <?php if (!empty($flash)): ?>
+    <?php if (!empty($error)): ?>
+        <div class="flash flash--error" role="alert"><?= e($error) ?></div>
+    <?php elseif (!empty($flash)): ?>
         <div class="flash flash--<?= e($flash['type']) ?>" role="alert"><?= e($flash['message']) ?></div>
     <?php endif; ?>
 
-    <form method="POST" action="/admin/verify" novalidate>
+    <form method="POST" action="/admin/verify-otp" novalidate>
         <div class="field">
-            <label for="email">Email</label>
-            <input id="email" name="email" type="email" required value="<?= e($pendingEmail ?? ($_POST['email'] ?? '')) ?>" autocomplete="email">
-        </div>
-        <div class="field">
-            <label for="otp_code">Code OTP</label>
-            <input id="otp_code" name="otp_code" class="otp" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="000000" required autocomplete="one-time-code">
+            <label for="code">Code OTP</label>
+            <input id="code" name="code" class="otp" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="000000" required autocomplete="one-time-code" autofocus>
         </div>
         <button type="submit">Valider le code</button>
     </form>

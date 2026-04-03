@@ -35,7 +35,7 @@ define('SESSION_LIFE',  3600 * 8); // 8h
 
 // ── Environnement ────────────────────────────────────────────
 define('APP_ENV',       'production'); // 'dev' ou 'production'
-define('APP_DEBUG',     false);
+define('APP_DEBUG',     true);
 
 // ── Pagination ───────────────────────────────────────────────
 define('BIENS_PER_PAGE',    12);

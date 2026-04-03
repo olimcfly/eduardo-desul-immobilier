@@ -8,6 +8,10 @@ require_once __DIR__ . '/config/config.php';
 require_once __DIR__ . '/config/constants.php';
 require_once __DIR__ . '/config/database.php';
 
+// ── Core classes ─────────────────────────────────────────────
+require_once __DIR__ . '/Session.php';
+require_once __DIR__ . '/Auth.php';
+
 // ── Helpers ──────────────────────────────────────────────────
 require_once __DIR__ . '/helpers/helpers.php';
 require_once __DIR__ . '/helpers/sanitize.php';

@@ -1,40 +1,30 @@
 <?php
-// ============================================================
-// ADMIN — Dashboard Controller
-// ============================================================
+class DashboardController extends Controller {
+    public function index() {
+        $stats = $this->getStatsData();
+        $this->render('admin/views/dashboard/index', ['stats' => $stats]);
+    }
 
-class DashboardController
-{
-    public function index(): void
-    {
-        $adminUser = Auth::user();
+    public function getStats() {
+        header('Content-Type: application/json');
+        echo json_encode($this->getStatsData());
+    }
 
-        // Stats de base (sans DB si tables pas encore créées)
-        $stats = [
-            'biens_total'   => 0,
-            'biens_actifs'  => 0,
-            'contacts'      => 0,
-            'estimations'   => 0,
-        ];
+    private function getStatsData(): array {
+        $stats = ['biens' => 0, 'leads' => 0, 'visites' => 0, 'avis' => 0];
 
         try {
-            $db = Database::getInstance();
-            $stats['biens_total']  = (int) $db->query('SELECT COUNT(*) FROM biens')->fetchColumn();
-            $stats['biens_actifs'] = (int) $db->query("SELECT COUNT(*) FROM biens WHERE statut = 'actif'")->fetchColumn();
-            $stats['contacts']     = (int) $db->query('SELECT COUNT(*) FROM contacts')->fetchColumn();
-            $stats['estimations']  = (int) $db->query('SELECT COUNT(*) FROM estimations')->fetchColumn();
-        } catch (Exception $e) {
-            // Tables pas encore créées — on affiche des zéros
-        }
+            if (class_exists('BienService')) {
+                $stats['biens'] = BienService::countActiveProperties();
+            }
+        } catch (Exception $e) {}
 
-        adminLayout('dashboard/index', [
-            'pageTitle'    => 'Tableau de bord',
-            'stats'        => $stats,
-            'adminUser'    => $adminUser,
-            'biensRecents' => [],
-            'avisRecents'  => [],
-            'topKeywords'  => [],
-            'socialQueue'  => [],
-        ]);
+        try {
+            if (class_exists('ReviewService')) {
+                $stats['avis'] = ReviewService::countApproved();
+            }
+        } catch (Exception $e) {}
+
+        return $stats;
     }
 }
