@@ -12,6 +12,8 @@ if ($advisorDisplayName === '') {
     <title><?= htmlspecialchars(replacePlaceholders((string)($pageTitle ?? 'IMMO LOCAL+'))) ?> — <?= htmlspecialchars($advisorDisplayName) ?></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="/admin/assets/css/dashboard.css?v=<?= filemtime($_SERVER['DOCUMENT_ROOT'] . '/admin/assets/css/dashboard.css') ?>">
+    <link rel="stylesheet"
+          href="/admin/assets/css/settings.css?v=<?= file_exists($_SERVER['DOCUMENT_ROOT'].'/admin/assets/css/settings.css') ? filemtime($_SERVER['DOCUMENT_ROOT'].'/admin/assets/css/settings.css') : 1 ?>">
 </head>
 <body>
 <div class="dashboard-container" id="dashboard-container">
