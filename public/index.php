@@ -25,6 +25,7 @@ require ROOT_PATH . '/core/Controller.php';
 require ROOT_PATH . '/core/Model.php';
 require ROOT_PATH . '/core/Router.php';
 require ROOT_PATH . '/core/helpers/helpers.php';
+require_once ROOT_PATH . '/includes/settings.php';
 
 // Démarrer la session
 Session::start();
