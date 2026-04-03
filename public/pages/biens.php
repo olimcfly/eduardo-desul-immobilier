@@ -80,18 +80,60 @@ $extraJs   = ['/assets/js/biens.js'];
         </form>
 
         <!-- Résultats -->
-        <div class="biens-count">Affichage de <strong>12</strong> biens sur <strong>24</strong></div>
+        <div class="biens-count">Affichage de <strong>4</strong> biens sur <strong>4</strong></div>
 
         <div class="biens-grid">
             <?php
-            // Données de démonstration
+            // Données de démonstration — sélection Eduardo De Sul
             $biens = [
-                ['id' => 1, 'titre' => 'Appartement T3 lumineux Chartrons', 'type' => 'Vente', 'typeBien' => 'appartement', 'prix' => '295 000', 'loc' => 'Bordeaux Chartrons', 'surface' => 72, 'pieces' => 3, 'img' => '/assets/images/bien-1.jpg', 'badge' => 'vente'],
-                ['id' => 2, 'titre' => 'Maison familiale avec jardin', 'type' => 'Vente', 'typeBien' => 'maison', 'prix' => '485 000', 'loc' => 'Mérignac', 'surface' => 145, 'pieces' => 5, 'img' => '/assets/images/bien-2.jpg', 'badge' => 'vente'],
-                ['id' => 3, 'titre' => 'Studio meublé centre historique', 'type' => 'Location', 'typeBien' => 'appartement', 'prix' => '750 /mois', 'loc' => 'Bordeaux Centre', 'surface' => 28, 'pieces' => 1, 'img' => '/assets/images/bien-3.jpg', 'badge' => 'location'],
-                ['id' => 4, 'titre' => 'T2 avec balcon et parking', 'type' => 'Vente', 'typeBien' => 'appartement', 'prix' => '189 000', 'loc' => 'Talence', 'surface' => 48, 'pieces' => 2, 'img' => '/assets/images/bien-4.jpg', 'badge' => 'vente'],
-                ['id' => 5, 'titre' => 'Loft atypique Saint-Michel', 'type' => 'Vente', 'typeBien' => 'appartement', 'prix' => '320 000', 'loc' => 'Bordeaux Saint-Michel', 'surface' => 85, 'pieces' => 3, 'img' => '/assets/images/bien-5.jpg', 'badge' => 'exclusif'],
-                ['id' => 6, 'titre' => 'Maison de ville avec patio', 'type' => 'Vente', 'typeBien' => 'maison', 'prix' => '560 000', 'loc' => 'Bordeaux Victoire', 'surface' => 120, 'pieces' => 4, 'img' => '/assets/images/bien-6.jpg', 'badge' => 'vente'],
+                [
+                    'id' => 1,
+                    'titre' => 'Maison de caractère avec jardin - Bordeaux Centre',
+                    'type' => 'Vente',
+                    'typeBien' => 'maison',
+                    'prix' => '895 000',
+                    'loc' => 'Bordeaux Chartrons',
+                    'surface' => 185,
+                    'pieces' => 7,
+                    'img' => '/assets/images/bien-2.jpg',
+                    'badge' => 'exclusif',
+                ],
+                [
+                    'id' => 2,
+                    'titre' => 'Appartement contemporain avec vue mer - Arcachon Centre',
+                    'type' => 'Vente',
+                    'typeBien' => 'appartement',
+                    'prix' => '980 000',
+                    'loc' => 'Arcachon Le Moulleau',
+                    'surface' => 120,
+                    'pieces' => 6,
+                    'img' => '/assets/images/bien-1.jpg',
+                    'badge' => 'vente',
+                ],
+                [
+                    'id' => 3,
+                    'titre' => 'Villa contemporaine avec piscine - Saint-Émilion',
+                    'type' => 'Vente',
+                    'typeBien' => 'maison',
+                    'prix' => '2 450 000',
+                    'loc' => 'Saint-Émilion',
+                    'surface' => 220,
+                    'pieces' => 10,
+                    'img' => '/assets/images/bien-6.jpg',
+                    'badge' => 'exclusif',
+                ],
+                [
+                    'id' => 4,
+                    'titre' => 'Terrain constructible vue océan - Cap Ferret',
+                    'type' => 'Vente',
+                    'typeBien' => 'terrain',
+                    'prix' => '1 250 000',
+                    'loc' => 'Lège-Cap Ferret',
+                    'surface' => 1200,
+                    'pieces' => 0,
+                    'img' => '/assets/images/bien-4.jpg',
+                    'badge' => 'vente',
+                ],
             ];
             foreach ($biens as $b):
                 $imgFile = defined('PUBLIC_PATH') ? PUBLIC_PATH . $b['img'] : __DIR__ . '/..' . $b['img'];
@@ -117,7 +159,11 @@ $extraJs   = ['/assets/js/biens.js'];
                     <p class="bien-card__loc"><?= e($b['loc']) ?></p>
                     <div class="bien-card__specs">
                         <span class="spec-item">📐 <?= $b['surface'] ?> m²</span>
-                        <span class="spec-item">🚪 <?= $b['pieces'] ?> pièces</span>
+                        <?php if (($b['pieces'] ?? 0) > 0): ?>
+                            <span class="spec-item">🚪 <?= $b['pieces'] ?> pièces</span>
+                        <?php else: ?>
+                            <span class="spec-item">🌿 Terrain constructible</span>
+                        <?php endif; ?>
                     </div>
                 </div>
             </article>
@@ -127,9 +173,6 @@ $extraJs   = ['/assets/js/biens.js'];
         <!-- Pagination -->
         <nav class="pagination" aria-label="Pagination">
             <a href="?page=1" class="page-btn active" aria-current="page">1</a>
-            <a href="?page=2" class="page-btn">2</a>
-            <a href="?page=3" class="page-btn">3</a>
-            <a href="?page=2" class="page-btn">→</a>
         </nav>
 
     </div>
