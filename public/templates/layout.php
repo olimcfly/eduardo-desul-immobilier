@@ -6,7 +6,7 @@ $siteMetaDescription = setting('site_meta_description', 'Conseiller immobilier i
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title><?= e($pageTitle ?? APP_NAME) ?></title>
     <meta name="description" content="<?= e($metaDesc ?? $siteMetaDescription) ?>">
     <meta name="robots" content="<?= e($metaRobots ?? 'index, follow') ?>">
@@ -63,18 +63,18 @@ $siteMetaDescription = setting('site_meta_description', 'Conseiller immobilier i
     <?php endforeach; ?>
 
     <style>
-        .role-topbar { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; padding: 8px 20px; font-weight: 700; font-family: Inter, Arial, sans-serif; font-size: 14px; }
+        .role-topbar { position: fixed; top: 0; left: 0; width: 100%; z-index: 9999; padding: .5rem 1.25rem; font-weight: 700; font-family: Inter, Arial, sans-serif; font-size: .875rem; }
         .topbar-admin { background: #1a73e8; color: #fff; }
         .topbar-superadmin { background: linear-gradient(90deg, #b8860b, #ffd700); color: #1a1a1a; }
         .role-topbar a { color: inherit; text-decoration: underline; }
-        body.has-role-topbar { padding-top: 42px; }
+        body.has-role-topbar { padding-top: 2.625rem; }
 
-        .session-access-modal { position: fixed; inset: 0; z-index: 10000; background: rgba(15, 23, 42, .45); display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .session-access-modal__card { background: #fff; border-radius: 12px; padding: 18px; max-width: 420px; width: 100%; box-shadow: 0 15px 45px rgba(0,0,0,.25); }
-        .session-access-modal__card h3 { margin: 0 0 8px; }
-        .session-access-modal__card p { margin: 0 0 14px; color: #334155; }
-        .session-access-modal__actions { display: flex; gap: 10px; }
-        .session-access-modal__actions button { border: 0; border-radius: 8px; padding: 10px 14px; cursor: pointer; font-weight: 600; background: #2563eb; color: #fff; }
+        .session-access-modal { position: fixed; inset: 0; z-index: 10000; background: rgba(15, 23, 42, .45); display: flex; align-items: center; justify-content: center; padding: 1.25rem; }
+        .session-access-modal__card { background: #fff; border-radius: .75rem; padding: 1.125rem; max-width: 26.25rem; width: 100%; box-shadow: 0 .9375rem 2.8125rem rgba(0,0,0,.25); }
+        .session-access-modal__card h3 { margin: 0 0 .5rem; }
+        .session-access-modal__card p { margin: 0 0 .875rem; color: #334155; }
+        .session-access-modal__actions { display: flex; gap: .625rem; }
+        .session-access-modal__actions button { border: 0; border-radius: .5rem; padding: .625rem .875rem; cursor: pointer; font-weight: 600; background: #2563eb; color: #fff; min-height: 3rem; }
         .session-access-modal__actions button.danger { background: #dc2626; }
     </style>
 
