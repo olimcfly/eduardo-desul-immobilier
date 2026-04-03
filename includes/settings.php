@@ -436,6 +436,53 @@ if (!function_exists('settings_group')) {
     }
 }
 
+
+if (!function_exists('get_ia_status')) {
+    function get_ia_status(int $userId = 0): string
+    {
+        $userId = resolveSettingsUserId($userId);
+
+        $configKeys = [
+            (string)($_ENV['ANTHROPIC_API_KEY'] ?? ''),
+            (string)($_ENV['OPENAI_API_KEY'] ?? ''),
+            (string)($_ENV['MISTRAL_API_KEY'] ?? ''),
+        ];
+
+        if ($userId > 0) {
+            $configKeys[] = (string)setting('tech_openai_key', '', $userId);
+        }
+
+        foreach ($configKeys as $key) {
+            if (trim($key) !== '') {
+                return 'connected';
+            }
+        }
+
+        try {
+            $pdo = settingsPdo();
+            if ($pdo) {
+                $stmt = $pdo->prepare(
+                    'SELECT api_key
+                     FROM ia_configurations
+                     WHERE user_id = :user_id AND is_active = 1
+                     ORDER BY updated_at DESC, id DESC
+                     LIMIT 1'
+                );
+                $stmt->execute(['user_id' => $userId > 0 ? $userId : (int)($_SESSION['user_id'] ?? 0)]);
+                $apiKey = (string)$stmt->fetchColumn();
+
+                if (trim($apiKey) !== '') {
+                    return 'connected';
+                }
+            }
+        } catch (Throwable $e) {
+            // Table absente ou indisponible => statut déconnecté.
+        }
+
+        return 'disconnected';
+    }
+}
+
 if (!function_exists('replacePlaceholders')) {
     function replacePlaceholders(string $template, int $userId = 0): string
     {

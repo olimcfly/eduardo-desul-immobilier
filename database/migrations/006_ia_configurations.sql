@@ -1,0 +1,16 @@
+-- MIGRATION 006 — Module IA Configurations
+
+CREATE TABLE IF NOT EXISTS ia_configurations (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id INT UNSIGNED NOT NULL,
+  provider VARCHAR(32) NOT NULL,
+  api_key TEXT NOT NULL,
+  model VARCHAR(120) NOT NULL,
+  tokens_used BIGINT UNSIGNED NOT NULL DEFAULT 0,
+  estimated_cost DECIMAL(12,6) NOT NULL DEFAULT 0,
+  is_active TINYINT(1) NOT NULL DEFAULT 1,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY idx_ia_user_active (user_id, is_active, updated_at),
+  CONSTRAINT fk_ia_configurations_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

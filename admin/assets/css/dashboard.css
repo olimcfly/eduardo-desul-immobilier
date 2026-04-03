@@ -945,3 +945,36 @@ body {
     .user-menu-info { display: none; }
     .footer-left { flex-direction: column; gap: 4px; }
 }
+
+
+.ia-header-widget {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: auto;
+    padding: 0 15px;
+}
+
+.ia-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.ia-dot.connected { background: #22c55e; }
+.ia-dot.disconnected { background: #ef4444; }
+
+.ia-gear {
+    opacity: 0.5;
+    font-size: 14px;
+    transition: all 0.3s;
+    color: #7f8c8d;
+    display: inline-flex;
+    align-items: center;
+}
+
+.ia-gear:hover {
+    opacity: 1;
+    transform: rotate(45deg);
+}
