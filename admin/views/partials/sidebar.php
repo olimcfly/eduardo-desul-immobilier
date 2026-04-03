@@ -4,7 +4,7 @@
         <li class="nav-section-label">Pilotage</li>
 
         <li>
-            <a href="#" class="menu-item active" data-module="construire" data-tooltip="Construire">
+            <a href="/admin?module=construire" class="menu-item active" data-module="construire" data-tooltip="Construire">
                 <span class="menu-icon"><i class="fas fa-layer-group"></i></span>
                 <span class="menu-label">Construire
                     <small class="menu-hint">Poser les bases</small>
@@ -12,7 +12,7 @@
             </a>
         </li>
         <li>
-            <a href="#" class="menu-item" data-module="attirer" data-tooltip="Attirer">
+            <a href="/admin?module=attirer" class="menu-item" data-module="attirer" data-tooltip="Attirer">
                 <span class="menu-icon"><i class="fas fa-bullseye"></i></span>
                 <span class="menu-label">Attirer
                     <small class="menu-hint">Générer des vendeurs</small>
@@ -20,7 +20,7 @@
             </a>
         </li>
         <li>
-            <a href="#" class="menu-item" data-module="capturer" data-tooltip="Capturer">
+            <a href="/admin?module=capturer" class="menu-item" data-module="capturer" data-tooltip="Capturer">
                 <span class="menu-icon"><i class="fas fa-inbox"></i></span>
                 <span class="menu-label">Capturer
                     <small class="menu-hint">Transformer en contacts</small>
@@ -28,7 +28,7 @@
             </a>
         </li>
         <li>
-            <a href="#" class="menu-item" data-module="convertir" data-tooltip="Convertir">
+            <a href="/admin?module=convertir" class="menu-item" data-module="convertir" data-tooltip="Convertir">
                 <span class="menu-icon"><i class="fas fa-arrow-trend-up"></i></span>
                 <span class="menu-label">Convertir
                     <small class="menu-hint">Transformer en clients</small>
@@ -36,7 +36,7 @@
             </a>
         </li>
         <li>
-            <a href="#" class="menu-item" data-module="optimiser" data-tooltip="Optimiser">
+            <a href="/admin?module=optimiser" class="menu-item" data-module="optimiser" data-tooltip="Optimiser">
                 <span class="menu-icon"><i class="fas fa-chart-line"></i></span>
                 <span class="menu-label">Optimiser
                     <small class="menu-hint">Améliorer les résultats</small>
@@ -47,7 +47,7 @@
         <li class="nav-section-label">Outils</li>
 
         <li>
-            <a href="#" class="menu-item" data-module="assistant" data-tooltip="Assistant IA">
+            <a href="/admin?module=assistant" class="menu-item" data-module="assistant" data-tooltip="Assistant IA">
                 <span class="menu-icon"><i class="fas fa-robot"></i></span>
                 <span class="menu-label">Assistant IA
                     <small class="menu-hint">IA à votre service</small>
@@ -55,7 +55,7 @@
             </a>
         </li>
         <li>
-            <a href="#" class="menu-item" data-module="biens" data-tooltip="Biens">
+            <a href="/admin?module=biens" class="menu-item" data-module="biens" data-tooltip="Biens">
                 <span class="menu-icon"><i class="fas fa-house"></i></span>
                 <span class="menu-label">Biens
                     <small class="menu-hint">Gestion du portefeuille</small>
@@ -63,7 +63,7 @@
             </a>
         </li>
         <li>
-            <a href="#" class="menu-item" data-module="gmb" data-tooltip="Google My Business">
+            <a href="/admin?module=gmb" class="menu-item" data-module="gmb" data-tooltip="Google My Business">
                 <span class="menu-icon"><i class="fab fa-google"></i></span>
                 <span class="menu-label">Google My Business
                     <small class="menu-hint">Avis et visibilité</small>
@@ -71,7 +71,7 @@
             </a>
         </li>
         <li>
-            <a href="#" class="menu-item" data-module="seo" data-tooltip="SEO">
+            <a href="/admin?module=seo" class="menu-item" data-module="seo" data-tooltip="SEO">
                 <span class="menu-icon"><i class="fas fa-magnifying-glass-chart"></i></span>
                 <span class="menu-label">SEO
                     <small class="menu-hint">Positionnement Google</small>
@@ -79,7 +79,7 @@
             </a>
         </li>
         <li>
-            <a href="#" class="menu-item" data-module="social" data-tooltip="Social">
+            <a href="/admin?module=social" class="menu-item" data-module="social" data-tooltip="Social">
                 <span class="menu-icon"><i class="fas fa-share-nodes"></i></span>
                 <span class="menu-label">Social
                     <small class="menu-hint">Publications & réseaux</small>
@@ -90,13 +90,25 @@
         <li class="nav-section-label">Compte</li>
 
         <li>
-            <a href="#" class="menu-item" data-module="parametres" data-tooltip="Paramètres">
+            <a href="/admin?module=parametres" class="menu-item" data-module="parametres" data-tooltip="Paramètres">
                 <span class="menu-icon"><i class="fas fa-gear"></i></span>
                 <span class="menu-label">Paramètres
                     <small class="menu-hint">Compte et préférences</small>
                 </span>
             </a>
         </li>
+
+        <?php $authUser = Auth::user(); ?>
+        <?php if (($authUser['role'] ?? '') === 'superadmin'): ?>
+        <li>
+            <a href="/admin?module=superadmin" class="menu-item" data-module="superadmin" data-tooltip="Superadmin">
+                <span class="menu-icon"><i class="fas fa-crown"></i></span>
+                <span class="menu-label">Superadmin
+                    <small class="menu-hint">Modules & accès live</small>
+                </span>
+            </a>
+        </li>
+        <?php endif; ?>
 
     </ul>
 </nav>

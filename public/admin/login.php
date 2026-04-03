@@ -20,8 +20,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $pdo = db();
 
-            // Vérifier que l'email correspond à un admin
-            $stmt = $pdo->prepare("SELECT id, name, role FROM users WHERE email = ? AND role = 'admin' LIMIT 1");
+            // Vérifier que l'email correspond à un admin ou superadmin
+            $stmt = $pdo->prepare("SELECT id, name, role FROM users WHERE email = ? AND role IN ('admin', 'superadmin') LIMIT 1");
             $stmt->execute([$email]);
             $user = $stmt->fetch();
 
@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['otp_pending_email'] = $email;
 
                 // Envoyer le code par email
-                MailService::send(
+                $sent = MailService::send(
                     $email,
                     'Votre code de connexion — Eduardo Desul Admin',
                     "Bonjour {$user['name']},\n\nVotre code de connexion est : {$code}\n\nIl est valable 10 minutes.\n\nSi vous n'avez pas demandé ce code, ignorez cet email.",
@@ -65,8 +65,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <p style='color:#999;font-size:12px'>Si vous n'avez pas demandé ce code, ignorez cet email.</p>"
                 );
 
-                header('Location: /admin/verify-otp');
-                exit;
+                if (!$sent) {
+                    $error = 'Email OTP non envoyé. Vérifiez la configuration mail.';
+                } else {
+                    header('Location: /admin/verify-otp');
+                    exit;
+                }
             }
 
             // Email inconnu : on affiche le même message pour ne pas révéler les comptes

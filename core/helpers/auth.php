@@ -10,7 +10,7 @@ function isLogged(): bool
 
 function isAdmin(): bool
 {
-    return isLogged() && $_SESSION['user_role'] === 'admin';
+    return isLogged() && in_array($_SESSION['user_role'], ['admin', 'superadmin'], true);
 }
 
 function requireAuth(): void
