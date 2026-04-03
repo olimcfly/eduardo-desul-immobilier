@@ -127,8 +127,7 @@ class OtpAuthService
             return ['ok' => false, 'message' => 'Code incorrect.'];
         }
 
-        // ✅ CORRECTION : accepte admin ET superadmin
-        if (!in_array($row['role'], ['admin', 'superadmin'])) {
+        if (!in_array($row['role'], ['admin', 'superadmin'], true)) {
             return ['ok' => false, 'message' => 'Accès réservé aux administrateurs.'];
         }
 
@@ -165,8 +164,7 @@ class OtpAuthService
         $stmt->execute(['email' => $email]);
         $user = $stmt->fetch();
 
-        // ✅ CORRECTION : accepte admin ET superadmin
-        if (!$user || !in_array($user['role'], ['admin', 'superadmin'])) {
+        if (!$user || !in_array($user['role'], ['admin', 'superadmin'], true)) {
             return null;
         }
 
