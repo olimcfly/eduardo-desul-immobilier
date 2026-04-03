@@ -77,7 +77,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 const parser = new DOMParser();
                 const doc    = parser.parseFromString(html, 'text/html');
                 const inner  = doc.getElementById('main-content');
-                mainContent.innerHTML = inner ? inner.innerHTML : html;
+                if (inner) {
+                    mainContent.innerHTML = inner.innerHTML;
+                } else {
+                    // Sécurité : ne jamais injecter le HTML complet (évite le layout imbriqué)
+                    mainContent.innerHTML = '<div class="loading-spinner"><i class="fas fa-triangle-exclamation"></i>&nbsp;Impossible de charger ce module.</div>';
+                    console.error('loadModule: #main-content introuvable dans la réponse pour le module "' + module + '"');
+                }
             })
             .catch(function (err) {
                 mainContent.innerHTML = '<div class="loading-spinner"><i class="fas fa-triangle-exclamation"></i>&nbsp;Impossible de charger ce module.</div>';
@@ -86,12 +92,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ── Module actif au démarrage ───────────────────────────────
-    const active = document.querySelector('.menu-item.active');
-    if (active) {
-        loadModule(active.getAttribute('data-module'));
-    } else if (menuItems.length > 0) {
-        menuItems[0].classList.add('active');
-        loadModule(menuItems[0].getAttribute('data-module'));
-    }
+    // Le PHP rend déjà le bon contenu initial — pas d'auto-chargement AJAX
+    // pour éviter le layout imbriqué (doublon sidebar + topbar).
+    // L'AJAX ne se déclenche qu'au clic sur un item de menu différent.
 
 });
