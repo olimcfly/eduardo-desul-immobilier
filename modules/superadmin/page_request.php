@@ -4,21 +4,19 @@ require_once __DIR__ . '/../../core/services/ModuleService.php';
 header('Content-Type: application/json; charset=utf-8');
 
 $db = Database::getInstance();
-$db->exec(
-    'CREATE TABLE IF NOT EXISTS admin_page_requests (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        superadmin_id INT NOT NULL,
-        user_id INT NOT NULL,
-        page_url VARCHAR(255),
-        status ENUM("pending", "allowed", "denied") DEFAULT "pending",
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        responded_at TIMESTAMP NULL DEFAULT NULL,
-        INDEX idx_user_status (user_id, status),
-        INDEX idx_superadmin_created (superadmin_id, created_at),
-        CONSTRAINT fk_apr_superadmin FOREIGN KEY (superadmin_id) REFERENCES users(id) ON DELETE CASCADE,
-        CONSTRAINT fk_apr_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4'
-);
+
+try {
+    $check = $db->query("SELECT 1 FROM information_schema.TABLES WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'admin_page_requests' LIMIT 1");
+    if (!$check || !$check->fetchColumn()) {
+        http_response_code(500);
+        echo json_encode(['ok' => false, 'message' => 'Table admin_page_requests absente. Exécutez la migration 006_superadmin_controls.sql']);
+        exit;
+    }
+} catch (Throwable $e) {
+    http_response_code(500);
+    echo json_encode(['ok' => false, 'message' => 'Impossible de vérifier la table admin_page_requests.']);
+    exit;
+}
 
 $authUser = Auth::user();
 if (!$authUser) {
