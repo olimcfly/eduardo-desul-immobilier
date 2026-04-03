@@ -12,6 +12,17 @@
 
     <aside class="sidebar" id="sidebar">
 
+        <!-- BRAND / LOGO -->
+        <div class="sidebar-brand">
+            <div class="brand-logo">
+                <i class="fas fa-building"></i>
+            </div>
+            <div class="brand-text">
+                <span class="brand-name">IMMO LOCAL<span class="brand-plus">+</span></span>
+                <span class="brand-sub">Eduardo De Sul</span>
+            </div>
+        </div>
+
         <?php require_once 'partials/sidebar.php'; ?>
 
         <div class="sidebar-footer">
@@ -32,17 +43,44 @@
 
         <!-- TOPBAR -->
         <header class="topbar">
+
+            <!-- Gauche : toggle mobile + breadcrumb -->
             <div class="topbar-left">
-                <span class="topbar-title">
-                    <?= htmlspecialchars($pageTitle ?? '') ?>
-                </span>
+                <button class="topbar-mobile-toggle" id="mobile-sidebar-toggle" type="button" title="Menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <nav class="topbar-breadcrumb" aria-label="Fil d'Ariane">
+                    <a href="#" class="breadcrumb-home" data-module="construire" title="Accueil">
+                        <i class="fas fa-house"></i>
+                    </a>
+                    <i class="fas fa-chevron-right breadcrumb-sep"></i>
+                    <span class="breadcrumb-current"><?= htmlspecialchars($pageTitle ?? '') ?></span>
+                </nav>
             </div>
+
+            <!-- Centre : recherche globale -->
+            <div class="topbar-center">
+                <div class="topbar-search">
+                    <i class="fas fa-magnifying-glass topbar-search-icon"></i>
+                    <input type="text" class="topbar-search-input" placeholder="Rechercher dans IMMO LOCAL+…" autocomplete="off">
+                    <kbd class="topbar-search-kbd">⌘K</kbd>
+                </div>
+            </div>
+
+            <!-- Droite : actions + user menu -->
             <div class="topbar-right">
-                <!-- Notifications -->
-                <button class="topbar-btn" title="Notifications">
+                <a href="/" target="_blank" class="topbar-btn" title="Voir le site public">
+                    <i class="fas fa-arrow-up-right-from-square"></i>
+                </a>
+                <button class="topbar-btn" title="Aide & documentation">
+                    <i class="fas fa-circle-question"></i>
+                </button>
+                <button class="topbar-btn" title="Notifications" id="notif-btn">
                     <i class="fas fa-bell"></i>
                     <span class="notif-badge">2</span>
                 </button>
+
+                <div class="topbar-divider"></div>
 
                 <!-- Menu utilisateur -->
                 <div class="user-menu" id="user-menu">
@@ -80,6 +118,7 @@
                     </div>
                 </div>
             </div>
+
         </header>
 
         <!-- CONTENU -->
@@ -88,6 +127,9 @@
                 <?php renderContent(); ?>
             </div>
         </main>
+
+        <!-- FOOTER -->
+        <?php require_once __DIR__ . '/partials/footer.php'; ?>
 
     </div><!-- /.layout-body -->
 
