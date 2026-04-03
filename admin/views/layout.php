@@ -12,8 +12,10 @@ if ($advisorDisplayName === '') {
     <title><?= htmlspecialchars(replacePlaceholders((string)($pageTitle ?? 'IMMO LOCAL+'))) ?> — <?= htmlspecialchars($advisorDisplayName) ?></title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="/admin/assets/css/dashboard.css?v=<?= filemtime($_SERVER['DOCUMENT_ROOT'] . '/admin/assets/css/dashboard.css') ?>">
+    <link rel="stylesheet"
+          href="/admin/assets/css/settings.css?v=<?= file_exists($_SERVER['DOCUMENT_ROOT'].'/admin/assets/css/settings.css') ? filemtime($_SERVER['DOCUMENT_ROOT'].'/admin/assets/css/settings.css') : 1 ?>">
 </head>
-<body>
+<body data-current-module="<?= htmlspecialchars($module ?? 'construire') ?>">
 <div class="dashboard-container" id="dashboard-container">
 
     <aside class="sidebar" id="sidebar">
@@ -29,7 +31,7 @@ if ($advisorDisplayName === '') {
             </div>
         </div>
 
-        <?php require_once 'partials/sidebar.php'; ?>
+        <?php require_once __DIR__ . '/partials/sidebar.php'; ?>
 
         <div class="sidebar-footer">
             <?php $user = Auth::user(); ?>
@@ -52,7 +54,7 @@ if ($advisorDisplayName === '') {
 
             <!-- Gauche : toggle mobile + breadcrumb -->
             <div class="topbar-left">
-                <button class="topbar-mobile-toggle" id="mobile-sidebar-toggle" type="button" title="Menu">
+                <button class="topbar-mobile-toggle" id="mobile-sidebar-toggle" type="button" title="Menu" aria-label="Ouvrir le menu">
                     <i class="fas fa-bars"></i>
                 </button>
                 <nav class="topbar-breadcrumb" aria-label="Fil d'Ariane">
@@ -78,10 +80,10 @@ if ($advisorDisplayName === '') {
                 <a href="/" target="_blank" class="topbar-btn" title="Voir le site public">
                     <i class="fas fa-arrow-up-right-from-square"></i>
                 </a>
-                <button class="topbar-btn" title="Aide & documentation">
+                <button class="topbar-btn" title="Aide & documentation" aria-label="Aide et documentation">
                     <i class="fas fa-circle-question"></i>
                 </button>
-                <button class="topbar-btn" title="Notifications" id="notif-btn">
+                <button class="topbar-btn" title="Notifications" id="notif-btn" aria-label="Notifications">
                     <i class="fas fa-bell"></i>
                     <span class="notif-badge">2</span>
                 </button>

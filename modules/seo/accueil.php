@@ -18,7 +18,6 @@ require_once __DIR__ . '/services/PerformanceAudit.php';
 
 $seoCurrentAction = $action;
 
-require_once '../../admin/views/layout.php';
 
 function renderContent(): void
 {

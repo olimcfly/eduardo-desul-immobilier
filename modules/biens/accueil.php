@@ -2,7 +2,6 @@
 $pageTitle = "Biens";
 $pageDescription = "Gérez votre portefeuille de biens immobiliers";
 
-require_once '../../admin/views/layout.php';
 
 function renderContent() {
     ?>

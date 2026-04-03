@@ -906,6 +906,27 @@ body {
 /* ============================================================
    RESPONSIVE
 ============================================================ */
+
+@media (max-width: 900px) {
+    .sidebar {
+        position: fixed;
+        left: -56px;
+        top: 0;
+        bottom: 0;
+        z-index: 1000;
+        transition: left .2s ease;
+    }
+    .dashboard-container.mobile-sidebar-open .sidebar { left: 0; }
+    .dashboard-container.mobile-sidebar-open::after {
+        content: "";
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, .35);
+        z-index: 999;
+    }
+    .layout-body { width: 100%; }
+}
+
 @media (max-width: 900px) {
     .sidebar { width: 56px; min-width: 56px; }
     .menu-label, .nav-section-label, .user-name, .toggle-label, .brand-text { opacity: 0; width: 0; }
