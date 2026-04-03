@@ -15,6 +15,16 @@ $articles = [
 
 $categories = ['Tous', 'Vente', 'Achat', 'Investissement', 'Financement', 'Réglementation'];
 $activeCat = trim((string) ($_GET['cat'] ?? ''));
+$filteredArticles = array_values(array_filter(
+    $articles,
+    static function (array $article) use ($activeCat): bool {
+        if ($activeCat === '') {
+            return true;
+        }
+
+        return strcasecmp($article['cat'], $activeCat) === 0;
+    }
+));
 ?>
 
 <section class="blog-hero">
@@ -48,10 +58,21 @@ $activeCat = trim((string) ($_GET['cat'] ?? ''));
                     <a href="<?= e($href) ?>" class="tag <?= $isActive ? 'tag--active' : '' ?>"><?= e($cat) ?></a>
                 <?php endforeach; ?>
             </div>
+            <p class="blog-toolbar__count"><?= count($filteredArticles) ?> article<?= count($filteredArticles) > 1 ? 's' : '' ?></p>
         </div>
 
         <div class="blog-grid">
-            <?php foreach ($articles as $art):
+            <?php if (empty($filteredArticles)): ?>
+            <article class="article-card article-card--empty">
+                <div class="article-card__body">
+                    <span class="article-card__cat">Aucun résultat</span>
+                    <h2 class="article-card__title">Aucun article pour cette catégorie</h2>
+                    <p class="article-card__excerpt">Essayez une autre catégorie ou revenez sur "Tous" pour afficher l'ensemble des contenus.</p>
+                </div>
+            </article>
+            <?php endif; ?>
+
+            <?php foreach ($filteredArticles as $art):
                 $imgFile = defined('PUBLIC_PATH') ? PUBLIC_PATH . $art['img'] : __DIR__ . '/../..' . $art['img'];
                 $imgSrc  = file_exists($imgFile)
                     ? e($art['img'])
