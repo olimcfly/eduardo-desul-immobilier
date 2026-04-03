@@ -1,4 +1,38 @@
 <?php
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    verifyCsrf();
+
+    $email = trim((string)($_POST['email'] ?? ''));
+    $prenom = trim((string)($_POST['prenom'] ?? ''));
+
+    if ($email !== '' && $prenom !== '' && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $wantsMeeting = isset($_POST['demande_rdv']) && $_POST['demande_rdv'] === '1';
+
+        LeadService::capture([
+            'source_type' => LeadService::SOURCE_ESTIMATION,
+            'pipeline' => LeadService::SOURCE_ESTIMATION,
+            'stage' => $wantsMeeting ? 'rdv_a_planifier' : 'a_qualifier',
+            'priority' => $wantsMeeting ? 'haute' : 'normal',
+            'first_name' => $prenom,
+            'email' => $email,
+            'phone' => trim((string)($_POST['telephone'] ?? '')),
+            'intent' => $wantsMeeting ? 'Demande de RDV après estimation' : 'Estimation gratuite',
+            'property_type' => trim((string)($_POST['type_bien'] ?? '')),
+            'property_address' => trim((string)($_POST['adresse'] ?? '')),
+            'consent' => !empty($_POST['rgpd']),
+            'metadata' => [
+                'surface' => trim((string)($_POST['surface'] ?? '')),
+                'pieces' => trim((string)($_POST['pieces'] ?? '')),
+                'demande_rdv' => $wantsMeeting ? 1 : 0,
+                'creneau_prefere' => trim((string)($_POST['creneau_prefere'] ?? '')),
+                'origin_path' => $_SERVER['REQUEST_URI'] ?? '/estimation-gratuite',
+            ],
+        ]);
+
+        redirect('/merci');
+    }
+}
+
 $pageTitle  = 'Estimation gratuite de votre bien — Eduardo Desul';
 $metaDesc   = 'Estimez gratuitement votre bien immobilier à Bordeaux. Résultat personnalisé sous 48h par Eduardo Desul.';
 $extraCss   = ['/assets/css/estimation.css'];
@@ -74,6 +108,22 @@ $bodyClass  = 'page-capture';
                     <div class="form-group">
                         <label class="form-label" for="cap-tel">Téléphone</label>
                         <input type="tel" id="cap-tel" name="telephone" class="form-control" autocomplete="tel">
+                    </div>
+                    <div class="form-group">
+                        <label style="display:flex;gap:.5rem;align-items:flex-start;font-size:.82rem;cursor:pointer">
+                            <input type="checkbox" name="demande_rdv" value="1" style="margin-top:.2rem;flex-shrink:0">
+                            <span>Je souhaite planifier un rendez-vous après réception de l'estimation.</span>
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="cap-creneau">Créneau préféré (optionnel)</label>
+                        <select id="cap-creneau" name="creneau_prefere" class="form-control">
+                            <option value="">— Sélectionner —</option>
+                            <option value="matin">Matin (9h - 12h)</option>
+                            <option value="midi">Midi (12h - 14h)</option>
+                            <option value="apres-midi">Après-midi (14h - 18h)</option>
+                            <option value="soir">Soir (18h - 20h)</option>
+                        </select>
                     </div>
                     <div class="form-group">
                         <label style="display:flex;gap:.5rem;align-items:flex-start;font-size:.82rem;cursor:pointer">

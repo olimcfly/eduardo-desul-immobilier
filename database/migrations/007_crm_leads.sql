@@ -1,0 +1,23 @@
+CREATE TABLE IF NOT EXISTS crm_leads (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    source_type VARCHAR(40) NOT NULL DEFAULT 'autre',
+    pipeline VARCHAR(60) NOT NULL DEFAULT 'autre',
+    stage VARCHAR(60) NOT NULL DEFAULT 'nouveau',
+    priority VARCHAR(16) NOT NULL DEFAULT 'normal',
+    first_name VARCHAR(80) NOT NULL,
+    last_name VARCHAR(80) NOT NULL DEFAULT '',
+    email VARCHAR(190) NOT NULL,
+    phone VARCHAR(40) NULL,
+    intent VARCHAR(120) NULL,
+    property_type VARCHAR(60) NULL,
+    property_address VARCHAR(255) NULL,
+    metadata_json JSON NULL,
+    notes TEXT NULL,
+    consent TINYINT(1) NOT NULL DEFAULT 0,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME NOT NULL,
+    INDEX idx_source_stage (source_type, stage),
+    INDEX idx_pipeline (pipeline),
+    INDEX idx_email (email),
+    INDEX idx_created_at (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
