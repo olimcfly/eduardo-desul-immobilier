@@ -8,7 +8,10 @@ declare(strict_types=1);
 if (!function_exists('setting')) {
     function setting(string $key, mixed $default = '', int $userId = 0): mixed
     {
-        static $cache = [];
+        $cache = &$GLOBALS['__settings_cache'];
+        if (!is_array($cache)) {
+            $cache = [];
+        }
 
         $userId = resolveSettingsUserId($userId);
         if ($userId <= 0) {
@@ -59,7 +62,10 @@ if (!function_exists('setting')) {
 if (!function_exists('settingsGroup')) {
     function settingsGroup(string $group, int $userId = 0): array
     {
-        static $groupCache = [];
+        $groupCache = &$GLOBALS['__settings_group_cache'];
+        if (!is_array($groupCache)) {
+            $groupCache = [];
+        }
 
         $userId = resolveSettingsUserId($userId);
         if ($userId <= 0) {
@@ -340,8 +346,34 @@ if (!function_exists('logSettingChange')) {
 if (!function_exists('clearSettingCache')) {
     function clearSettingCache(int $userId = 0, string $key = ''): void
     {
-        // Le cache est request-scope (static). Rien à faire ici.
-        // Hook conservé pour compatibilité API.
+        if (!isset($GLOBALS['__settings_cache']) || !is_array($GLOBALS['__settings_cache'])) {
+            $GLOBALS['__settings_cache'] = [];
+        }
+        if (!isset($GLOBALS['__settings_group_cache']) || !is_array($GLOBALS['__settings_group_cache'])) {
+            $GLOBALS['__settings_group_cache'] = [];
+        }
+
+        if ($userId <= 0) {
+            $GLOBALS['__settings_cache'] = [];
+            $GLOBALS['__settings_group_cache'] = [];
+            return;
+        }
+
+        if ($key !== '') {
+            unset($GLOBALS['__settings_cache'][$userId . '_' . $key]);
+        } else {
+            foreach (array_keys($GLOBALS['__settings_cache']) as $cacheKey) {
+                if (str_starts_with((string)$cacheKey, $userId . '_')) {
+                    unset($GLOBALS['__settings_cache'][$cacheKey]);
+                }
+            }
+        }
+
+        foreach (array_keys($GLOBALS['__settings_group_cache']) as $groupKey) {
+            if (str_starts_with((string)$groupKey, $userId . '_')) {
+                unset($GLOBALS['__settings_group_cache'][$groupKey]);
+            }
+        }
     }
 }
 
@@ -371,6 +403,38 @@ if (!function_exists('settingsPdo')) {
     }
 }
 
+
+
+if (!function_exists('setting_flush')) {
+    function setting_flush(int $userId = 0, string $key = ''): void
+    {
+        clearSettingCache($userId, $key);
+    }
+}
+
+if (!function_exists('settings_save')) {
+    function settings_save(array $data, string $group = 'general', int $userId = 0): bool
+    {
+        $userId = resolveSettingsUserId($userId);
+        if ($userId <= 0) {
+            return false;
+        }
+
+        $success = saveSettingsBatch($data, $userId);
+        if ($success) {
+            clearSettingCache($userId);
+        }
+
+        return $success;
+    }
+}
+
+if (!function_exists('settings_group')) {
+    function settings_group(string $group, int $userId = 0): array
+    {
+        return settingsGroup($group, $userId);
+    }
+}
 
 if (!function_exists('replacePlaceholders')) {
     function replacePlaceholders(string $template, int $userId = 0): string
