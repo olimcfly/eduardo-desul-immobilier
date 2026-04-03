@@ -3,15 +3,31 @@ $pageTitle = 'Ressources immobilières — Eduardo Desul';
 $metaDesc  = 'Guides gratuits pour acheter ou vendre votre bien immobilier : guide vendeur, guide acheteur, check-lists, simulateurs.';
 $extraCss  = ['/assets/css/guide.css'];
 $guidesByPersona = require __DIR__ . '/guides-data.php';
+$guidesCount = 0;
+foreach ($guidesByPersona as $catalog) {
+    $guidesCount += isset($catalog['guides']) && is_array($catalog['guides']) ? count($catalog['guides']) : 0;
+}
 ?>
 
-<div class="page-header">
-    <div class="container">
-        <nav class="breadcrumb"><a href="/">Accueil</a><span>Ressources</span></nav>
-        <h1>Ressources gratuites</h1>
-        <p>Guides pratiques, check-lists et conseils pour réussir votre projet immobilier.</p>
+<section class="blog-hero">
+    <div class="container blog-hero__grid">
+        <div>
+            <nav class="breadcrumb"><a href="/">Accueil</a><span>Ressources</span></nav>
+            <span class="section-label">Guides & outils pratiques</span>
+            <h1>Ressources gratuites</h1>
+            <p>Guides pratiques, check-lists et conseils pour réussir votre projet immobilier.</p>
+            <div class="blog-hero__actions">
+                <a href="/estimation-gratuite" class="btn btn--accent">Estimer mon bien</a>
+                <a href="/contact" class="btn btn--outline">Poser une question</a>
+            </div>
+        </div>
+        <div class="blog-hero__card" aria-hidden="true">
+            <div class="blog-hero__metric"><strong><?= $guidesCount ?>+</strong><span>guides disponibles</span></div>
+            <div class="blog-hero__metric"><strong>100%</strong><span>accès gratuit</span></div>
+            <div class="blog-hero__metric"><strong>Actionnable</strong><span>conseils terrain</span></div>
+        </div>
     </div>
-</div>
+</section>
 
 <section class="section">
     <div class="container">
