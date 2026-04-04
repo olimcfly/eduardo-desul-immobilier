@@ -22,9 +22,6 @@ $menuGroups = [
 ?>
 <nav class="sidebar-nav">
     <ul class="sidebar-menu">
-        <?php foreach ($menuGroups as $section => $items): ?>
-            <li class="nav-section-label"><?= htmlspecialchars($section) ?></li>
-
         <li class="nav-section-label">Pilotage</li>
 
         <li>
