@@ -1,0 +1,8 @@
+.gmb-hidden{display:none}
+.gmb-toast{position:fixed;right:18px;bottom:18px;z-index:9999;padding:10px 12px;border-radius:8px;color:#fff;font-size:13px;opacity:0;transform:translateY(8px);transition:all .2s ease}
+.gmb-toast.is-visible{opacity:1;transform:translateY(0)}
+.gmb-toast-success{background:#16a34a}
+.gmb-toast-error{background:#dc2626}
+.gmb-toast-warning{background:#d97706}
+.gmb-toast-info{background:#2563eb}
+.gmb-hub .btn.disabled{opacity:.6}
