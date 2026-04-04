@@ -49,6 +49,12 @@ if ($action === 'page_request') {
         exit;
     }
 
+    if ($pageUrl === '') {
+        http_response_code(422);
+        echo json_encode(['ok' => false, 'message' => 'URL de page requise.']);
+        exit;
+    }
+
     $stmt = $db->prepare(
         'INSERT INTO admin_page_requests (superadmin_id, user_id, page_url, status)
          VALUES (:superadmin_id, :user_id, :page_url, "pending")'
@@ -83,6 +89,12 @@ if ($action === 'poll_request') {
 
     if (($authUser['role'] ?? '') === 'superadmin') {
         $requestId = (int) ($_GET['request_id'] ?? 0);
+        if ($requestId <= 0) {
+            http_response_code(422);
+            echo json_encode(['ok' => false, 'message' => 'Requête invalide.']);
+            exit;
+        }
+
         $stmt = $db->prepare(
             'SELECT id, status, created_at, responded_at
              FROM admin_page_requests
@@ -118,6 +130,11 @@ if ($action === 'respond_request') {
     $requestId = (int) ($_POST['request_id'] ?? 0);
     $decision = (string) ($_POST['decision'] ?? 'denied');
     $status = $decision === 'allowed' ? 'allowed' : 'denied';
+    if ($requestId <= 0) {
+        http_response_code(422);
+        echo json_encode(['ok' => false, 'message' => 'Requête invalide.']);
+        exit;
+    }
 
     $stmt = $db->prepare(
         'UPDATE admin_page_requests

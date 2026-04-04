@@ -1,15 +1,7 @@
 <?php
 require_once __DIR__ . '/../../core/services/ModuleService.php';
 
-$moduleDir = dirname(__DIR__);
-$folders = array_filter(scandir($moduleDir) ?: [], static function ($entry) use ($moduleDir) {
-    if ($entry === '.' || $entry === '..' || $entry === 'superadmin') {
-        return false;
-    }
-    return is_dir($moduleDir . '/' . $entry) && is_file($moduleDir . '/' . $entry . '/accueil.php');
-});
-
-$modules = ModuleService::getAllSettings(array_values($folders));
+$modules = ModuleService::getAllSettings(ModuleService::listAvailableModules());
 
 // Liste des utilisateurs (hors superadmin)
 $users = [];
