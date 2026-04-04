@@ -23,12 +23,29 @@ if ($module === '') {
     exit;
 }
 
+$availableModules = ModuleService::listAvailableModules();
+if (!in_array($module, $availableModules, true)) {
+    http_response_code(404);
+    echo json_encode(['ok' => false, 'message' => 'Module introuvable.']);
+    exit;
+}
+
 $enabledForUsers = (int) ($_POST['enabled_for_users'] ?? 0) === 1;
 $enabledForAdmins = (int) ($_POST['enabled_for_admins'] ?? 0) === 1;
 
 $ok = ModuleService::setModuleState($module, $enabledForUsers, $enabledForAdmins);
+if (!$ok) {
+    http_response_code(500);
+    echo json_encode([
+        'ok' => false,
+        'message' => 'Échec de la mise à jour du module.',
+        'module_name' => $module,
+    ]);
+    exit;
+}
+
 echo json_encode([
-    'ok' => $ok,
+    'ok' => true,
     'module_name' => $module,
     'enabled_for_users' => $enabledForUsers,
     'enabled_for_admins' => $enabledForAdmins,

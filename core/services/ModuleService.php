@@ -4,6 +4,29 @@ class ModuleService
 {
     private static array $tableExistsCache = [];
 
+    public static function listAvailableModules(): array
+    {
+        $moduleDir = ROOT_PATH . '/modules';
+        if (!is_dir($moduleDir)) {
+            return [];
+        }
+
+        $folders = array_filter(scandir($moduleDir) ?: [], static function ($entry) use ($moduleDir) {
+            if ($entry === '.' || $entry === '..' || $entry === 'superadmin') {
+                return false;
+            }
+
+            return is_dir($moduleDir . '/' . $entry) && is_file($moduleDir . '/' . $entry . '/accueil.php');
+        });
+
+        $modules = array_values(array_unique(array_map(static function ($name) {
+            return self::sanitizeModuleName((string) $name);
+        }, $folders)));
+
+        sort($modules);
+        return $modules;
+    }
+
     public static function getAllSettings(array $moduleNames = []): array
     {
         $byModule = [];

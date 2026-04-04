@@ -16,6 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $name = trim((string) ($_POST['name'] ?? ''));
 if ($name === '' || mb_strlen($name) > 100) {
+    http_response_code(422);
     echo json_encode(['ok' => false, 'message' => 'Nom invalide (1–100 caractères).']);
     exit;
 }
@@ -23,8 +24,14 @@ if ($name === '' || mb_strlen($name) > 100) {
 try {
     $stmt = db()->prepare('UPDATE users SET name = ? WHERE id = ? AND role = "superadmin"');
     $stmt->execute([$name, (int) $user['id']]);
+    if ($stmt->rowCount() === 0) {
+        echo json_encode(['ok' => true, 'message' => 'Aucun changement détecté.']);
+        exit;
+    }
+
     echo json_encode(['ok' => true, 'message' => 'Nom mis à jour.']);
 } catch (Throwable $e) {
+    http_response_code(500);
     error_log('update_profile: ' . $e->getMessage());
     echo json_encode(['ok' => false, 'message' => 'Erreur lors de la mise à jour.']);
 }
