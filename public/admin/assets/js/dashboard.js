@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const toggleIcon  = document.getElementById('toggle-icon');
     const menuItems   = document.querySelectorAll('.sidebar-menu .menu-item');
     const mainContent = document.getElementById('main-content');
+    let lastLoadedUrl = null;
 
     // ── Sidebar collapse ────────────────────────────────────────
     if (toggleBtn && container) {
@@ -40,12 +41,13 @@ document.addEventListener('DOMContentLoaded', function () {
         // Les liens du dropdown qui chargent un module
         userMenu.querySelectorAll('.dropdown-item[data-module]').forEach(function (link) {
             link.addEventListener('click', function (e) {
-                e.preventDefault();
                 userMenu.classList.remove('open');
                 const module = this.getAttribute('data-module');
                 if (module) {
+                    e.preventDefault();
                     menuItems.forEach(function (i) { i.classList.remove('active'); });
-                    loadModule(module);
+                    this.classList.add('active');
+                    loadModule(module, { push: true });
                 }
             });
         });
@@ -54,21 +56,24 @@ document.addEventListener('DOMContentLoaded', function () {
     // ── Navigation modules ──────────────────────────────────────
     menuItems.forEach(function (item) {
         item.addEventListener('click', function (e) {
+            const module = this.getAttribute('data-module');
+            if (!module) return;
             e.preventDefault();
             menuItems.forEach(function (i) { i.classList.remove('active'); });
             this.classList.add('active');
-            const module = this.getAttribute('data-module');
-            if (module) loadModule(module);
+            loadModule(module, { push: true });
         });
     });
 
     // ── Charger un module via AJAX ──────────────────────────────
-    function loadModule(module) {
+    function loadModule(module, options) {
         if (!mainContent) return;
+        const opts = options || {};
+        const url = '/admin?module=' + encodeURIComponent(module);
 
         mainContent.innerHTML = '<div class="loading-spinner"><div class="spinner"></div> Chargement…</div>';
 
-        fetch('/admin?module=' + encodeURIComponent(module))
+        fetch(url)
             .then(function (r) {
                 if (!r.ok) throw new Error('HTTP ' + r.status);
                 return r.text();
@@ -87,6 +92,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     // Mettre à jour le titre de la page
                     document.title = doc.title || document.title;
+
+                    if (opts.push === true && window.history && typeof window.history.pushState === 'function') {
+                        const nextState = { module: module, url: url };
+                        if (lastLoadedUrl !== url && window.location.href !== new URL(url, window.location.origin).href) {
+                            window.history.pushState(nextState, '', url);
+                        }
+                    }
+                    lastLoadedUrl = url;
                 } else {
                     // Sécurité : ne jamais injecter le HTML complet (évite le layout imbriqué)
                     mainContent.innerHTML = '<div class="loading-spinner"><i class="fas fa-triangle-exclamation"></i>&nbsp;Impossible de charger ce module.</div>';
@@ -98,6 +111,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.error(err);
             });
     }
+
+    window.addEventListener('popstate', function () {
+        const params = new URLSearchParams(window.location.search);
+        const module = params.get('module');
+        if (!module) return;
+
+        const activeLink = document.querySelector('.sidebar-menu .menu-item[data-module="' + module + '"]');
+        if (activeLink) {
+            menuItems.forEach(function (i) { i.classList.remove('active'); });
+            activeLink.classList.add('active');
+        }
+        loadModule(module, { push: false });
+    });
 
     // ── Module actif au démarrage ───────────────────────────────
     // Le PHP rend déjà le bon contenu initial — pas d'auto-chargement AJAX
