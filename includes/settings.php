@@ -527,4 +527,39 @@ if (!function_exists('replacePlaceholders')) {
         return strtr($template, $map);
     }
 }
+if (!function_exists('setting_set')) {
+    function setting_set(string $key, mixed $value, int $userId = 0): bool
+    {
+        return saveSetting($key, $value, $userId);
+    }
+}
+
+if (!function_exists('setting_delete')) {
+    function setting_delete(string $key, int $userId = 0): bool
+    {
+        $userId = resolveSettingsUserId($userId);
+        if ($userId <= 0) {
+            return false;
+        }
+
+        try {
+            $pdo = settingsPdo();
+            if (!$pdo) {
+                return false;
+            }
+
+            $stmt = $pdo->prepare(
+                'DELETE FROM settings WHERE user_id = ? AND setting_key = ?'
+            );
+            $stmt->execute([$userId, $key]);
+
+            clearSettingCache($userId, $key);
+            return true;
+
+        } catch (Throwable $e) {
+            error_log('setting_delete error [' . $key . ']: ' . $e->getMessage());
+            return false;
+        }
+    }
+}
 

@@ -4,7 +4,7 @@
 // ============================================================
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../core/bootstrap.php';
 Auth::requireAuth();
-require_once ROOT_PATH . '/core/helpers/settings.php';
+require_once ROOT_PATH . '/includes/settings.php';
 
 $section = preg_replace('/[^a-z_]/', '', $_GET['section'] ?? 'profil');
 
