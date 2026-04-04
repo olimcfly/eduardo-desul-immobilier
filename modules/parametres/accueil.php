@@ -4,8 +4,8 @@
 // ============================================================
 require_once __DIR__ . '/../../includes/settings.php';
 
-
-require_once __DIR__ . '/../../admin/views/layout.php';
+$pageTitle       = 'Paramètres';
+$pageDescription = 'Compte et préférences';
 
 function renderContent(): void
 {
