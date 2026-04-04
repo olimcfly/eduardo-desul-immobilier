@@ -1,0 +1,16 @@
+.gmb-page-header h1 { margin: 0 0 6px; font-size: 30px; }
+.gmb-page-header p { margin: 0 0 18px; color: #64748b; }
+.gmb-cards-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px; }
+.gmb-card { display:block; padding:18px; background:#fff; border:1px solid #e2e8f0; border-radius:12px; text-decoration:none; color:#0f172a; }
+.gmb-card:hover { border-color:#2563eb; transform:translateY(-1px); }
+.gmb-panel { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:18px; }
+.gmb-panel-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; gap:12px; }
+.gmb-form { display:grid; gap:10px; }
+.gmb-form input, .gmb-form textarea, .gmb-form select, .reply-input { width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:9px; font:inherit; }
+.btn-gmb { background:#2563eb; color:#fff; border:none; border-radius:8px; padding:10px 12px; cursor:pointer; }
+.gmb-avis-list { display:grid; gap:12px; }
+.gmb-avis-item { border:1px solid #e2e8f0; border-radius:10px; padding:12px; }
+.gmb-avis-head { display:flex; justify-content:space-between; margin-bottom:7px; }
+.gmb-stats-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:10px; }
+.gmb-stats-grid > div { background:#f8fafc; border-radius:8px; padding:10px; display:flex; flex-direction:column; gap:8px; }
+.gmb-stats-grid span { font-weight:700; font-size:22px; }

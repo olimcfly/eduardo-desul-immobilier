@@ -8,13 +8,20 @@ if (!in_array($view, $allowedViews, true)) {
     $view = 'index';
 }
 
+function gmbAssetVersion(string $absolutePath): int
+{
+    return is_file($absolutePath) ? (int) filemtime($absolutePath) : 1;
+}
 
 function renderContent(): void
 {
     global $view;
     $viewFile = __DIR__ . '/' . $view . '.php';
 
-    echo '<link rel="stylesheet" href="/modules/gmb/assets/gmb.css?v=' . filemtime(__DIR__ . '/assets/gmb.css') . '">';
+    $publicCssPath = $_SERVER['DOCUMENT_ROOT'] . '/admin/assets/css/gmb.css';
+    $publicJsPath = $_SERVER['DOCUMENT_ROOT'] . '/admin/assets/js/gmb.js';
+
+    echo '<link rel="stylesheet" href="/admin/assets/css/gmb.css?v=' . gmbAssetVersion($publicCssPath) . '">';
 
     if (is_file($viewFile)) {
         require $viewFile;
@@ -22,5 +29,5 @@ function renderContent(): void
         require __DIR__ . '/index.php';
     }
 
-    echo '<script src="/modules/gmb/assets/gmb.js?v=' . filemtime(__DIR__ . '/assets/gmb.js') . '"></script>';
+    echo '<script src="/admin/assets/js/gmb.js?v=' . gmbAssetVersion($publicJsPath) . '"></script>';
 }
