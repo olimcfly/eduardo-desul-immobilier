@@ -1,13 +1,13 @@
 <?php
-$pageTitle = 'À propos — Eduardo Desul Immobilier';
-$metaDesc  = 'Découvrez Eduardo Desul, conseiller immobilier indépendant à Bordeaux. 15 ans d\'expérience, +200 transactions réussies.';
+$pageTitle = 'À propos — Eduardo De Sul, Agent immobilier & Expert en estimation immobilière';
+$metaDesc  = 'Découvrez Eduardo De Sul, agent immobilier à Bordeaux & expert en estimation immobilière. Vente, achat et estimation en Gironde. Certifié Expert en évaluation immobilière.';
 ?>
 
 <div class="page-header">
     <div class="container">
         <nav class="breadcrumb"><a href="/">Accueil</a><span>À propos</span></nav>
-        <h1>À propos d'Eduardo Desul</h1>
-        <p>Conseiller immobilier indépendant à Bordeaux depuis plus de 15 ans.</p>
+        <h1>À propos d'Eduardo De Sul</h1>
+        <p>Agent immobilier à Bordeaux & Expert en estimation immobilière.</p>
     </div>
 </div>
 
@@ -16,24 +16,31 @@ $metaDesc  = 'Découvrez Eduardo Desul, conseiller immobilier indépendant à Bo
         <div class="grid-2" style="gap:4rem;align-items:center">
             <div data-animate>
                 <div style="background:var(--clr-primary);border-radius:var(--radius-xl);aspect-ratio:4/5;display:flex;align-items:center;justify-content:center;font-size:6rem;overflow:hidden;position:relative">
-                    <img src="/assets/images/eduardo-portrait.jpg" alt="Eduardo Desul" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display='none'">
-                    <span style="position:absolute">👤</span>
+                    <img src="https://nhkxpqunzawllesgatth.supabase.co/storage/v1/object/public/agent-images/1773076139097-2w3xgeid3of.jpg" alt="Eduardo De Sul, agent immobilier Bordeaux" style="width:100%;height:100%;object-fit:cover">
                 </div>
             </div>
             <div data-animate>
                 <span class="section-label">Mon histoire</span>
-                <h2 class="section-title">Un conseiller qui vous ressemble</h2>
-                <p>Passionné par l'immobilier depuis toujours, j'ai débuté ma carrière en 2009 au sein de grandes agences bordelaises avant de choisir l'indépendance pour mieux servir mes clients.</p>
-                <p>Cette indépendance est une force : je ne représente aucune enseigne, seulement vos intérêts. Ma rémunération dépend uniquement de votre satisfaction, pas des commissions que je pourrais générer.</p>
-                <p>Mon secteur de prédilection : Bordeaux et la métropole bordelaise, dont je connais chaque quartier, chaque tendance de marché.</p>
+                <h2 class="section-title">Eduardo De Sul,<br>Agent immobilier & Expert en estimation</h2>
+                <p>Passionné par l'immobilier et les relations humaines, j'accompagne mes clients avec engagement dans chaque étape de leur projet. Certifié <strong>Expert en évaluation immobilière</strong>, je mets mon expertise au service de vos intérêts.</p>
+                <p>Mon approche : écoute, transparence et résultats concrets. Que vous soyez vendeur, acheteur ou simplement à la recherche d'une estimation fiable, je suis à vos côtés à Bordeaux et en Gironde.</p>
+                <p>Mon secteur de prédilection : Bordeaux et la Gironde, dont je connais chaque quartier, chaque tendance de marché et chaque opportunité.</p>
 
                 <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin:2rem 0;text-align:center">
-                    <?php foreach ([['200+', 'Transactions'], ['4.9/5', 'Note clients'], ['15 ans', 'Expérience']] as [$val, $lab]): ?>
+                    <?php foreach ([['Vente', 'Maisons & apparts.'], ['Achat', 'Accompagnement'], ['Expert', 'Évaluation certifiée']] as [$val, $lab]): ?>
                     <div style="padding:1.5rem;background:var(--clr-bg);border-radius:var(--radius-lg);border:1px solid var(--clr-border)">
-                        <div style="font-family:var(--font-display);font-size:1.75rem;font-weight:700;color:var(--clr-primary)"><?= $val ?></div>
+                        <div style="font-family:var(--font-display);font-size:1.4rem;font-weight:700;color:var(--clr-primary)"><?= $val ?></div>
                         <div style="font-size:.8rem;color:var(--clr-text-muted)"><?= $lab ?></div>
                     </div>
                     <?php endforeach; ?>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:2rem">
+                    <a href="tel:+33676592367" style="display:inline-flex;align-items:center;gap:.5rem;font-weight:600;color:var(--clr-primary)">
+                        📞 +33 6 76 59 23 67
+                    </a>
+                    <a href="mailto:eduardo.desul@expfrance.fr" style="display:inline-flex;align-items:center;gap:.5rem;color:var(--clr-text-muted)">
+                        ✉️ eduardo.desul@expfrance.fr
+                    </a>
                 </div>
                 <a href="/contact" class="btn btn--primary">Me contacter</a>
             </div>
@@ -51,7 +58,7 @@ $metaDesc  = 'Découvrez Eduardo Desul, conseiller immobilier indépendant à Bo
             <?php foreach ([
                 ['🤝', 'Confiance', 'Je construis une relation durable avec chaque client. La transparence est ma règle d\'or, à chaque étape.'],
                 ['🎯', 'Excellence', 'Je m\'engage à donner le meilleur pour chaque mission. Votre satisfaction est ma priorité absolue.'],
-                ['📍', 'Expertise locale', 'Bordeaux est mon terrain. Je connais ses quartiers, ses dynamiques et ses opportunités comme personne.'],
+                ['📍', 'Expertise locale', 'Bordeaux et la Gironde sont mon terrain. Je connais ses quartiers, ses dynamiques et ses opportunités.'],
             ] as [$icon, $titre, $texte]): ?>
             <div class="service-card">
                 <div class="service-card__icon"><?= $icon ?></div>
@@ -73,8 +80,8 @@ $metaDesc  = 'Découvrez Eduardo Desul, conseiller immobilier indépendant à Bo
             <?php foreach ([
                 ['📜', 'Carte professionnelle', 'Délivrée par la CCI de Bordeaux'],
                 ['⚖️', 'Loi Hoguet', 'Conformité réglementaire totale'],
-                ['🛡️', 'RC Professionnelle', 'Assurance garantie décennale'],
-                ['🎓', 'Formation continue', '14h/an minimum respectées'],
+                ['🎓', 'Expert en évaluation', 'Certification Expert immobilier'],
+                ['🛡️', 'RC Professionnelle', 'Assurance garantie professionnelle'],
             ] as [$icon, $titre, $desc]): ?>
             <div style="padding:1.5rem;background:var(--clr-bg);border-radius:var(--radius-lg);border:1px solid var(--clr-border)">
                 <div style="font-size:2rem;margin-bottom:.75rem"><?= $icon ?></div>
@@ -89,9 +96,9 @@ $metaDesc  = 'Découvrez Eduardo Desul, conseiller immobilier indépendant à Bo
 <section class="cta-banner">
     <div class="container">
         <h2>Travaillons ensemble</h2>
-        <p>Prêt à concrétiser votre projet immobilier ? Je suis à votre écoute.</p>
+        <p>Prêt à concrétiser votre projet immobilier à Bordeaux ou en Gironde ? Je suis à votre écoute.</p>
         <div class="cta-banner__actions">
-            <a href="/contact" class="btn btn--accent btn--lg">Prendre contact</a>
+            <a href="tel:+33676592367" class="btn btn--accent btn--lg">📞 +33 6 76 59 23 67</a>
             <a href="/estimation-gratuite" class="btn btn--outline-white btn--lg">Estimer mon bien</a>
         </div>
     </div>

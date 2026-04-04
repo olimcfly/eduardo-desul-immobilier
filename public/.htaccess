@@ -5,11 +5,13 @@ RewriteEngine On
 # RewriteCond %{HTTPS} off
 # RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
-# Autoriser les fichiers et dossiers réels
+# Autoriser les fichiers statiques réels
 RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
 
-# Tout passer à index.php
+# Exclure le dossier admin (géré par son propre .htaccess)
+RewriteCond %{REQUEST_URI} !^/admin/
+
+# Tout passer à index.php (y compris les dossiers comme /blog/, /actualites/, etc.)
 RewriteRule ^ index.php [QSA,L]
 
 # Sécurité : cacher les fichiers sensibles

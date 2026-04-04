@@ -8,6 +8,16 @@ if ($action === 'toggle_module') {
     return;
 }
 
+if ($action === 'update_profile') {
+    require __DIR__ . '/update_profile.php';
+    return;
+}
+
+if ($action === 'toggle_user') {
+    require __DIR__ . '/toggle_user.php';
+    return;
+}
+
 if ($action === 'page_request' || $action === 'poll_request' || $action === 'respond_request') {
     require __DIR__ . '/page_request.php';
     return;

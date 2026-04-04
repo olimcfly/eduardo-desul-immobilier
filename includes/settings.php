@@ -501,27 +501,15 @@ if (!function_exists('replacePlaceholders')) {
         $neighborhoodB = is_array($zoneNeighborhoods) && isset($zoneNeighborhoods[1]) ? (string)$zoneNeighborhoods[1] : 'Quartier 2';
 
         $map = [
-            '{{advisor_name}}' => $advisorFull,
-            '{{agency_name}}' => (string)setting('agency_name', APP_NAME, $userId),
-            '{{advisor_email}}' => (string)setting('advisor_email', APP_EMAIL, $userId),
-            '{{advisor_phone}}' => (string)setting('advisor_phone', APP_PHONE, $userId),
-            '{{zone_city}}' => $zoneCity,
+            '{{advisor_name}}'        => $advisorFull,
+            '{{agency_name}}'         => (string)setting('agency_name', APP_NAME, $userId),
+            '{{advisor_email}}'       => (string)setting('advisor_email', APP_EMAIL, $userId),
+            '{{advisor_phone}}'       => (string)setting('advisor_phone', APP_PHONE, $userId),
+            '{{zone_city}}'           => $zoneCity,
             '{{zone_neighborhood_1}}' => $neighborhoodA,
             '{{zone_neighborhood_2}}' => $neighborhoodB,
-            '{{app_url}}' => (string)setting('tech_app_url', APP_URL, $userId),
-            '{{advisor_photo}}' => (string)setting('advisor_photo', '/assets/images/eduardo-portrait.jpg', $userId),
-
-            // migration legacy hardcodes
-            'Eduardo Desul' => $advisorFull,
-            'Eduardo De Sul' => $advisorFull,
-            'Eduardo Desul Immobilier' => (string)setting('agency_name', APP_NAME, $userId),
-            'contact@eduardo-desul-immobilier.fr' => (string)setting('advisor_email', APP_EMAIL, $userId),
-            'https://eduardo-desul-immobilier.fr' => (string)setting('tech_app_url', APP_URL, $userId),
-            '/assets/images/eduardo-portrait.jpg' => (string)setting('advisor_photo', '/assets/images/eduardo-portrait.jpg', $userId),
-            'Bordeaux' => $zoneCity,
-            'Chartrons' => $neighborhoodA,
-            'Mérignac' => $neighborhoodB,
-            'Pessac' => (is_array($zoneNeighborhoods) && isset($zoneNeighborhoods[2])) ? (string)$zoneNeighborhoods[2] : $neighborhoodB,
+            '{{app_url}}'             => (string)setting('tech_app_url', APP_URL, $userId),
+            '{{advisor_photo}}'       => (string)setting('advisor_photo', '/assets/images/eduardo-portrait.jpg', $userId),
         ];
 
         return strtr($template, $map);

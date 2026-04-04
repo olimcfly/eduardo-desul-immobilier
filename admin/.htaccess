@@ -1,0 +1,18 @@
+Options -Indexes
+RewriteEngine On
+
+# Autoriser les fichiers et dossiers réels
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Gestion des URLs propres
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [QSA,L]
+
+# Sécurité : cacher les fichiers sensibles
+<FilesMatch "\.(env|log|sql|git|md|htaccess|ini|bak|swp)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>

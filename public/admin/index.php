@@ -1,6 +1,5 @@
 <?php
 require_once '../../core/bootstrap.php';
-require_once '../../core/Database.php';
 require_once '../../core/services/ModuleService.php';
 
 $loginRedirect = '/admin/login';
