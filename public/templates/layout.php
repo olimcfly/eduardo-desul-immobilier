@@ -6,7 +6,7 @@ $siteMetaDescription = setting('site_meta_description', 'Conseiller immobilier i
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($pageTitle ?? APP_NAME) ?></title>
     <meta name="description" content="<?= e($metaDesc ?? $siteMetaDescription) ?>">
     <meta name="robots" content="<?= e($metaRobots ?? 'index, follow') ?>">

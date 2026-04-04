@@ -31,7 +31,7 @@
   --transition: 0.25s ease;
   --container:  1200px;
   --header-h:   72px;
-  color-scheme: light;
+  color-scheme: only light;
 }
 
 /* ── Animations data-animate ────────────────────────────────── */
@@ -554,51 +554,44 @@ th, td {
 /* ── Responsive ─────────────────────────────────────────────── */
 @media (max-width: 1024px) {
   .footer__grid { grid-template-columns: 1fr 1fr; gap: 2rem; }
+  .section { padding-block: 4rem; }
 }
 
 @media (max-width: 768px) {
   :root { --header-h: 64px; }
   .site-nav, .header__actions { display: none; }
   .burger { display: flex; }
-  .btn { width: 100%; }
-  .btn--phone { width: auto; }
+  /* Seuls les boutons dans les bannières CTA passent en pleine largeur */
+  .cta-banner__actions { flex-direction: column; align-items: stretch; }
+  .cta-banner__actions .btn { width: 100%; }
   .footer__grid { grid-template-columns: 1fr; gap: 2rem; padding-block: 3rem; }
   .footer__bottom-inner { flex-direction: column; text-align: center; }
   .hero { min-height: 80vh; }
   .hero__trust { gap: 1.5rem; }
   .section { padding-block: 3.5rem; }
+  .section__header { margin-bottom: 2rem; }
+  .page-header { padding-block: 2.5rem; }
+  .page-header p { font-size: 1rem; }
 }
 
 @media (max-width: 480px) {
   .container { padding-inline: 1rem; }
-  .hero__actions { flex-direction: column; }
+  /* Boutons hero empilés et pleine largeur sur petit mobile */
+  .hero__actions { flex-direction: column; align-items: stretch; }
+  .hero__actions .btn { width: 100%; }
   .logo__text em { font-size: .78rem; }
   .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  /* Trust items plus compacts */
+  .trust-item .value { font-size: 1.5rem; }
+  .hero__trust { gap: 1rem; margin-top: 2rem; padding-top: 1.5rem; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --clr-text: #e5e7eb;
-    --clr-text-muted: #b7bec9;
-    --clr-bg: #0f172a;
-    --clr-white: #111827;
-    --clr-border: #263244;
-  }
-  .site-header,
-  .card,
-  .service-card,
-  .testimonial,
-  .nav-mobile,
-  .form-control { background: #111827; }
-  .dropdown__link:hover,
-  .nav-mobile ul li a.active,
-  .nav-mobile ul li a:hover { background: #1f2937; }
-  .section--alt { background: #0b1220; }
-}
+/* Mode sombre désactivé : l'interface reste toujours en mode clair
+   pour une cohérence visuelle identique sur mobile, tablette et desktop. */
 
 /* ── Image placeholder ──────────────────────────────────────── */
 .img-placeholder {

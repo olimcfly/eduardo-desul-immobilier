@@ -61,6 +61,9 @@ $navItems = [
             <?php endif; ?>
         </li>
         <?php endforeach; ?>
+        <?php if (APP_PHONE): ?>
+        <li style="margin-bottom:.5rem"><a href="tel:<?= e(preg_replace('/\s+/', '', APP_PHONE)) ?>" class="btn btn--outline btn--full">📞 <?= e(APP_PHONE) ?></a></li>
+        <?php endif; ?>
         <li><a href="<?= e(url('/estimation-gratuite')) ?>" class="btn btn--primary btn--full">Estimation gratuite</a></li>
     </ul>
 </div>
