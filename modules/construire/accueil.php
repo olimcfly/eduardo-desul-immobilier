@@ -27,37 +27,94 @@ function renderContent()
         }
     }
     ?>
-    <div class="page-header">
-        <h1><i class="fas fa-layer-group page-icon"></i> HUB<span class="page-title-accent">Construire</span></h1>
-        <p>Posez les bases solides de votre activité avec Noah IA</p>
-    </div>
+    <link rel="stylesheet" href="/admin/assets/css/seo.css?v=<?= filemtime($_SERVER['DOCUMENT_ROOT'] . '/admin/assets/css/seo.css') ?>">
 
-    <div class="noah-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.25rem;margin-top:1.5rem;">
+    <div class="seo-hub">
+        <div class="seo-breadcrumb">Accueil › Construire</div>
+        <h1>🧱 HUB Construire</h1>
+        <p class="seo-subtitle">
+            Posez les bases solides de votre activité : positionnement, personas, offre, zone et plan d'action.
+        </p>
 
-        <?php
-        $cards = [
-            ['id'=>'positionnement','title'=>'Méthode ANCRE+','desc'=>"Générez 3 formulations d'accroche claires.",'icon'=>'fa-anchor','color'=>'#e74c3c','href'=>'?module=construire&action=ancre'],
-            ['id'=>'profils','title'=>'NeuroPersona','desc'=>'Identifiez vos 3 profils clients prioritaires.','icon'=>'fa-brain','color'=>'#3498db','href'=>'?module=construire&action=profils'],
-            ['id'=>'offre','title'=>'Offre Conseiller','desc'=>'Construisez votre pitch en 3 versions.','icon'=>'fa-briefcase','color'=>'#27ae60','href'=>'?module=construire&action=offre'],
-            ['id'=>'zone','title'=>'Zone de Prospection','desc'=>'Délimitez votre territoire en 3 niveaux.','icon'=>'fa-map-marked-alt','color'=>'#8e44ad','href'=>'?module=construire&action=zone'],
-            ['id'=>'synthese','title'=>'Synthèse Stratégique','desc'=>'Résumé de votre situation en 100 mots.','icon'=>'fa-layer-group','color'=>'#e67e22','href'=>'?module=construire&action=synthese'],
-            ['id'=>'actions','title'=>'Actions du Jour','desc'=>'3 à 5 actions concrètes pour aujourd\'hui.','icon'=>'fa-bolt','color'=>'#16a085','href'=>'?module=construire&action=actions'],
-        ];
-        foreach ($cards as $c): ?>
-        <div style="background:#1a3c5e;border-radius:14px;border:1.5px solid rgba(255,255,255,.07);padding:1.25rem;">
-            <div style="display:flex;align-items:center;gap:.85rem;margin-bottom:.75rem;">
-                <div style="width:40px;height:40px;border-radius:10px;background:<?= $c['color'] ?>22;display:flex;align-items:center;justify-content:center;color:<?= $c['color'] ?>;">
-                    <i class="fas <?= $c['icon'] ?>"></i>
-                </div>
-                <strong style="color:#e8f1f9;"><?= $c['title'] ?></strong>
-            </div>
-            <p style="color:#7a9ab8;font-size:.85rem;margin:0 0 1rem;"><?= $c['desc'] ?></p>
-            <a href="<?= $c['href'] ?>" style="display:inline-flex;align-items:center;gap:.4rem;background:<?= $c['color'] ?>;color:#fff;padding:.5rem 1rem;border-radius:8px;font-size:.85rem;font-weight:700;text-decoration:none;">
-                <i class="fas fa-arrow-right"></i> Accéder
-            </a>
+        <div class="seo-search-wrap">
+            <input type="text"
+                   id="construire-module-search"
+                   placeholder="Rechercher un module Construire…"
+                   oninput="filterConstruireModules(this.value)">
         </div>
-        <?php endforeach; ?>
 
+        <div class="seo-grid" id="construire-modules-grid">
+            <article class="seo-card"
+                     data-module="méthode ancre positionnement accroche"
+                     style="--accent:#3b82f6;--icon-bg:#dbeafe;">
+                <div class="seo-card-head"><span class="icon">⚓</span><h3>Méthode ANCRE+</h3></div>
+                <p>Générez 3 formulations d'accroche claires pour affirmer votre positionnement.</p>
+                <div class="badges"><span>Positionnement</span><span>Message</span></div>
+                <a href="/admin?module=construire&amp;action=ancre" class="btn btn-sm">Lancer</a>
+                <small>Clarifiez votre promesse en moins de 10 minutes.</small>
+            </article>
+
+            <article class="seo-card"
+                     data-module="neuro persona profils clients cibles"
+                     style="--accent:#10b981;--icon-bg:#d1fae5;">
+                <div class="seo-card-head"><span class="icon">🧠</span><h3>NeuroPersona</h3></div>
+                <p>Identifiez vos 3 profils clients prioritaires pour mieux cibler vos actions.</p>
+                <div class="badges"><span>Clients</span><span>Ciblage</span></div>
+                <a href="/admin?module=construire&amp;action=profils" class="btn btn-sm">Définir</a>
+                <small>Passez d'une communication générique à une approche précise.</small>
+            </article>
+
+            <article class="seo-card"
+                     data-module="offre conseiller pitch proposition valeur"
+                     style="--accent:#ef4444;--icon-bg:#fee2e2;">
+                <div class="seo-card-head"><span class="icon">💼</span><h3>Offre Conseiller</h3></div>
+                <p>Construisez votre pitch en 3 versions : courte, intermédiaire et détaillée.</p>
+                <div class="badges"><span>Pitch</span><span>Valeur</span></div>
+                <a href="/admin?module=construire&amp;action=offre" class="btn btn-sm">Construire</a>
+                <small>Une offre lisible augmente vos prises de rendez-vous.</small>
+            </article>
+
+            <article class="seo-card"
+                     data-module="zone prospection territoire local"
+                     style="--accent:#f59e0b;--icon-bg:#fef3c7;">
+                <div class="seo-card-head"><span class="icon">🗺️</span><h3>Zone de Prospection</h3></div>
+                <p>Délimitez votre territoire en 3 niveaux pour prioriser vos efforts terrain.</p>
+                <div class="badges"><span>Territoire</span><span>Priorités</span></div>
+                <a href="/admin?module=construire&amp;action=zone" class="btn btn-sm">Cartographier</a>
+                <small>Concentrez votre énergie sur les zones à plus fort potentiel.</small>
+            </article>
+
+            <article class="seo-card"
+                     data-module="synthèse stratégique plan global"
+                     style="--accent:#8b5cf6;--icon-bg:#ede9fe;">
+                <div class="seo-card-head"><span class="icon">🧩</span><h3>Synthèse Stratégique</h3></div>
+                <p>Obtenez une vue d'ensemble claire de votre positionnement et de vos axes de progression.</p>
+                <div class="badges"><span>Vision</span><span>Stratégie</span></div>
+                <a href="/admin?module=construire&amp;action=synthese" class="btn btn-sm">Synthétiser</a>
+                <small>Un résumé actionnable pour piloter vos décisions.</small>
+            </article>
+
+            <article class="seo-card"
+                     data-module="actions du jour to-do priorités"
+                     style="--accent:#14b8a6;--icon-bg:#ccfbf1;">
+                <div class="seo-card-head"><span class="icon">⚡</span><h3>Actions du Jour</h3></div>
+                <p>Transformez votre stratégie en 3 à 5 actions concrètes à exécuter aujourd'hui.</p>
+                <div class="badges"><span>Exécution</span><span>Productivité</span></div>
+                <a href="/admin?module=construire&amp;action=actions" class="btn btn-sm">Planifier</a>
+                <small>Passez rapidement de l'idée à la mise en œuvre.</small>
+            </article>
+        </div>
     </div>
+
+    <script>
+        function filterConstruireModules(query) {
+            var q = (query || '').toLowerCase();
+            var cards = document.querySelectorAll('#construire-modules-grid .seo-card');
+            cards.forEach(function (card) {
+                var text = (card.dataset.module || '').toLowerCase();
+                card.style.display = text.includes(q) ? '' : 'none';
+            });
+        }
+    </script>
     <?php
 }
