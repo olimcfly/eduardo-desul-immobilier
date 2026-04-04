@@ -1,50 +1,150 @@
 <?php
-
 declare(strict_types=1);
 
-require_once dirname(__DIR__, 3) . '/core/bootstrap.php';
-require_once dirname(__DIR__) . '/services/KeywordTracker.php';
+// ── Bootstrap ─────────────────────────────────────────────────────────────────
+require_once __DIR__ . '/../../../bootstrap.php';
+require_once __DIR__ . '/../services/KeywordTracker.php';
 
-Auth::requireAuth('/admin/login');
-header('Content-Type: application/json; charset=utf-8');
+// ── Helpers JSON ──────────────────────────────────────────────────────────────
+function jsonOk(mixed $data = null, string $message = 'OK'): never
+{
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(['success' => true, 'message' => $message, 'data' => $data]);
+    exit;
+}
 
-$userId = (int)(Auth::user()['id'] ?? 0);
+function jsonError(string $message, int $code = 400): never
+{
+    http_response_code($code);
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode(['success' => false, 'message' => $message, 'data' => null]);
+    exit;
+}
+
+// ── Auth ──────────────────────────────────────────────────────────────────────
+if (!Auth::check()) {
+    jsonError('Non autorisé', 401);
+}
+
+$userId  = (int)(Auth::user()['id'] ?? 0);
 $tracker = new KeywordTracker(db(), $userId);
-$action = (string)($_REQUEST['action'] ?? 'refresh');
 
-try {
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        verifyCsrf();
+// ── Action ────────────────────────────────────────────────────────────────────
+$action = isset($_GET['action'])
+    ? preg_replace('/[^a-z_]/', '', (string)$_GET['action'])
+    : '';
+
+match ($action) {
+    'save'     => handleSave($tracker),
+    'delete'   => handleDelete($tracker),
+    'refresh'  => handleRefresh($tracker),
+    default    => jsonError('Action inconnue', 404),
+};
+
+// ── Handlers ──────────────────────────────────────────────────────────────────
+
+function handleSave(KeywordTracker $tracker): never
+{
+    // CSRF
+    if (!verifyCsrf($_POST['csrf_token'] ?? '')) {
+        jsonError('Token CSRF invalide', 403);
     }
 
-    if ($action === 'save') {
-        $id = $tracker->upsertKeyword($_POST);
-        echo json_encode(['success' => true, 'id' => $id]);
-        exit;
+    // Validation
+    $keyword    = trim((string)($_POST['keyword']    ?? ''));
+    $targetUrl  = trim((string)($_POST['target_url'] ?? ''));
+    $volume     = max(0, (int)($_POST['estimated_volume'] ?? 0));
+    $difficulty = min(100, max(0, (int)($_POST['difficulty'] ?? 0)));
+
+    if ($keyword === '') {
+        jsonError('Le mot-clé est obligatoire');
+    }
+    if (strlen($keyword) > 190) {
+        jsonError('Le mot-clé ne doit pas dépasser 190 caractères');
+    }
+    if ($targetUrl === '' || !filter_var($targetUrl, FILTER_VALIDATE_URL)) {
+        jsonError('L\'URL cible est invalide');
     }
 
-    if ($action === 'delete') {
-        $id = (int)($_POST['id'] ?? 0);
-        echo json_encode(['success' => $tracker->deleteKeyword($id)]);
-        exit;
+    // Insert
+    $id = $tracker->addKeyword($keyword, $targetUrl, $volume, $difficulty);
+
+    jsonOk(['id' => $id], 'Mot-clé ajouté');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+function handleDelete(KeywordTracker $tracker): never
+{
+    // CSRF via header ou POST
+    $token = $_SERVER['HTTP_X_CSRF_TOKEN']
+          ?? $_POST['csrf_token']
+          ?? '';
+
+    if (!verifyCsrf($token)) {
+        jsonError('Token CSRF invalide', 403);
     }
 
     $id = (int)($_POST['id'] ?? $_GET['id'] ?? 0);
-    $stmt = db()->prepare('SELECT keyword, target_url FROM seo_keywords WHERE id = ? AND user_id = ?');
-    $stmt->execute([$id, $userId]);
-    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-    if (!$row) {
-        throw new RuntimeException('Mot-clé introuvable.');
+
+    if ($id <= 0) {
+        jsonError('ID invalide');
     }
 
-    $position = $tracker->checkPosition((string)$row['keyword'], (string)$row['target_url']);
-    $update = db()->prepare('UPDATE seo_keywords SET previous_position = current_position, current_position = ?, last_checked_at = NOW() WHERE id = ? AND user_id = ?');
-    $update->execute([$position, $id, $userId]);
-    $tracker->saveHistory($id, $position);
+    $deleted = $tracker->deleteKeyword($id);
 
-    echo json_encode(['success' => true, 'position' => $position]);
-} catch (Throwable $e) {
-    error_log('[' . date('Y-m-d H:i:s') . '] keyword: ' . $e->getMessage() . PHP_EOL, 3, dirname(__DIR__, 3) . '/logs/seo.log');
-    http_response_code(400);
-    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    if (!$deleted) {
+        jsonError('Mot-clé introuvable ou non autorisé', 404);
+    }
+
+    jsonOk(['id' => $id], 'Mot-clé supprimé');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+function handleRefresh(KeywordTracker $tracker): never
+{
+    // CSRF
+    $token = $_SERVER['HTTP_X_CSRF_TOKEN']
+          ?? $_POST['csrf_token']
+          ?? '';
+
+    if (!verifyCsrf($token)) {
+        jsonError('Token CSRF invalide', 403);
+    }
+
+    $id = (int)($_POST['id'] ?? $_GET['id'] ?? 0);
+
+    if ($id <= 0) {
+        jsonError('ID invalide');
+    }
+
+    // Simuler un check de position
+    // À remplacer par un vrai appel API (Google Search Console, DataForSEO…)
+    $newPosition = fetchPositionFromApi($id, $tracker);
+
+    $tracker->updatePosition($id, $newPosition);
+
+    jsonOk([
+        'id'               => $id,
+        'current_position' => $newPosition,
+        'last_checked_at'  => date('d/m/Y H:i'),
+    ], 'Position mise à jour');
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Stub — brancher ici DataForSEO / GSC / SerpAPI
+ * Retourne null si le mot-clé n'est pas classé
+ */
+function fetchPositionFromApi(int $keywordId, KeywordTracker $tracker): ?int
+{
+    // TODO: appel API réel
+    // Exemple DataForSEO :
+    // $client = new DataForSeoClient($_ENV['DATAFORSEO_LOGIN'], $_ENV['DATAFORSEO_PASS']);
+    // return $client->getPosition($keyword, $targetUrl);
+
+    // Pour l'instant on retourne null (pas classé)
+    return null;
 }
