@@ -51,7 +51,8 @@ $v = fn(string $k, string $d = '') => htmlspecialchars((string)($s[$k] ?? $d), E
         </div>
     </div>
 
-    <div class="form-actions">
-        <button type="submit" class="btn btn-primary">Enregistrer</button>
+    <div class="drawer-footer">
+        <button type="button" class="btn-cancel" onclick="closeSettingsDrawer()">Annuler</button>
+        <button type="submit" class="btn-save"><i class="fas fa-check"></i> Enregistrer</button>
     </div>
 </form>

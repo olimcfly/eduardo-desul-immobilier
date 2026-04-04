@@ -83,6 +83,7 @@ if (!function_exists('settingsGroup')) {
                 return [];
             }
 
+            // Essai 1 : clés définies dans les templates pour ce groupe
             $stmt = $pdo->prepare(
                 'SELECT s.setting_key, s.setting_value, s.setting_type, s.is_encrypted
                  FROM settings s
@@ -96,13 +97,24 @@ if (!function_exists('settingsGroup')) {
             $stmt->execute([$userId, $group]);
             $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+            // Fallback : lecture directe par préfixe (ex: profil_*, site_*, smtp_*)
+            if (empty($rows)) {
+                $stmt = $pdo->prepare(
+                    'SELECT setting_key, setting_value, setting_type, is_encrypted
+                     FROM settings
+                     WHERE user_id = ? AND setting_key LIKE ?'
+                );
+                $stmt->execute([$userId, $group . '_%']);
+                $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            }
+
             $result = [];
             foreach ($rows as $row) {
                 $value = $row['setting_value'];
                 if ((int)($row['is_encrypted'] ?? 0) === 1 && !empty($value)) {
                     $value = decryptSetting((string)$value);
                 }
-                $result[$row['setting_key']] = castSettingValue($value, (string)$row['setting_type']);
+                $result[$row['setting_key']] = castSettingValue($value, (string)($row['setting_type'] ?? 'text'));
             }
 
             $groupCache[$cacheKey] = $result;

@@ -4,7 +4,6 @@
 // ============================================================
 require_once $_SERVER['DOCUMENT_ROOT'] . '/../core/bootstrap.php';
 Auth::requireAuth();
-require_once ROOT_PATH . '/core/helpers/settings.php';
 
 header('Content-Type: application/json');
 
@@ -42,7 +41,7 @@ const ALLOWED_FIELDS = [
     ],
     'smtp' => [
         'smtp_host', 'smtp_port', 'smtp_user', 'smtp_pass',
-        'smtp_from_name', 'smtp_secure',
+        'smtp_from', 'smtp_from_name', 'smtp_secure',
     ],
     'securite' => [
         'sec_2fa_active', 'sec_session_ttl', 'sec_ip_whitelist',
