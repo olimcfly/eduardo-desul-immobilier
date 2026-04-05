@@ -10,6 +10,19 @@ if (file_exists($_autoload)) {
 }
 unset($_autoload);
 
+// ── Charger les variables d'environnement (.env) ─────────────
+$envFile = dirname(__DIR__) . '/.env';
+if (file_exists($envFile)) {
+    foreach (file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
+        $line = trim($line);
+        if ($line === '' || str_starts_with($line, '#') || !str_contains($line, '=')) {
+            continue;
+        }
+        [$key, $val] = explode('=', $line, 2);
+        $_ENV[trim($key)] = trim($val, " \t\n\r\"'");
+    }
+}
+
 // ── Autoload configs ─────────────────────────────────────────
 require_once __DIR__ . '/config/config.php';
 require_once __DIR__ . '/config/constants.php';
