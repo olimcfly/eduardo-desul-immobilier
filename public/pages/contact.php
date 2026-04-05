@@ -30,6 +30,15 @@ $pageTitle = 'Contact — Eduardo Desul Immobilier';
 $metaDesc  = 'Contactez Eduardo Desul, conseiller immobilier à Bordeaux. Réponse sous 24h.';
 $extraCss  = ['/assets/css/contact.css'];
 $extraJs   = ['/assets/js/contact.js'];
+
+$contactTitle     = trim((string) setting('contact_title', 'Contactez-moi'));
+$contactAddress   = trim((string) setting('contact_address', APP_ADDRESS));
+$contactPhone     = trim((string) setting('contact_phone', APP_PHONE));
+$contactEmail     = trim((string) setting('contact_email', APP_EMAIL));
+$contactMapEmbed  = trim((string) setting('contact_map_embed', ''));
+$contactFormTitle = trim((string) setting('contact_form_title', 'Envoyez-moi un message'));
+
+$contactPhoneHref = preg_replace('/\s+/', '', $contactPhone) ?: '';
 ?>
 
 <div class="page-header">
@@ -37,7 +46,7 @@ $extraJs   = ['/assets/js/contact.js'];
         <nav class="breadcrumb" aria-label="Fil d'Ariane">
             <a href="/">Accueil</a><span>Contact</span>
         </nav>
-        <h1>Contactez-moi</h1>
+        <h1><?= e($contactTitle !== '' ? $contactTitle : 'Contactez-moi') ?></h1>
         <p>Je vous réponds personnellement dans les 24 heures. N'hésitez pas à me poser toutes vos questions.</p>
     </div>
 </div>
@@ -48,7 +57,7 @@ $extraJs   = ['/assets/js/contact.js'];
 
             <!-- Formulaire -->
             <div class="contact-form-box">
-                <h2>Envoyez-moi un message</h2>
+                <h2><?= e($contactFormTitle !== '' ? $contactFormTitle : 'Envoyez-moi un message') ?></h2>
                 <p>Décrivez votre projet ou posez votre question.</p>
 
                 <form id="contact-form" action="/contact" method="POST" novalidate>
@@ -114,15 +123,15 @@ $extraJs   = ['/assets/js/contact.js'];
                         <span class="info-icon">📍</span>
                         <div class="info-text">
                             <strong>Adresse</strong>
-                            <p><?= e(APP_ADDRESS) ?></p>
+                            <p><?= e($contactAddress !== '' ? $contactAddress : 'Adresse indisponible') ?></p>
                         </div>
                     </div>
-                    <?php if (APP_PHONE): ?>
+                    <?php if ($contactPhone !== ''): ?>
                     <div class="info-item">
                         <span class="info-icon">📞</span>
                         <div class="info-text">
                             <strong>Téléphone</strong>
-                            <p><a href="tel:<?= e(preg_replace('/\s+/', '', APP_PHONE)) ?>"><?= e(APP_PHONE) ?></a></p>
+                            <p><a href="tel:<?= e($contactPhoneHref) ?>"><?= e($contactPhone) ?></a></p>
                         </div>
                     </div>
                     <?php endif; ?>
@@ -130,7 +139,7 @@ $extraJs   = ['/assets/js/contact.js'];
                         <span class="info-icon">✉️</span>
                         <div class="info-text">
                             <strong>Email</strong>
-                            <p><a href="mailto:<?= e(APP_EMAIL) ?>"><?= e(APP_EMAIL) ?></a></p>
+                            <p><a href="mailto:<?= e($contactEmail !== '' ? $contactEmail : APP_EMAIL) ?>"><?= e($contactEmail !== '' ? $contactEmail : APP_EMAIL) ?></a></p>
                         </div>
                     </div>
                 </div>
@@ -146,7 +155,20 @@ $extraJs   = ['/assets/js/contact.js'];
                 </div>
 
                 <div class="map-placeholder" aria-label="Carte de localisation">
-                    📍 Carte Google Maps ici
+                    <?php if ($contactMapEmbed !== ''): ?>
+                        <?= $contactMapEmbed ?>
+                    <?php else: ?>
+                        <iframe
+                            title="Carte de localisation"
+                            src="https://maps.google.com/maps?q=Bordeaux&t=&z=12&ie=UTF8&iwloc=&output=embed"
+                            width="100%"
+                            height="320"
+                            style="border:0"
+                            loading="lazy"
+                            referrerpolicy="no-referrer-when-downgrade"
+                            allowfullscreen>
+                        </iframe>
+                    <?php endif; ?>
                 </div>
 
                 <div style="background:var(--clr-primary);color:white;border-radius:var(--radius-lg);padding:1.5rem;text-align:center">
