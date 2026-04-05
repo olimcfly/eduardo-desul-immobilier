@@ -9,10 +9,19 @@ define('ROOT', ROOT_PATH); // Alias pour compatibilité avec les anciens fichier
 // Charger les variables d'environnement
 $envFile = ROOT_PATH . '/.env';
 if (file_exists($envFile)) {
-    foreach (file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
-        if (str_starts_with(trim($line), '#') || !str_contains($line, '=')) continue;
-        [$key, $val] = explode('=', $line, 2);
-        $_ENV[trim($key)] = trim($val, " \t\n\r\"'");
+    $envValues = parse_ini_file($envFile, false, INI_SCANNER_RAW);
+    if (is_array($envValues)) {
+        foreach ($envValues as $key => $value) {
+            $key = trim((string) $key);
+            if ($key === '') {
+                continue;
+            }
+
+            $value = trim((string) $value);
+            $_ENV[$key] = $value;
+            $_SERVER[$key] = $value;
+            putenv($key . '=' . $value);
+        }
     }
 }
 
