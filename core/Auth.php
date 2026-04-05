@@ -58,6 +58,44 @@ class Auth
         }
     }
 
+
+    /**
+     * Authentifie un utilisateur par email/mot de passe et ouvre la session.
+     *
+     * @param string $email
+     * @param string $password
+     * @param array<int, string> $allowedRoles
+     */
+    public static function attempt(string $email, string $password, array $allowedRoles = []): bool
+    {
+        $email = trim(mb_strtolower($email));
+        if ($email === '' || $password === '') {
+            return false;
+        }
+
+        $sql = "SELECT id, email, password, role, name FROM users WHERE email = ? LIMIT 1";
+        $stmt = db()->prepare($sql);
+        $stmt->execute([$email]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$user || !isset($user['password']) || !self::verifyPassword($password, (string) $user['password'])) {
+            return false;
+        }
+
+        if ($allowedRoles !== [] && !in_array((string) ($user['role'] ?? ''), $allowedRoles, true)) {
+            return false;
+        }
+
+        self::login([
+            'id'    => $user['id'],
+            'email' => $user['email'],
+            'role'  => $user['role'] ?? 'admin',
+            'name'  => $user['name'] ?? '',
+        ]);
+
+        return true;
+    }
+
     public static function hashPassword(string $password): string
     {
         return password_hash($password, PASSWORD_BCRYPT, ['cost' => 12]);

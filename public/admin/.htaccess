@@ -1,6 +1,10 @@
 Options -Indexes
 RewriteEngine On
 
+# Forcer HTTPS pour l'interface admin
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
 # Pages d'authentification (sans extension .php dans l'URL)
 RewriteRule ^login$       login.php [L]
 RewriteRule ^logout$      logout.php [L]
@@ -9,11 +13,12 @@ RewriteRule ^verify-otp$  verify-otp.php [L]
 # API endpoints
 RewriteRule ^api/noah$    api/noah.php [L]
 
-# Autoriser les fichiers réels (CSS, JS, images)
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
+# Autoriser les fichiers et dossiers réels (CSS, JS, images)
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
 
-# Tout router vers index.php
+# Tout le reste est routé vers index.php
 RewriteRule ^ index.php [QSA,L]
 
 # Bloquer l'accès direct aux fichiers sensibles
