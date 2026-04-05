@@ -1,6 +1,39 @@
 <?php
 $pageTitle = 'Agent immobilier Bordeaux & Expert estimation immobilière — Eduardo De Sul';
 $metaDesc  = 'Vous souhaitez vendre votre bien au juste prix ou réaliser un achat immobilier en Gironde ? Eduardo De Sul, agent immobilier à Bordeaux, vous offre une estimation gratuite et un accompagnement sur-mesure.';
+
+$homeCmsContent = [];
+try {
+    $pdo = db();
+    $stmt = $pdo->prepare('SELECT section_key, content FROM page_contents WHERE page_key = :page_key');
+    $stmt->execute(['page_key' => 'home']);
+
+    foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $sectionKey = (string) ($row['section_key'] ?? '');
+        $rawContent = $row['content'] ?? null;
+
+        if ($sectionKey === '' || !is_string($rawContent) || $rawContent === '') {
+            continue;
+        }
+
+        $decoded = json_decode($rawContent, true);
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+            $homeCmsContent[$sectionKey] = $decoded;
+        }
+    }
+} catch (Throwable $e) {
+    // Fallback silencieux : la homepage utilise les contenus par défaut si le CMS n'est pas prêt.
+}
+
+$hero = $homeCmsContent['hero'] ?? [];
+$about = $homeCmsContent['about'] ?? [];
+$services = $homeCmsContent['services'] ?? [];
+$faq = $homeCmsContent['faq'] ?? [];
+
+$heroTrustItems = isset($hero['trust_items']) && is_array($hero['trust_items']) ? $hero['trust_items'] : [];
+$aboutStats = isset($about['stats']) && is_array($about['stats']) ? $about['stats'] : [];
+$serviceItems = isset($services['items']) && is_array($services['items']) ? $services['items'] : [];
+$faqItemsCms = isset($faq['items']) && is_array($faq['items']) ? $faq['items'] : [];
 ?>
 
 <!-- ── Hero ────────────────────────────────────────────────── -->
@@ -9,33 +42,41 @@ $metaDesc  = 'Vous souhaitez vendre votre bien au juste prix ou réaliser un ach
     <div class="container">
         <div class="hero__content" data-animate>
             <span class="section-label hero__label">Agent immobilier à Bordeaux — Expert en évaluation immobilière</span>
-            <h1>Vendez au juste prix.<br>Achetez en toute sérénité.</h1>
+            <h1><?= $hero['title'] ?? 'Vendez au juste prix.<br>Achetez en toute sérénité.' ?></h1>
             <p class="hero__subtitle">
-                Vous souhaitez <strong>vendre votre maison ou appartement</strong> au meilleur prix, ou concrétiser un <strong>achat immobilier</strong> à Bordeaux et en Gironde ?
-                Bénéficiez d'une <strong>estimation immobilière gratuite</strong> et d'un accompagnement personnalisé par Eduardo De Sul, certifié <strong>Expert en évaluation immobilière</strong>.
+                <?= e($hero['subtitle'] ?? 'Vous souhaitez vendre votre maison ou appartement au meilleur prix, ou concrétiser un achat immobilier à Bordeaux et en Gironde ? Bénéficiez d\'une estimation immobilière gratuite et d\'un accompagnement personnalisé par Eduardo De Sul, certifié Expert en évaluation immobilière.') ?>
             </p>
             <div class="hero__actions">
-                <a href="/estimation-gratuite" class="btn btn--accent btn--lg">Estimer mon bien gratuitement</a>
-                <a href="/biens" class="btn btn--outline-white btn--lg">Voir les annonces</a>
+                <a href="<?= e($ctaPrimaryUrl) ?>" class="btn btn--accent btn--lg"><?= e($ctaPrimaryLabel) ?></a>
+                <a href="<?= e($ctaSecondaryUrl) ?>" class="btn btn--outline-white btn--lg"><?= e($ctaSecondaryLabel) ?></a>
             </div>
 
             <div class="hero__trust">
-                <div class="trust-item">
-                    <span class="value">Vente</span>
-                    <span class="label">Au prix du marché</span>
-                </div>
-                <div class="trust-item">
-                    <span class="value">Achat</span>
-                    <span class="label">Accompagnement complet</span>
-                </div>
-                <div class="trust-item">
-                    <span class="value">Expert</span>
-                    <span class="label">Évaluation certifiée</span>
-                </div>
-                <div class="trust-item">
-                    <span class="value">24h</span>
-                    <span class="label">Délai de réponse</span>
-                </div>
+                <?php if (!empty($heroTrustItems)): ?>
+                    <?php foreach ($heroTrustItems as $item): ?>
+                        <div class="trust-item">
+                            <span class="value"><?= e((string) ($item['value'] ?? '')) ?></span>
+                            <span class="label"><?= e((string) ($item['label'] ?? '')) ?></span>
+                        </div>
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="trust-item">
+                        <span class="value">Vente</span>
+                        <span class="label">Au prix du marché</span>
+                    </div>
+                    <div class="trust-item">
+                        <span class="value">Achat</span>
+                        <span class="label">Accompagnement complet</span>
+                    </div>
+                    <div class="trust-item">
+                        <span class="value">Expert</span>
+                        <span class="label">Évaluation certifiée</span>
+                    </div>
+                    <div class="trust-item">
+                        <span class="value">24h</span>
+                        <span class="label">Délai de réponse</span>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
     </div>
@@ -46,36 +87,43 @@ $metaDesc  = 'Vous souhaitez vendre votre bien au juste prix ou réaliser un ach
     <div class="container">
         <div class="section__header text-center" data-animate>
             <span class="section-label">Pourquoi me choisir ?</span>
-            <h2 class="section-title">Une expertise immobilière à votre service</h2>
-            <p class="section-subtitle">
-                Avec Eduardo De Sul, simplifiez votre <strong>vente immobilière</strong> ou votre <strong>achat</strong> grâce à une connaissance approfondie des <strong>prix du marché bordelais</strong> et une approche humaine, sans commission cachée.
-            </p>
+            <h2 class="section-title"><?= e($services['title'] ?? 'Une expertise immobilière à votre service') ?></h2>
         </div>
         <div class="grid-3" data-animate>
-            <div class="service-card">
-                <div class="service-card__icon">📊</div>
-                <h3 class="service-card__title">Estimation immobilière précise</h3>
-                <p class="service-card__text">
-                    Obtenez la <strong>valeur vénale</strong> réelle de votre bien, calculée sur les <strong>prix au mètre carré</strong> du quartier, les transactions récentes et les spécificités de votre maison ou appartement.
-                </p>
-                <a href="/estimation-gratuite" class="btn btn--accent btn--sm" style="margin-top:1rem">Estimer maintenant</a>
-            </div>
-            <div class="service-card">
-                <div class="service-card__icon">🏠</div>
-                <h3 class="service-card__title">Vente au meilleur prix</h3>
-                <p class="service-card__text">
-                    Une <strong>mise en vente</strong> optimisée : photos professionnelles, annonce percutante, diffusion multi-plateformes et négociation pour maximiser votre <strong>prix de vente</strong>.
-                </p>
-                <a href="/services" class="btn btn--outline btn--sm" style="margin-top:1rem">En savoir plus</a>
-            </div>
-            <div class="service-card">
-                <div class="service-card__icon">🔑</div>
-                <h3 class="service-card__title">Achat sécurisé en Gironde</h3>
-                <p class="service-card__text">
-                    Trouvez le <strong>bien immobilier</strong> idéal : recherche ciblée, visites accompagnées, comparatif des <strong>prix au m²</strong> par secteur et négociation avec les vendeurs en votre faveur.
-                </p>
-                <a href="/services" class="btn btn--outline btn--sm" style="margin-top:1rem">En savoir plus</a>
-            </div>
+            <?php if (!empty($serviceItems)): ?>
+                <?php foreach ($serviceItems as $service): ?>
+                    <div class="service-card">
+                        <div class="service-card__icon"><?= e((string) ($service['icon'] ?? '🏠')) ?></div>
+                        <h3 class="service-card__title"><?= e((string) ($service['title'] ?? '')) ?></h3>
+                        <p class="service-card__text"><?= e((string) ($service['description'] ?? '')) ?></p>
+                    </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <div class="service-card">
+                    <div class="service-card__icon">📊</div>
+                    <h3 class="service-card__title">Estimation immobilière précise</h3>
+                    <p class="service-card__text">
+                        Obtenez la <strong>valeur vénale</strong> réelle de votre bien, calculée sur les <strong>prix au mètre carré</strong> du quartier, les transactions récentes et les spécificités de votre maison ou appartement.
+                    </p>
+                    <a href="/estimation-gratuite" class="btn btn--accent btn--sm" style="margin-top:1rem">Estimer maintenant</a>
+                </div>
+                <div class="service-card">
+                    <div class="service-card__icon">🏠</div>
+                    <h3 class="service-card__title">Vente au meilleur prix</h3>
+                    <p class="service-card__text">
+                        Une <strong>mise en vente</strong> optimisée : photos professionnelles, annonce percutante, diffusion multi-plateformes et négociation pour maximiser votre <strong>prix de vente</strong>.
+                    </p>
+                    <a href="/services" class="btn btn--outline btn--sm" style="margin-top:1rem">En savoir plus</a>
+                </div>
+                <div class="service-card">
+                    <div class="service-card__icon">🔑</div>
+                    <h3 class="service-card__title">Achat sécurisé en Gironde</h3>
+                    <p class="service-card__text">
+                        Trouvez le <strong>bien immobilier</strong> idéal : recherche ciblée, visites accompagnées, comparatif des <strong>prix au m²</strong> par secteur et négociation avec les vendeurs en votre faveur.
+                    </p>
+                    <a href="/services" class="btn btn--outline btn--sm" style="margin-top:1rem">En savoir plus</a>
+                </div>
+            <?php endif; ?>
         </div>
     </div>
 </section>
@@ -162,26 +210,31 @@ $metaDesc  = 'Vous souhaitez vendre votre bien au juste prix ou réaliser un ach
         <div class="grid-2" style="align-items:center;gap:4rem">
             <div data-animate>
                 <span class="section-label">Votre agent immobilier à Bordeaux</span>
-                <h2 class="section-title">Eduardo De Sul,<br>Expert en évaluation immobilière</h2>
-                <p>
-                    Passionné par l'immobilier et les relations humaines, j'accompagne vendeurs et acquéreurs avec le même engagement. Certifié <strong>Expert en évaluation immobilière</strong>, je détermine la <strong>valeur réelle de votre bien</strong> en croisant les données du marché local, le <strong>prix au mètre carré</strong> du secteur et les spécificités du bien.
-                </p>
-                <p>
-                    Que vous souhaitiez <strong>vendre votre maison</strong>, <strong>acheter un appartement</strong> ou obtenir une <strong>estimation fiable</strong> avant de prendre une décision, je suis à vos côtés à Bordeaux et dans toute la Gironde.
-                </p>
+                <h2 class="section-title"><?= $about['title'] ?? 'Eduardo De Sul,<br>Expert en évaluation immobilière' ?></h2>
+                <p><?= e($about['text1'] ?? 'Passionné par l\'immobilier et les relations humaines, j\'accompagne vendeurs et acquéreurs avec le même engagement. Certifié Expert en évaluation immobilière, je détermine la valeur réelle de votre bien en croisant les données du marché local, le prix au mètre carré du secteur et les spécificités du bien.') ?></p>
+                <p><?= e($about['text2'] ?? 'Que vous souhaitiez vendre votre maison, acheter un appartement ou obtenir une estimation fiable avant de prendre une décision, je suis à vos côtés à Bordeaux et dans toute la Gironde.') ?></p>
                 <div style="display:flex;gap:2rem;flex-wrap:wrap;margin:1.5rem 0 2rem">
-                    <div>
-                        <strong style="font-family:var(--font-display);font-size:1.75rem;color:var(--clr-primary)">100%</strong>
-                        <div style="font-size:.8rem;color:var(--clr-text-muted)">Transparent sur les honoraires</div>
-                    </div>
-                    <div>
-                        <strong style="font-family:var(--font-display);font-size:1.75rem;color:var(--clr-primary)">Gironde</strong>
-                        <div style="font-size:.8rem;color:var(--clr-text-muted)">Secteur d'intervention</div>
-                    </div>
-                    <div>
-                        <strong style="font-family:var(--font-display);font-size:1.75rem;color:var(--clr-primary)">Expert</strong>
-                        <div style="font-size:.8rem;color:var(--clr-text-muted)">Évaluation certifiée</div>
-                    </div>
+                    <?php if (!empty($aboutStats)): ?>
+                        <?php foreach ($aboutStats as $stat): ?>
+                            <div>
+                                <strong style="font-family:var(--font-display);font-size:1.75rem;color:var(--clr-primary)"><?= e((string) ($stat['value'] ?? '')) ?></strong>
+                                <div style="font-size:.8rem;color:var(--clr-text-muted)"><?= e((string) ($stat['label'] ?? '')) ?></div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div>
+                            <strong style="font-family:var(--font-display);font-size:1.75rem;color:var(--clr-primary)">100%</strong>
+                            <div style="font-size:.8rem;color:var(--clr-text-muted)">Transparent sur les honoraires</div>
+                        </div>
+                        <div>
+                            <strong style="font-family:var(--font-display);font-size:1.75rem;color:var(--clr-primary)">Gironde</strong>
+                            <div style="font-size:.8rem;color:var(--clr-text-muted)">Secteur d'intervention</div>
+                        </div>
+                        <div>
+                            <strong style="font-family:var(--font-display);font-size:1.75rem;color:var(--clr-primary)">Expert</strong>
+                            <div style="font-size:.8rem;color:var(--clr-text-muted)">Évaluation certifiée</div>
+                        </div>
+                    <?php endif; ?>
                 </div>
                 <div style="display:flex;flex-direction:column;gap:.5rem;margin-bottom:2rem">
                     <a href="tel:+33676592367" style="display:inline-flex;align-items:center;gap:.5rem;font-weight:600;color:var(--clr-primary)">
@@ -275,11 +328,11 @@ $metaDesc  = 'Vous souhaitez vendre votre bien au juste prix ou réaliser un ach
     <div class="container" style="max-width:860px">
         <div class="section__header text-center" data-animate>
             <span class="section-label">Vos questions</span>
-            <h2 class="section-title">Questions fréquentes sur l'immobilier à Bordeaux</h2>
+            <h2 class="section-title"><?= e($faq['title'] ?? 'Questions fréquentes sur l\'immobilier à Bordeaux') ?></h2>
         </div>
         <div data-animate style="display:flex;flex-direction:column;gap:1rem">
             <?php
-            $faq = [
+            $faqDefault = [
                 [
                     'q' => 'Comment est calculé le prix au mètre carré d\'un bien ?',
                     'r' => 'Le prix au m² dépend de la localisation, de la surface, de l\'état du bien et du marché local. Mon estimation croise les transactions récentes du secteur, les tendances de prix en Gironde et les spécificités de votre maison ou appartement pour vous donner une valeur vénale fiable.',
@@ -297,7 +350,19 @@ $metaDesc  = 'Vous souhaitez vendre votre bien au juste prix ou réaliser un ach
                     'r' => 'Le délai moyen de vente varie selon le secteur : 35 jours aux Chartrons, 49 jours à Mérignac, 52 jours à Pessac. Un bien correctement estimé au prix du marché se vend significativement plus vite qu\'un bien surévalué.',
                 ],
             ];
-            foreach ($faq as $i => $item): ?>
+            $faqList = [];
+            if (!empty($faqItemsCms)) {
+                foreach ($faqItemsCms as $item) {
+                    $faqList[] = [
+                        'q' => (string) ($item['question'] ?? ''),
+                        'r' => (string) ($item['answer'] ?? ''),
+                    ];
+                }
+            }
+            if (empty($faqList)) {
+                $faqList = $faqDefault;
+            }
+            foreach ($faqList as $i => $item): ?>
             <details style="background:var(--clr-white);border:1px solid var(--clr-border);border-radius:var(--radius-lg);padding:1.25rem 1.5rem;cursor:pointer" <?= $i === 0 ? 'open' : '' ?>>
                 <summary style="font-weight:700;font-size:1rem;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:1rem">
                     <?= e($item['q']) ?>

@@ -23,6 +23,9 @@ const ALLOWED_FIELDS = [
     'site' => [
         'site_nom', 'site_url', 'site_slogan', 'site_description',
         'site_logo', 'site_couleur_primaire', 'site_favicon',
+        'site_home_hero_label', 'site_home_hero_title', 'site_home_hero_subtitle',
+        'site_home_cta_primary_label', 'site_home_cta_primary_url',
+        'site_home_cta_secondary_label', 'site_home_cta_secondary_url',
     ],
     'zone' => [
         'zone_ville', 'zone_departement', 'zone_region',
