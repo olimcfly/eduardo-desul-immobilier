@@ -23,6 +23,7 @@ require_once __DIR__ . '/Auth.php';
 require_once __DIR__ . '/helpers/helpers.php';
 require_once __DIR__ . '/helpers/sanitize.php';
 require_once __DIR__ . '/helpers/auth.php';
+require_once __DIR__ . '/helpers/cms.php';
 require_once dirname(__DIR__) . '/includes/settings.php';
 require_once __DIR__ . '/services/LeadService.php';
 
