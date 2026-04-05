@@ -10,6 +10,25 @@ if (file_exists($_autoload)) {
 }
 unset($_autoload);
 
+// ── Charger les variables d'environnement (.env) ─────────────
+$envFile = dirname(__DIR__) . '/.env';
+if (file_exists($envFile)) {
+    $envValues = parse_ini_file($envFile, false, INI_SCANNER_RAW);
+    if (is_array($envValues)) {
+        foreach ($envValues as $key => $value) {
+            $key = trim((string) $key);
+            if ($key === '') {
+                continue;
+            }
+
+            $value = trim((string) $value);
+            $_ENV[$key] = $value;
+            $_SERVER[$key] = $value;
+            putenv($key . '=' . $value);
+        }
+    }
+}
+
 // ── Autoload configs ─────────────────────────────────────────
 require_once __DIR__ . '/config/config.php';
 require_once __DIR__ . '/config/constants.php';

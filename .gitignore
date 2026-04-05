@@ -40,3 +40,4 @@ Thumbs.db
 *.sublime-*
 storage/logs/
 public/error_log
+storage/logs/
