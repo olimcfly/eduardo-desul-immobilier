@@ -1,13 +1,22 @@
 <?php
 $pageTitle = 'À propos — Eduardo De Sul, Agent immobilier & Expert en estimation immobilière';
 $metaDesc  = 'Découvrez Eduardo De Sul, agent immobilier à Bordeaux & expert en estimation immobilière. Vente, achat et estimation en Gironde. Certifié Expert en évaluation immobilière.';
+
+$hero = function_exists('get_page_content') ? (get_page_content('a-propos', 'hero') ?? []) : [];
+$stats = function_exists('get_page_content') ? (get_page_content('a-propos', 'stats') ?? []) : [];
+$cta = function_exists('get_page_content') ? (get_page_content('a-propos', 'cta') ?? []) : [];
+$statsItems = $stats['stats'] ?? [
+    ['value' => 'Vente', 'label' => 'Maisons & apparts.'],
+    ['value' => 'Achat', 'label' => 'Accompagnement'],
+    ['value' => 'Expert', 'label' => 'Évaluation certifiée'],
+];
 ?>
 
-<div class="page-header">
+<div class="page-header"<?= !empty($hero['image']) ? ' style="background-image:url(\'' . e((string) $hero['image']) . '\');background-size:cover;background-position:center"' : '' ?>>
     <div class="container">
         <nav class="breadcrumb"><a href="/">Accueil</a><span>À propos</span></nav>
-        <h1>À propos d'Eduardo De Sul</h1>
-        <p>Agent immobilier à Bordeaux & Expert en estimation immobilière.</p>
+        <h1><?= e((string)($hero['title'] ?? "À propos d'Eduardo De Sul")) ?></h1>
+        <p><?= $hero['subtitle'] ?? 'Votre expert immobilier à Bordeaux' ?></p>
     </div>
 </div>
 
@@ -27,10 +36,10 @@ $metaDesc  = 'Découvrez Eduardo De Sul, agent immobilier à Bordeaux & expert e
                 <p>Mon secteur de prédilection : Bordeaux et la Gironde, dont je connais chaque quartier, chaque tendance de marché et chaque opportunité.</p>
 
                 <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin:2rem 0;text-align:center">
-                    <?php foreach ([['Vente', 'Maisons & apparts.'], ['Achat', 'Accompagnement'], ['Expert', 'Évaluation certifiée']] as [$val, $lab]): ?>
+                    <?php foreach ($statsItems as $stat): ?>
                     <div style="padding:1.5rem;background:var(--clr-bg);border-radius:var(--radius-lg);border:1px solid var(--clr-border)">
-                        <div style="font-family:var(--font-display);font-size:1.4rem;font-weight:700;color:var(--clr-primary)"><?= $val ?></div>
-                        <div style="font-size:.8rem;color:var(--clr-text-muted)"><?= $lab ?></div>
+                        <div style="font-family:var(--font-display);font-size:1.4rem;font-weight:700;color:var(--clr-primary)"><?= e((string)($stat['value'] ?? '')) ?></div>
+                        <div style="font-size:.8rem;color:var(--clr-text-muted)"><?= e((string)($stat['label'] ?? '')) ?></div>
                     </div>
                     <?php endforeach; ?>
                 </div>
@@ -95,11 +104,10 @@ $metaDesc  = 'Découvrez Eduardo De Sul, agent immobilier à Bordeaux & expert e
 
 <section class="cta-banner">
     <div class="container">
-        <h2>Travaillons ensemble</h2>
-        <p>Prêt à concrétiser votre projet immobilier à Bordeaux ou en Gironde ? Je suis à votre écoute.</p>
+        <h2><?= e((string)($cta['title'] ?? 'Prêt à vendre ou acheter ?')) ?></h2>
+        <p><?= $cta['text'] ?? 'Contactez-moi pour une estimation gratuite.' ?></p>
         <div class="cta-banner__actions">
-            <a href="tel:+33676592367" class="btn btn--accent btn--lg">📞 +33 6 76 59 23 67</a>
-            <a href="/estimation-gratuite" class="btn btn--outline-white btn--lg">Estimer mon bien</a>
+            <a href="<?= e((string)($cta['cta_link'] ?? '/contact')) ?>" class="btn btn--accent btn--lg"><?= e((string)($cta['cta_text'] ?? 'Me contacter')) ?></a>
         </div>
     </div>
 </section>
