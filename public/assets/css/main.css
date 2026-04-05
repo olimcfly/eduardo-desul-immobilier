@@ -332,8 +332,18 @@ p, li, dd, dt { font-size: clamp(1rem, 0.96rem + .22vw, 1.08rem); }
   display: flex;
   align-items: center;
   overflow: hidden;
+  padding-top: 20px !important;
   background: linear-gradient(135deg, var(--clr-primary) 0%, #0f2644 100%);
 }
+.hero img,
+.hero-section img {
+  max-width: 100%;
+  height: auto;
+  max-height: 500px;
+  object-fit: cover;
+  display: block;
+}
+.hero-section { padding-top: 20px !important; }
 .hero__bg {
   position: absolute;
   inset: 0;
