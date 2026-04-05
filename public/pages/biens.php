@@ -3,6 +3,15 @@ $pageTitle = 'Annonces immobilières à Bordeaux — Eduardo Desul';
 $metaDesc  = 'Découvrez toutes les annonces immobilières de Eduardo Desul à Bordeaux et alentours. Appartements, maisons, terrains.';
 $extraCss  = ['/assets/css/biens.css'];
 $extraJs   = ['/assets/js/biens.js'];
+
+$cmsHelper = ROOT_PATH . '/core/helpers/cms.php';
+if (file_exists($cmsHelper)) {
+    require_once $cmsHelper;
+}
+
+$filters = function_exists('get_page_content')
+    ? (get_page_content('biens', 'filters') ?: [])
+    : [];
 ?>
 
 <div class="page-header">
@@ -10,8 +19,8 @@ $extraJs   = ['/assets/js/biens.js'];
         <nav class="breadcrumb" aria-label="Fil d'Ariane">
             <a href="/">Accueil</a><span>Biens immobiliers</span>
         </nav>
-        <h1>Biens immobiliers</h1>
-        <p>Découvrez notre sélection de biens à vendre et à louer à Bordeaux et dans le Bordelais.</p>
+        <h1><?= e($filters['title'] ?? 'Trouvez votre bien idéal') ?></h1>
+        <p><?= e($filters['default_text'] ?? 'Utilisez les filtres ci-dessous pour affiner votre recherche.') ?></p>
     </div>
 </div>
 
