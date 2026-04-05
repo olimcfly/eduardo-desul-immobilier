@@ -47,8 +47,8 @@ $faqItemsCms = isset($faq['items']) && is_array($faq['items']) ? $faq['items'] :
                 <?= e($hero['subtitle'] ?? 'Vous souhaitez vendre votre maison ou appartement au meilleur prix, ou concrétiser un achat immobilier à Bordeaux et en Gironde ? Bénéficiez d\'une estimation immobilière gratuite et d\'un accompagnement personnalisé par Eduardo De Sul, certifié Expert en évaluation immobilière.') ?>
             </p>
             <div class="hero__actions">
-                <a href="/estimation-gratuite" class="btn btn--accent btn--lg">Estimer mon bien gratuitement</a>
-                <a href="/biens" class="btn btn--outline-white btn--lg">Voir les annonces</a>
+                <a href="<?= e($ctaPrimaryUrl) ?>" class="btn btn--accent btn--lg"><?= e($ctaPrimaryLabel) ?></a>
+                <a href="<?= e($ctaSecondaryUrl) ?>" class="btn btn--outline-white btn--lg"><?= e($ctaSecondaryLabel) ?></a>
             </div>
 
             <div class="hero__trust">
