@@ -1,38 +1,43 @@
 <?php
 namespace Admin\Modules\Cms\Controllers;
 
-use Core\Controller;
 use Admin\Modules\Cms\Services\CmsService;
 
-class PageController extends Controller {
-    private $cmsService;
+class PageController {
+    private CmsService $cmsService;
 
     public function __construct() {
-        parent::__construct();
         $this->cmsService = new CmsService();
-        $this->checkAuth(); // Vérifie que l'utilisateur est connecté
-    }
-
-    // Liste des pages
-    public function index() {
-        $pages = $this->cmsService->getPagesList();
-        $this->view('cms/pages/index', ['pages' => $pages]);
     }
 
     // Éditer une page
     public function edit($page_slug) {
-        $page = $this->cmsService->getPageData($page_slug);
-        $this->view('cms/pages/edit', [
-            'page' => $page,
-            'page_slug' => $page_slug
-        ]);
+        if (!\Auth::check()) {
+            \Session::flash('error', 'Connectez-vous pour accéder à cette page.');
+            header('Location: /admin/login');
+            exit;
+        }
+
+        $page_slug = (string) $page_slug;
+        $pageData = $this->cmsService->getPageContent($page_slug);
+        $sections = $this->cmsService->getSectionsDefinition($page_slug);
+
+        include __DIR__ . '/../views/pages/edit.php';
     }
 
     // Sauvegarder une page
     public function save() {
+        if (!\Auth::check()) {
+            \Session::flash('error', 'Connectez-vous pour accéder à cette page.');
+            header('Location: /admin/login');
+            exit;
+        }
+
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $this->cmsService->savePage($_POST);
-            header("Location: /admin/cms/edit/{$_POST['page_slug']}?success=1");
+            $pageSlug = (string) ($_POST['page_slug'] ?? '');
+            $sections = $_POST['sections'] ?? [];
+            $this->cmsService->savePageContent($pageSlug, is_array($sections) ? $sections : []);
+            header('Location: /admin/cms/edit/' . rawurlencode($pageSlug) . '?success=1');
             exit;
         }
     }
