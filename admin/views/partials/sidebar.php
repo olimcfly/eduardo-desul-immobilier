@@ -16,6 +16,9 @@ $menuGroups = [
         ['module' => 'seo',         'label' => 'SEO',               'hint' => 'Positionnement Google',     'icon' => 'fas fa-magnifying-glass-chart'],
         ['module' => 'social',      'label' => 'Social',            'hint' => 'Publications & réseaux',    'icon' => 'fas fa-share-nodes'],
     ],
+    'Contenu' => [
+        ['module' => 'cms_blog',    'label' => 'Modifier le Blog',  'hint' => 'Sections CMS /blog',        'icon' => 'fas fa-blog', 'url' => '/admin/cms/edit/blog'],
+    ],
     'Compte' => [
         ['module' => 'parametres',  'label' => 'Paramètres',        'hint' => 'Compte et préférences',     'icon' => 'fas fa-gear'],
     ],
@@ -31,10 +34,14 @@ if (($authUser['role'] ?? '') === 'superadmin') {
         <?php foreach ($menuGroups as $sectionLabel => $items): ?>
         <li class="nav-section-label"><?= htmlspecialchars($sectionLabel) ?></li>
         <?php foreach ($items as $item):
-            $isActive = ($currentModule === $item['module']);
+            $targetUrl = $item['url'] ?? ('/admin?module=' . rawurlencode($item['module']));
+            $currentPath = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?? '';
+            $isActive = isset($item['url'])
+                ? (rtrim($currentPath, '/') === rtrim($item['url'], '/'))
+                : ($currentModule === $item['module']);
         ?>
         <li>
-            <a href="/admin?module=<?= htmlspecialchars($item['module']) ?>"
+            <a href="<?= htmlspecialchars($targetUrl) ?>"
                class="menu-item<?= $isActive ? ' active' : '' ?>"
                data-module="<?= htmlspecialchars($item['module']) ?>"
                data-tooltip="<?= htmlspecialchars($item['label']) ?>">
