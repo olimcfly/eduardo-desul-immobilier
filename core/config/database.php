@@ -7,29 +7,27 @@ class Database
 {
     private static ?PDO $instance = null;
 
-    private static array $config = [
-        'host'    => 'localhost',
-        'dbname'  => 'mahe6420_site_immo',
-        'user'    => 'mahe6420_site_immo',
-        'pass'    => 'm3okqlr55312ik05',
-        'charset' => 'utf8mb4',
-    ];
-
     public static function getInstance(): PDO
     {
         if (self::$instance === null) {
+            $host    = $_ENV['DB_HOST'] ?? 'localhost';
+            $dbname  = $_ENV['DB_NAME'] ?? '';
+            $user    = $_ENV['DB_USER'] ?? '';
+            $pass    = $_ENV['DB_PASS'] ?? '';
+            $charset = $_ENV['DB_CHARSET'] ?? 'utf8mb4';
+
             $dsn = sprintf(
                 'mysql:host=%s;dbname=%s;charset=%s',
-                self::$config['host'],
-                self::$config['dbname'],
-                self::$config['charset']
+                $host,
+                $dbname,
+                $charset
             );
 
             try {
                 self::$instance = new PDO(
                     $dsn,
-                    self::$config['user'],
-                    self::$config['pass'],
+                    $user,
+                    $pass,
                     [
                         PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
                         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
