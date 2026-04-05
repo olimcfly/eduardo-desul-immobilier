@@ -5,6 +5,9 @@
 
 /** @var Router $router */
 
+require_once ROOT_PATH . '/admin/modules/cms/services/CmsService.php';
+require_once ROOT_PATH . '/admin/modules/cms/controllers/PageController.php';
+
 if (!function_exists('resourceGuidesData')) {
     function resourceGuidesData(): array
     {
@@ -154,3 +157,15 @@ $router->get('/mentions-legales',           fn() => page('legal/mentions-legales
 $router->get('/politique-confidentialite',  fn() => page('legal/politique-confidentialite'),  'politique-confidentialite');
 $router->get('/politique-cookies',          fn() => page('legal/politique-cookies'),          'politique-cookies');
 $router->get('/cgv',                        fn() => page('legal/cgv'),                        'cgv');
+
+// ── CMS Admin (édition pages) ───────────────────────────────
+$router->get(
+    '/admin/cms/edit/{page_slug}',
+    [\Admin\Modules\Cms\Controllers\PageController::class, 'edit'],
+    'admin.cms.edit'
+);
+$router->post(
+    '/admin/cms/save',
+    [\Admin\Modules\Cms\Controllers\PageController::class, 'save'],
+    'admin.cms.save'
+);
