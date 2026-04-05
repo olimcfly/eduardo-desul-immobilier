@@ -11,13 +11,21 @@ class Database
     public static function getInstance(): PDO
     {
         if (self::$instance === null) {
-            $host    = $_ENV['DB_HOST']    ?? 'localhost';
-            $dbname  = $_ENV['DB_NAME']    ?? '';
-            $user    = $_ENV['DB_USER']    ?? '';
-            $pass    = $_ENV['DB_PASS']    ?? '';
+            $host    = $_ENV['DB_HOST'] ?? $_ENV['DATABASE_HOST'] ?? 'localhost';
+            $port    = $_ENV['DB_PORT'] ?? $_ENV['DATABASE_PORT'] ?? '';
+            $socket  = $_ENV['DB_SOCKET'] ?? $_ENV['DATABASE_SOCKET'] ?? '';
+            $dbname  = $_ENV['DB_NAME'] ?? $_ENV['DB_DATABASE'] ?? $_ENV['DATABASE_NAME'] ?? '';
+            $user    = $_ENV['DB_USER'] ?? $_ENV['DB_USERNAME'] ?? $_ENV['DATABASE_USER'] ?? '';
+            $pass    = $_ENV['DB_PASS'] ?? $_ENV['DB_PASSWORD'] ?? $_ENV['DATABASE_PASSWORD'] ?? '';
             $charset = $_ENV['DB_CHARSET'] ?? 'utf8mb4';
 
             $dsn = "mysql:host={$host};dbname={$dbname};charset={$charset}";
+            if ($port !== '') {
+                $dsn .= ';port=' . (int) $port;
+            }
+            if ($socket !== '') {
+                $dsn .= ';unix_socket=' . $socket;
+            }
 
             try {
                 self::$instance = new PDO($dsn, $user, $pass, [

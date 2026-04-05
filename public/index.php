@@ -10,9 +10,27 @@ define('ROOT', ROOT_PATH); // Alias pour compatibilité avec les anciens fichier
 $envFile = ROOT_PATH . '/.env';
 if (file_exists($envFile)) {
     foreach (file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
-        if (str_starts_with(trim($line), '#') || !str_contains($line, '=')) continue;
-        [$key, $val] = explode('=', $line, 2);
-        $_ENV[trim($key)] = trim($val, " \t\n\r\"'");
+        $line = trim($line);
+        if ($line === '' || str_starts_with($line, '#') || str_starts_with($line, ';') || !str_contains($line, '=')) {
+            continue;
+        }
+
+        [$key, $value] = explode('=', $line, 2);
+        $key = trim((string) $key);
+        if ($key === '') {
+            continue;
+        }
+
+        $value = trim((string) $value);
+        $firstChar = $value[0] ?? '';
+        $lastChar = $value !== '' ? substr($value, -1) : '';
+        if (($firstChar === '"' && $lastChar === '"') || ($firstChar === "'" && $lastChar === "'")) {
+            $value = substr($value, 1, -1);
+        }
+
+        $_ENV[$key] = $value;
+        $_SERVER[$key] = $value;
+        putenv($key . '=' . $value);
     }
 }
 
