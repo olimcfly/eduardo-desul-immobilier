@@ -38,3 +38,6 @@ Thumbs.db
 .vscode/
 .idea/
 *.sublime-*
+storage/logs/
+public/error_log
+storage/logs/
