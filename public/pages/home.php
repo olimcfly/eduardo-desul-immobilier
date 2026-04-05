@@ -1,6 +1,17 @@
 <?php
 $pageTitle = 'Agent immobilier Bordeaux & Expert estimation immobilière — Eduardo De Sul';
 $metaDesc  = 'Vous souhaitez vendre votre bien au juste prix ou réaliser un achat immobilier en Gironde ? Eduardo De Sul, agent immobilier à Bordeaux, vous offre une estimation gratuite et un accompagnement sur-mesure.';
+
+$heroLabel = (string) setting('site_home_hero_label', 'Agent immobilier à Bordeaux — Expert en évaluation immobilière');
+$heroTitle = (string) setting('site_home_hero_title', 'Vendez au juste prix.<br>Achetez en toute sérénité.');
+$heroSubtitle = (string) setting(
+    'site_home_hero_subtitle',
+    "Vous souhaitez <strong>vendre votre maison ou appartement</strong> au meilleur prix, ou concrétiser un <strong>achat immobilier</strong> à Bordeaux et en Gironde ?\nBénéficiez d'une <strong>estimation immobilière gratuite</strong> et d'un accompagnement personnalisé par Eduardo De Sul, certifié <strong>Expert en évaluation immobilière</strong>."
+);
+$ctaPrimaryLabel = (string) setting('site_home_cta_primary_label', 'Estimer mon bien gratuitement');
+$ctaPrimaryUrl = (string) setting('site_home_cta_primary_url', '/estimation-gratuite');
+$ctaSecondaryLabel = (string) setting('site_home_cta_secondary_label', 'Voir les annonces');
+$ctaSecondaryUrl = (string) setting('site_home_cta_secondary_url', '/biens');
 ?>
 
 <!-- ── Hero ────────────────────────────────────────────────── -->
@@ -8,15 +19,14 @@ $metaDesc  = 'Vous souhaitez vendre votre bien au juste prix ou réaliser un ach
     <div class="hero__bg" style="background-image:url('/assets/images/hero-bordeaux.jpg')"></div>
     <div class="container">
         <div class="hero__content" data-animate>
-            <span class="section-label hero__label">Agent immobilier à Bordeaux — Expert en évaluation immobilière</span>
-            <h1>Vendez au juste prix.<br>Achetez en toute sérénité.</h1>
+            <span class="section-label hero__label"><?= e($heroLabel) ?></span>
+            <h1><?= strip_tags($heroTitle, '<br>') ?></h1>
             <p class="hero__subtitle">
-                Vous souhaitez <strong>vendre votre maison ou appartement</strong> au meilleur prix, ou concrétiser un <strong>achat immobilier</strong> à Bordeaux et en Gironde ?
-                Bénéficiez d'une <strong>estimation immobilière gratuite</strong> et d'un accompagnement personnalisé par Eduardo De Sul, certifié <strong>Expert en évaluation immobilière</strong>.
+                <?= strip_tags($heroSubtitle, '<strong><br>') ?>
             </p>
             <div class="hero__actions">
-                <a href="/estimation-gratuite" class="btn btn--accent btn--lg">Estimer mon bien gratuitement</a>
-                <a href="/biens" class="btn btn--outline-white btn--lg">Voir les annonces</a>
+                <a href="<?= e($ctaPrimaryUrl) ?>" class="btn btn--accent btn--lg"><?= e($ctaPrimaryLabel) ?></a>
+                <a href="<?= e($ctaSecondaryUrl) ?>" class="btn btn--outline-white btn--lg"><?= e($ctaSecondaryLabel) ?></a>
             </div>
 
             <div class="hero__trust">
