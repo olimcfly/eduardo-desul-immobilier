@@ -1,27 +1,19 @@
-# .htaccess
-DirectoryIndex index.php
+# .htaccess (racine)
+DirectoryIndex public/index.php index.php
 
 RewriteEngine On
-RewriteBase /
 
-# Fichiers réels
-RewriteCond %{REQUEST_FILENAME} -f
-RewriteRule ^ - [L]
-
+# Autoriser les fichiers/dossiers réels à la racine
+RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
 RewriteRule ^ - [L]
 
-# Zones protégées
-RewriteRule ^admin(/.*)?$ - [L]
-RewriteRule ^api(/.*)?$ - [L]
-RewriteRule ^assets(/.*)?$ - [L]
-RewriteRule ^uploads(/.*)?$ - [L]
+# Bloquer l'accès direct aux dossiers sensibles
+RewriteRule ^(config|logs|vendor|storage)(/.*)?$ - [F,L]
 
-# Sécurité : bloquer fichiers sensibles
-RewriteRule ^(config|logs|vendor)(/.*)?$ - [F,L]
-
-# Router front
-RewriteRule ^(.*)$ /front/page.php?slug=$1 [L,QSA]
+# Router front: si le vhost pointe sur la racine du dépôt,
+# on délègue toutes les URLs applicatives à public/index.php.
+RewriteRule ^ public/index.php [QSA,L]
 
 # Cache
 <IfModule mod_expires.c>
@@ -38,6 +30,4 @@ RewriteRule ^(.*)$ /front/page.php?slug=$1 [L,QSA]
 </IfModule>
 
 # Erreurs
-ErrorDocument 404 /front/renderers/404.php
-ErrorDocument 404 /front/page.php
-ErrorDocument 500 /front/500.php
+ErrorDocument 404 /public/index.php
