@@ -107,6 +107,42 @@ $router->post('/estimation',fn() => page('pages/estimation'), 'estimation.post')
 $router->get('/avis',       fn() => page('pages/avis'),       'avis');
 $router->get('/plan-du-site', fn() => page('pages/plan-du-site'), 'plan-du-site');
 
+
+$router->get('/estimation-instantanee', fn() => page('pages/estimation-instantanee'), 'estimation.instantanee');
+$router->get('/prendre-rendez-vous', fn() => page('pages/prendre-rendez-vous'), 'estimation.rdv');
+$router->post('/prendre-rendez-vous', fn() => page('pages/prendre-rendez-vous'), 'estimation.rdv.post');
+
+$router->post('/api/estimate/instant', function () {
+    header('Content-Type: application/json; charset=utf-8');
+    $raw = file_get_contents('php://input');
+    $payload = json_decode((string) $raw, true) ?: [];
+
+    $input = [
+        'property_type' => trim((string) ($payload['property_type'] ?? '')),
+        'surface' => (float) ($payload['surface'] ?? 0),
+        'city' => trim((string) ($payload['city'] ?? '')),
+        'lat' => $payload['lat'] ?? null,
+        'lng' => $payload['lng'] ?? null,
+    ];
+
+    $estimate = DvfEstimatorService::estimate($input);
+
+    DvfEstimatorService::saveRequest([
+        'request_type' => 'instant',
+        'property_type' => $input['property_type'],
+        'surface' => $input['surface'],
+        'address_raw' => trim((string) ($payload['address'] ?? '')),
+        'address_norm' => trim((string) ($payload['address'] ?? '')),
+        'city' => $input['city'],
+        'postal_code' => trim((string) ($payload['postal_code'] ?? '')),
+        'lat' => $input['lat'],
+        'lng' => $input['lng'],
+        'metadata' => ['source' => 'estimation-instantanee'],
+    ], $estimate);
+
+    echo json_encode($estimate, JSON_UNESCAPED_UNICODE);
+});
+
 // ── Biens immobiliers ────────────────────────────────────────
 $router->get('/biens',              fn() => page('pages/biens'),        'biens');
 $router->get('/biens/{slug}',       fn($slug) => page('pages/biens', ['slug' => $slug]), 'bien.detail');
