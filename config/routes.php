@@ -105,6 +105,7 @@ $router->post('/contact',   fn() => page('pages/contact'),    'contact.post');
 $router->get('/estimation', fn() => page('pages/estimation'), 'estimation');
 $router->post('/estimation',fn() => page('pages/estimation'), 'estimation.post');
 $router->get('/avis',       fn() => page('pages/avis'),       'avis');
+$router->get('/plan-du-site', fn() => page('pages/plan-du-site'), 'plan-du-site');
 
 // ── Biens immobiliers ────────────────────────────────────────
 $router->get('/biens',              fn() => page('pages/biens'),        'biens');

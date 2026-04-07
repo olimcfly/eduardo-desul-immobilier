@@ -1,9 +1,13 @@
 Options -Indexes
 RewriteEngine On
 
-# Forcer HTTPS (décommenter en production)
-# RewriteCond %{HTTPS} off
-# RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# Forcer HTTPS + version préférée (sans www)
+RewriteCond %{HTTPS} off [OR]
+RewriteCond %{HTTP:X-Forwarded-Proto} !https
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+RewriteRule ^ https://%1%{REQUEST_URI} [L,R=301]
 
 # Autoriser les fichiers statiques réels
 RewriteCond %{REQUEST_FILENAME} !-f
@@ -37,3 +41,7 @@ RewriteRule ^ index.php [QSA,L]
     ExpiresByType text/css         "access plus 1 month"
     ExpiresByType text/javascript  "access plus 1 month"
 </IfModule>
+
+
+# Gestion des erreurs
+ErrorDocument 404 /index.php
