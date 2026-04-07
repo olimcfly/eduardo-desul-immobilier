@@ -203,4 +203,21 @@ return [
             'style' => 'Clair, pédagogique, rassurant, professionnel et accessible.',
         ],
     ],
+
+    'estimation_dvf' => [
+        'slug' => 'estimation_dvf',
+        'title' => 'MODULE ESTIMATION : DVF OPS',
+        'section' => 'Outils',
+        'route' => '/admin/index.php?module=estimation_dvf',
+        'icon' => 'fa-map-location-dot',
+        'description' => "Pilotage opérationnel des imports DVF et des demandes d’estimation.",
+        'available' => true,
+        'hub_order' => 81,
+        'meta' => [
+            'motivation' => '',
+            'explanation' => '',
+            'recipe' => [],
+            'exercise' => '',
+        ],
+    ],
 ];
