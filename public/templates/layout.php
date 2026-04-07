@@ -11,6 +11,10 @@ $siteMetaDescription = setting('site_meta_description', 'Conseiller immobilier i
     <meta name="description" content="<?= e($metaDesc ?? $siteMetaDescription) ?>">
     <meta name="robots" content="<?= e($metaRobots ?? 'index, follow') ?>">
     <link rel="canonical" href="<?= e($canonical ?? APP_URL . strtok($_SERVER['REQUEST_URI'], '?')) ?>">
+    <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg">
+    <?php if (!empty($_ENV['SEARCH_CONSOLE_VERIFICATION'])): ?>
+    <meta name="google-site-verification" content="<?= e((string) $_ENV['SEARCH_CONSOLE_VERIFICATION']) ?>">
+    <?php endif; ?>
 
     <!-- Open Graph -->
     <meta property="og:title"       content="<?= e($pageTitle ?? APP_NAME) ?>">
@@ -77,6 +81,16 @@ $siteMetaDescription = setting('site_meta_description', 'Conseiller immobilier i
         .session-access-modal__actions button { border: 0; border-radius: .5rem; padding: .625rem .875rem; cursor: pointer; font-weight: 600; background: #2563eb; color: #fff; min-height: 3rem; }
         .session-access-modal__actions button.danger { background: #dc2626; }
     </style>
+
+    <?php if (!empty($_ENV['GA_MEASUREMENT_ID'])): ?>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=<?= e((string) $_ENV['GA_MEASUREMENT_ID']) ?>"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', <?= json_encode((string) $_ENV['GA_MEASUREMENT_ID']) ?>);
+    </script>
+    <?php endif; ?>
 
 </head>
 <body class="<?= e($bodyClass ?? '') ?>">
