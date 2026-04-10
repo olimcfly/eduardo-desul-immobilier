@@ -7,7 +7,7 @@ $metaDesc  = 'Vente, achat, estimation, investissement locatif : Eduardo Desul v
     <div class="container">
         <nav class="breadcrumb"><a href="/">Accueil</a><span>Services</span></nav>
         <h1>Mes services</h1>
-        <p>Un accompagnement complet pour tous vos projets immobiliers à Bordeaux et alentours.</p>
+        <p>Un accompagnement complet pour tous vos projets immobiliers à Bordeaux Métropole.</p>
     </div>
 </div>
 

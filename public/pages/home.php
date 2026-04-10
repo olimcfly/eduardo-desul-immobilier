@@ -1,6 +1,6 @@
 <?php
 $pageTitle = 'Agent immobilier Bordeaux & Expert estimation immobilière — Eduardo De Sul';
-$metaDesc  = 'Vous souhaitez vendre votre bien au juste prix ou réaliser un achat immobilier en Gironde ? Eduardo De Sul, agent immobilier à Bordeaux, vous offre une estimation gratuite et un accompagnement sur-mesure.';
+$metaDesc  = 'Vous souhaitez vendre votre bien au juste prix ou réaliser un achat immobilier à Bordeaux Métropole ? Eduardo De Sul, agent immobilier à Bordeaux, vous offre une estimation gratuite et un accompagnement sur-mesure.';
 ?>
 
 <!-- ── Hero ────────────────────────────────────────────────── -->
@@ -11,7 +11,7 @@ $metaDesc  = 'Vous souhaitez vendre votre bien au juste prix ou réaliser un ach
             <span class="section-label hero__label">Agent immobilier à Bordeaux — Expert en évaluation immobilière</span>
             <h1>Vendez au juste prix.<br>Achetez en toute sérénité.</h1>
             <p class="hero__subtitle">
-                Vous souhaitez <strong>vendre votre maison ou appartement</strong> au meilleur prix, ou concrétiser un <strong>achat immobilier</strong> à Bordeaux et en Gironde ?
+                Vous souhaitez <strong>vendre votre maison ou appartement</strong> au meilleur prix, ou concrétiser un <strong>achat immobilier</strong> à Bordeaux Métropole ?
                 Bénéficiez d'une <strong>estimation immobilière gratuite</strong> et d'un accompagnement personnalisé par Eduardo De Sul, certifié <strong>Expert en évaluation immobilière</strong>.
             </p>
             <div class="hero__actions">
@@ -91,7 +91,7 @@ $metaDesc  = 'Vous souhaitez vendre votre bien au juste prix ou réaliser un ach
                 </div>
                 <h3 class="service-title">Estimation gratuite</h3>
                 <p class="service-desc">
-                    Obtenez une estimation précise et gratuite de votre bien immobilier à Bordeaux et en Gironde.
+                    Obtenez une estimation précise et gratuite de votre bien immobilier à Bordeaux Métropole.
                 </p>
             </div>
 
@@ -118,7 +118,7 @@ $metaDesc  = 'Vous souhaitez vendre votre bien au juste prix ou réaliser un ach
                 </div>
                 <h3 class="service-title">Achat immobilier</h3>
                 <p class="service-desc">
-                    Trouvez le bien idéal à Bordeaux et en Gironde avec un accompagnement complet et des conseils avisés.
+                    Trouvez le bien idéal à Bordeaux Métropole avec un accompagnement complet et des conseils avisés.
                 </p>
             </div>
         </div>
@@ -132,7 +132,7 @@ $metaDesc  = 'Vous souhaitez vendre votre bien au juste prix ou réaliser un ach
             <span class="section-label">Biens en vedette</span>
             <h2 class="section-title">Découvrez nos biens immobiliers à Bordeaux</h2>
             <p class="section-subtitle">
-                Une sélection de biens exceptionnels à Bordeaux et en Gironde
+                Une sélection de biens exceptionnels à Bordeaux Métropole
             </p>
         </div>
 
