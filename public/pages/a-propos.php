@@ -1,6 +1,6 @@
 <?php
 $pageTitle = 'À propos — Eduardo De Sul, Agent immobilier & Expert en estimation immobilière';
-$metaDesc  = 'Découvrez Eduardo De Sul, agent immobilier à Bordeaux & expert en estimation immobilière. Vente, achat et estimation en Gironde. Certifié Expert en évaluation immobilière.';
+$metaDesc  = 'Découvrez Eduardo De Sul, agent immobilier à Bordeaux & expert en estimation immobilière. Vente, achat et estimation à Bordeaux Métropole. Certifié Expert en évaluation immobilière.';
 
 $hero = function_exists('get_page_content') ? (get_page_content('a-propos', 'hero') ?? []) : [];
 $stats = function_exists('get_page_content') ? (get_page_content('a-propos', 'stats') ?? []) : [];
@@ -32,8 +32,8 @@ $statsItems = $stats['stats'] ?? [
                 <span class="section-label">Mon histoire</span>
                 <h2 class="section-title">Eduardo De Sul,<br>Agent immobilier & Expert en estimation</h2>
                 <p>Passionné par l'immobilier et les relations humaines, j'accompagne mes clients avec engagement dans chaque étape de leur projet. Certifié <strong>Expert en évaluation immobilière</strong>, je mets mon expertise au service de vos intérêts.</p>
-                <p>Mon approche : écoute, transparence et résultats concrets. Que vous soyez vendeur, acheteur ou simplement à la recherche d'une estimation fiable, je suis à vos côtés à Bordeaux et en Gironde.</p>
-                <p>Mon secteur de prédilection : Bordeaux et la Gironde, dont je connais chaque quartier, chaque tendance de marché et chaque opportunité.</p>
+                <p>Mon approche : écoute, transparence et résultats concrets. Que vous soyez vendeur, acheteur ou simplement à la recherche d'une estimation fiable, je suis à vos côtés à Bordeaux Métropole.</p>
+                <p>Mon secteur de prédilection : Bordeaux Métropole, dont je connais chaque quartier, chaque tendance de marché et chaque opportunité.</p>
 
                 <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin:2rem 0;text-align:center">
                     <?php foreach ($statsItems as $stat): ?>
@@ -67,7 +67,7 @@ $statsItems = $stats['stats'] ?? [
             <?php foreach ([
                 ['🤝', 'Confiance', 'Je construis une relation durable avec chaque client. La transparence est ma règle d\'or, à chaque étape.'],
                 ['🎯', 'Excellence', 'Je m\'engage à donner le meilleur pour chaque mission. Votre satisfaction est ma priorité absolue.'],
-                ['📍', 'Expertise locale', 'Bordeaux et la Gironde sont mon terrain. Je connais ses quartiers, ses dynamiques et ses opportunités.'],
+                ['📍', 'Expertise locale', 'Bordeaux Métropole est mon terrain. Je connais ses quartiers, ses dynamiques et ses opportunités.'],
             ] as [$icon, $titre, $texte]): ?>
             <div class="service-card">
                 <div class="service-card__icon"><?= $icon ?></div>
