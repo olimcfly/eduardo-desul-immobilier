@@ -10,19 +10,19 @@ $v = fn(string $k, string $d = '') => htmlspecialchars((string)($s[$k] ?? $d), E
     <div class="form-row">
         <div class="form-group">
             <label>Hôte SMTP</label>
-            <input type="text" name="smtp_host" value="<?= $v('smtp_host') ?>" placeholder="smtp.gmail.com">
+            <input type="text" name="smtp_host" value="<?= $v('smtp_host', 'mail.pascal-hamm-immobilier-aix-en-provence.fr') ?>" placeholder="mail.pascal-hamm-immobilier-aix-en-provence.fr">
         </div>
         <div class="form-group">
             <label>Port</label>
-            <input type="number" name="smtp_port" value="<?= $v('smtp_port', '587') ?>" placeholder="587">
+            <input type="number" name="smtp_port" value="<?= $v('smtp_port', '465') ?>" placeholder="465">
         </div>
     </div>
 
     <div class="form-group">
         <label>Sécurité</label>
         <select name="smtp_secure">
-            <option value="tls" <?= $v('smtp_secure', 'tls') === 'tls' ? 'selected' : '' ?>>TLS (recommandé)</option>
-            <option value="ssl" <?= $v('smtp_secure') === 'ssl' ? 'selected' : '' ?>>SSL</option>
+            <option value="ssl" <?= $v('smtp_secure', 'ssl') === 'ssl' ? 'selected' : '' ?>>SSL (recommandé)</option>
+            <option value="tls" <?= $v('smtp_secure') === 'tls' ? 'selected' : '' ?>>TLS</option>
             <option value="none" <?= $v('smtp_secure') === 'none' ? 'selected' : '' ?>>Aucune</option>
         </select>
     </div>
@@ -30,7 +30,7 @@ $v = fn(string $k, string $d = '') => htmlspecialchars((string)($s[$k] ?? $d), E
     <div class="form-row">
         <div class="form-group">
             <label>Utilisateur SMTP</label>
-            <input type="text" name="smtp_user" value="<?= $v('smtp_user') ?>" placeholder="contact@domaine.fr">
+            <input type="text" name="smtp_user" value="<?= $v('smtp_user', 'contact@pascal-hamm-immobilier-aix-en-provence.fr') ?>" placeholder="contact@pascal-hamm-immobilier-aix-en-provence.fr">
         </div>
         <div class="form-group">
             <label>Mot de passe SMTP</label>
@@ -43,11 +43,11 @@ $v = fn(string $k, string $d = '') => htmlspecialchars((string)($s[$k] ?? $d), E
     <div class="form-row">
         <div class="form-group">
             <label>Email expéditeur</label>
-            <input type="email" name="smtp_from" value="<?= $v('smtp_from') ?>" placeholder="noreply@domaine.fr">
+            <input type="email" name="smtp_from" value="<?= $v('smtp_from', 'contact@pascal-hamm-immobilier-aix-en-provence.fr') ?>" placeholder="contact@pascal-hamm-immobilier-aix-en-provence.fr">
         </div>
         <div class="form-group">
             <label>Nom expéditeur</label>
-            <input type="text" name="smtp_from_name" value="<?= $v('smtp_from_name') ?>" placeholder="Eduardo Desul Immobilier">
+            <input type="text" name="smtp_from_name" value="<?= $v('smtp_from_name') ?>" placeholder="Pascal Hamm Immobilier">
         </div>
     </div>
 

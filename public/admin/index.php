@@ -24,10 +24,10 @@ if ($user === null) {
     exit;
 }
 
-$module = isset($_GET['module']) ? (string) $_GET['module'] : 'construire';
+$module = isset($_GET['module']) ? (string) $_GET['module'] : 'dashboard';
 $module = preg_replace('/[^a-z0-9_-]/', '', strtolower($module));
 if ($module === '') {
-    $module = 'construire';
+    $module = 'dashboard';
 }
 
 $role = (string) ($user['role'] ?? 'user');

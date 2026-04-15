@@ -521,7 +521,7 @@ if (!function_exists('replacePlaceholders')) {
             '{{zone_neighborhood_1}}' => $neighborhoodA,
             '{{zone_neighborhood_2}}' => $neighborhoodB,
             '{{app_url}}'             => (string)setting('tech_app_url', APP_URL, $userId),
-            '{{advisor_photo}}'       => (string)setting('advisor_photo', '/assets/images/eduardo-portrait.jpg', $userId),
+            '{{advisor_photo}}'       => (string)setting('advisor_photo', '/assets/images/advisor-photo.jpg', $userId),
         ];
 
         return strtr($template, $map);

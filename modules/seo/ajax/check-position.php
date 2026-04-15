@@ -1,8 +1,11 @@
 <?php
+/** @deprecated SEO legacy freeze: no new feature here. Use /modules/seo/mots-cles/api.php */
 declare(strict_types=1);
 
 require_once __DIR__ . '/../../../core/bootstrap.php';
 require_once __DIR__ . '/../includes/KeywordTracker.php';
+require_once __DIR__ . '/../_legacy_guard.php';
+seoLegacyGuard('modules/seo/ajax/check-position.php', '/modules/seo/mots-cles/api.php');
 
 header('Content-Type: application/json');
 

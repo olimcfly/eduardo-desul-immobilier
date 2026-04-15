@@ -51,7 +51,10 @@ class Database
     private function __clone() {}
 }
 
-function db(): PDO
-{
-    return Database::getInstance();
+if (!function_exists('db')) {
+    function db(): PDO
+    {
+        return Database::getInstance();
+    }
 }
+

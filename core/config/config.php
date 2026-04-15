@@ -3,8 +3,30 @@
 // CONFIG GLOBALE — Core (legacy)
 // ============================================================
 
-define('APP_NAME',      $_ENV['APP_NAME'] ?? 'CRM Immobilier');
-define('APP_URL',       $_ENV['APP_URL'] ?? 'http://localhost');
+define('APP_NAME',      $_ENV['APP_NAME'] ?? 'Pascal Hamm Immobilier');
+
+$configuredAppUrl = trim((string) ($_ENV['APP_URL'] ?? ''));
+$appHost          = strtolower((string) parse_url($configuredAppUrl, PHP_URL_HOST));
+$looksLocalUrl    = $configuredAppUrl === ''
+    || $appHost === ''
+    || in_array($appHost, ['localhost', '127.0.0.1', '::1'], true);
+
+if ($looksLocalUrl) {
+    $forwardedProto = strtolower((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? ''));
+    $isHttps        = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (isset($_SERVER['SERVER_PORT']) && (int) $_SERVER['SERVER_PORT'] === 443)
+        || $forwardedProto === 'https';
+    $scheme         = $isHttps ? 'https' : 'http';
+    $host           = trim((string) ($_SERVER['HTTP_HOST'] ?? ''));
+
+    if ($host !== '') {
+        $configuredAppUrl = $scheme . '://' . $host;
+    } else {
+        $configuredAppUrl = 'http://localhost';
+    }
+}
+
+define('APP_URL',       rtrim($configuredAppUrl, '/'));
 define('APP_EMAIL',     $_ENV['APP_EMAIL'] ?? '');
 define('APP_PHONE',     $_ENV['APP_PHONE'] ?? '');
 define('APP_ADDRESS',   $_ENV['APP_ADDRESS'] ?? '');

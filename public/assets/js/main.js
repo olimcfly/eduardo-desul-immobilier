@@ -1,5 +1,5 @@
 /* ============================================================
-   MAIN JS — Eduardo Desul Immobilier
+   MAIN JS — Pascal Hamm Immobilier
    ============================================================ */
 
 'use strict';
@@ -42,6 +42,27 @@ overlay?.addEventListener('click', closeNav);
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') closeNav();
+});
+
+// ── Mobile accordions (navigation) ───────────────────────────
+const mobileToggles = document.querySelectorAll('.nav-mobile__toggle');
+mobileToggles.forEach(toggle => {
+  toggle.addEventListener('click', () => {
+    const item = toggle.closest('.nav-mobile__item');
+    const panel = item?.querySelector('.mobile-sub');
+    const expanded = toggle.getAttribute('aria-expanded') === 'true';
+
+    mobileToggles.forEach(other => {
+      if (other !== toggle) {
+        other.setAttribute('aria-expanded', 'false');
+        const otherPanel = other.closest('.nav-mobile__item')?.querySelector('.mobile-sub');
+        if (otherPanel) otherPanel.hidden = true;
+      }
+    });
+
+    toggle.setAttribute('aria-expanded', String(!expanded));
+    if (panel) panel.hidden = expanded;
+  });
 });
 
 // ── Flash auto-dismiss ────────────────────────────────────────
@@ -119,6 +140,29 @@ document.querySelectorAll('[data-share]').forEach(btn => {
       });
     } else if (urls[network]) {
       window.open(urls[network], '_blank', 'noopener,width=600,height=400');
+    }
+  });
+});
+
+// ── Accordion (pages villes/quartiers/guides) ─────────────────
+document.querySelectorAll('.accordion__button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const item    = btn.closest('.accordion__item');
+    const content = item?.querySelector('.accordion__content');
+    const isOpen  = item?.classList.contains('open');
+
+    // Fermer tous les autres items du même accordion
+    btn.closest('.accordion')?.querySelectorAll('.accordion__item.open').forEach(openItem => {
+      openItem.classList.remove('open');
+      openItem.querySelector('.accordion__button')?.setAttribute('aria-expanded', 'false');
+      openItem.querySelector('.accordion__content').style.display = '';
+    });
+
+    // Ouvrir ou fermer l'item cliqué
+    if (!isOpen && item && content) {
+      item.classList.add('open');
+      btn.setAttribute('aria-expanded', 'true');
+      content.style.display = 'block';
     }
   });
 });

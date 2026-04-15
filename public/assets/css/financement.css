@@ -1,0 +1,130 @@
+.fin-hero-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 1.4rem;
+}
+
+.fin-hero-trust {
+  margin-top: 1rem;
+  font-size: .92rem;
+  opacity: .85;
+}
+
+.fin-reassurance { gap: 1rem; }
+
+.fin-card {
+  background: var(--clr-white);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--clr-border);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.fin-card h2,
+.fin-card h3 {
+  font-size: 1.15rem;
+  margin-bottom: .55rem;
+}
+
+.fin-card--project {
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.fin-columns {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 2rem;
+  align-items: center;
+}
+
+.fin-list { display: grid; gap: .8rem; }
+.fin-list li {
+  background: var(--clr-bg);
+  border-radius: var(--radius);
+  padding: .8rem 1rem;
+  border: 1px solid var(--clr-border);
+}
+
+.fin-steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.fin-step {
+  background: var(--clr-white);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  border: 1px solid var(--clr-border);
+}
+
+.fin-step span {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--clr-primary);
+  color: #fff;
+  font-weight: 700;
+  margin-bottom: .7rem;
+}
+
+.fin-form-box {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.fin-faq {
+  max-width: 900px;
+  margin: 0 auto;
+  display: grid;
+  gap: .75rem;
+}
+
+.fin-faq-item {
+  background: var(--clr-white);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+}
+
+.fin-faq-item summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--clr-primary);
+}
+
+.fin-faq-item p {
+  margin-top: .7rem;
+  color: var(--clr-text-muted);
+}
+
+.form-group--checkbox .checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: .65rem;
+  font-size: .9rem;
+  color: var(--clr-text-muted);
+}
+
+.form-group--checkbox input {
+  margin-top: .25rem;
+}
+
+@media (max-width: 900px) {
+  .fin-columns,
+  .fin-steps {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .fin-hero-actions .btn {
+    width: 100%;
+  }
+}

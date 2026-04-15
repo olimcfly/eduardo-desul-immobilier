@@ -1,0 +1,92 @@
+.iv-shell {
+    max-width: 980px;
+}
+
+.iv-hero {
+    padding-top: clamp(2.5rem, 8vw, 5rem);
+    padding-bottom: clamp(2.5rem, 8vw, 4.5rem);
+}
+
+.iv-subtitle {
+    max-width: 760px;
+}
+
+.iv-cta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.iv-cta-row--center {
+    justify-content: center;
+}
+
+.iv-trust {
+    margin-top: 1.25rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.625rem;
+    padding: 0;
+    list-style: none;
+}
+
+.iv-trust li {
+    border: 1px solid var(--clr-border);
+    border-radius: 999px;
+    padding: 0.4rem 0.8rem;
+    font-size: 0.875rem;
+    background: #fff;
+}
+
+.iv-grid {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 1.25rem;
+    align-items: start;
+}
+
+.iv-profile {
+    padding: 1.25rem;
+    display: grid;
+    gap: 0.75rem;
+}
+
+.iv-profile .btn {
+    justify-self: start;
+}
+
+.iv-services .card {
+    height: 100%;
+}
+
+.iv-quote {
+    margin: 0 0 0.75rem;
+    padding: 1rem;
+    border-left: 4px solid var(--clr-primary);
+    background: #f8fafc;
+    border-radius: 0.25rem;
+}
+
+.iv-faq-item {
+    border: 1px solid var(--clr-border);
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.625rem;
+    background: #fff;
+}
+
+.iv-faq-item summary {
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.iv-final-cta .btn {
+    min-width: 240px;
+}
+
+@media (max-width: 900px) {
+    .iv-grid {
+        grid-template-columns: 1fr;
+    }
+}

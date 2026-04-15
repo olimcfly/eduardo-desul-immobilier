@@ -17,6 +17,7 @@ if (!$action) {
 
 $user   = Auth::user();
 $userId = (int)($user['id'] ?? 0);
+$maintenanceFlag = STORAGE_PATH . '/cache/maintenance.flag';
 
 if ($userId <= 0) {
     echo json_encode(['success' => false, 'error' => 'Utilisateur introuvable.']);
@@ -29,6 +30,43 @@ switch ($action) {
     case 'clear_cache':
         clearSettingCache($userId);
         echo json_encode(['success' => true, 'message' => 'Cache vidé avec succès.']);
+        break;
+
+    // ── Activer le mode maintenance ──────────────────────────
+    case 'maintenance_on':
+        try {
+            $dir = dirname($maintenanceFlag);
+            if (!is_dir($dir) && !mkdir($dir, 0775, true) && !is_dir($dir)) {
+                throw new RuntimeException('Impossible de créer le dossier de maintenance.');
+            }
+
+            $payload = json_encode([
+                'enabled_by' => $userId,
+                'enabled_at' => gmdate('c'),
+            ], JSON_UNESCAPED_SLASHES);
+
+            if (file_put_contents($maintenanceFlag, $payload === false ? '' : $payload, LOCK_EX) === false) {
+                throw new RuntimeException('Impossible d\'écrire le fichier de maintenance.');
+            }
+
+            echo json_encode(['success' => true, 'message' => 'Mode maintenance activé.']);
+        } catch (Throwable $e) {
+            error_log('maintenance_on error: ' . $e->getMessage());
+            echo json_encode(['success' => false, 'error' => 'Impossible d\'activer la maintenance.']);
+        }
+        break;
+
+    // ── Désactiver le mode maintenance ───────────────────────
+    case 'maintenance_off':
+        try {
+            if (is_file($maintenanceFlag) && !unlink($maintenanceFlag)) {
+                throw new RuntimeException('Impossible de supprimer le fichier de maintenance.');
+            }
+            echo json_encode(['success' => true, 'message' => 'Mode maintenance désactivé.']);
+        } catch (Throwable $e) {
+            error_log('maintenance_off error: ' . $e->getMessage());
+            echo json_encode(['success' => false, 'error' => 'Impossible de désactiver la maintenance.']);
+        }
         break;
 
     // ── Réinitialiser les paramètres ─────────────────────────

@@ -1,9 +1,12 @@
 <?php
+/** @deprecated SEO legacy freeze: no new feature here. Use /modules/seo/mots-cles/api.php */
 declare(strict_types=1);
 
 // ── Bootstrap ─────────────────────────────────────────────────────────────────
 require_once __DIR__ . '/../../../bootstrap.php';
 require_once __DIR__ . '/../services/KeywordTracker.php';
+require_once __DIR__ . '/../_legacy_guard.php';
+seoLegacyGuard('modules/seo/ajax/check-keyword.php', '/modules/seo/mots-cles/api.php');
 
 // ── Helpers JSON ──────────────────────────────────────────────────────────────
 function jsonOk(mixed $data = null, string $message = 'OK'): never
@@ -119,15 +122,30 @@ function handleRefresh(KeywordTracker $tracker): never
         jsonError('ID invalide');
     }
 
-    // Simuler un check de position
-    // À remplacer par un vrai appel API (Google Search Console, DataForSEO…)
-    $newPosition = fetchPositionFromApi($id, $tracker);
+    $metrics = fetchKeywordMetricsFromApi($id, $tracker);
+    $newPosition = $metrics['position'];
+    $searchVolume = $metrics['search_volume'];
 
     $tracker->updatePosition($id, $newPosition);
 
+    if ($searchVolume !== null) {
+        $stmt = db()->prepare(
+            'UPDATE seo_keywords
+             SET estimated_volume = :volume, updated_at = NOW()
+             WHERE id = :id AND user_id = :user_id'
+        );
+        $stmt->execute([
+            ':volume' => $searchVolume,
+            ':id' => $id,
+            ':user_id' => (int)(Auth::user()['id'] ?? 0),
+        ]);
+    }
+
     jsonOk([
         'id'               => $id,
+        'provider'         => $metrics['provider'],
         'current_position' => $newPosition,
+        'estimated_volume' => $searchVolume,
         'last_checked_at'  => date('d/m/Y H:i'),
     ], 'Position mise à jour');
 }
@@ -135,16 +153,237 @@ function handleRefresh(KeywordTracker $tracker): never
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * Stub — brancher ici DataForSEO / GSC / SerpAPI
- * Retourne null si le mot-clé n'est pas classé
+ * Retourne les métriques (position + volume) récupérées depuis le provider SEO
+ * configuré dans les settings utilisateur.
  */
-function fetchPositionFromApi(int $keywordId, KeywordTracker $tracker): ?int
+function fetchKeywordMetricsFromApi(int $keywordId, KeywordTracker $tracker): array
 {
-    // TODO: appel API réel
-    // Exemple DataForSEO :
-    // $client = new DataForSeoClient($_ENV['DATAFORSEO_LOGIN'], $_ENV['DATAFORSEO_PASS']);
-    // return $client->getPosition($keyword, $targetUrl);
+    $default = [
+        'provider' => 'none',
+        'position' => null,
+        'search_volume' => null,
+    ];
 
-    // Pour l'instant on retourne null (pas classé)
+    $userId = (int)(Auth::user()['id'] ?? 0);
+    if ($userId <= 0) {
+        return $default;
+    }
+
+    $stmt = db()->prepare(
+        'SELECT keyword, target_url
+         FROM seo_keywords
+         WHERE id = :id AND user_id = :user_id
+         LIMIT 1'
+    );
+    $stmt->execute([
+        ':id' => $keywordId,
+        ':user_id' => $userId,
+    ]);
+    $keywordRow = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if (!$keywordRow) {
+        return $default;
+    }
+
+    $keyword = trim((string)($keywordRow['keyword'] ?? ''));
+    $targetUrl = trim((string)($keywordRow['target_url'] ?? ''));
+    if ($keyword === '' || !filter_var($targetUrl, FILTER_VALIDATE_URL)) {
+        return $default;
+    }
+
+    $provider = resolveSeoProvider($userId);
+
+    if ($provider === 'dataforseo') {
+        $position = fetchDataForSeoPosition($keyword, $targetUrl, $userId);
+        $searchVolume = fetchDataForSeoSearchVolume($keyword, $userId);
+
+        return [
+            'provider' => 'dataforseo',
+            'position' => $position,
+            'search_volume' => $searchVolume,
+        ];
+    }
+
+    return $default;
+}
+
+function resolveSeoProvider(int $userId): string
+{
+    $dfsLogin = trim((string)setting('api_dataforseo_login', '', $userId));
+    $dfsPassword = trim((string)setting('api_dataforseo_password', '', $userId));
+
+    if ($dfsLogin !== '' && $dfsPassword !== '') {
+        return 'dataforseo';
+    }
+
+    return 'none';
+}
+
+/**
+ * Interroge DataForSEO SERP API et retourne la meilleure position
+ * organique trouvée pour l'URL cible.
+ */
+function fetchDataForSeoPosition(string $keyword, string $targetUrl, int $userId): ?int
+{
+    $credentials = getDataForSeoCredentials($userId);
+    $login = $credentials['login'];
+    $password = $credentials['password'];
+
+    if ($login === '' || $password === '') {
+        return null;
+    }
+
+    $apiUrl = 'https://api.dataforseo.com/v3/serp/google/organic/live/regular';
+    $payload = [[
+        'language_name' => 'French',
+        'location_name' => 'France',
+        'keyword' => $keyword,
+        'device' => 'desktop',
+        'os' => 'windows',
+        'depth' => 100,
+    ]];
+
+    $response = dataForSeoRequest($apiUrl, $payload, $login, $password);
+    if (!is_array($response)) {
+        return null;
+    }
+
+    $items = $response['tasks'][0]['result'][0]['items'] ?? null;
+    if (!is_array($items)) {
+        return null;
+    }
+
+    $targetHost = strtolower((string)parse_url($targetUrl, PHP_URL_HOST));
+    if ($targetHost === '') {
+        return null;
+    }
+
+    $bestPosition = null;
+    foreach ($items as $item) {
+        if (!is_array($item) || ($item['type'] ?? '') !== 'organic') {
+            continue;
+        }
+
+        $itemUrl = (string)($item['url'] ?? '');
+        $itemHost = strtolower((string)parse_url($itemUrl, PHP_URL_HOST));
+        if ($itemHost === '') {
+            continue;
+        }
+
+        if ($itemHost !== $targetHost && !str_ends_with($itemHost, '.' . $targetHost)) {
+            continue;
+        }
+
+        $position = (int)($item['rank_absolute'] ?? 0);
+        if ($position <= 0) {
+            continue;
+        }
+
+        if ($bestPosition === null || $position < $bestPosition) {
+            $bestPosition = $position;
+        }
+    }
+
+    return $bestPosition;
+}
+
+function fetchDataForSeoSearchVolume(string $keyword, int $userId): ?int
+{
+    $credentials = getDataForSeoCredentials($userId);
+    $login = $credentials['login'];
+    $password = $credentials['password'];
+
+    if ($login === '' || $password === '') {
+        return null;
+    }
+
+    $apiUrl = 'https://api.dataforseo.com/v3/keywords_data/google_ads/search_volume/live';
+    $payload = [[
+        'keywords' => [$keyword],
+        'language_name' => 'French',
+        'location_name' => 'France',
+    ]];
+
+    $response = dataForSeoRequest($apiUrl, $payload, $login, $password);
+    if (!is_array($response)) {
+        return null;
+    }
+
+    $results = $response['tasks'][0]['result'] ?? null;
+    if (!is_array($results)) {
+        return null;
+    }
+
+    foreach ($results as $row) {
+        if (!is_array($row)) {
+            continue;
+        }
+
+        $rowKeyword = trim((string)($row['keyword'] ?? ''));
+        if ($rowKeyword !== '' && mb_strtolower($rowKeyword) !== mb_strtolower($keyword)) {
+            continue;
+        }
+
+        $value = $row['search_volume'] ?? $row['monthly_searches'] ?? null;
+        if ($value === null) {
+            continue;
+        }
+
+        $volume = (int)$value;
+        if ($volume >= 0) {
+            return $volume;
+        }
+    }
+
     return null;
+}
+
+function getDataForSeoCredentials(int $userId): array
+{
+    $login = trim((string)setting('api_dataforseo_login', '', $userId));
+    $password = trim((string)setting('api_dataforseo_password', '', $userId));
+
+    // Fallback env pour compatibilité avec anciennes installations.
+    if ($login === '') {
+        $login = trim((string)($_ENV['DATAFORSEO_LOGIN'] ?? getenv('DATAFORSEO_LOGIN') ?: ''));
+    }
+    if ($password === '') {
+        $password = trim((string)($_ENV['DATAFORSEO_PASSWORD'] ?? getenv('DATAFORSEO_PASSWORD') ?: ''));
+    }
+
+    return ['login' => $login, 'password' => $password];
+}
+
+function dataForSeoRequest(string $apiUrl, array $payload, string $login, string $password): ?array
+{
+    $jsonPayload = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    if (!is_string($jsonPayload)) {
+        return null;
+    }
+
+    $ch = curl_init($apiUrl);
+    curl_setopt_array($ch, [
+        CURLOPT_POST => true,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_HTTPAUTH => CURLAUTH_BASIC,
+        CURLOPT_USERPWD => $login . ':' . $password,
+        CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+        CURLOPT_POSTFIELDS => $jsonPayload,
+        CURLOPT_TIMEOUT => 20,
+    ]);
+
+    $rawResponse = curl_exec($ch);
+    $statusCode = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($statusCode < 200 || $statusCode >= 300 || !is_string($rawResponse) || $rawResponse === '') {
+        return null;
+    }
+
+    $response = json_decode($rawResponse, true);
+    if (!is_array($response)) {
+        return null;
+    }
+
+    return $response;
 }

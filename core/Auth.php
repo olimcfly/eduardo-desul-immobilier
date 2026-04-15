@@ -73,12 +73,12 @@ class Auth
             return false;
         }
 
-        $sql = "SELECT id, email, password, role, name FROM users WHERE email = ? LIMIT 1";
+        $sql = "SELECT id, email, password_hash, role, firstname, lastname FROM users WHERE email = ? AND status = 'active' LIMIT 1";
         $stmt = db()->prepare($sql);
         $stmt->execute([$email]);
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (!$user || !isset($user['password']) || !self::verifyPassword($password, (string) $user['password'])) {
+        if (!$user || !isset($user['password_hash']) || !self::verifyPassword($password, (string) $user['password_hash'])) {
             return false;
         }
 
@@ -90,7 +90,7 @@ class Auth
             'id'    => $user['id'],
             'email' => $user['email'],
             'role'  => $user['role'] ?? 'admin',
-            'name'  => $user['name'] ?? '',
+            'name'  => trim(($user['firstname'] ?? '') . ' ' . ($user['lastname'] ?? '')),
         ]);
 
         return true;

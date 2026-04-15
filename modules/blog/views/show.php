@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../../config/database.php';
+require_once __DIR__ . '/../services/PersonaResolver.php';
 $website_id = 1;
 $id = (int)($_GET['id'] ?? 0);
 
@@ -11,6 +12,7 @@ if (!$a) { header('Location: ../accueil.php'); exit; }
 $kw_stmt = $pdo->prepare("SELECT * FROM blog_keywords WHERE article_id=? ORDER BY volume DESC");
 $kw_stmt->execute([$id]);
 $keywords = $kw_stmt->fetchAll();
+$persona = PersonaResolver::resolveFromPersonaId(isset($a['persona_id']) ? (string)$a['persona_id'] : null);
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -45,6 +47,13 @@ $keywords = $kw_stmt->fetchAll();
         <p><strong>Title :</strong> <?= htmlspecialchars($a['seo_title'] ?? '—') ?></p>
         <p><strong>Meta :</strong> <?= htmlspecialchars($a['meta_desc'] ?? '—') ?></p>
         <p><strong>Index :</strong> <?= $a['index_status'] ?></p>
+      </div>
+      <div class="side-box">
+        <h3>Persona</h3>
+        <p><strong>Persona détecté :</strong> <?= htmlspecialchars($persona['label']) ?></p>
+        <p><strong>ID technique :</strong> <?= htmlspecialchars((string)($persona['persona_id'] ?? '—')) ?></p>
+        <p><strong>Niveau de conscience :</strong> <?= htmlspecialchars((string)($persona['niveau_conscience'] ?? '—')) ?></p>
+        <p><strong>Insight :</strong> <?= htmlspecialchars($persona['description']) ?></p>
       </div>
       <div class="side-box">
         <h3>Mots-clés (<?= count($keywords) ?>)</h3>

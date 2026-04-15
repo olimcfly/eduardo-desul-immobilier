@@ -1,9 +1,12 @@
 <?php
+/** @deprecated SEO legacy freeze: no new feature here. Use /modules/seo/performance/api.php */
 
 declare(strict_types=1);
 
 require_once dirname(__DIR__, 3) . '/core/bootstrap.php';
 require_once dirname(__DIR__) . '/services/PerformanceAudit.php';
+require_once __DIR__ . '/../_legacy_guard.php';
+seoLegacyGuard('modules/seo/ajax/performance-audit.php', '/modules/seo/performance/api.php');
 
 Auth::requireAuth('/admin/login');
 header('Content-Type: application/json; charset=utf-8');

@@ -16,31 +16,39 @@ class MailService
             require_once $autoloadPath;
         }
 
-        $smtpHost = $_ENV['SMTP_HOST'] ?? null;
+        $smtpConfig = self::resolveSmtpConfig();
+        $smtpHost = $smtpConfig['host'];
 
         if ($smtpHost && class_exists(PHPMailer::class)) {
-            return self::sendSmtp($to, $subject, $textBody, $htmlBody);
+            return self::sendSmtp($to, $subject, $textBody, $htmlBody, $smtpConfig);
         }
 
         return self::sendNativeMail($to, $subject, $textBody, $htmlBody);
     }
 
-    private static function sendSmtp(string $to, string $subject, string $textBody, ?string $htmlBody): bool
+    private static function sendSmtp(string $to, string $subject, string $textBody, ?string $htmlBody, array $smtpConfig): bool
     {
         try {
             $mail = new PHPMailer(true);
 
             $mail->isSMTP();
-            $mail->Host       = $_ENV['SMTP_HOST'];
-            $mail->SMTPAuth   = true;
-            $mail->Username   = $_ENV['SMTP_USER'] ?? '';
-            $mail->Password   = $_ENV['SMTP_PASS'] ?? '';
-            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
-            $mail->Port       = (int) ($_ENV['SMTP_PORT_SSL'] ?? 465);
+            $mail->Host = $smtpConfig['host'];
+            $mail->SMTPAuth = $smtpConfig['user'] !== '';
+            $mail->Username = $smtpConfig['user'];
+            $mail->Password = $smtpConfig['pass'];
+            $mail->Port = $smtpConfig['port'];
+            if ($smtpConfig['secure'] === 'ssl') {
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+            } elseif ($smtpConfig['secure'] === 'tls') {
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            } else {
+                $mail->SMTPSecure = '';
+                $mail->SMTPAutoTLS = false;
+            }
             $mail->CharSet    = 'UTF-8';
 
-            $from     = $_ENV['SMTP_FROM_EMAIL'] ?? $_ENV['APP_EMAIL'] ?? 'no-reply@localhost';
-            $fromName = $_ENV['SMTP_FROM_NAME'] ?? $_ENV['APP_NAME'] ?? '';
+            $from = $smtpConfig['from'];
+            $fromName = $smtpConfig['from_name'];
 
             $mail->setFrom($from, $fromName);
             $mail->addAddress($to);
@@ -65,8 +73,9 @@ class MailService
 
     private static function sendNativeMail(string $to, string $subject, string $textBody, ?string $htmlBody): bool
     {
-        $from     = $_ENV['SMTP_FROM_EMAIL'] ?? $_ENV['APP_EMAIL'] ?? 'no-reply@localhost';
-        $fromName = $_ENV['SMTP_FROM_NAME'] ?? $_ENV['APP_NAME'] ?? '';
+        $smtpConfig = self::resolveSmtpConfig();
+        $from = $smtpConfig['from'];
+        $fromName = $smtpConfig['from_name'];
 
         $encodedFromName = mb_encode_mimeheader($fromName, 'UTF-8');
 
@@ -98,5 +107,38 @@ class MailService
         }
 
         return mail($to, $subject, $message, implode("\r\n", $headers));
+    }
+
+    private static function resolveSmtpConfig(): array
+    {
+        $host = trim((string) (setting('smtp_host', '') ?: ($_ENV['SMTP_HOST'] ?? '')));
+        $user = trim((string) (setting('smtp_user', '') ?: ($_ENV['SMTP_USER'] ?? '')));
+        $pass = (string) (setting('smtp_pass', '') ?: ($_ENV['SMTP_PASS'] ?? ''));
+        $secure = strtolower(trim((string) (setting('smtp_secure', '') ?: ($_ENV['SMTP_SECURE'] ?? 'ssl'))));
+        if (!in_array($secure, ['ssl', 'tls', 'none'], true)) {
+            $secure = 'ssl';
+        }
+
+        $port = (int) (setting('smtp_port', '0') ?: 0);
+        if ($port <= 0) {
+            $portEnv = (int) ($_ENV['SMTP_PORT'] ?? 0);
+            $port = $portEnv > 0 ? $portEnv : (int) ($_ENV['SMTP_PORT_SSL'] ?? 0);
+        }
+        if ($port <= 0) {
+            $port = $secure === 'ssl' ? 465 : ($secure === 'tls' ? 587 : 25);
+        }
+
+        $from = trim((string) (setting('smtp_from', '') ?: ($_ENV['SMTP_FROM_EMAIL'] ?? ($_ENV['APP_EMAIL'] ?? 'no-reply@localhost'))));
+        $fromName = trim((string) (setting('smtp_from_name', '') ?: ($_ENV['SMTP_FROM_NAME'] ?? ($_ENV['APP_NAME'] ?? ''))));
+
+        return [
+            'host' => $host,
+            'user' => $user,
+            'pass' => $pass,
+            'secure' => $secure,
+            'port' => $port,
+            'from' => $from,
+            'from_name' => $fromName,
+        ];
     }
 }

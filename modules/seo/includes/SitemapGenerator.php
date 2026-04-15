@@ -1,5 +1,9 @@
 <?php
+/** @deprecated SEO legacy freeze: no new feature here. Use modules/seo/services/SitemapGenerator.php */
 declare(strict_types=1);
+
+require_once __DIR__ . '/../_legacy_guard.php';
+seoLegacyGuard('modules/seo/includes/SitemapGenerator.php', 'modules/seo/services/SitemapGenerator.php');
 
 class SitemapGenerator
 {

@@ -29,10 +29,44 @@ class DemandeAvisManager
         return (int) $this->pdo->lastInsertId();
     }
 
+    public function findById(int $demandeId): array
+    {
+        $stmt = $this->pdo->prepare('SELECT * FROM gmb_demandes_avis WHERE id = ? AND user_id = ? LIMIT 1');
+        $stmt->execute([$demandeId, $this->userId]);
+        $row = $stmt->fetch();
+
+        return is_array($row) ? $row : [];
+    }
+
+    public function findTemplateById(int $templateId, string $canal = 'email'): array
+    {
+        $stmt = $this->pdo->prepare('SELECT * FROM gmb_templates WHERE id = ? AND user_id = ? AND canal = ? LIMIT 1');
+        $stmt->execute([$templateId, $this->userId, $canal]);
+        $row = $stmt->fetch();
+
+        return is_array($row) ? $row : [];
+    }
+
     public function markSent(int $demandeId): bool
     {
         $stmt = $this->pdo->prepare('UPDATE gmb_demandes_avis SET statut = "envoye", envoye_at = NOW() WHERE id = ? AND user_id = ?');
         return $stmt->execute([$demandeId, $this->userId]);
+    }
+
+    public function trackReviewRequest(int $demandeId, string $email, string $status, ?string $errorMessage = null): bool
+    {
+        $stmt = $this->pdo->prepare('INSERT INTO gmb_review_requests
+            (user_id, demande_id, email, statut, date_envoi, error_message)
+            VALUES (?, ?, ?, ?, ?, ?)');
+
+        return $stmt->execute([
+            $this->userId,
+            $demandeId,
+            $email,
+            $status,
+            $status === 'envoye' ? date('Y-m-d H:i:s') : null,
+            $errorMessage,
+        ]);
     }
 
     public function templates(string $canal = 'email'): array

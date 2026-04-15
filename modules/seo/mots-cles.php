@@ -1,4 +1,5 @@
 <?php
+/** @deprecated SEO legacy freeze: no new feature here. Use /admin?module=seo&action=keywords */
 require_once '../../includes/auth.php';
 require_once '../../includes/db.php';
 
@@ -34,6 +35,8 @@ $stmt->execute([$user_id]);
 $keywords = $stmt->fetchAll();
 
 require_once '../../includes/header.php';
+require_once __DIR__ . '/_legacy_guard.php';
+seoLegacyGuard('modules/seo/mots-cles.php', '/admin?module=seo&action=keywords');
 ?>
 
 <div class="container mt-4">

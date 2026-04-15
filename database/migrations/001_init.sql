@@ -1,5 +1,5 @@
 -- ============================================================
--- MIGRATION 001 — Schéma initial Eduardo Desul Immobilier
+-- MIGRATION 001 — Schéma initial Pascal Hamm Immobilier
 -- ============================================================
 
 SET NAMES utf8mb4;
@@ -228,10 +228,10 @@ CREATE TABLE IF NOT EXISTS `settings` (
 
 -- ── Seeds ─────────────────────────────────────────────────────
 INSERT IGNORE INTO `settings` (`cle`, `valeur`, `groupe`) VALUES
-  ('site_nom',        'Eduardo Desul Immobilier', 'general'),
+  ('site_nom',        'Pascal Hamm Immobilier', 'general'),
   ('site_telephone',  '',                          'general'),
-  ('site_email',      'contact@eduardo-desul-immobilier.fr', 'general'),
-  ('site_adresse',    'Bordeaux, France',           'general'),
+  ('site_email',      'contact@pascal-hamm-immobilier.fr', 'general'),
+  ('site_adresse',    'Aix-en-Provence, France',           'general'),
   ('gmb_account_id',  '',                           'api'),
   ('smtp_host',       '',                           'smtp');
 

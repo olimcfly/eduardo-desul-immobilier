@@ -4,11 +4,11 @@
 INSERT INTO settings (user_id, `key`, `value`, `group`) VALUES
 
 -- Profil
-(1, 'profil_nom',            'Eduardo De Sul',                          'profil'),
-(1, 'profil_prenom',         'Eduardo',                                 'profil'),
-(1, 'profil_email',          'contact@eduardo-desul-immobilier.fr',     'profil'),
+(1, 'profil_nom',            'Pascal Hamm',                          'profil'),
+(1, 'profil_prenom',         'Pascal',                                 'profil'),
+(1, 'profil_email',          'contact@pascal-hamm-immobilier.fr',     'profil'),
 (1, 'profil_telephone',      '',                                        'profil'),
-(1, 'profil_ville',          'Bordeaux',                                'profil'),
+(1, 'profil_ville',          'Aix-en-Provence',                                'profil'),
 (1, 'profil_bio',            '',                                        'profil'),
 (1, 'profil_photo',          '',                                        'profil'),
 (1, 'profil_carte_pro',      '',                                        'profil'),
@@ -17,8 +17,8 @@ INSERT INTO settings (user_id, `key`, `value`, `group`) VALUES
 (1, 'profil_siret',          '',                                        'profil'),
 
 -- Site public
-(1, 'site_nom',              'Eduardo Desul Immobilier',                'site'),
-(1, 'site_url',              'https://eduardo-desul-immobilier.fr',     'site'),
+(1, 'site_nom',              'Pascal Hamm Immobilier',                'site'),
+(1, 'site_url',              'https://pascal-hamm-immobilier.fr',     'site'),
 (1, 'site_slogan',           '',                                        'site'),
 (1, 'site_description',      '',                                        'site'),
 (1, 'site_logo',             '',                                        'site'),
@@ -26,13 +26,13 @@ INSERT INTO settings (user_id, `key`, `value`, `group`) VALUES
 (1, 'site_favicon',          '',                                        'site'),
 
 -- Zone géographique
-(1, 'zone_ville',            'Bordeaux',                                'zone'),
-(1, 'zone_departement',      'Gironde',                                 'zone'),
-(1, 'zone_region',           'Nouvelle-Aquitaine',                      'zone'),
+(1, 'zone_ville',            'Aix-en-Provence',                                'zone'),
+(1, 'zone_departement',      'Bouches-du-Rhône',                        'zone'),
+(1, 'zone_region',           'Provence-Alpes-Côte d'Azur',             'zone'),
 (1, 'zone_communes',         '',                                        'zone'),
 (1, 'zone_rayon_km',         '30',                                      'zone'),
-(1, 'zone_lat',              '44.8378',                                 'zone'),
-(1, 'zone_lng',              '-0.5792',                                 'zone'),
+(1, 'zone_lat',              '43.5297',                                 'zone'),
+(1, 'zone_lng',              '5.4474',                                  'zone'),
 
 -- Clés API
 (1, 'api_openai',            '',                                        'api'),
@@ -58,12 +58,12 @@ INSERT INTO settings (user_id, `key`, `value`, `group`) VALUES
 (1, 'notif_email_dest',      '',                                        'notif'),
 
 -- SMTP
-(1, 'smtp_host',             '',                                        'smtp'),
-(1, 'smtp_port',             '587',                                     'smtp'),
-(1, 'smtp_user',             '',                                        'smtp'),
+(1, 'smtp_host',             'mail.pascal-hamm-immobilier-aix-en-provence.fr', 'smtp'),
+(1, 'smtp_port',             '465',                                     'smtp'),
+(1, 'smtp_user',             'contact@pascal-hamm-immobilier-aix-en-provence.fr', 'smtp'),
 (1, 'smtp_pass',             '',                                        'smtp'),
 (1, 'smtp_from_name',        '',                                        'smtp'),
-(1, 'smtp_secure',           'tls',                                     'smtp'),
+(1, 'smtp_secure',           'ssl',                                     'smtp'),
 
 -- Sécurité
 (1, 'sec_2fa_active',        '0',                                       'securite'),

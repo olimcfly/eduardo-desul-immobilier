@@ -20,7 +20,7 @@ final class SequenceController
             $payload = [
                 'nom' => trim((string) ($_POST['nom'] ?? 'Nouvelle séquence')),
                 'persona' => trim((string) ($_POST['persona'] ?? 'Persona libre')),
-                'zone' => trim((string) ($_POST['zone'] ?? setting('zone_city', 'Bordeaux'))),
+                'zone' => trim((string) ($_POST['zone'] ?? setting('zone_city', 'Aix-en-Provence'))),
                 'statut' => trim((string) ($_POST['statut'] ?? 'active')),
                 'objectif' => trim((string) ($_POST['objectif'] ?? 'N2 -> N3')),
             ];

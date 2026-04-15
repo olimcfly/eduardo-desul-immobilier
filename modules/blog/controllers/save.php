@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../../config/database.php';
+require_once __DIR__ . '/../services/PersonaResolver.php';
 
 $id               = $_POST['id'] ?? null;
 $website_id       = 1; // à rendre dynamique plus tard
@@ -7,15 +8,28 @@ $silo_id          = $_POST['silo_id'] ?: null;
 $type             = $_POST['type'] ?? 'satellite';
 $titre            = trim($_POST['titre'] ?? '');
 $slug             = trim($_POST['slug'] ?? '') ?: strtolower(preg_replace('/[^a-z0-9]+/i', '-', $titre));
+$slug             = trim($slug, '-');
 $seo_title        = trim($_POST['seo_title'] ?? '');
 $meta_desc        = trim($_POST['meta_desc'] ?? '');
 $h1               = trim($_POST['h1'] ?? '');
 $contenu          = $_POST['contenu'] ?? '';
 $statut           = $_POST['statut'] ?? 'brouillon';
+$statut           = in_array($statut, ['brouillon', 'publié'], true) ? $statut : 'brouillon';
 $index_status     = $_POST['index_status'] ?? 'index';
-$persona_id       = $_POST['persona_id'] ?: null;
-$niveau_conscience = $_POST['niveau_conscience'] ?: null;
-$date_publication = $_POST['date_publication'] ?: null;
+
+$personaTarget    = $_POST['persona_target'] ?? null;
+$personaReason    = $_POST['persona_reason'] ?? null;
+$resolvedPersona  = PersonaResolver::resolve(
+    is_string($personaTarget) ? $personaTarget : null,
+    is_string($personaReason) ? $personaReason : null
+);
+
+$persona_id        = $resolvedPersona['persona_id'];
+$niveau_conscience = $resolvedPersona['niveau_conscience'];
+
+$date_publication_input = trim($_POST['date_publication'] ?? '');
+$date_publication_ts = $date_publication_input !== '' ? strtotime($date_publication_input) : false;
+$date_publication = $date_publication_ts !== false ? date('Y-m-d H:i:s', $date_publication_ts) : null;
 $mots             = str_word_count(strip_tags($contenu));
 
 if (empty($titre)) {

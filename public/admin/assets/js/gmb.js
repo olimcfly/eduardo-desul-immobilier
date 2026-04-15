@@ -1,6 +1,13 @@
 (function () {
     'use strict';
 
+    const statusLabels = {
+        pending: 'En attente',
+        running: 'En cours',
+        done: 'Terminé',
+        error: 'Erreur',
+    };
+
     async function postForm(url, formData) {
         const response = await fetch(url, {
             method: 'POST',
@@ -8,6 +15,48 @@
             body: formData,
         });
         return response.json();
+    }
+
+    function syncBadgeClass(status) {
+        return 'gmb-sync-' + (status || 'pending');
+    }
+
+    function renderSyncStatus(job) {
+        const statusNode = document.querySelector('[data-gmb-sync-status]');
+        const jobNode = document.querySelector('[data-gmb-sync-job]');
+        const updatedNode = document.querySelector('[data-gmb-sync-updated]');
+        const errorNode = document.querySelector('[data-gmb-sync-error]');
+
+        if (!statusNode) return;
+
+        const status = (job && job.status) ? job.status : 'pending';
+        statusNode.textContent = statusLabels[status] || status;
+        statusNode.className = 'gmb-sync-badge ' + syncBadgeClass(status);
+
+        if (jobNode) {
+            jobNode.textContent = job && job.id ? String(job.id) : '-';
+        }
+
+        if (updatedNode) {
+            updatedNode.textContent = (job && job.updated_at) ? job.updated_at : 'Jamais';
+        }
+
+        if (errorNode) {
+            errorNode.textContent = status === 'error' ? ((job && job.error_message) || 'Erreur inconnue') : '';
+        }
+    }
+
+    async function fetchSyncStatus() {
+        const response = await fetch('/admin/api/gmb/sync', {
+            method: 'GET',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        });
+        const data = await response.json();
+        if (data && data.success && data.job) {
+            renderSyncStatus(data.job);
+            return data.job;
+        }
+        return null;
     }
 
     document.addEventListener('submit', async function (event) {
@@ -36,9 +85,15 @@
         if (!btn) return;
 
         if (btn.dataset.action === 'sync-fiche') {
-            const data = await postForm('/modules/gmb/ajax/sync-fiche.php', new FormData());
-            alert(data.message || 'Synchronisation terminée.');
-            location.reload();
+            const data = await postForm('/admin/api/gmb/sync', new FormData());
+            if (!data.success) {
+                alert(data.message || 'Impossible de lancer la synchronisation.');
+                return;
+            }
+
+            alert(data.message || 'Synchronisation mise en file d\'attente.');
+            await fetchSyncStatus();
+            return;
         }
 
         if (btn.dataset.action === 'get-avis') {
@@ -70,4 +125,9 @@
             });
         }
     });
+
+    if (document.querySelector('[data-gmb-sync-status]')) {
+        fetchSyncStatus();
+        setInterval(fetchSyncStatus, 5000);
+    }
 })();

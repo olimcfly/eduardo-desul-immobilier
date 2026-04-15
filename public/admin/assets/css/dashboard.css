@@ -637,6 +637,96 @@ body {
     font-size: 14px;
 }
 
+.optimiser-hero-subtitle {
+    margin-top: 4px;
+    color: #5f6f81;
+    font-size: 15px;
+    max-width: 720px;
+}
+
+.optimiser-mere-card {
+    margin: 20px 0 24px;
+    padding: 18px;
+    border: 1px solid #e7eef5;
+    border-radius: 12px;
+    background: linear-gradient(180deg, #f9fcff 0%, #ffffff 100%);
+}
+
+.optimiser-mere-kicker {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .06em;
+    color: #3498db;
+    margin-bottom: 6px;
+}
+
+.optimiser-mere-header h2 {
+    margin: 0 0 8px;
+    font-size: 20px;
+    color: #23364a;
+}
+
+.optimiser-mere-explanation {
+    margin: 0 0 12px;
+    color: #5f6f81;
+    font-size: 14px;
+}
+
+.optimiser-cycle {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.optimiser-cycle-step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    background: #fff;
+    border: 1px solid #e4edf6;
+    border-radius: 10px;
+}
+
+.optimiser-cycle-badge {
+    width: 26px;
+    height: 26px;
+    border-radius: 999px;
+    background: #3498db;
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.optimiser-cycle-arrow,
+.optimiser-cycle-loop {
+    color: #9bb7d1;
+    display: flex;
+    justify-content: center;
+}
+
+.optimiser-cycle-loop i {
+    padding: 6px;
+    border-radius: 999px;
+    background: #eef6ff;
+}
+
+.optimiser-mere-footer {
+    display: grid;
+    gap: 6px;
+    color: #3d4d5e;
+    font-size: 14px;
+}
+
+.optimiser-mere-footer p {
+    margin: 0;
+}
+
 /* ============================================================
    BARRE DE RECHERCHE
 ============================================================ */
@@ -800,6 +890,23 @@ body {
     width: fit-content;
 }
 
+.optimiser-final-cta {
+    margin-top: 26px;
+    padding: 20px;
+    border-radius: 12px;
+    background: #1f2937;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.optimiser-final-cta h2 {
+    margin: 0;
+    color: #fff;
+    font-size: 22px;
+}
+
 /* ============================================================
    DATA TABLE
 ============================================================ */
@@ -938,4 +1045,9 @@ body {
     .topbar-center { display: none; }
     .user-menu-info { display: none; }
     .footer-left { flex-direction: column; gap: 4px; }
+}
+
+/* ============================================================
+   CAPTURE HUB
+    }
 }

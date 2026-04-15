@@ -90,13 +90,19 @@ function csrfField(): string
     return '<input type="hidden" name="csrf_token" value="' . csrfToken() . '">';
 }
 
-function verifyCsrf(): void
+function verifyCsrf(?string $token = null): bool
 {
-    $token = $_POST['csrf_token'] ?? '';
-    if (!hash_equals(csrfToken(), $token)) {
+    if ($token !== null) {
+        return hash_equals(csrfToken(), $token);
+    }
+
+    $postedToken = $_POST['csrf_token'] ?? '';
+    if (!hash_equals(csrfToken(), $postedToken)) {
         http_response_code(403);
         die('Token CSRF invalide.');
     }
+
+    return true;
 }
 
 function paginate(int $total, int $perPage, int $current): array
@@ -113,8 +119,92 @@ function paginate(int $total, int $perPage, int $current): array
     ];
 }
 
+
+
+function asset_url(string $path): string
+{
+    if ($path === '' || preg_match('#^https?://#i', $path)) {
+        return $path;
+    }
+
+    $normalizedPath = '/' . ltrim($path, '/');
+
+    static $manifest = null;
+    if ($manifest === null) {
+        $manifestPath = ROOT_PATH . '/storage/cache/assets-manifest.json';
+        if (is_file($manifestPath)) {
+            $decoded = json_decode((string) file_get_contents($manifestPath), true);
+            $manifest = is_array($decoded) ? $decoded : [];
+        } else {
+            $manifest = [];
+        }
+    }
+
+    if (isset($manifest[$normalizedPath])) {
+        return (string) $manifest[$normalizedPath];
+    }
+
+    $localPath = asset_local_path($normalizedPath);
+    if ($localPath !== null && is_file($localPath)) {
+        return $normalizedPath . '?v=' . filemtime($localPath);
+    }
+
+    return $normalizedPath;
+}
+
+function asset_local_path(string $normalizedPath): ?string
+{
+    if (str_starts_with($normalizedPath, '/assets/')) {
+        return ROOT_PATH . '/public' . $normalizedPath;
+    }
+
+    if (str_starts_with($normalizedPath, '/admin/assets/')) {
+        return ROOT_PATH . '/public' . $normalizedPath;
+    }
+
+    if (str_starts_with($normalizedPath, '/modules/')) {
+        return ROOT_PATH . $normalizedPath;
+    }
+
+    return null;
+}
+
 function generateRef(string $type, int $id): string
 {
     $prefix = strtoupper(substr($type, 0, 3));
     return $prefix . '-' . str_pad($id, 5, '0', STR_PAD_LEFT);
+}
+
+function get_ia_status(?int $userId = null): string
+{
+    $resolvedUserId = $userId ?? (int) ($_SESSION['user_id'] ?? 0);
+    if ($resolvedUserId <= 0) {
+        return 'disconnected';
+    }
+
+    try {
+        $stmt = db()->prepare(
+            'SELECT provider, api_key, model
+             FROM ia_configurations
+             WHERE user_id = :user_id AND is_active = 1
+             ORDER BY updated_at DESC, id DESC
+             LIMIT 1'
+        );
+        $stmt->execute(['user_id' => $resolvedUserId]);
+        $config = $stmt->fetch(PDO::FETCH_ASSOC);
+    } catch (Throwable $e) {
+        return 'disconnected';
+    }
+
+    if (!is_array($config)) {
+        return 'disconnected';
+    }
+
+    $provider = trim((string) ($config['provider'] ?? ''));
+    $apiKey = trim((string) ($config['api_key'] ?? ''));
+    $model = trim((string) ($config['model'] ?? ''));
+
+    return ($provider !== '' && $apiKey !== '' && $model !== '')
+        ? 'connected'
+        : 'disconnected';
 }

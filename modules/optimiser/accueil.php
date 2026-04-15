@@ -1,57 +1,98 @@
 <?php
-$pageTitle = "Optimiser";
-$pageDescription = "Analysez et améliorez en continu vos performances";
 
+require_once __DIR__ . '/services/MonthlyReportService.php';
 
-function renderContent() {
+$allowedActions = ['index', 'rapport-mensuel'];
+$action = isset($_GET['action']) ? preg_replace('/[^a-z-]/', '', (string) $_GET['action']) : 'index';
+if (!in_array($action, $allowedActions, true)) {
+    $action = 'index';
+}
+
+$pageTitle = $action === 'rapport-mensuel' ? 'Optimiser — Rapport mensuel' : 'Optimiser';
+$pageDescription = 'Améliorez vos résultats avec des décisions simples';
+
+function renderContent(): void
+{
+    global $action;
+
+    if ($action === 'rapport-mensuel') {
+        require __DIR__ . '/views/rapport-mensuel.php';
+        return;
+    }
     ?>
-    <div class="page-header">
-        <h1><i class="fas fa-chart-line page-icon"></i> HUB <span class="page-title-accent">Optimiser</span></h1>
-        <p>Analysez et améliorez en continu vos performances</p>
-    </div>
+    <section class="hub-page">
 
-    <div class="cards-container">
+        <header class="hub-hero">
+            <div class="hub-hero-badge"><i class="fas fa-chart-line"></i> Amélioration continue</div>
+            <h1>Gagnez en résultats chaque semaine</h1>
+            <p>Voyez ce qui marche, corrigez vite, avancez en continu.</p>
+        </header>
 
-        <div class="card" style="--card-accent:#3498db; --card-icon-bg:#e3f2fd;">
-            <div class="card-header">
-                <div class="card-icon"><i class="fas fa-chart-bar"></i></div>
-                <h3 class="card-title">Tableau de bord Analytics</h3>
+        <section class="hub-narrative" aria-label="Méthode d'amélioration">
+            <article class="hub-narrative-card hub-narrative-card--motivation">
+                <h3><i class="fas fa-triangle-exclamation" style="color:#ef4444;"></i> Problème</h3>
+                <p>Vous agissez sans repère clair.</p>
+            </article>
+            <article class="hub-narrative-card hub-narrative-card--explanation">
+                <h3><i class="fas fa-diagram-project" style="color:#3b82f6;"></i> Logique</h3>
+                <p>Mesurer, ajuster, vérifier.</p>
+            </article>
+            <article class="hub-narrative-card hub-narrative-card--resultat">
+                <h3><i class="fas fa-chart-line" style="color:#10b981;"></i> Bénéfice</h3>
+                <p>Chaque action devient plus rentable.</p>
+            </article>
+            <article class="hub-narrative-card hub-narrative-card--action">
+                <h3><i class="fas fa-play-circle" style="color:#f59e0b;"></i> Action</h3>
+                <p>Commencez par un seul levier.</p>
+            </article>
+        </section>
+
+        <div class="hub-modules-grid">
+            <a href="?module=optimiser&view=analytics" class="hub-module-card">
+                <div class="hub-module-card-head">
+                    <div class="hub-module-card-icon" style="background:#dbeafe;color:#2563eb;"><i class="fas fa-chart-bar"></i></div>
+                    <h3>Lire les résultats</h3>
+                </div>
+                <p>Comprenez en un coup d'œil ce qui monte ou baisse.</p>
+                <span class="hub-module-card-action"><i class="fas fa-arrow-right"></i> Ouvrir</span>
+            </a>
+
+            <div class="hub-module-card hub-module-card--soon">
+                <div class="hub-module-card-head">
+                    <div class="hub-module-card-icon" style="background:#fef3c7;color:#d97706;"><i class="fas fa-lightbulb"></i></div>
+                    <h3>Trouver le frein</h3>
+                </div>
+                <p>Identifiez le point qui bloque votre progression.</p>
+                <span class="hub-state hub-state--soon"><i class="fas fa-clock"></i> Bientôt</span>
             </div>
-            <p class="card-description">Vue consolidée de vos KPIs : leads, mandats, trafic, conversions.</p>
-            <div class="card-tags"><span class="tag">KPIs</span><span class="tag">Reporting</span></div>
-            <span class="card-soon"><i class="fas fa-clock"></i> Arrivée bientôt</span>
+
+            <div class="hub-module-card hub-module-card--soon">
+                <div class="hub-module-card-head">
+                    <div class="hub-module-card-icon" style="background:#eafaf1;color:#16a34a;"><i class="fas fa-vials"></i></div>
+                    <h3>Tester une amélioration</h3>
+                </div>
+                <p>Comparez deux versions et gardez la meilleure.</p>
+                <span class="hub-state hub-state--soon"><i class="fas fa-clock"></i> Bientôt</span>
+            </div>
+
+            <a href="/admin?module=optimiser&action=rapport-mensuel" class="hub-module-card">
+                <div class="hub-module-card-head">
+                    <div class="hub-module-card-icon" style="background:#fdedec;color:#dc2626;"><i class="fas fa-file-chart-line"></i></div>
+                    <h3>Bilan mensuel</h3>
+                </div>
+                <p>Gardez une vision claire et prenez vos décisions plus vite.</p>
+                <span class="hub-module-card-action"><i class="fas fa-arrow-right"></i> Ouvrir</span>
+            </a>
         </div>
 
-        <div class="card" style="--card-accent:#f39c12; --card-icon-bg:#fef9e7;">
-            <div class="card-header">
-                <div class="card-icon"><i class="fas fa-vials"></i></div>
-                <h3 class="card-title">A/B Testing</h3>
+        <section class="hub-final-cta" aria-label="Progression optimiser">
+            <div>
+                <h2>Progression : Mesurer → Corriger → Vérifier → Répéter</h2>
+                <p>Commencez par un levier, puis développez votre système.</p>
             </div>
-            <p class="card-description">Testez vos pages, emails et messages pour maximiser les taux de conversion.</p>
-            <div class="card-tags"><span class="tag">Tests</span><span class="tag">Conversion</span></div>
-            <span class="card-soon"><i class="fas fa-clock"></i> Arrivée bientôt</span>
-        </div>
+            <a href="?module=optimiser&view=analytics" class="hub-btn hub-btn--gold"><i class="fas fa-rocket"></i> Lancer ma première amélioration</a>
+        </section>
 
-        <div class="card" style="--card-accent:#27ae60; --card-icon-bg:#eafaf1;">
-            <div class="card-header">
-                <div class="card-icon"><i class="fas fa-lightbulb"></i></div>
-                <h3 class="card-title">Recommandations IA</h3>
-            </div>
-            <p class="card-description">Suggestions personnalisées pour améliorer vos actions chaque semaine.</p>
-            <div class="card-tags"><span class="tag">IA</span><span class="tag">Insights</span></div>
-            <span class="card-soon"><i class="fas fa-clock"></i> Arrivée bientôt</span>
-        </div>
-
-        <div class="card" style="--card-accent:#e74c3c; --card-icon-bg:#fdedec;">
-            <div class="card-header">
-                <div class="card-icon"><i class="fas fa-file-chart-line"></i></div>
-                <h3 class="card-title">Rapport mensuel</h3>
-            </div>
-            <p class="card-description">Générez votre rapport de performance mensuel en un clic.</p>
-            <div class="card-tags"><span class="tag">Rapport</span><span class="tag">Export PDF</span></div>
-            <span class="card-soon"><i class="fas fa-clock"></i> Arrivée bientôt</span>
-        </div>
-
-    </div>
+    </section>
     <?php
 }

@@ -10,11 +10,11 @@
 ## Catégorie A — Identité du conseiller
 
 ### Éléments hardcodés trouvés
-- **Nom/prénom** : `Eduardo Desul`, `Eduardo De Sul`.
+- **Nom/prénom** : `Pascal Hamm`, `Pascal Hamm`.
 - **Titre pro** : `Conseiller immobilier`, `Conseiller Immobilier`, `Conseiller`.
-- **Photo** : `/assets/images/eduardo-portrait.jpg`.
-- **Slogan/bio marketing** : textes fixes type “Expert immobilier indépendant à Bordeaux...”.
-- **Signature/personnalisation messages** : textes “Eduardo vous répondra...”, “Eduardo vous contactera...”.
+- **Photo** : `/assets/images/pascal-portrait.jpg`.
+- **Slogan/bio marketing** : textes fixes type “Expert immobilier indépendant à Aix-en-Provence...”.
+- **Signature/personnalisation messages** : textes “Pascal vous répondra...”, “Pascal vous contactera...”.
 
 ### Fichiers principaux impactés
 - `public/templates/header.php`
@@ -34,9 +34,9 @@
 ## Catégorie B — Agence / Réseau
 
 ### Éléments hardcodés trouvés
-- **Nom agence** : `Eduardo Desul Immobilier`.
-- **Email pro/agence** : `contact@eduardo-desul-immobilier.fr`.
-- **Adresse agence** : `Bordeaux, France`.
+- **Nom agence** : `Pascal Hamm Immobilier`.
+- **Email pro/agence** : `contact@pascal-hamm-immobilier.fr`.
+- **Adresse agence** : `Aix-en-Provence, France`.
 - **SIRET/RSAC/CPI** : mentions textuelles figées dans pages légales.
 - **Réseaux/outils** : mentions fixes Google My Business, LinkedIn, Facebook.
 
@@ -54,10 +54,10 @@
 ## Catégorie C — Zone géographique
 
 ### Éléments hardcodés trouvés
-- **Ville principale** : Bordeaux.
+- **Ville principale** : Aix-en-Provence.
 - **Villes/quartiers** : Chartrons, Mérignac, Pessac, Saint-Michel, Victoire.
-- **Adresse exemple** : `12 rue des Chartrons, Bordeaux`.
-- **Pages/labels SEO** : “Guide local Bordeaux”, “Conseiller à Bordeaux”.
+- **Adresse exemple** : `12 rue des Chartrons, Aix-en-Provence`.
+- **Pages/labels SEO** : “Guide local Aix-en-Provence”, “Conseiller à Aix-en-Provence”.
 
 ### Fichiers principaux impactés
 - `public/pages/home.php`
@@ -94,7 +94,7 @@
 ## Catégorie E — Configuration technique
 
 ### Éléments hardcodés trouvés
-- **URLs hardcodées** : `https://eduardo-desul-immobilier.fr`, endpoints externes.
+- **URLs hardcodées** : `https://pascal-hamm-immobilier.fr`, endpoints externes.
 - **Secrets en clair (critique)** :
   - identifiants DB dans `core/config/database.php`
   - identifiants SMTP dans `core/config/constants.php` (avant refactor de ce ticket)

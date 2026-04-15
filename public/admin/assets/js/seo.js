@@ -130,3 +130,53 @@ document.addEventListener('submit', async (e) => {
     if (data.success) window.location.reload(); else alert(data.message || 'Erreur');
   }
 });
+
+
+async function runSitemapAction(action) {
+  const form = new FormData();
+  form.append('csrf_token', getCsrfToken());
+
+  let endpoint = '/modules/seo/sitemap/api.php';
+  if (action === 'generate') endpoint = '/modules/seo/sitemap/generate.php';
+  if (action !== 'generate') form.append('action', action);
+
+  const res = await fetch(endpoint, { method: 'POST', body: form });
+  const payload = await res.json();
+  if (!payload.success) {
+    alert(payload.message || 'Erreur sitemap');
+    return;
+  }
+
+  const data = payload.data || {};
+  if (action === 'generate' && data.xml) {
+    const pre = document.getElementById('sitemap-xml-preview');
+    if (pre) pre.textContent = data.xml;
+  }
+
+  if (Array.isArray(data.issues)) {
+    const issuesCount = data.issues.length;
+    alert(issuesCount === 0 ? 'Aucune anomalie détectée.' : `${issuesCount} anomalie(s) détectée(s).`);
+  } else if (data.message) {
+    alert(data.message);
+  } else {
+    alert('Action sitemap exécutée.');
+  }
+
+  await refreshSitemapLogs();
+}
+
+async function refreshSitemapLogs() {
+  const tbody = document.getElementById('sitemap-logs-body');
+  if (!tbody) return;
+
+  const res = await fetch('/modules/seo/sitemap/logs.php');
+  const payload = await res.json();
+  if (!payload.success) return;
+
+  tbody.innerHTML = '';
+  (payload.logs || []).forEach((log) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${log.created_at || ''}</td><td>${log.action_type || ''}</td><td>${log.status || ''}</td><td>${log.message || ''}</td><td>${log.urls_count || 0}</td>`;
+    tbody.appendChild(tr);
+  });
+}

@@ -17,13 +17,19 @@ final class PostController
 
         if ($action === 'save-post') {
             $id = (int) ($_POST['id'] ?? 0);
+
+            $niveauRaw = trim((string) ($_POST['niveau'] ?? ''));
+            $niveauVal = in_array($niveauRaw, ['n1','n2','n3','n4','n5'], true) ? $niveauRaw : null;
+
             $payload = [
-                'sequence_id' => (int) ($_POST['sequence_id'] ?? 0),
-                'titre' => trim((string) ($_POST['titre'] ?? 'Publication')),
-                'contenu' => trim((string) ($_POST['contenu'] ?? '')),
-                'reseaux' => $_POST['reseaux'] ?? ['facebook'],
-                'statut' => trim((string) ($_POST['statut'] ?? 'brouillon')),
-                'planifie_at' => trim((string) ($_POST['planifie_at'] ?? '')),
+                'sequence_id'    => (int) ($_POST['sequence_id'] ?? 0),
+                'titre'          => trim((string) ($_POST['titre'] ?? 'Publication')),
+                'contenu'        => trim((string) ($_POST['contenu'] ?? '')),
+                'reseaux'        => $_POST['reseaux'] ?? ['facebook'],
+                'statut'         => trim((string) ($_POST['statut'] ?? 'brouillon')),
+                'planifie_at'    => trim((string) ($_POST['planifie_at'] ?? '')),
+                'niveau'         => $niveauVal,
+                'ordre_sequence' => (int) ($_POST['ordre_sequence'] ?? 0) ?: null,
             ];
 
             if ($payload['contenu'] === '') {

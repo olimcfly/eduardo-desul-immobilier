@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion OTP — Admin <?= htmlspecialchars(trim((string) setting('advisor_firstname', '') . ' ' . (string) setting('advisor_lastname', '')) ?: (ADVISOR_NAME ?: APP_NAME)) ?></title>
+    <title>Connexion — Admin</title>
     <meta name="robots" content="noindex, nofollow">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -59,6 +59,21 @@
             border-color: #c9a84c; box-shadow: 0 0 0 3px rgba(201,168,76,.15);
         }
 
+        .password-wrap { position: relative; }
+        .password-toggle {
+            position: absolute; right: .75rem; top: 50%; transform: translateY(-50%);
+            background: none; border: none; color: #7a9ab8; cursor: pointer;
+            padding: .25rem; display: flex; align-items: center;
+        }
+        .password-toggle:hover { color: #c9a84c; }
+
+        .forgot-link {
+            display: block; text-align: right; font-size: .78rem;
+            color: #7a9ab8; text-decoration: none; margin-top: .4rem;
+            transition: color .2s;
+        }
+        .forgot-link:hover { color: #c9a84c; }
+
         .btn-login {
             width: 100%; padding: .875rem; background: #c9a84c; color: #0f2237;
             font-size: .95rem; font-weight: 700; border: none; border-radius: 8px;
@@ -67,13 +82,6 @@
         }
         .btn-login:hover  { background: #dbb95a; }
         .btn-login:active { transform: scale(.98); }
-
-        .hint {
-            margin-top: .75rem;
-            color: #7a9ab8;
-            font-size: .8rem;
-            line-height: 1.45;
-        }
 
         .login-footer { text-align: center; margin-top: 1.5rem; font-size: .78rem; color: #3d6585; }
         .login-footer a { color: #5a8ab0; text-decoration: none; }
@@ -86,50 +94,96 @@
 
     <div class="login-brand">
         <div class="login-brand__logo">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
                 <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/>
                 <path d="M9 21V12h6v9"/>
             </svg>
         </div>
-        <h1><?= htmlspecialchars(trim((string) setting('advisor_firstname', '') . ' ' . (string) setting('advisor_lastname', '')) ?: (ADVISOR_NAME ?: APP_NAME)) ?></h1>
-        <p>Espace d'administration (OTP sans mot de passe)</p>
+        <h1><?= htmlspecialchars(defined('APP_NAME') ? APP_NAME : 'Administration') ?></h1>
+        <p>Espace d'administration</p>
     </div>
 
     <div class="login-card">
 
-        <?php if (!empty($flash)): ?>
-        <div class="flash flash--<?= e($flash['type']) ?>" role="alert">
-            <?= e($flash['message']) ?>
+        <?php if (!empty($error)): ?>
+        <div class="flash flash--error" role="alert">
+            <?= htmlspecialchars($error) ?>
+        </div>
+        <?php elseif (!empty($flash)): ?>
+        <div class="flash flash--<?= htmlspecialchars($flash['type']) ?>" role="alert">
+            <?= htmlspecialchars($flash['message']) ?>
         </div>
         <?php endif; ?>
 
-        <form method="POST" action="/admin/login" novalidate>
+        <form method="POST" action="/admin/login" novalidate autocomplete="on">
+
             <div class="form-group">
-                <label class="form-label" for="email">Adresse e-mail admin/superadmin</label>
+                <label class="form-label" for="email">Adresse e-mail</label>
                 <input
-                    id="email"
-                    name="email"
-                    type="email"
+                    id="email" name="email" type="email"
                     class="form-input"
                     placeholder="vous@example.com"
-                    value="<?= e($_POST['email'] ?? '') ?>"
+                    value="<?= htmlspecialchars($_POST['email'] ?? '') ?>"
                     autocomplete="email"
-                    required
+                    required autofocus
                 >
             </div>
 
-            <button type="submit" class="btn-login">Envoyer un code OTP</button>
+            <div class="form-group">
+                <label class="form-label" for="password">Mot de passe</label>
+                <div class="password-wrap">
+                    <input
+                        id="password" name="password" type="password"
+                        class="form-input"
+                        placeholder="••••••••"
+                        autocomplete="current-password"
+                        required
+                    >
+                    <button type="button" class="password-toggle" id="pwToggle"
+                            aria-label="Afficher/masquer le mot de passe">
+                        <svg id="eyeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                    </button>
+                </div>
+                <a href="/admin/forgot-password" class="forgot-link">Mot de passe oublié ?</a>
+            </div>
 
-            <p class="hint">
-                Un code à 6 chiffres vous sera envoyé par email, valable 10 minutes.
-            </p>
+            <button type="submit" class="btn-login">Se connecter</button>
+
         </form>
     </div>
 
     <div class="login-footer">
         <a href="/">&larr; Retour au site</a>
+        &nbsp;&nbsp;·&nbsp;&nbsp;
+        <?php if (defined('APP_URL') && APP_URL !== ''): ?>
+        <a href="<?= htmlspecialchars(rtrim(APP_URL, '/') . '/webmail') ?>" target="_blank" rel="noopener" style="opacity:.5;font-size:.72rem">
+            Webmail
+        </a>
+        <?php endif; ?>
     </div>
 
 </div>
+
+<script>
+    document.getElementById('pwToggle').addEventListener('click', function () {
+        const input = document.getElementById('password');
+        const icon  = document.getElementById('eyeIcon');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94"/>' +
+                '<path d="M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/>' +
+                '<line x1="1" y1="1" x2="23" y2="23"/>';
+        } else {
+            input.type = 'password';
+            icon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+        }
+    });
+</script>
+
 </body>
 </html>

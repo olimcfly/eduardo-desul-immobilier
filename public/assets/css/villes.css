@@ -1,0 +1,241 @@
+/* ============================================================
+   VILLES & QUARTIERS CSS — Pascal Hamm Immobilier
+   Styles spécifiques aux pages de villes et quartiers.
+   Dépend de main.css chargé en amont.
+   ============================================================ */
+
+/* ── Hero premium (variante avec image de fond) ─────────────── */
+.hero--premium .hero__bg {
+  opacity: .35;
+}
+.hero--light {
+  background: linear-gradient(135deg, #f0f4f8 0%, #e8edf2 100%);
+  color: var(--clr-text);
+  padding-block: 5rem;
+}
+.hero--light h1 { color: var(--clr-primary); }
+
+/* ── Stat cards ─────────────────────────────────────────────── */
+.stat-card {
+  background: var(--clr-white);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--clr-border);
+  padding: 2rem 1.5rem;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition), transform var(--transition);
+}
+.stat-card:hover {
+  box-shadow: var(--shadow);
+  transform: translateY(-3px);
+}
+.stat-card__value {
+  display: block;
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  font-weight: 700;
+  color: var(--clr-primary);
+  line-height: 1.1;
+  margin-bottom: .5rem;
+}
+.stat-card__label {
+  font-size: .875rem;
+  color: var(--clr-text-muted);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+/* ── Card variants ──────────────────────────────────────────── */
+.card--alt {
+  background: var(--clr-bg);
+  border-color: transparent;
+  padding: 1.75rem;
+}
+.card--alt:hover {
+  border-color: var(--clr-accent);
+  background: var(--clr-white);
+}
+
+/* Card body padding (when used without .card__body wrapper) */
+.card:not(.card--alt) { padding: 1.75rem; }
+
+/* ── Card icon ──────────────────────────────────────────────── */
+.card__icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--clr-primary) 10%, white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+  color: var(--clr-primary);
+  flex-shrink: 0;
+}
+.card__icon svg { width: 22px; height: 22px; }
+
+/* ── Accordion ──────────────────────────────────────────────── */
+.accordion {
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+}
+.accordion__item {
+  background: var(--clr-white);
+  border: 1px solid var(--clr-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+.accordion__item:hover {
+  border-color: var(--clr-primary);
+  box-shadow: var(--shadow-sm);
+}
+.accordion__button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  color: var(--clr-text);
+}
+.accordion__button:hover { background: var(--clr-bg); }
+.accordion__title {
+  font-weight: 600;
+  font-size: 1rem;
+  line-height: 1.4;
+  color: var(--clr-primary);
+}
+.accordion__icon {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--clr-accent);
+  transition: transform var(--transition);
+  stroke: currentColor;
+  fill: none;
+}
+.accordion__item.open .accordion__icon,
+.accordion__button[aria-expanded="true"] .accordion__icon {
+  transform: rotate(180deg);
+}
+.accordion__content {
+  padding: 0 1.5rem 1.25rem;
+  color: var(--clr-text-muted);
+  line-height: 1.7;
+  display: none;
+}
+.accordion__item.open .accordion__content,
+.accordion__item .accordion__content[style*="block"] {
+  display: block;
+}
+
+/* ── CTA Banner sub-elements ────────────────────────────────── */
+.cta-banner__content {
+  max-width: 720px;
+  margin-inline: auto;
+}
+.cta-banner__title {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-weight: 700;
+  color: var(--clr-white);
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+.cta-banner__text {
+  font-size: 1.1rem;
+  opacity: .85;
+  margin-bottom: 2rem;
+  max-width: 55ch;
+  margin-inline: auto;
+}
+
+/* ── Section CTA variant ────────────────────────────────────── */
+.section--cta {
+  background: linear-gradient(135deg, var(--clr-primary) 0%, var(--clr-primary-lt) 100%);
+  color: var(--clr-white);
+  text-align: center;
+}
+.section--cta h2 { color: var(--clr-white); margin-bottom: 1rem; }
+.section--cta .section-subtitle { color: rgba(255,255,255,.85); margin-inline: auto; }
+.cta-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+/* ── Trust item variants (used in market sections) ──────────── */
+.trust-item__value {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--clr-primary);
+  display: block;
+  line-height: 1.1;
+}
+.trust-item__label {
+  font-size: .8rem;
+  color: var(--clr-text-muted);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+/* ── Related cities grid ────────────────────────────────────── */
+.related-cities { background: var(--clr-bg); }
+.cities-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.25rem;
+  margin-top: 2rem;
+}
+.city-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--clr-white);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--clr-border);
+  overflow: hidden;
+  text-decoration: none;
+  transition: box-shadow var(--transition), transform var(--transition), border-color var(--transition);
+  box-shadow: var(--shadow-sm);
+}
+.city-card:hover {
+  box-shadow: var(--shadow);
+  transform: translateY(-3px);
+  border-color: var(--clr-accent);
+}
+.city-card img {
+  width: 100%;
+  aspect-ratio: 4/3;
+  object-fit: cover;
+}
+.city-card h3 {
+  font-size: 1rem;
+  padding: 1rem 1.25rem;
+  color: var(--clr-primary);
+  margin: 0;
+}
+
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .stat-card { padding: 1.5rem 1rem; }
+  .stat-card__value { font-size: 1.75rem; }
+  .cities-grid { grid-template-columns: 1fr 1fr; }
+  .cta-actions { flex-direction: column; align-items: stretch; }
+  .cta-actions .btn { width: 100%; }
+}
+
+@media (max-width: 480px) {
+  .cities-grid { grid-template-columns: 1fr; }
+  .accordion__button { padding: 1rem; }
+  .accordion__content { padding: 0 1rem 1rem; }
+}

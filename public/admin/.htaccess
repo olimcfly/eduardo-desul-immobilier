@@ -6,9 +6,10 @@ RewriteCond %{HTTPS} !=on
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
 # Pages d'authentification (sans extension .php dans l'URL)
-RewriteRule ^login$       login.php [L]
-RewriteRule ^logout$      logout.php [L]
-RewriteRule ^verify-otp$  verify-otp.php [L]
+RewriteRule ^login$            login.php [L]
+RewriteRule ^logout$           logout.php [L]
+RewriteRule ^forgot-password$  forgot-password.php [L]
+RewriteRule ^reset-password$   reset-password.php [L]
 
 # API endpoints
 RewriteRule ^api/noah$    api/noah.php [L]

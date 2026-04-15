@@ -117,9 +117,9 @@ WHERE NOT EXISTS (SELECT 1 FROM social_templates WHERE user_id = 1 AND nom = 'TÃ
 INSERT INTO social_hashtags (user_id, hashtag, reseau, categorie)
 SELECT 1, '#immobilier', 'all', 'general' WHERE NOT EXISTS (SELECT 1 FROM social_hashtags WHERE user_id = 1 AND hashtag = '#immobilier');
 INSERT INTO social_hashtags (user_id, hashtag, reseau, categorie)
-SELECT 1, '#bordeaux', 'all', 'localisation' WHERE NOT EXISTS (SELECT 1 FROM social_hashtags WHERE user_id = 1 AND hashtag = '#bordeaux');
+SELECT 1, '#aixenprovence', 'all', 'localisation' WHERE NOT EXISTS (SELECT 1 FROM social_hashtags WHERE user_id = 1 AND hashtag = '#aixenprovence');
 INSERT INTO social_hashtags (user_id, hashtag, reseau, categorie)
-SELECT 1, '#immobilierbordeaux', 'all', 'local' WHERE NOT EXISTS (SELECT 1 FROM social_hashtags WHERE user_id = 1 AND hashtag = '#immobilierbordeaux');
+SELECT 1, '#immobilieraixenprovence', 'all', 'local' WHERE NOT EXISTS (SELECT 1 FROM social_hashtags WHERE user_id = 1 AND hashtag = '#immobilieraixenprovence');
 INSERT INTO social_hashtags (user_id, hashtag, reseau, categorie)
 SELECT 1, '#achatimmo', 'all', 'transaction' WHERE NOT EXISTS (SELECT 1 FROM social_hashtags WHERE user_id = 1 AND hashtag = '#achatimmo');
 INSERT INTO social_hashtags (user_id, hashtag, reseau, categorie)

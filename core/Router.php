@@ -1,24 +1,22 @@
 <?php
-// ============================================================
-// ROUTER
-// ============================================================
 
 class Router
 {
     private array $routes = [];
     private array $namedRoutes = [];
+    private ?\Closure $handler404 = null;
 
-    public function get(string $path, callable|array $handler, string $name = ''): void
+    public function get(string $path, callable|array|string $handler, string $name = ''): void
     {
         $this->add('GET', $path, $handler, $name);
     }
 
-    public function post(string $path, callable|array $handler, string $name = ''): void
+    public function post(string $path, callable|array|string $handler, string $name = ''): void
     {
         $this->add('POST', $path, $handler, $name);
     }
 
-    public function add(string $method, string $path, callable|array $handler, string $name = ''): void
+    public function add(string $method, string $path, callable|array|string $handler, string $name = ''): void
     {
         $pattern = preg_replace('/\{([a-z_]+)\}/', '([^/]+)', $path);
         $pattern = '#^' . $pattern . '$#';
@@ -26,17 +24,34 @@ class Router
             'method'  => strtoupper($method),
             'path'    => $path,
             'pattern' => $pattern,
-            'handler' => $handler,
+            'handler' => $this->resolveHandler($handler),
         ];
         if ($name) {
             $this->namedRoutes[$name] = $path;
         }
     }
 
+    private function resolveHandler(callable|array|string $handler): array|callable
+    {
+        if (is_string($handler) && str_contains($handler, '@')) {
+            [$class, $method] = explode('@', $handler, 2);
+            if (!class_exists($class)) {
+                throw new \RuntimeException("Contrôleur {$class} introuvable");
+            }
+            return [$class, $method];
+        }
+        return $handler;
+    }
+
+    public function set404(callable $handler): void
+    {
+        $this->handler404 = \Closure::fromCallable($handler);
+    }
+
     public function route(string $name, array $params = []): string
     {
         if (!isset($this->namedRoutes[$name])) {
-            throw new RuntimeException("Route inconnue : {$name}");
+            throw new \RuntimeException("Route inconnue : {$name}");
         }
         $url = $this->namedRoutes[$name];
         foreach ($params as $key => $val) {
@@ -54,7 +69,6 @@ class Router
             $uri = substr($uri, strlen($base));
         }
         $uri = '/' . ltrim($uri, '/');
-        // Supprimer le slash final (sauf pour la racine "/")
         if ($uri !== '/') {
             $uri = rtrim($uri, '/');
         }
@@ -82,11 +96,10 @@ class Router
     private function notFound(): void
     {
         http_response_code(404);
-        $view = ROOT . '/views/errors/404.php';
-        if (file_exists($view)) {
-            require $view;
-        } else {
-            echo '<h1>404 — Page introuvable</h1>';
+        if ($this->handler404) {
+            ($this->handler404)();
+            return;
         }
+        echo '<h1>404 — Page introuvable</h1>';
     }
 }

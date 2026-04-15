@@ -1,5 +1,6 @@
 <?php
 // Section : Zone de danger
+$maintenanceEnabled = is_file(STORAGE_PATH . '/cache/maintenance.flag');
 ?>
 <div class="danger-zone-wrapper">
 
@@ -45,6 +46,25 @@
         <div class="danger-card-actions">
             <button class="btn-danger-safe" onclick="clearCache()">
                 <i class="fas fa-rotate"></i> Vider
+            </button>
+        </div>
+    </div>
+
+    <!-- Mode maintenance -->
+    <div class="danger-card danger-card-warn">
+        <div class="danger-card-body">
+            <div class="danger-card-icon"><i class="fas fa-screwdriver-wrench"></i></div>
+            <div>
+                <div class="danger-card-title">Mode maintenance du site</div>
+                <div class="danger-card-desc">
+                    Active une page de maintenance publique (HTTP 503) tout en conservant l'accès à l'admin.
+                </div>
+            </div>
+        </div>
+        <div class="danger-card-actions">
+            <button class="btn-danger-warn" id="maintenance-toggle-btn" onclick="toggleMaintenance()">
+                <i class="fas fa-power-off"></i>
+                <?= $maintenanceEnabled ? 'Désactiver la maintenance' : 'Activer la maintenance' ?>
             </button>
         </div>
     </div>
@@ -117,6 +137,7 @@
 <script>
 let _dangerAction  = null;
 let _requireTyping = false;
+let _maintenanceEnabled = <?= $maintenanceEnabled ? 'true' : 'false' ?>;
 
 function confirmDangerAction(action, title, requireTyping = false) {
     _dangerAction  = action;
@@ -198,4 +219,49 @@ function clearCache() {
             showToast(data.success ? 'Cache vidé.' : data.error, data.success ? 'success' : 'error');
     });
 }
+
+function refreshMaintenanceButton() {
+    const btn = document.getElementById('maintenance-toggle-btn');
+    if (!btn) return;
+
+    btn.innerHTML = _maintenanceEnabled
+        ? '<i class="fas fa-power-off"></i> Désactiver la maintenance'
+        : '<i class="fas fa-power-off"></i> Activer la maintenance';
+}
+
+function toggleMaintenance() {
+    const action = _maintenanceEnabled ? 'maintenance_off' : 'maintenance_on';
+    const btn = document.getElementById('maintenance-toggle-btn');
+    if (btn) {
+        btn.disabled = true;
+    }
+
+    fetch('/admin/api/settings/danger.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action }),
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            _maintenanceEnabled = !_maintenanceEnabled;
+            refreshMaintenanceButton();
+        }
+        if (window.showToast) {
+            showToast(data.success ? (data.message || 'Action effectuée.') : (data.error || 'Erreur.'), data.success ? 'success' : 'error');
+        }
+    })
+    .catch(() => {
+        if (window.showToast) {
+            showToast('Erreur réseau.', 'error');
+        }
+    })
+    .finally(() => {
+        if (btn) {
+            btn.disabled = false;
+        }
+    });
+}
+
+refreshMaintenanceButton();
 </script>

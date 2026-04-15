@@ -11,11 +11,11 @@ $v = fn(string $k, string $d = '') => htmlspecialchars($s[$k] ?? $d);
     <div class="form-row">
         <div class="form-group">
             <label>Prénom</label>
-            <input type="text" name="profil_prenom" value="<?= $v('profil_prenom') ?>" placeholder="Eduardo">
+            <input type="text" name="profil_prenom" value="<?= $v('profil_prenom') ?>" placeholder="Pascal">
         </div>
         <div class="form-group">
             <label>Nom</label>
-            <input type="text" name="profil_nom" value="<?= $v('profil_nom') ?>" placeholder="De Sul">
+            <input type="text" name="profil_nom" value="<?= $v('profil_nom') ?>" placeholder="Hamm">
         </div>
     </div>
 
@@ -33,7 +33,7 @@ $v = fn(string $k, string $d = '') => htmlspecialchars($s[$k] ?? $d);
     <div class="form-row">
         <div class="form-group">
             <label>Ville</label>
-            <input type="text" name="profil_ville" value="<?= $v('profil_ville', 'Bordeaux') ?>">
+            <input type="text" name="profil_ville" value="<?= $v('profil_ville', 'Aix-en-Provence') ?>">
         </div>
         <div class="form-group">
             <label>Réseau / Enseigne</label>
@@ -55,7 +55,7 @@ $v = fn(string $k, string $d = '') => htmlspecialchars($s[$k] ?? $d);
 
     <div class="form-group">
         <label>Bio <span class="label-hint">Texte court affiché sur le site</span></label>
-        <textarea name="profil_bio" rows="4" placeholder="Expert immobilier à Bordeaux depuis…"><?= $v('profil_bio') ?></textarea>
+        <textarea name="profil_bio" rows="4" placeholder="Expert immobilier à Aix-en-Provence depuis…"><?= $v('profil_bio') ?></textarea>
     </div>
 
     <div class="form-section-title">Médias</div>

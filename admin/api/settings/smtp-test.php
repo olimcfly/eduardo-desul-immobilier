@@ -20,11 +20,11 @@ if (!$to) {
 
 // Lire la config SMTP depuis la DB
 $host = (string) setting('smtp_host');
-$port = (int) setting('smtp_port', '587');
+$port = (int) setting('smtp_port', '465');
 $user = (string) setting('smtp_user');
 $pass = (string) setting('smtp_pass');
-$fromName = (string) setting('smtp_from_name', setting('profil_nom', 'Eduardo De Sul'));
-$secure = strtolower((string) setting('smtp_secure', 'tls'));
+$fromName = (string) setting('smtp_from_name', setting('profil_nom', 'Pascal Hamm'));
+$secure = strtolower((string) setting('smtp_secure', 'ssl'));
 
 if ($host === '' || $user === '') {
     echo json_encode([
@@ -48,8 +48,11 @@ if (class_exists('PHPMailer\\PHPMailer\\PHPMailer')) {
 
         if ($secure === 'ssl') {
             $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
-        } else {
+        } elseif ($secure === 'tls') {
             $mail->SMTPSecure = \PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+        } else {
+            $mail->SMTPSecure = '';
+            $mail->SMTPAutoTLS = false;
         }
 
         $mail->setFrom($user, $fromName);

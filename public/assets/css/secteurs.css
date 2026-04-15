@@ -1,0 +1,320 @@
+/* ============================================================
+   CSS POUR LA PAGE SECTEURS - Pascal Hamm Immobilier
+   ============================================================ */
+
+/* Variables */
+:root {
+  --primary-color: #2c3e50;
+  --secondary-color: #3498db;
+  --accent-color: #e74c3c;
+  --light-color: #ecf0f1;
+  --dark-color: #2c3e50;
+  --success-color: #27ae60;
+  --warning-color: #f39c12;
+  --danger-color: #e74c3c;
+  --border-radius: 8px;
+  --box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  --transition: all 0.3s ease;
+}
+
+/* Base styles */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+/* Section principale */
+.section {
+  padding: 4rem 0;
+}
+
+.section h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: var(--primary-color);
+}
+
+.section p.lead {
+  font-size: 1.25rem;
+  font-weight: 300;
+  margin-bottom: 2rem;
+  color: #555;
+}
+
+/* Introduction */
+.sectors-intro {
+  background: var(--light-color);
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  margin-bottom: 2rem;
+  box-shadow: var(--box-shadow);
+}
+
+.sectors-intro p {
+  margin-bottom: 1rem;
+}
+
+/* Carte des secteurs */
+.sectors-map {
+  position: relative;
+  margin: 3rem 0;
+  overflow: hidden;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+}
+
+.map-image {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.map-legend {
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  background: rgba(255,255,255,0.9);
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  z-index: 10;
+}
+
+.legend-color {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+  border-radius: 4px;
+}
+
+.legend-color.color-1 { background-color: #4e79a7; }
+.legend-color.color-2 { background-color: #f28e2b; }
+.legend-color.color-3 { background-color: #e15759; }
+
+.map-legend h3 {
+  margin-top: 0;
+  font-size: 1rem;
+  color: var(--primary-color);
+}
+
+.map-legend ul {
+  margin: 0.5rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.map-legend li {
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+}
+
+/* Grille des secteurs */
+.sectors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+  margin: 3rem 0;
+}
+
+.sector-card {
+  background: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  overflow: hidden;
+  transition: var(--transition);
+}
+
+.sector-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+.sector-header {
+  background: var(--primary-color);
+  color: white;
+  padding: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.sector-header:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+}
+
+.sector-header h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+.sector-type {
+  display: inline-block;
+  background: rgba(255,255,255,0.2);
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: normal;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.sector-content {
+  padding: 1.5rem;
+}
+
+.sector-content p {
+  margin-bottom: 1rem;
+  color: #555;
+}
+
+.sector-stats {
+  margin: 1rem 0;
+  padding-left: 1rem;
+  border-left: 3px solid var(--secondary-color);
+}
+
+.sector-stats li {
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+/* Points d'expertise */
+.expertise-points {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.point {
+  background: var(--light-color);
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  transition: var(--transition);
+}
+
+.point:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.point h3 {
+  margin-top: 0;
+  color: var(--secondary-color);
+  font-size: 1.1rem;
+}
+
+.point p {
+  margin-bottom: 0;
+  color: #555;
+}
+
+/* CTA section */
+.cta-section {
+  background: var(--light-color);
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  text-align: center;
+  margin: 3rem 0;
+  box-shadow: var(--box-shadow);
+}
+
+.cta-section h2 {
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.cta-section p {
+  color: #555;
+  margin-bottom: 1.5rem;
+}
+
+/* Boutons */
+.btn {
+  display: inline-block;
+  padding: 0.5rem 1.25rem;
+  background: var(--secondary-color);
+  color: white;
+  text-decoration: none;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  transition: var(--transition);
+  border: none;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: #2980b9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(41, 128, 185, 0.2);
+}
+
+.btn-primary {
+  background: var(--secondary-color);
+}
+
+.btn-lg {
+  padding: 0.75rem 1.5rem;
+  font-size: 1.1rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .section h1 {
+    font-size: 2rem;
+  }
+
+  .section p.lead {
+    font-size: 1.1rem;
+  }
+
+  .sectors-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .map-legend {
+    position: static;
+    margin-top: 1rem;
+    background: white;
+    box-shadow: none;
+  }
+
+  .cta-section {
+    padding: 1.5rem;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+[data-animate] {
+  animation: fadeIn 0.6s ease forwards;
+  opacity: 0;
+}
+
+[data-animate].animate__animated {
+  animation: fadeIn 0.6s ease forwards;
+}

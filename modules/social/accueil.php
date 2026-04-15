@@ -24,14 +24,10 @@ $sequenceController = new SequenceController($sequenceRepository, $postRepositor
 $postController = new PostController($postRepository, $strategyService);
 $socialController = new SocialController($sequenceRepository, $postRepository, $strategyService);
 
-$action = preg_replace('/[^a-z-]/', '', (string) ($_GET['action'] ?? 'sequences'));
-$allowedActions = ['index', 'sequences', 'journal', 'post', 'post-form', 'save-sequence', 'save-post', 'delete-post', 'toggle-sequence', 'duplicate-sequence'];
+$action = preg_replace('/[^a-z-]/', '', (string) ($_GET['action'] ?? 'index'));
+$allowedActions = ['index', 'sequences', 'journal', 'post', 'post-form', 'kit', 'save-sequence', 'save-post', 'delete-post', 'toggle-sequence', 'duplicate-sequence'];
 if (!in_array($action, $allowedActions, true)) {
-    $action = 'sequences';
-}
-
-if ($action === 'index') {
-    $action = 'sequences';
+    $action = 'index';
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -45,11 +41,94 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 require_once __DIR__ . '/../../admin/views/layout.php';
 
+function renderSocialHub(): void
+{
+    ?>
+    <section class="hub-page">
+
+        <header class="hub-hero">
+            <div class="hub-hero-badge"><i class="fas fa-share-nodes"></i> Réseaux sociaux</div>
+            <h1>Publiez régulièrement pour rester visible</h1>
+            <p>Planifiez vos contenus, automatisez vos séquences et entretenez la relation avec votre audience locale.</p>
+        </header>
+
+        <section class="hub-narrative" aria-label="Méthode social">
+            <article class="hub-narrative-card hub-narrative-card--motivation">
+                <h3><i class="fas fa-triangle-exclamation" style="color:#ef4444;"></i> Problème</h3>
+                <p>Publier manuellement prend du temps et manque de régularité.</p>
+            </article>
+            <article class="hub-narrative-card hub-narrative-card--explanation">
+                <h3><i class="fas fa-diagram-project" style="color:#3b82f6;"></i> Logique</h3>
+                <p>Des séquences planifiées, un journal de bord, un kit de contenus réutilisables.</p>
+            </article>
+            <article class="hub-narrative-card hub-narrative-card--resultat">
+                <h3><i class="fas fa-chart-line" style="color:#10b981;"></i> Bénéfice</h3>
+                <p>Vous restez visible chaque semaine sans effort supplémentaire.</p>
+            </article>
+            <article class="hub-narrative-card hub-narrative-card--action">
+                <h3><i class="fas fa-play-circle" style="color:#f59e0b;"></i> Action</h3>
+                <p>Créez votre première séquence ou rédigez un post maintenant.</p>
+            </article>
+        </section>
+
+        <div class="hub-modules-grid">
+            <a href="?module=social&action=sequences" class="hub-module-card">
+                <div class="hub-module-card-head">
+                    <div class="hub-module-card-icon" style="background:#eafaf1;color:#16a34a;"><i class="fas fa-layer-group"></i></div>
+                    <h3>Séquences</h3>
+                </div>
+                <p>Planifiez des séries de posts automatiques sur vos réseaux.</p>
+                <span class="hub-module-card-action"><i class="fas fa-arrow-right"></i> Ouvrir</span>
+            </a>
+
+            <a href="?module=social&action=journal" class="hub-module-card">
+                <div class="hub-module-card-head">
+                    <div class="hub-module-card-icon" style="background:#dbeafe;color:#2563eb;"><i class="fas fa-newspaper"></i></div>
+                    <h3>Journal</h3>
+                </div>
+                <p>Suivez tous vos posts publiés et leur historique.</p>
+                <span class="hub-module-card-action"><i class="fas fa-arrow-right"></i> Ouvrir</span>
+            </a>
+
+            <a href="?module=social&action=post-form" class="hub-module-card">
+                <div class="hub-module-card-head">
+                    <div class="hub-module-card-icon" style="background:#fef3c7;color:#d97706;"><i class="fas fa-pen-to-square"></i></div>
+                    <h3>Nouveau post</h3>
+                </div>
+                <p>Rédigez et planifiez un post en quelques secondes.</p>
+                <span class="hub-module-card-action"><i class="fas fa-arrow-right"></i> Créer</span>
+            </a>
+
+            <a href="?module=social&action=kit" class="hub-module-card">
+                <div class="hub-module-card-head">
+                    <div class="hub-module-card-icon" style="background:#ede9fe;color:#7c3aed;"><i class="fas fa-toolbox"></i></div>
+                    <h3>Kit de contenus</h3>
+                </div>
+                <p>Accédez à des modèles et inspirations pour vos publications.</p>
+                <span class="hub-module-card-action"><i class="fas fa-arrow-right"></i> Ouvrir</span>
+            </a>
+        </div>
+
+        <section class="hub-final-cta" aria-label="Progression social">
+            <div>
+                <h2>Progression : Séquences → Posts → Journal → Amplifier</h2>
+                <p>Commencez par une séquence, puis publiez régulièrement.</p>
+            </div>
+            <a href="?module=social&action=sequences" class="hub-btn hub-btn--gold"><i class="fas fa-rocket"></i> Créer ma première séquence</a>
+        </section>
+
+    </section>
+    <?php
+}
+
 function renderContent(): void
 {
     global $socialController, $action;
 
-    echo '<link rel="stylesheet" href="/modules/social/assets/social.css?v=' . (int) @filemtime(__DIR__ . '/assets/social.css') . '">';
+    $cssPath = __DIR__ . '/assets/social.css';
+    if (is_file($cssPath)) {
+        echo '<style data-social-inline="1">' . file_get_contents($cssPath) . '</style>';
+    }
 
     switch ($action) {
         case 'journal':
@@ -61,10 +140,19 @@ function renderContent(): void
         case 'post-form':
             $socialController->postForm((int) ($_GET['id'] ?? 0));
             break;
-        default:
+        case 'kit':
+            require __DIR__ . '/views/kit.php';
+            break;
+        case 'sequences':
             $socialController->sequences();
+            break;
+        default:
+            renderSocialHub();
             break;
     }
 
-    echo '<script src="/modules/social/assets/social.js?v=' . (int) @filemtime(__DIR__ . '/assets/social.js') . '"></script>';
+    $jsPath = __DIR__ . '/assets/social.js';
+    if (is_file($jsPath)) {
+        echo '<script>' . file_get_contents($jsPath) . '</script>';
+    }
 }

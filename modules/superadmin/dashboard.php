@@ -119,7 +119,7 @@ $currentUser = Auth::user();
 
 <script>
 (function () {
-    const BASE = '/admin/';
+    const BASE = '/admin';
 
     // ── Modules toggle ────────────────────────────────────────
     const feedback = document.getElementById('module-save-feedback');

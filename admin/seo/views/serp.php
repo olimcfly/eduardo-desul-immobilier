@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-$selectedKeyword = (string)($_GET['keyword'] ?? 'immobilier bordeaux');
+$selectedKeyword = (string)($_GET['keyword'] ?? 'immobilier aix-en-provence');
 $serpResults = $seoService->getSerpSimulation($selectedKeyword);
 
 require __DIR__ . '/_layout_top.php';

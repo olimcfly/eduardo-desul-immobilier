@@ -5,28 +5,33 @@
 CREATE TABLE IF NOT EXISTS seo_keywords (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT UNSIGNED NOT NULL,
+    advisor_id BIGINT UNSIGNED NULL,
+    website_id BIGINT UNSIGNED NULL,
     keyword VARCHAR(190) NOT NULL,
-    target_url VARCHAR(255) NOT NULL,
+    city_name VARCHAR(160) NULL,
+    intent ENUM('estimation','vente','achat','quartier','commune','blog') NOT NULL DEFAULT 'estimation',
+    target_url VARCHAR(255) NULL,
+    status ENUM('active','paused','archived') NOT NULL DEFAULT 'active',
     current_position INT NULL,
     previous_position INT NULL,
-    estimated_volume INT UNSIGNED DEFAULT 0,
-    difficulty TINYINT UNSIGNED DEFAULT 0,
     last_checked_at DATETIME NULL,
-    is_active TINYINT(1) NOT NULL DEFAULT 1,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    UNIQUE KEY uniq_user_keyword (user_id, keyword),
+    UNIQUE KEY uniq_user_keyword_city (user_id, keyword, city_name),
     KEY idx_keywords_user (user_id),
+    KEY idx_keywords_status_intent (status, intent),
     KEY idx_keywords_position (current_position)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS seo_keyword_history (
+CREATE TABLE IF NOT EXISTS seo_keyword_positions (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     keyword_id BIGINT UNSIGNED NOT NULL,
     position_value INT NULL,
     checked_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    KEY idx_history_keyword_date (keyword_id, checked_at),
-    CONSTRAINT fk_keyword_history_keyword
+    source VARCHAR(40) NOT NULL DEFAULT 'manual',
+    notes VARCHAR(255) NULL,
+    KEY idx_keyword_positions_keyword_date (keyword_id, checked_at),
+    CONSTRAINT fk_keyword_positions_keyword
         FOREIGN KEY (keyword_id) REFERENCES seo_keywords(id)
         ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
@@ -34,22 +39,26 @@ CREATE TABLE IF NOT EXISTS seo_keyword_history (
 CREATE TABLE IF NOT EXISTS seo_city_pages (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT UNSIGNED NOT NULL,
-    city VARCHAR(160) NOT NULL,
-    postal_code VARCHAR(12) NOT NULL,
+    city_name VARCHAR(160) NOT NULL,
     slug VARCHAR(190) NOT NULL,
-    h1 VARCHAR(190) NOT NULL,
-    seo_title VARCHAR(60) NOT NULL,
-    meta_description VARCHAR(160) NOT NULL,
-    content MEDIUMTEXT NOT NULL,
-    price_m2 DECIMAL(10,2) NULL,
-    population INT UNSIGNED NULL,
-    targeted_keywords JSON NULL,
-    status ENUM('draft', 'published') NOT NULL DEFAULT 'draft',
+    status ENUM('draft', 'ready', 'published') NOT NULL DEFAULT 'draft',
+    seo_title VARCHAR(70) DEFAULT NULL,
+    meta_description VARCHAR(170) DEFAULT NULL,
+    h1 VARCHAR(190) DEFAULT NULL,
+    intro TEXT NULL,
+    market_block MEDIUMTEXT NULL,
+    faq_json JSON NULL,
+    internal_links_json JSON NULL,
+    canonical_url VARCHAR(255) DEFAULT NULL,
+    seo_score TINYINT UNSIGNED NOT NULL DEFAULT 0,
+    content_score TINYINT UNSIGNED NOT NULL DEFAULT 0,
     published_at DATETIME NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE KEY uniq_city_slug (user_id, slug),
-    KEY idx_city_status (user_id, status)
+    KEY idx_city_status (user_id, status),
+    KEY idx_city_name (user_id, city_name),
+    KEY idx_city_score (user_id, seo_score)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS seo_sitemap_urls (
@@ -67,16 +76,31 @@ CREATE TABLE IF NOT EXISTS seo_sitemap_urls (
     KEY idx_sitemap_user (user_id, included)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE IF NOT EXISTS seo_sitemap_logs (
+CREATE TABLE IF NOT EXISTS seo_sitemaps (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     user_id BIGINT UNSIGNED NOT NULL,
-    generated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    urls_count INT UNSIGNED NOT NULL DEFAULT 0,
-    ping_status TINYINT(1) NOT NULL DEFAULT 0,
-    submitted_to_gsc TINYINT(1) NOT NULL DEFAULT 0,
-    xml_size INT UNSIGNED NOT NULL DEFAULT 0,
+    sitemap_url VARCHAR(255) NOT NULL,
+    total_urls INT UNSIGNED NOT NULL DEFAULT 0,
+    last_generated_at DATETIME NULL,
+    status ENUM('idle','ok','warning','error') NOT NULL DEFAULT 'idle',
+    issues_count INT UNSIGNED NOT NULL DEFAULT 0,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    KEY idx_sitemap_logs_user (user_id, generated_at)
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_sitemap_user (user_id),
+    KEY idx_sitemap_status (status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS seo_sitemap_logs (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    sitemap_id BIGINT UNSIGNED NULL,
+    user_id BIGINT UNSIGNED NOT NULL,
+    action_type ENUM('generate','verify','submit') NOT NULL,
+    status ENUM('ok','warning','error') NOT NULL DEFAULT 'ok',
+    message TEXT NULL,
+    urls_count INT UNSIGNED NOT NULL DEFAULT 0,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    KEY idx_sitemap_logs_sitemap (sitemap_id, created_at),
+    KEY idx_sitemap_logs_user (user_id, created_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS seo_performance_audits (
@@ -105,4 +129,41 @@ CREATE TABLE IF NOT EXISTS seo_rate_limits (
     window_started_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     UNIQUE KEY uniq_limit (user_id, endpoint_key)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS seo_technical_audits (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    advisor_id BIGINT UNSIGNED NULL,
+    website_id BIGINT UNSIGNED NULL,
+    page_url VARCHAR(255) NOT NULL,
+    page_type VARCHAR(50) NOT NULL,
+    global_score TINYINT UNSIGNED NOT NULL DEFAULT 0,
+    lcp DECIMAL(10,2) NULL,
+    cls DECIMAL(8,4) NULL,
+    inp DECIMAL(10,2) NULL,
+    load_time_ms INT UNSIGNED NULL,
+    page_weight_kb INT UNSIGNED NULL,
+    seo_meta_ok TINYINT(1) NOT NULL DEFAULT 0,
+    broken_links_count INT UNSIGNED NOT NULL DEFAULT 0,
+    image_issues_count INT UNSIGNED NOT NULL DEFAULT 0,
+    audited_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    KEY idx_audits_advisor_date (advisor_id, audited_at),
+    KEY idx_audits_page (page_url)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS seo_audit_issues (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    audit_id BIGINT UNSIGNED NOT NULL,
+    severity ENUM('critical','important','minor') NOT NULL DEFAULT 'minor',
+    issue_code VARCHAR(80) NOT NULL,
+    issue_label VARCHAR(190) NOT NULL,
+    issue_description TEXT NOT NULL,
+    recommended_action TEXT NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    KEY idx_issues_audit (audit_id),
+    KEY idx_issues_severity (severity),
+    CONSTRAINT fk_issues_audit
+        FOREIGN KEY (audit_id) REFERENCES seo_technical_audits(id)
+        ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

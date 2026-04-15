@@ -1,5 +1,5 @@
 /* ============================================================
-   ADMIN.JS — Eduardo Desul Immobilier
+   ADMIN.JS — Pascal Hamm Immobilier
    ============================================================ */
 
 document.addEventListener('DOMContentLoaded', () => {

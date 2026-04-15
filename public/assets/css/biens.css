@@ -1,148 +1,338 @@
-/* ── Biens / Annonces ──────────────────────────────────────── */
-
-/* Filtres */
-.biens-filters {
-  background: var(--clr-white);
-  border-radius: var(--radius-lg);
-  padding: 1.5rem;
-  border: 1px solid var(--clr-border);
-  margin-bottom: 2rem;
-  box-shadow: var(--shadow-sm);
+/* Styles pour la page biens */
+.hero--biens .hero__bg {
+    background-size: cover;
+    background-position: center 30%;
 }
-.filters-row { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end; }
-.filter-group { flex: 1; min-width: 150px; }
-.filter-label { font-size: .8rem; font-weight: 600; color: var(--clr-text-muted); margin-bottom: .4rem; text-transform: uppercase; letter-spacing: .06em; }
-.filter-select {
-  width: 100%;
-  padding: .6rem .9rem;
-  border: 1.5px solid var(--clr-border);
-  border-radius: var(--radius);
-  font-size: .9rem;
-  background: var(--clr-bg);
-  cursor: pointer;
-  transition: border-color var(--transition);
+
+.hero__stats {
+    display: flex;
+    gap: 2rem;
+    margin-top: 2rem;
 }
-.filter-select:focus { outline: none; border-color: var(--clr-primary); }
-.filter-btn { align-self: flex-end; }
 
-/* Grille biens */
-.biens-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.75rem; }
-.biens-count { font-size: .875rem; color: var(--clr-text-muted); margin-bottom: 1rem; }
+.stat-item {
+    text-align: center;
+}
 
-/* Carte bien */
+.stat-value {
+    display: block;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--color-white);
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    color: rgba(255,255,255,0.8);
+}
+
+.hero__filters-preview {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+}
+
+.filter-pill {
+    background: rgba(255,255,255,0.1);
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    font-size: 0.875rem;
+    border: 1px solid rgba(255,255,255,0.2);
+}
+
+.filter-pill.active {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+}
+
+/* Formulaires de filtres */
+.filters-form {
+    background: var(--color-white);
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+.filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.filter-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--color-text);
+}
+
+.filter-group select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    background: var(--color-white);
+}
+
+.filters-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+/* Grille des biens */
+.biens-grid {
+    gap: 2rem;
+}
+
 .bien-card {
-  background: var(--clr-white);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  border: 1px solid var(--clr-border);
-  box-shadow: var(--shadow-sm);
-  transition: box-shadow var(--transition), transform var(--transition);
+    border: 1px solid var(--color-border);
+    border-radius: 1rem;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-.bien-card:hover { box-shadow: var(--shadow); transform: translateY(-4px); }
+
+.bien-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.1);
+}
+
+.bien-card__header {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+}
 
 .bien-card__img {
-  position: relative;
-  aspect-ratio: 4/3;
-  overflow: hidden;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
-.bien-card__img img { width: 100%; height: 100%; object-fit: cover; transition: transform .4s ease; }
-.bien-card:hover .bien-card__img img { transform: scale(1.04); }
-.bien-card__badge {
-  position: absolute;
-  top: .75rem;
-  left: .75rem;
-  padding: .3rem .75rem;
-  border-radius: 20px;
-  font-size: .75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .05em;
-}
-.badge--vente { background: var(--clr-primary); color: white; }
-.badge--location { background: var(--clr-accent); color: var(--clr-primary); }
-.badge--exclusif { background: #7c3aed; color: white; }
-.badge--vendu { background: var(--clr-text-muted); color: white; }
 
-.bien-card__body { padding: 1.25rem; }
-.bien-card__prix {
-  font-family: var(--font-display);
-  font-size: 1.4rem;
-  font-weight: 700;
-  color: var(--clr-primary);
-  margin-bottom: .25rem;
+.bien-badge {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 0.375rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    z-index: 1;
 }
-.bien-card__titre { font-size: 1rem; font-weight: 600; margin-bottom: .4rem; color: var(--clr-text); }
-.bien-card__loc { font-size: .85rem; color: var(--clr-text-muted); margin-bottom: .75rem; }
-.bien-card__loc::before { content: '📍 '; }
+
+.bien-badge.vente {
+    background: var(--color-primary);
+    color: white;
+}
+
+.bien-badge.location {
+    background: var(--color-accent);
+    color: white;
+}
+
+.bien-badge.warning {
+    background: #f59e0b;
+    color: white;
+}
+
+.bien-card__body {
+    padding: 1.5rem;
+}
+
+.bien-card__title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.bien-card__location {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--color-text-light);
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+}
 
 .bien-card__specs {
-  display: flex;
-  gap: 1rem;
-  padding-top: .75rem;
-  border-top: 1px solid var(--clr-border);
-  font-size: .85rem;
-  color: var(--clr-text-muted);
+    display: flex;
+    gap: 1.5rem;
+    margin: 1rem 0;
+    padding: 1rem 0;
+    border-top: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border);
 }
-.spec-item { display: flex; align-items: center; gap: .3rem; }
 
-/* Page détail bien */
-.bien-detail-grid {
-  display: grid;
-  grid-template-columns: 1fr 380px;
-  gap: 2.5rem;
-  align-items: start;
+.spec-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
 }
-.bien-gallery { border-radius: var(--radius-lg); overflow: hidden; margin-bottom: 2rem; }
-.bien-gallery__main { aspect-ratio: 16/9; overflow: hidden; }
-.bien-gallery__main img { width: 100%; height: 100%; object-fit: cover; }
-.bien-gallery__thumbs { display: grid; grid-template-columns: repeat(4, 1fr); gap: .5rem; margin-top: .5rem; }
-.bien-gallery__thumbs img { aspect-ratio: 1; object-fit: cover; border-radius: var(--radius-sm); cursor: pointer; opacity: .7; transition: opacity var(--transition); }
-.bien-gallery__thumbs img:hover, .bien-gallery__thumbs img.active { opacity: 1; }
 
-.bien-prix-box {
-  background: var(--clr-primary);
-  color: white;
-  border-radius: var(--radius-lg);
-  padding: 2rem;
-  position: sticky;
-  top: calc(var(--header-h) + 1rem);
+.spec-item svg {
+    color: var(--color-primary);
 }
-.bien-prix-box .prix { font-family: var(--font-display); font-size: 2rem; font-weight: 700; color: var(--clr-accent); }
-.bien-prix-box .type { font-size: .85rem; opacity: .7; margin-bottom: 1.5rem; }
-.bien-specs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0; }
-.bien-spec { background: rgba(255,255,255,.1); border-radius: var(--radius); padding: .75rem; text-align: center; }
-.bien-spec .spec-val { font-family: var(--font-display); font-size: 1.25rem; font-weight: 600; display: block; }
-.bien-spec .spec-name { font-size: .75rem; opacity: .7; }
 
-/* Contact sidebar */
-.contact-sidebar {
-  background: var(--clr-white);
-  border-radius: var(--radius-lg);
-  padding: 1.5rem;
-  border: 1px solid var(--clr-border);
+.bien-card__price {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-primary);
+    margin: 1rem 0;
 }
-.contact-sidebar h3 { font-size: 1rem; margin-bottom: 1rem; }
+
+.bien-card__desc {
+    color: var(--color-text-light);
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
 
 /* Pagination */
-.pagination { display: flex; justify-content: center; gap: .5rem; margin-top: 3rem; }
-.page-btn {
-  display: flex; align-items: center; justify-content: center;
-  width: 40px; height: 40px;
-  border-radius: var(--radius);
-  border: 1.5px solid var(--clr-border);
-  font-size: .875rem;
-  font-weight: 500;
-  color: var(--clr-text);
-  transition: var(--transition);
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 3rem;
 }
-.page-btn:hover { border-color: var(--clr-primary); color: var(--clr-primary); }
-.page-btn.active { background: var(--clr-primary); border-color: var(--clr-primary); color: white; }
 
-@media (max-width: 900px) {
-  .bien-detail-grid { grid-template-columns: 1fr; }
-  .bien-prix-box { position: static; }
+.pagination__link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
 }
-@media (max-width: 600px) {
-  .filters-row { flex-direction: column; }
-  .biens-grid { grid-template-columns: 1fr; }
+
+.pagination__link:hover:not(.disabled) {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+}
+
+.pagination__link.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pagination__current {
+    padding: 0.75rem 1.5rem;
+    background: var(--color-primary);
+    color: white;
+    border-radius: 0.5rem;
+    font-weight: 600;
+}
+
+/* Header des résultats */
+.header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.results-info {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.results-count {
+    font-weight: 600;
+    color: var(--color-primary);
+}
+
+.sort-select {
+    padding: 0.5rem;
+    border: 1px solid var(--color-border);
+    border-radius: 0.375rem;
+    background: var(--color-white);
+}
+
+/* Message aucun résultat */
+.no-results {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.no-results__icon {
+    margin-bottom: 1.5rem;
+    color: var(--color-border);
+}
+
+.no-results h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.no-results p {
+    color: var(--color-text-light);
+    margin-bottom: 0.5rem;
+}
+
+/* Services */
+.service-card {
+    background: var(--color-white);
+    padding: 2rem;
+    border-radius: 1rem;
+    border: 1px solid var(--color-border);
+    text-align: center;
+}
+
+.service-card__icon {
+    margin-bottom: 1rem;
+    color: var(--color-primary);
+}
+
+.service-card__title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+}
+
+.service-card__text {
+    color: var(--color-text-light);
+    margin-bottom: 1.5rem;
+    line-height: 1.5;
+}
+
+.service-card__link {
+    color: var(--color-primary);
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.service-card__link:hover {
+    text-decoration: underline;
+}
+.placeholder-image {
+    width: 100%;
+    height: 220px;
+    background: linear-gradient(135deg, #1a3c5e, #0f2644);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+}
+
+.placeholder-image span {
+    font-size: 32px;
+    margin-bottom: 8px;
+}
+
+.placeholder-image p {
+    font-size: 14px;
+    opacity: 0.8;
+}
+.biens-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 24px;
 }

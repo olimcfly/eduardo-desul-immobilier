@@ -33,9 +33,11 @@ const ALLOWED_FIELDS = [
     ],
     'api' => [
         'api_openai', 'api_google_maps', 'api_google_psi', 'api_gsc',
+        'api_gsc_client_id', 'api_gsc_client_secret', 'api_gsc_site_url',
         'api_gmb_client_id', 'api_gmb_client_secret', 'api_gmb_account_id',
         'api_fb_page_id', 'api_fb_access_token', 'api_instagram_id',
         'api_cloudinary_name', 'api_cloudinary_key', 'api_cloudinary_secret',
+        'api_dataforseo_login', 'api_dataforseo_password',
     ],
     'notif' => [
         'notif_email_contact', 'notif_email_estimation',

@@ -100,14 +100,14 @@ function renderContent()
 
         <?php noahCard('positionnement', 'Positionnement', 'Formulations d\'accroche claires', '#8e44ad', '#f5eef8', 'fa-bullseye', [
             ['name' => 'metier',  'label' => 'Votre métier',        'placeholder' => 'ex : agent immobilier indépendant'],
-            ['name' => 'zone',    'label' => 'Zone géographique',   'placeholder' => 'ex : Bordeaux Métropole'],
+            ['name' => 'zone',    'label' => 'Zone géographique',   'placeholder' => 'ex : Aix-en-Provence Métropole'],
             ['name' => 'persona', 'label' => 'Type de clients',     'placeholder' => 'ex : primo-accédants 30-45 ans'],
             ['name' => 'objectif','label' => 'Objectif principal',  'placeholder' => 'ex : générer des mandats vendeurs'],
         ]); ?>
 
         <?php noahCard('profils', 'Profils Clients', 'Identifiez vos clients idéaux', '#3498db', '#e3f2fd', 'fa-users', [
             ['name' => 'activite', 'label' => 'Votre activité',    'placeholder' => 'ex : conseiller en immobilier'],
-            ['name' => 'zone',     'label' => 'Zone',              'placeholder' => 'ex : Bordeaux Sud'],
+            ['name' => 'zone',     'label' => 'Zone',              'placeholder' => 'ex : Aix-en-Provence Sud'],
             ['name' => 'objectif', 'label' => 'Objectif',         'placeholder' => 'ex : 3 mandats par mois'],
         ]); ?>
 
@@ -137,6 +137,14 @@ function renderContent()
             ['name' => 'objectif',   'label' => 'Objectif mensuel',     'placeholder' => 'ex : 3 mandats signés'],
             ['name' => 'biens',      'label' => 'Biens en portefeuille','placeholder' => 'ex : 8 biens actifs'],
             ['name' => 'activite',   'label' => 'Activité actuelle',    'placeholder' => 'ex : peu de prospection terrain'],
+        ]); ?>
+
+        <?php noahCard('argumentaire_mandat', 'Argumentaire Mandat', 'Scripts et supports pour signer en exclusivité', '#c0392b', '#fdecea', 'fa-file-signature', [
+            ['name' => 'zone',           'label' => 'Zone géographique',       'placeholder' => 'ex : Aix-en-Provence centre'],
+            ['name' => 'type_bien',      'label' => 'Type de bien',            'placeholder' => 'ex : appartement T3 avec terrasse'],
+            ['name' => 'profil_vendeur', 'label' => 'Profil vendeur',          'placeholder' => 'ex : vendeur prudent, compare plusieurs agences'],
+            ['name' => 'objections',     'label' => 'Objections principales',  'placeholder' => 'ex : je veux garder la liberté / vos honoraires sont élevés'],
+            ['name' => 'objectif',       'label' => 'Objectif du RDV',         'placeholder' => 'ex : signer un mandat exclusif au 1er rendez-vous'],
         ]); ?>
 
     </div>

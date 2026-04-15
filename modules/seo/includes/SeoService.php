@@ -1,7 +1,9 @@
 <?php
+/** @deprecated SEO legacy freeze: no new feature here. Use modules/seo/services/SeoService.php */
 declare(strict_types=1);
 
-require_once __DIR__ . '/../../../core/bootstrap.php';
+require_once __DIR__ . '/../_legacy_guard.php';
+seoLegacyGuard('modules/seo/includes/SeoService.php', 'modules/seo/services/SeoService.php');
 
 class SeoService
 {
@@ -39,11 +41,11 @@ class SeoService
 
     public function getAdvisorIdentity(): array
     {
-        $fullName = trim((string)setting('advisor_firstname', 'Eduardo', $this->userId) . ' ' . (string)setting('advisor_lastname', 'De Sul', $this->userId));
+        $fullName = trim((string)setting('advisor_firstname', 'Pascal', $this->userId) . ' ' . (string)setting('advisor_lastname', 'Hamm', $this->userId));
 
         return [
-            'name' => $fullName !== '' ? $fullName : 'Eduardo De Sul',
-            'zone' => (string)setting('zone_city', 'Bordeaux', $this->userId),
+            'name' => $fullName !== '' ? $fullName : 'Pascal Hamm',
+            'zone' => (string)setting('zone_city', 'Aix-en-Provence', $this->userId),
         ];
     }
 }

@@ -100,6 +100,25 @@ try {
             "Format :\n\nActions du jour :\n\n1.\n2.\n3.\n4.\n\nObjectif :\n..."
         ),
 
+        'argumentaire_mandat' => buildPrompt(
+            "Ta mission est de créer un argumentaire de rendez-vous pour signer un mandat exclusif.\n\n" .
+            "Données :\n" .
+            "- zone : {$data['zone']}\n" .
+            "- type de bien : {$data['type_bien']}\n" .
+            "- profil vendeur : {$data['profil_vendeur']}\n" .
+            "- objections principales : {$data['objections']}\n" .
+            "- objectif du RDV : {$data['objectif']}\n\n" .
+            "Consignes :\n- rester concret, orienté terrain immobilier\n- proposer un script verbal facile à dire\n- inclure des preuves et supports à montrer\n- finir par une transition vers la signature du mandat exclusif\n\n" .
+            "Format :\n\n" .
+            "1) Préparation avant RDV :\n...\n\n" .
+            "2) Script d'ouverture (2-3 minutes) :\n...\n\n" .
+            "3) Argumentaire exclusivité (3 piliers) :\n- Pilier 1 :\n- Pilier 2 :\n- Pilier 3 :\n\n" .
+            "4) Réponses aux objections :\n- Objection 1 :\n- Réponse :\n- Objection 2 :\n- Réponse :\n\n" .
+            "5) Supports à remettre pendant le RDV :\n...\n\n" .
+            "6) Closing mandat exclusif (script de conclusion) :\n...\n\n" .
+            "7) Plan de suivi si non-signature immédiate (J+1, J+3, J+7) :\n..."
+        ),
+
         default => throw new InvalidArgumentException('Outil inconnu'),
     };
 

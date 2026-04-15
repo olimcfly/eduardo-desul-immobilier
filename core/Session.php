@@ -15,7 +15,7 @@ class Session
             session_set_cookie_params([
                 'lifetime' => $life,
                 'path'     => '/',
-                'secure'   => isset($_SERVER['HTTPS']),
+                'secure'   => $_SERVER['HTTPS'] === 'on',
                 'httponly' => true,
                 'samesite' => 'Lax',
             ]);

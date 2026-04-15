@@ -1,5 +1,5 @@
 -- ============================================================
--- Eduardo DeSul Immobilier — Schéma SQL complet (single database)
+-- Pascal Hamm Immobilier — Schéma SQL complet (single database)
 -- Version consolidée des migrations + modules actifs du dépôt.
 -- Cible : MySQL 8+ / MariaDB 10.6+
 -- ============================================================
@@ -7,11 +7,11 @@
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
-CREATE DATABASE IF NOT EXISTS `eduardo_desul_immobilier`
+CREATE DATABASE IF NOT EXISTS `pascal_hamm_immobilier`
   CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci;
 
-USE `eduardo_desul_immobilier`;
+USE `pascal_hamm_immobilier`;
 
 -- ============================================================
 -- 1) AUTH / USERS
@@ -460,6 +460,23 @@ CREATE TABLE IF NOT EXISTS `gmb_demandes_avis` (
   INDEX `idx_user_demande` (`user_id`),
   INDEX `idx_statut_demande` (`statut`),
   CONSTRAINT `fk_gmb_demandes_user` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+CREATE TABLE IF NOT EXISTS `gmb_review_requests` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `user_id` INT NOT NULL,
+  `demande_id` INT NOT NULL,
+  `email` VARCHAR(200) NOT NULL,
+  `statut` ENUM('en_attente','envoye','echec') DEFAULT 'en_attente',
+  `date_envoi` DATETIME DEFAULT NULL,
+  `error_message` VARCHAR(255) DEFAULT NULL,
+  `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  INDEX `idx_user_review_requests` (`user_id`),
+  INDEX `idx_demande_review_requests` (`demande_id`),
+  INDEX `idx_statut_review_requests` (`statut`),
+  CONSTRAINT `fk_gmb_review_requests_user` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_gmb_review_requests_demande` FOREIGN KEY (`demande_id`) REFERENCES `gmb_demandes_avis`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS `gmb_templates` (

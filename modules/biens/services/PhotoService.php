@@ -17,18 +17,19 @@ class PhotoService
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function uploadPhotos(int $bienId, array $files): void
+    public function uploadPhotos(int $bienId, array $files): array
     {
         if (empty($files['name']) || !is_array($files['name'])) {
-            return;
+            return [];
         }
 
-        $targetDir = dirname(__DIR__, 3) . '/public/assets/uploads/biens/' . $bienId;
-        if (!is_dir($targetDir)) {
-            mkdir($targetDir, 0775, true);
+        $targetDir = $this->getTargetDirectory($bienId);
+        if (!is_dir($targetDir) && !mkdir($targetDir, 0775, true) && !is_dir($targetDir)) {
+            throw new RuntimeException('Impossible de créer le dossier de stockage des photos.');
         }
 
         $position = $this->getNextPosition($bienId);
+        $uploaded = [];
 
         foreach ($files['name'] as $index => $originalName) {
             if (($files['error'][$index] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
@@ -47,7 +48,7 @@ class PhotoService
 
             $fileName = uniqid('photo_', true) . '.' . $extension;
             $fullPath = $targetDir . '/' . $fileName;
-            $publicPath = '/public/assets/uploads/biens/' . $bienId . '/' . $fileName;
+            $publicPath = $this->buildPublicPath($bienId, $fileName);
 
             if (!move_uploaded_file($tmpName, $fullPath)) {
                 continue;
@@ -61,7 +62,33 @@ class PhotoService
                 ':position' => $position,
             ]);
 
+            $uploaded[] = [
+                'id' => (int) $this->pdo->lastInsertId(),
+                'bien_id' => $bienId,
+                'chemin' => $publicPath,
+                'alt' => pathinfo((string) $originalName, PATHINFO_FILENAME),
+                'position' => $position,
+            ];
+
             $position++;
+        }
+
+        return $uploaded;
+    }
+
+    public function reorderPhotos(int $bienId, array $photoIds): void
+    {
+        if ($photoIds === []) {
+            return;
+        }
+
+        $stmt = $this->pdo->prepare('UPDATE bien_photos SET position = :position WHERE id = :id AND bien_id = :bien_id');
+        foreach (array_values($photoIds) as $position => $photoId) {
+            $stmt->execute([
+                ':position' => $position,
+                ':id' => (int) $photoId,
+                ':bien_id' => $bienId,
+            ]);
         }
     }
 
@@ -84,7 +111,7 @@ class PhotoService
 
     public function deletePhoto(int $photoId): void
     {
-        $stmt = $this->pdo->prepare('SELECT chemin FROM bien_photos WHERE id = :id LIMIT 1');
+        $stmt = $this->pdo->prepare('SELECT id, bien_id, chemin FROM bien_photos WHERE id = :id LIMIT 1');
         $stmt->execute([':id' => $photoId]);
         $photo = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -92,13 +119,28 @@ class PhotoService
             return;
         }
 
-        $localPath = dirname(__DIR__, 3) . ltrim((string) $photo['chemin'], '/');
+        $localPath = ROOT_PATH . '/' . ltrim((string) $photo['chemin'], '/');
         if (is_file($localPath)) {
             @unlink($localPath);
         }
 
         $deleteStmt = $this->pdo->prepare('DELETE FROM bien_photos WHERE id = :id');
         $deleteStmt->execute([':id' => $photoId]);
+
+        $this->compactPositions((int) $photo['bien_id']);
+    }
+
+    private function compactPositions(int $bienId): void
+    {
+        $photos = $this->getPhotos($bienId);
+        $stmt = $this->pdo->prepare('UPDATE bien_photos SET position = :position WHERE id = :id');
+
+        foreach ($photos as $position => $photo) {
+            $stmt->execute([
+                ':position' => $position,
+                ':id' => (int) $photo['id'],
+            ]);
+        }
     }
 
     private function getNextPosition(int $bienId): int
@@ -107,5 +149,15 @@ class PhotoService
         $stmt->execute([':bien_id' => $bienId]);
 
         return (int) $stmt->fetchColumn();
+    }
+
+    private function getTargetDirectory(int $bienId): string
+    {
+        return rtrim(UPLOAD_PATH, '/') . '/biens/' . $bienId;
+    }
+
+    private function buildPublicPath(int $bienId, string $fileName): string
+    {
+        return '/storage/uploads/biens/' . $bienId . '/' . $fileName;
     }
 }
