@@ -659,7 +659,7 @@ ob_start();
                                     la plus-value est <strong>totalement exonérée</strong> d'impôt.
                                     Pour une résidence secondaire ou un investissement locatif,
                                     des abattements progressifs s'appliquent à partir de 6 ans
-                                    de détention. ' . ADVISOR_NAME . ' peut vous orienter vers un notaire
+                                    de détention. <?= ADVISOR_NAME ?> peut vous orienter vers un notaire
                                     partenaire pour simuler votre situation fiscale.
                                 </p>
                             </div>
@@ -751,7 +751,7 @@ ob_start();
                             </div>
                             <h2>Prêt à vendre sur le Pays d\'Aix ?</h2>
                             <p>
-                                ' . ADVISOR_NAME . ' vous accompagne de A à Z dans votre
+                                <?= ADVISOR_NAME ?> vous accompagne de A à Z dans votre
                                 projet de vente à Aix-en-Provence et ses environs.
                                 Estimation gratuite, stratégie de vente, diffusion,
                                 négociation et signature : un seul interlocuteur pour tout.
@@ -763,7 +763,7 @@ ob_start();
                                 </a>
                                 <a href="/contact" class="btn btn--outline btn--lg">
                                     <i class="fas fa-comments"></i>
-                                    Parler à ' . ADVISOR_NAME . '
+                                    Parler à <?= ADVISOR_NAME ?>
                                 </a>
                             </div>
                             <p class="guide-cta-final__reassurance">

@@ -83,7 +83,7 @@ ob_start();
                     </a>
                     <a href="/contact" class="btn btn--outline btn--lg">
                         <i class="fas fa-comments"></i>
-                        Parler à ' . ADVISOR_NAME . '
+                        Parler à <?= ADVISOR_NAME ?>
                     </a>
                 </div>
 
@@ -634,7 +634,7 @@ ob_start();
                             </div>
                             <h2>Prêt à acheter sur le Pays d\'Aix ?</h2>
                             <p>
-                                ' . ADVISOR_NAME . ' vous accompagne de A à Z dans votre
+                                <?= ADVISOR_NAME ?> vous accompagne de A à Z dans votre
                                 projet immobilier à Aix-en-Provence et ses environs.
                                 Estimation, recherche, négociation, financement :
                                 un seul interlocuteur pour tout.
@@ -642,7 +642,7 @@ ob_start();
                             <div class="guide-cta-final__actions">
                                 <a href="/contact" class="btn btn--primary btn--lg">
                                     <i class="fas fa-comments"></i>
-                                    Parler à ' . ADVISOR_NAME . '
+                                    Parler à <?= ADVISOR_NAME ?>
                                 </a>
                                 <a href="/biens" class="btn btn--outline btn--lg">
                                     <i class="fas fa-search"></i>

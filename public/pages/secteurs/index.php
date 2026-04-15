@@ -1,7 +1,7 @@
 <?php
 $pageTitle    = 'Nos secteurs immobiliers — ' . ADVISOR_NAME;
-$metaDesc     = 'Découvrez nos secteurs d\'intervention autour d\'Aix-en-Provence. Expertise locale pour Aix-en-Provence, Venelles, Bouc-Bel-Air, Eguilles et leurs alentours.';
-$metaKeywords = 'secteurs immobiliers Provence, expert immobilier Aix-en-Provence, immobilier Bouc-Bel-Air, immobilier Eguilles, immobilier Simiane-Collongue';
+$metaDesc     = 'Découvrez nos secteurs d\'intervention. Expertise locale par ' . ADVISOR_NAME . ', conseiller immobilier indépendant.';
+$metaKeywords = 'secteurs immobiliers, expert immobilier ' . APP_CITY . ', conseiller immobilier indépendant';
 $extraCss     = ['/assets/css/villes.css'];
 ?>
 
@@ -21,87 +21,87 @@ $extraCss     = ['/assets/css/villes.css'];
         <div class="section__header">
             <span class="section-label">Villes</span>
             <h2 id="villes-title" class="section-title">Villes couvertes</h2>
-            <p class="section-subtitle">ADVISOR_NAME . ' intervient sur l'ensemble des communes du Pays d'Aix avec une connaissance approfondie de chaque secteur.</p>
+            <p class="section-subtitle"><?= ADVISOR_NAME ?> intervient sur l'ensemble des communes de la zone avec une connaissance approfondie de chaque secteur.</p>
         </div>
         <div class="cities-grid">
-            <a href="<?= url('/secteurs/villes/aix-en-provence') ?>" class="city-card">
+            <a href="<?= url('/immobilier/aix-en-provence') ?>" class="city-card">
                 <div class="city-card__body">
                     <h3 class="city-card__name">Aix-en-Provence</h3>
                     <p class="city-card__desc">Zone principale d'intervention — quartiers historiques, résidentiels et périphérie.</p>
                     <span class="city-card__cta">Découvrir →</span>
                 </div>
             </a>
-            <a href="<?= url('/secteurs/villes/venelles') ?>" class="city-card">
+            <a href="<?= url('/immobilier/venelles') ?>" class="city-card">
                 <div class="city-card__body">
                     <h3 class="city-card__name">Venelles</h3>
                     <p class="city-card__desc">Village résidentiel calme au nord d'Aix, très prisé des familles.</p>
                     <span class="city-card__cta">Découvrir →</span>
                 </div>
             </a>
-            <a href="<?= url('/secteurs/villes/bouc-bel-air') ?>" class="city-card">
+            <a href="<?= url('/immobilier/bouc-bel-air') ?>" class="city-card">
                 <div class="city-card__body">
                     <h3 class="city-card__name">Bouc-Bel-Air</h3>
                     <p class="city-card__desc">Commune résidentielle au sud d'Aix, espaces verts et cadre de vie paisible.</p>
                     <span class="city-card__cta">Découvrir →</span>
                 </div>
             </a>
-            <a href="<?= url('/secteurs/villes/le-tholonet') ?>" class="city-card">
+            <a href="<?= url('/immobilier/le-tholonet') ?>" class="city-card">
                 <div class="city-card__body">
                     <h3 class="city-card__name">Le Tholonet</h3>
                     <p class="city-card__desc">Village de charme au pied de la Sainte-Victoire, propriétés de caractère.</p>
                     <span class="city-card__cta">Découvrir →</span>
                 </div>
             </a>
-            <a href="<?= url('/secteurs/villes/eguilles') ?>" class="city-card">
+            <a href="<?= url('/immobilier/eguilles') ?>" class="city-card">
                 <div class="city-card__body">
                     <h3 class="city-card__name">Eguilles</h3>
                     <p class="city-card__desc">Village perché à l'ouest d'Aix, vues panoramiques et mas provençaux.</p>
                     <span class="city-card__cta">Découvrir →</span>
                 </div>
             </a>
-            <a href="<?= url('/secteurs/villes/simiane-collongue') ?>" class="city-card">
+            <a href="<?= url('/immobilier/simiane-collongue') ?>" class="city-card">
                 <div class="city-card__body">
                     <h3 class="city-card__name">Simiane-Collongue</h3>
                     <p class="city-card__desc">Commune verdoyante entre Aix et Marseille, cadre naturel préservé.</p>
                     <span class="city-card__cta">Découvrir →</span>
                 </div>
             </a>
-            <a href="<?= url('/secteurs/villes/gardanne') ?>" class="city-card">
+            <a href="<?= url('/immobilier/gardanne') ?>" class="city-card">
                 <div class="city-card__body">
                     <h3 class="city-card__name">Gardanne</h3>
                     <p class="city-card__desc">Ville dynamique entre Aix et Marseille, prix attractifs et bonne desserte.</p>
                     <span class="city-card__cta">Découvrir →</span>
                 </div>
             </a>
-            <a href="<?= url('/secteurs/villes/lambesc') ?>" class="city-card">
+            <a href="<?= url('/immobilier/lambesc') ?>" class="city-card">
                 <div class="city-card__body">
                     <h3 class="city-card__name">Lambesc</h3>
                     <p class="city-card__desc">Bourg provençal typique à l'ouest d'Aix, bastides et maisons de village.</p>
                     <span class="city-card__cta">Découvrir →</span>
                 </div>
             </a>
-            <a href="<?= url('/secteurs/villes/meyreuil') ?>" class="city-card">
+            <a href="<?= url('/immobilier/meyreuil') ?>" class="city-card">
                 <div class="city-card__body">
                     <h3 class="city-card__name">Meyreuil</h3>
                     <p class="city-card__desc">Village résidentiel à l'est d'Aix, calme et proche du bassin minier.</p>
                     <span class="city-card__cta">Découvrir →</span>
                 </div>
             </a>
-            <a href="<?= url('/secteurs/villes/rognes') ?>" class="city-card">
+            <a href="<?= url('/immobilier/rognes') ?>" class="city-card">
                 <div class="city-card__body">
                     <h3 class="city-card__name">Rognes</h3>
                     <p class="city-card__desc">Village provençal au nord-ouest d'Aix, propriétés rurales et vignobles.</p>
                     <span class="city-card__cta">Découvrir →</span>
                 </div>
             </a>
-            <a href="<?= url('/secteurs/villes/saint-cannat') ?>" class="city-card">
+            <a href="<?= url('/immobilier/saint-cannat') ?>" class="city-card">
                 <div class="city-card__body">
                     <h3 class="city-card__name">Saint-Cannat</h3>
                     <p class="city-card__desc">Commune entre Aix et Salon-de-Provence, maisons provençales abordables.</p>
                     <span class="city-card__cta">Découvrir →</span>
                 </div>
             </a>
-            <a href="<?= url('/secteurs/villes/ventabren') ?>" class="city-card">
+            <a href="<?= url('/immobilier/ventabren') ?>" class="city-card">
                 <div class="city-card__body">
                     <h3 class="city-card__name">Ventabren</h3>
                     <p class="city-card__desc">Village médiéval surplombant l'Arc, vues d'exception et biens de caractère.</p>
@@ -121,42 +121,42 @@ $extraCss     = ['/assets/css/villes.css'];
             <p class="section-subtitle">Une connaissance fine de chaque quartier aixois pour vous orienter vers le bien qui correspond à votre projet.</p>
         </div>
         <div class="cities-grid">
-            <a href="<?= url('/secteurs/quartiers/mazarin') ?>" class="city-card">
+            <a href="<?= url('/quartier/mazarin') ?>" class="city-card">
                 <div class="city-card__body">
                     <h3 class="city-card__name">Mazarin</h3>
                     <p class="city-card__desc">Quartier historique haussmannien, hôtels particuliers et immeubles de prestige.</p>
                     <span class="city-card__cta">Découvrir →</span>
                 </div>
             </a>
-            <a href="<?= url('/secteurs/quartiers/centre-ville') ?>" class="city-card">
+            <a href="<?= url('/quartier/centre-ville') ?>" class="city-card">
                 <div class="city-card__body">
                     <h3 class="city-card__name">Centre-ville</h3>
                     <p class="city-card__desc">Le cœur d'Aix — Cours Mirabeau, vieux-Aix, commerces et vie culturelle.</p>
                     <span class="city-card__cta">Découvrir →</span>
                 </div>
             </a>
-            <a href="<?= url('/secteurs/quartiers/puyricard') ?>" class="city-card">
+            <a href="<?= url('/quartier/puyricard') ?>" class="city-card">
                 <div class="city-card__body">
                     <h3 class="city-card__name">Puyricard</h3>
                     <p class="city-card__desc">Quartier résidentiel premium au nord — villas, piscines et grand calme.</p>
                     <span class="city-card__cta">Découvrir →</span>
                 </div>
             </a>
-            <a href="<?= url('/secteurs/quartiers/jas-de-bouffan') ?>" class="city-card">
+            <a href="<?= url('/quartier/jas-de-bouffan') ?>" class="city-card">
                 <div class="city-card__body">
                     <h3 class="city-card__name">Jas de Bouffan</h3>
                     <p class="city-card__desc">Quartier résidentiel à l'ouest, maisons individuelles et résidences récentes.</p>
                     <span class="city-card__cta">Découvrir →</span>
                 </div>
             </a>
-            <a href="<?= url('/secteurs/quartiers/luynes') ?>" class="city-card">
+            <a href="<?= url('/quartier/luynes') ?>" class="city-card">
                 <div class="city-card__body">
                     <h3 class="city-card__name">Luynes</h3>
                     <p class="city-card__desc">Village intégré au sud-ouest d'Aix, pavillons et copropriétés récentes.</p>
                     <span class="city-card__cta">Découvrir →</span>
                 </div>
             </a>
-            <a href="<?= url('/secteurs/quartiers/les-milles') ?>" class="city-card">
+            <a href="<?= url('/quartier/les-milles') ?>" class="city-card">
                 <div class="city-card__body">
                     <h3 class="city-card__name">Les Milles</h3>
                     <p class="city-card__desc">Secteur économique et résidentiel au sud, technopôle et résidences modernes.</p>

@@ -86,7 +86,7 @@ if (!function_exists('formatPrice')) {
 $pageTitle = htmlspecialchars($b['titre'])
            . ' — '
            . htmlspecialchars($b['secteur_name'])
-           . ' | Pascal Hamm Immobilier';
+           . ' | ' . APP_NAME . '';
 
 $metaDesc  = 'Découvrez ce bien immobilier à '
            . htmlspecialchars($b['secteur_name'])
@@ -511,7 +511,7 @@ $extraJs  = ['/assets/js/bien-detail.js'];
                     </p>
                     <?php endif; ?>
                     <p class="bien-legal__ref">
-                        Bien présenté par Pascal Hamm — Mandataire immobilier
+                        Bien présenté par <?= ADVISOR_NAME ?> — Mandataire immobilier
                         indépendant rattaché au réseau IAD France.
                         RCP souscrite. Pas de maniement de fonds.
                     </p>
@@ -612,7 +612,7 @@ $extraJs  = ['/assets/js/bien-detail.js'];
                     <div class="form-success">
                         <i class="fas fa-check-circle"></i>
                         <strong>Message envoyé !</strong>
-                        <p>Pascal Hamm vous contactera sous 24h.</p>
+                        <p><?= ADVISOR_NAME ?> vous contactera sous 24h.</p>
                     </div>
                     <?php else: ?>
 

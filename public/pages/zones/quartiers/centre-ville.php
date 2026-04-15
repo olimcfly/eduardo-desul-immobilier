@@ -1,6 +1,6 @@
 <?php
 $pageTitle    = 'Immobilier Centre-Ville Aix-en-Provence - Expert | ' . ADVISOR_NAME;
-$metaDesc     = 'Expert immobilier au centre-ville d\'Aix-en-Provence. Appartements anciens, biens rénovés, commerces — Pascal Hamm vous accompagne pour votre projet en hyper-centre.';
+$metaDesc     = 'Expert immobilier au centre-ville d\'Aix-en-Provence. Appartements anciens, biens rénovés, commerces — <?= ADVISOR_NAME ?> vous accompagne pour votre projet en hyper-centre.';
 $metaKeywords = 'immobilier centre-ville Aix-en-Provence, appartement centre Aix, achat vente immobilier hyper-centre Aix, expert immobilier Aix centre';
 $extraCss     = ['/assets/css/villes.css'];
 

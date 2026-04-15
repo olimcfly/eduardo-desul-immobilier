@@ -1,6 +1,6 @@
 <?php
 $pageTitle    = 'Immobilier Saint-Marc-Jaumegarde - Village exclusif | ' . ADVISOR_NAME;
-$metaDesc     = 'Expert immobilier à Saint-Marc-Jaumegarde — village résidentiel d\'exception au pied de la Sainte-Victoire. Pascal Hamm vous accompagne pour vos transactions de prestige.';
+$metaDesc     = 'Expert immobilier à Saint-Marc-Jaumegarde — village résidentiel d\'exception au pied de la Sainte-Victoire. <?= ADVISOR_NAME ?> vous accompagne pour vos transactions de prestige.';
 $metaKeywords = 'immobilier Saint-Marc-Jaumegarde, expert immobilier Saint-Marc, maison prestige Sainte-Victoire, estimation immobilière Saint-Marc-Jaumegarde';
 $extraCss     = ['/assets/css/villes.css'];
 

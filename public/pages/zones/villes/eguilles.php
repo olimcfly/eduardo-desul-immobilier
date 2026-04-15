@@ -1,7 +1,7 @@
 <?php
 // Définition des métadonnées pour la page
 $pageTitle = "Immobilier Eguilles - Expert immobilier indépendant";
-$pageDescription = "Découvrez l'immobilier à Eguilles avec ' . ADVISOR_NAME . ', expert immobilier indépendant. Estimation gratuite, vente et achat d'appartements et maisons.";
+$pageDescription = "Découvrez l'immobilier à Eguilles avec <?= ADVISOR_NAME ?>, expert immobilier indépendant. Estimation gratuite, vente et achat d'appartements et maisons.";
 $metaKeywords = 'immobilier Eguilles, expert immobilier Eguilles, estimation immobilière Eguilles, achat immobilier Eguilles, vente immobilière Eguilles, conseiller immobilier indépendant Eguilles';
 
 // CSS supplémentaire pour cette page

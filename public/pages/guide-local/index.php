@@ -1,5 +1,5 @@
 <?php
-$pageTitle = 'Guide local Aix-en-Provence — Pascal Hamm Immobilier';
+$pageTitle = 'Guide local Aix-en-Provence — ' . APP_NAME . '';
 $metaDesc  = 'Découvrez les communes autour d’Aix-en-Provence, les secteurs majeurs aixois et les villes proches pertinentes pour votre recherche immobilière.';
 $extraCss  = ['/assets/css/guide.css'];
 
@@ -98,7 +98,7 @@ $communesProches = [
         <div class="blog-cta" data-animate>
             <div>
                 <h3>Vous cherchez dans une commune précise ?</h3>
-                <p>Parlez de votre projet avec Pascal Hamm et obtenez une orientation personnalisée selon votre budget, votre style de vie et vos délais.</p>
+                <p>Parlez de votre projet avec <?= ADVISOR_NAME ?> et obtenez une orientation personnalisée selon votre budget, votre style de vie et vos délais.</p>
             </div>
             <a href="/contact" class="btn btn--accent">Prendre contact</a>
         </div>

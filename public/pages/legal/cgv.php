@@ -1,5 +1,5 @@
 <?php
-$pageTitle  = 'CGV — Pascal Hamm Immobilier';
+$pageTitle  = 'CGV — ' . APP_NAME . '';
 $metaRobots = 'noindex, nofollow';
 ?>
 <div class="page-header">
@@ -12,7 +12,7 @@ $metaRobots = 'noindex, nofollow';
     <div class="container" style="max-width:800px">
         <div class="article-content">
             <h2>Objet</h2>
-            <p>Les présentes CGV définissent les conditions dans lesquelles Pascal Hamm Immobilier (ci-après "le Prestataire") fournit ses services de conseil et d'intermédiation immobilière aux clients.</p>
+            <p>Les présentes CGV définissent les conditions dans lesquelles <?= APP_NAME ?> (ci-après "le Prestataire") fournit ses services de conseil et d'intermédiation immobilière aux clients.</p>
 
             <h2>Services proposés</h2>
             <ul>

@@ -1,6 +1,6 @@
 <?php
-$pageTitle  = 'Plan du site — Pascal Hamm Immobilier';
-$metaDesc   = 'Plan du site pour accéder rapidement aux pages clés de Pascal Hamm Immobilier.';
+$pageTitle  = 'Plan du site — ' . APP_NAME . '';
+$metaDesc   = 'Plan du site pour accéder rapidement aux pages clés de ' . APP_NAME . '.';
 $metaRobots = 'noindex, follow';
 ?>
 <div class="page-header">

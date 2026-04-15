@@ -1,6 +1,6 @@
 <?php
 $pageTitle    = 'Immobilier Meyreuil - Expert immobilier indépendant | ' . ADVISOR_NAME;
-$metaDesc     = 'Achetez, vendez ou estimez votre bien à Meyreuil avec Pascal Hamm. Commune résidentielle à 10 km d\'Aix-en-Provence avec une belle qualité de vie.';
+$metaDesc     = 'Achetez, vendez ou estimez votre bien à Meyreuil avec <?= ADVISOR_NAME ?>. Commune résidentielle à 10 km d\'Aix-en-Provence avec une belle qualité de vie.';
 $metaKeywords = 'immobilier Meyreuil, expert immobilier Meyreuil, estimation immobilière Meyreuil, achat vente immobilier Meyreuil';
 $extraCss     = ['/assets/css/villes.css'];
 

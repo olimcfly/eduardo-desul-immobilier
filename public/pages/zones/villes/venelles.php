@@ -1,6 +1,6 @@
 <?php
 $pageTitle    = 'Immobilier Venelles - Expert immobilier indépendant | ' . ADVISOR_NAME;
-$metaDesc     = 'Achetez, vendez ou estimez votre bien à Venelles avec Pascal Hamm. Commune très prisée au nord d\'Aix-en-Provence, réputée pour ses écoles et sa qualité de vie.';
+$metaDesc     = 'Achetez, vendez ou estimez votre bien à Venelles avec <?= ADVISOR_NAME ?>. Commune très prisée au nord d\'Aix-en-Provence, réputée pour ses écoles et sa qualité de vie.';
 $metaKeywords = 'immobilier Venelles, expert immobilier Venelles, estimation immobilière Venelles, achat vente maison Venelles, Venelles résidentiel';
 $extraCss     = ['/assets/css/villes.css'];
 

@@ -103,7 +103,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$pageTitle = 'Estimation gratuite — Pascal Hamm | Expert Immobilier 360° Aix-en-Provence';
+$pageTitle = 'Estimation gratuite — <?= ADVISOR_NAME ?> | Expert Immobilier 360° Aix-en-Provence';
 $metaDesc  = 'Obtenez une fourchette d\'estimation basée sur les ventes réelles du Pays d\'Aix. Gratuit, instantané, sans inscription.';
 $extraCss  = ['/assets/css/estimation.css'];
 $extraJs   = ['/assets/js/estimation.js'];
@@ -365,7 +365,7 @@ ob_start();
                     <div class="advisor-mini">
                         <div class="advisor-mini__avatar" aria-hidden="true">👤</div>
                         <div class="advisor-mini__info">
-                            <strong><?= e(defined('ADVISOR_NAME') ? ADVISOR_NAME : 'Pascal Hamm') ?></strong>
+                            <strong><?= e(defined('ADVISOR_NAME') ? ADVISOR_NAME : ADVISOR_NAME) ?></strong>
                             <span>Expert immobilier 360° — Pays d\'Aix</span>
                         </div>
                     </div>

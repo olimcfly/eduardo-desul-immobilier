@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 return [
     'advisor' => [
-        'name' => trim((string) setting('advisor_fullname', 'Pascal Hamm')),
+        'name' => trim((string) setting('advisor_fullname', ADVISOR_NAME)),
         'city' => trim((string) setting('city_name', 'Aix-en-Provence')),
         'zone' => trim((string) setting('advisor_zone', 'Pays d\'Aix')),
         'phone' => trim((string) setting('contact_phone', defined('APP_PHONE') ? APP_PHONE : '+33 6 67 19 83 66')),
@@ -33,7 +33,7 @@ return [
             ],
             'positioning' => [
                 'title' => 'Un conseiller de proximité pour un projet exigeant',
-                'text' => 'Pascal Hamm accompagne vendeurs, acheteurs et expatriés avec une méthode claire : données de marché, stratégie personnalisée et suivi continu.',
+                'text' => '<?= ADVISOR_NAME ?> accompagne vendeurs, acheteurs et expatriés avec une méthode claire : données de marché, stratégie personnalisée et suivi continu.',
                 'points' => [
                     'Connaissance terrain : Aix-en-Provence et Pays d\'Aix.',
                     'Interlocuteur unique, du premier échange à la signature.',
@@ -97,7 +97,7 @@ return [
             ],
             'positioning' => [
                 'title' => 'A local advisor with an international mindset',
-                'text' => 'Pascal Hamm provides structured guidance for sales and acquisitions, with straightforward communication and reliable local execution.',
+                'text' => '<?= ADVISOR_NAME ?> provides structured guidance for sales and acquisitions, with straightforward communication and reliable local execution.',
                 'points' => [
                     'On-the-ground knowledge of Aix-en-Provence and the Pays d\'Aix area.',
                     'Single point of contact from strategy to signature.',
@@ -161,7 +161,7 @@ return [
             ],
             'positioning' => [
                 'title' => 'Asesoramiento cercano, criterio profesional',
-                'text' => 'Pascal Hamm acompaña operaciones de compraventa con una metodología clara, sin promesas exageradas y con seguimiento continuo.',
+                'text' => '<?= ADVISOR_NAME ?> acompaña operaciones de compraventa con una metodología clara, sin promesas exageradas y con seguimiento continuo.',
                 'points' => [
                     'Conocimiento real del mercado de Aix-en-Provence y Pays d\'Aix.',
                     'Un solo interlocutor durante todo el proceso.',

@@ -26,8 +26,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$pageTitle = 'Avis de valeur gratuit — Estimation de votre bien | Pascal Hamm Immobilier';
-$metaDesc  = 'Obtenez un avis de valeur gratuit et personnalisé pour votre bien immobilier. Pascal Hamm, expert indépendant, analyse votre bien et vous remet une estimation détaillée.';
+$pageTitle = 'Avis de valeur gratuit — Estimation de votre bien | ' . APP_NAME . '';
+$metaDesc  = 'Obtenez un avis de valeur gratuit et personnalisé pour votre bien immobilier. <?= ADVISOR_NAME ?>, expert indépendant, analyse votre bien et vous remet une estimation détaillée.';
 $extraCss  = ['/assets/css/estimation.css'];
 ?>
 <section class="hero hero--light" aria-labelledby="avis-valeur-hero">

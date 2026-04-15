@@ -33,8 +33,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$pageTitle  = 'Estimation gratuite de votre bien — Pascal Hamm';
-$metaDesc   = 'Estimez gratuitement votre bien immobilier à Aix-en-Provence. Résultat personnalisé sous 48h par Pascal Hamm.';
+$pageTitle  = 'Estimation gratuite de votre bien — ' . ADVISOR_NAME . '';
+$metaDesc   = 'Estimez gratuitement votre bien immobilier à Aix-en-Provence. Résultat personnalisé sous 48h par <?= ADVISOR_NAME ?>.';
 $extraCss   = ['/assets/css/estimation.css'];
 $extraJs    = ['/assets/js/estimation.js'];
 $bodyClass  = 'page-capture';

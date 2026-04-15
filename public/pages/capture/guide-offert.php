@@ -25,8 +25,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$pageTitle  = 'Guide immobilier gratuit — Pascal Hamm';
-$metaDesc   = 'Recevez gratuitement le guide immobilier de Pascal Hamm : conseils, tendances, stratégies pour réussir votre projet.';
+$pageTitle  = 'Guide immobilier gratuit — ' . ADVISOR_NAME . '';
+$metaDesc   = 'Recevez gratuitement le guide immobilier de <?= ADVISOR_NAME ?> : conseils, tendances, stratégies pour réussir votre projet.';
 $metaRobots = 'noindex';
 $bodyClass  = 'page-capture';
 ?>
@@ -57,7 +57,7 @@ $bodyClass  = 'page-capture';
                     <div style="font-size:2.5rem">📚</div>
                     <div>
                         <div style="font-weight:600">Guide PDF · 32 pages</div>
-                        <div style="font-size:.8rem;opacity:.7">Rédigé par Pascal Hamm · Édition 2026</div>
+                        <div style="font-size:.8rem;opacity:.7">Rédigé par <?= ADVISOR_NAME ?> · Édition 2026</div>
                     </div>
                 </div>
             </div>

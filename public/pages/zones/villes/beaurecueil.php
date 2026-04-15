@@ -13,7 +13,7 @@ $schemaMarkup = '
 {
   "@context": "https://schema.org",
   "@type": "LocalBusiness",
-  "name": "Pascal Hamm - Expert immobilier Beaurecueil",
+  "name": "<?= ADVISOR_NAME ?> - Expert immobilier Beaurecueil",
   "address": {
     "@type": "PostalAddress",
     "addressLocality": "Beaurecueil",

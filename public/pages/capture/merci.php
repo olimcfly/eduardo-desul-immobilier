@@ -1,5 +1,5 @@
 <?php
-$pageTitle  = 'Merci ! — Pascal Hamm Immobilier';
+$pageTitle  = 'Merci ! — ' . APP_NAME . '';
 $metaRobots = 'noindex';
 $bodyClass  = 'page-merci';
 ?>

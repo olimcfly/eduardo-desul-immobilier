@@ -1,5 +1,5 @@
 <?php
-$pageTitle  = 'Politique de confidentialité — Pascal Hamm Immobilier';
+$pageTitle  = 'Politique de confidentialité — ' . APP_NAME . '';
 $metaDesc   = 'Politique de confidentialité et protection des données personnelles.';
 $metaRobots = 'noindex, nofollow';
 ?>

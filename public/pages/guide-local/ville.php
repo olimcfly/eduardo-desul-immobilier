@@ -128,9 +128,9 @@ if (!$s) {
 }
 
 /* ── Meta dynamiques ──────────────────────────────────────── */
-$pageTitle = 'Immobilier ' . $s['nom'] . ' — Prix, marché & conseils | Pascal Hamm';
+$pageTitle = 'Immobilier ' . $s['nom'] . ' — Prix, marché & conseils | ' . ADVISOR_NAME;
 $metaDesc  = 'Prix au m², tendances et analyse du marché immobilier à ' . $s['nom']
-           . '. Conseils terrain de Pascal Hamm, expert immobilier 360° dans le Pays d\'Aix.';
+           . '. Conseils terrain de <?= ADVISOR_NAME ?>, expert immobilier 360° dans le Pays d\'Aix.';
 
 $autresSecteurs = array_filter($secteurs, fn($k) => $k !== $slug, ARRAY_FILTER_USE_KEY);
 ?>
@@ -240,7 +240,7 @@ $autresSecteurs = array_filter($secteurs, fn($k) => $k !== $slug, ARRAY_FILTER_U
 
             <div class="sidebar-card">
                 <h3>Estimer votre bien à <?= e($s['nom']) ?></h3>
-                <p>Obtenez une estimation gratuite et personnalisée par Pascal Hamm, expert de ce secteur.</p>
+                <p>Obtenez une estimation gratuite et personnalisée par <?= ADVISOR_NAME ?>, expert de ce secteur.</p>
                 <a href="/estimation-gratuite" class="btn btn--accent btn--full">
                     Estimation gratuite
                 </a>
@@ -270,9 +270,9 @@ $autresSecteurs = array_filter($secteurs, fn($k) => $k !== $slug, ARRAY_FILTER_U
 
             <div class="sidebar-card sidebar-card--contact">
                 <h3>Une question ?</h3>
-                <p>Pascal Hamm répond sous 24h.</p>
+                <p><?= ADVISOR_NAME ?> répond sous 24h.</p>
                 <a href="/contact" class="btn btn--outline btn--full">
-                    Contacter Pascal Hamm
+                    Contacter <?= ADVISOR_NAME ?>
                 </a>
             </div>
 

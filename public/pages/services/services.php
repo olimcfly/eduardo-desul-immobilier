@@ -1,13 +1,13 @@
 <?php
 $pageTitle = 'Services immobiliers à ' . APP_CITY . ' — ' . ADVISOR_NAME;
-$metaDesc  = 'Vente, achat, estimation, investissement locatif : ' . ADVISOR_NAME . ' vous accompagne pour tous vos projets immobiliers à ' . APP_CITY . '.';
+$metaDesc  = 'Vente, achat, estimation, investissement locatif : <?= ADVISOR_NAME ?> vous accompagne pour tous vos projets immobiliers à ' . APP_CITY . '.';
 ?>
 
 <div class="page-header">
     <div class="container">
         <nav class="breadcrumb"><a href="/">Accueil</a><span>Services</span></nav>
         <h1>Mes services</h1>
-        <p>Un accompagnement complet pour tous vos projets immobiliers à ' . APP_CITY . ' et ses environs.</p>
+        <p>Un accompagnement complet pour tous vos projets immobiliers à <?= APP_CITY ?> et ses environs.</p>
     </div>
 </div>
 
