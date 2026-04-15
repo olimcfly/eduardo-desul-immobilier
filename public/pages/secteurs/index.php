@@ -1,5 +1,5 @@
 <?php
-$pageTitle    = 'Nos secteurs immobiliers en Provence — Expertise locale | Pascal Hamm';
+$pageTitle    = 'Nos secteurs immobiliers — ' . ADVISOR_NAME;
 $metaDesc     = 'Découvrez nos secteurs d\'intervention autour d\'Aix-en-Provence. Expertise locale pour Aix-en-Provence, Venelles, Bouc-Bel-Air, Eguilles et leurs alentours.';
 $metaKeywords = 'secteurs immobiliers Provence, expert immobilier Aix-en-Provence, immobilier Bouc-Bel-Air, immobilier Eguilles, immobilier Simiane-Collongue';
 $extraCss     = ['/assets/css/villes.css'];
@@ -21,7 +21,7 @@ $extraCss     = ['/assets/css/villes.css'];
         <div class="section__header">
             <span class="section-label">Villes</span>
             <h2 id="villes-title" class="section-title">Villes couvertes</h2>
-            <p class="section-subtitle">Pascal Hamm intervient sur l'ensemble des communes du Pays d'Aix avec une connaissance approfondie de chaque secteur.</p>
+            <p class="section-subtitle">ADVISOR_NAME . ' intervient sur l'ensemble des communes du Pays d'Aix avec une connaissance approfondie de chaque secteur.</p>
         </div>
         <div class="cities-grid">
             <a href="<?= url('/secteurs/villes/aix-en-provence') ?>" class="city-card">

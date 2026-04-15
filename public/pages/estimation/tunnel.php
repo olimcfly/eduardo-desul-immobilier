@@ -3,7 +3,7 @@
  * ESTIMATION TUNNEL — Page publique multi-étapes
  * Route GET : /estimation
  */
-$pageTitle = 'Estimation immobilière gratuite — Pays d\'Aix | Pascal Hamm';
+$pageTitle = 'Estimation immobilière gratuite — Pays d\'Aix | ADVISOR_NAME';
 $metaDesc  = 'Obtenez une fourchette de prix en 60 secondes. Basée sur les ventes réelles DVF. Sans inscription, sans engagement.';
 $extraCss  = ['/assets/css/estimation-tunnel.css'];
 $extraJs   = ['/assets/js/estimation-tunnel.js'];
@@ -239,7 +239,7 @@ $extraJs   = ['/assets/js/estimation-tunnel.js'];
                             <div class="cta-card cta-card--contact" data-action="contact_request">
                                 <div class="cta-card__icon" aria-hidden="true">📞</div>
                                 <h3 class="cta-card__title">Être rappelé</h3>
-                                <p class="cta-card__text">Pascal Hamm vous contacte pour affiner cette estimation et répondre à vos questions.</p>
+                                <p class="cta-card__text">ADVISOR_NAME vous contacte pour affiner cette estimation et répondre à vos questions.</p>
                                 <button type="button" class="btn btn--outline btn--full cta-trigger" data-action="contact_request">
                                     Demander un rappel
                                 </button>
@@ -249,7 +249,7 @@ $extraJs   = ['/assets/js/estimation-tunnel.js'];
                             <div class="cta-card cta-card--rdv" data-action="rdv_request">
                                 <div class="cta-card__icon" aria-hidden="true">📅</div>
                                 <h3 class="cta-card__title">Prendre rendez-vous</h3>
-                                <p class="cta-card__text">Rencontrez Pascal Hamm pour une estimation certifiée, sur place, sans engagement.</p>
+                                <p class="cta-card__text">Rencontrez ADVISOR_NAME pour une estimation certifiée, sur place, sans engagement.</p>
                                 <button type="button" class="btn btn--accent btn--full cta-trigger" data-action="rdv_request">
                                     Choisir un créneau
                                 </button>
@@ -273,7 +273,7 @@ $extraJs   = ['/assets/js/estimation-tunnel.js'];
                         <h3>Données insuffisantes pour ce secteur</h3>
                         <p id="result-insufficient-msg">
                             Les données disponibles ne permettent pas de calculer une fourchette fiable pour ce secteur et ce type de bien.
-                            Demandez un avis de valeur personnalisé — Pascal Hamm se déplace dans tout le Pays d'Aix.
+                            Demandez un avis de valeur personnalisé — ADVISOR_NAME se déplace dans tout le Pays d'Aix.
                         </p>
                         <div class="result-insufficient__actions">
                             <a href="/avis-de-valeur" class="btn btn--accent">Demander un avis de valeur</a>
@@ -359,7 +359,7 @@ $extraJs   = ['/assets/js/estimation-tunnel.js'];
                     <div class="convert-success">
                         <div class="convert-success__icon" aria-hidden="true">✅</div>
                         <h3 id="convert-success-title">Demande envoyée !</h3>
-                        <p id="convert-success-msg">Pascal Hamm reviendra vers vous dans les meilleurs délais.</p>
+                        <p id="convert-success-msg">ADVISOR_NAME reviendra vers vous dans les meilleurs délais.</p>
                         <a href="/" class="btn btn--outline" style="margin-top:1.5rem">Retour à l'accueil</a>
                     </div>
                 </div>
@@ -400,7 +400,7 @@ $extraJs   = ['/assets/js/estimation-tunnel.js'];
                 <div class="card__body">
                     <h3 class="card__title">🤝 Complétée par un expert</h3>
                     <p class="card__text">
-                        Une estimation algorithmique reste indicative. Pascal Hamm peut affiner
+                        Une estimation algorithmique reste indicative. ADVISOR_NAME peut affiner
                         cette fourchette grâce à une visite terrain et une connaissance fine
                         du marché local à Aix-en-Provence et dans le Pays d'Aix.
                     </p>
@@ -414,7 +414,7 @@ $extraJs   = ['/assets/js/estimation-tunnel.js'];
 <section class="cta-banner">
     <div class="container">
         <h2>Besoin d'une estimation certifiée ?</h2>
-        <p>Pascal Hamm se déplace dans tout le Pays d'Aix pour une évaluation précise, sur place, sans engagement.</p>
+        <p>ADVISOR_NAME se déplace dans tout le Pays d'Aix pour une évaluation précise, sur place, sans engagement.</p>
         <div class="cta-banner__actions">
             <a href="/prendre-rendez-vous" class="btn btn--accent btn--lg">Prendre rendez-vous</a>
             <a href="/avis-de-valeur" class="btn btn--outline-white btn--lg">Avis de valeur</a>

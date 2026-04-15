@@ -1,5 +1,5 @@
 <?php
-$pageTitle    = 'Immobilier Rognes - Expert immobilier indépendant | Pascal Hamm';
+$pageTitle    = 'Immobilier Rognes - Expert immobilier indépendant | ' . ADVISOR_NAME;
 $metaDesc     = 'Achetez, vendez ou estimez votre bien à Rognes avec Pascal Hamm. Village provençal authentique dans la plaine de la Durance, entre Aix et Pertuis.';
 $metaKeywords = 'immobilier Rognes, expert immobilier Rognes, estimation immobilière Rognes, achat vente maison Rognes';
 $extraCss     = ['/assets/css/villes.css'];

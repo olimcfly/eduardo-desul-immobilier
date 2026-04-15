@@ -285,7 +285,7 @@ ob_start();
                             <span class="cta-card__icon" aria-hidden="true">📅</span>
                             <h4>Obtenir une estimation précise</h4>
                             <p>
-                                Prenez rendez-vous avec Pascal Hamm.
+                                Prenez rendez-vous avec ADVISOR_NAME.
                                 Visite, analyse et rapport personnalisé gratuit.
                             </p>
                             <button type="button"
@@ -404,7 +404,7 @@ ob_start();
                     <div class="advisor-mini">
                         <div class="advisor-mini__avatar" aria-hidden="true">👤</div>
                         <div class="advisor-mini__info">
-                            <strong><?= e(defined('ADVISOR_NAME') ? ADVISOR_NAME : 'Pascal Hamm') ?></strong>
+                            <strong><?= e(defined('ADVISOR_NAME') ? ADVISOR_NAME : 'ADVISOR_NAME') ?></strong>
                             <span>Expert immobilier 360° — Pays d\'Aix</span>
                         </div>
                     </div>

@@ -1,6 +1,6 @@
 <?php
-$pageTitle = 'Blog immobilier — Conseils & Actualités | Pascal Hamm';
-$metaDesc  = 'Conseils, guides et actualités du marché immobilier à Aix-en-Provence et dans le Pays d\'Aix. Expertise locale par Pascal Hamm, expert immobilier indépendant.';
+$pageTitle = 'Blog immobilier — Conseils & Actualités | ' . ADVISOR_NAME;
+$metaDesc  = 'Conseils, guides et actualités du marché immobilier à Aix-en-Provence et dans le Pays d\'Aix. Expertise locale par ' . ADVISOR_NAME . ', expert immobilier indépendant.';
 $extraCss  = ['/assets/css/guide.css'];
 
 require_once ROOT_PATH . '/core/helpers/articles.php';

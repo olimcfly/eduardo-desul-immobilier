@@ -1,5 +1,5 @@
 <?php
-$pageTitle    = 'Immobilier Aix-en-Provence - Expert indépendant | Pascal Hamm';
+$pageTitle    = 'Immobilier Aix-en-Provence - Expert indépendant | ' . ADVISOR_NAME;
 $metaDesc     = 'Expert immobilier indépendant à Aix-en-Provence. Estimation gratuite, vente et achat de maisons et appartements. Connaissance approfondie du marché aixois depuis plus de 20 ans.';
 $metaKeywords = 'immobilier Aix-en-Provence, expert immobilier Aix-en-Provence, estimation immobilière Aix-en-Provence, achat maison Aix-en-Provence, vente appartement Aix-en-Provence, conseiller immobilier indépendant Aix-en-Provence';
 $extraCss     = ['/assets/css/villes.css'];

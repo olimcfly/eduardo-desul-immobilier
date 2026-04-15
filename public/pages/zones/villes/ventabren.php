@@ -1,5 +1,5 @@
 <?php
-$pageTitle    = 'Immobilier Ventabren - Village avec vue panoramique | Pascal Hamm';
+$pageTitle    = 'Immobilier Ventabren - Village avec vue panoramique | ' . ADVISOR_NAME;
 $metaDesc     = 'Achetez, vendez ou estimez votre bien à Ventabren avec Pascal Hamm. Village provençal offrant des vues exceptionnelles sur l\'Étang de Berre et la Sainte-Victoire.';
 $metaKeywords = 'immobilier Ventabren, expert immobilier Ventabren, estimation immobilière Ventabren, maison vue panoramique Ventabren, achat vente Ventabren';
 $extraCss     = ['/assets/css/villes.css'];

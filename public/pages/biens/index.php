@@ -1,5 +1,5 @@
 <?php
-$pageTitle = 'Nos biens immobiliers à Aix-en-Provence — Pascal Hamm';
+$pageTitle = 'Nos biens immobiliers à ' . APP_CITY . ' — ' . ADVISOR_NAME;
 $metaDesc = 'Découvrez notre sélection exclusive de biens immobiliers à Aix-en-Provence et dans le Pays d\'Aix.';
 $extraCss = ['/assets/css/style.css', '/assets/css/biens.css'];
 

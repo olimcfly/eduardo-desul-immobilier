@@ -1,5 +1,5 @@
 <?php
-$pageTitle    = 'Immobilier Puyricard Aix-en-Provence - Expert | Pascal Hamm';
+$pageTitle    = 'Immobilier Puyricard Aix-en-Provence - Expert | ' . ADVISOR_NAME;
 $metaDesc     = 'Expert immobilier à Puyricard, quartier résidentiel premium au nord d\'Aix-en-Provence. Villas, maisons avec piscine, environnement calme et verdoyant.';
 $metaKeywords = 'immobilier Puyricard, maison Puyricard Aix, villa Puyricard, expert immobilier nord Aix-en-Provence, résidentiel Puyricard';
 $extraCss     = ['/assets/css/villes.css'];

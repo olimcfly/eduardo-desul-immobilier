@@ -49,6 +49,7 @@ require ROOT_PATH . '/core/services/LeadService.php';
 require ROOT_PATH . '/core/services/DvfEstimatorService.php';
 require ROOT_PATH . '/core/services/DvfImportService.php';
 require_once ROOT_PATH . '/includes/settings.php';
+require_once ROOT_PATH . '/core/services/SectionRenderer.php';
 
 // Démarrer la session
 Session::start();

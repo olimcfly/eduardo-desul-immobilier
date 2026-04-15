@@ -1,5 +1,5 @@
 <?php
-$pageTitle = 'Guide de l\'acheteur immobilier — Pascal Hamm';
+$pageTitle = 'Guide de l\'acheteur immobilier — ' . ADVISOR_NAME . '';
 $metaDesc  = 'Guide complet pour acheter votre premier bien immobilier à Aix-en-Provence : financement, recherche, offre, signature.';
 $extraCss  = ['/assets/css/guide.css'];
 ?>

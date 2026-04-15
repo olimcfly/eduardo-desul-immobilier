@@ -1,7 +1,7 @@
 <?php
 // Définition des métadonnées pour la page
 $pageTitle = "Immobilier Bouc-Bel-Air - Expert immobilier indépendant";
-$pageDescription = "Découvrez l'immobilier à Bouc-Bel-Air avec Pascal Hamm, expert immobilier indépendant. Estimation gratuite, vente et achat d'appartements et maisons.";
+$pageDescription = "Découvrez l'immobilier à Bouc-Bel-Air avec ' . ADVISOR_NAME . ', expert immobilier indépendant. Estimation gratuite, vente et achat d'appartements et maisons.";
 $metaKeywords = 'immobilier Bouc-Bel-Air, expert immobilier Bouc-Bel-Air, estimation immobilière Bouc-Bel-Air, achat immobilier Bouc-Bel-Air, vente immobilière Bouc-Bel-Air, conseiller immobilier indépendant Bouc-Bel-Air';
 
 // CSS supplémentaire pour cette page

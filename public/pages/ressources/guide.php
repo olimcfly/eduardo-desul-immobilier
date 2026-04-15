@@ -3,7 +3,7 @@ $guide = $guideContext['guide'] ?? [];
 $persona = $guideContext['persona'] ?? 'persona';
 $personaLabel = $guideContext['persona_label'] ?? ucfirst($persona);
 
-$pageTitle = ($guide['title'] ?? 'Guide immobilier') . ' — Pascal Hamm';
+$pageTitle = ($guide['title'] ?? 'Guide immobilier') . ' — ' . ADVISOR_NAME . '';
 $metaDesc = $guide['excerpt'] ?? 'Guide immobilier pratique par persona.';
 $extraCss = ['/assets/css/guide.css'];
 ?>

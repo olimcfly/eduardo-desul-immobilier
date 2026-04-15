@@ -1,6 +1,6 @@
 <?php
-$pageTitle = 'Actualités immobilières — Pascal Hamm';
-$metaDesc  = 'Suivez l\'actualité du marché immobilier aixois avec Pascal Hamm.';
+$pageTitle = 'Actualités immobilières — ' . ADVISOR_NAME;
+$metaDesc  = 'Suivez l\'actualité du marché immobilier aixois avec ' . ADVISOR_NAME . '.';
 $extraCss  = ['/assets/css/guide.css'];
 $publicDomainImages = [
     'city' => 'https://commons.wikimedia.org/wiki/Special:FilePath/Aix-en-Provence%20-%20Cours%20Mirabeau%20(2).jpg',

@@ -1,6 +1,6 @@
 <?php
-$pageTitle    = 'Immobilier Le Tholonet - Village de prestige près d\'Aix | Pascal Hamm';
-$metaDesc     = 'Achetez ou vendez un bien d\'exception au Tholonet avec Pascal Hamm, expert immobilier indépendant. Village prisé au pied de la Montagne Sainte-Victoire.';
+$pageTitle    = 'Immobilier Le Tholonet - Village de prestige près d\'Aix | ' . ADVISOR_NAME;
+$metaDesc     = 'Achetez ou vendez un bien d\'exception au Tholonet avec ' . ADVISOR_NAME . ', expert immobilier indépendant. Village prisé au pied de la Montagne Sainte-Victoire.';
 $metaKeywords = 'immobilier Le Tholonet, expert immobilier Tholonet, maison de prestige Tholonet, estimation immobilière Tholonet, Sainte-Victoire immobilier';
 $extraCss     = ['/assets/css/villes.css'];
 

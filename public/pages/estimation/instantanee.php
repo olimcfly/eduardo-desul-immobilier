@@ -1,7 +1,7 @@
 <?php
 require_once ROOT_PATH . '/core/services/InstantEstimationService.php';
 
-$pageTitle = 'Estimation instantanée — Pascal Hamm Immobilier';
+$pageTitle = 'Estimation instantanée — ADVISOR_NAME Immobilier';
 $metaDesc = 'Obtenez une estimation immobilière indicative instantanée basée sur des comparables DVF.';
 $extraCss = ['/assets/css/estimation.css'];
 $extraJs = ['/assets/js/estimation-instantanee.js'];

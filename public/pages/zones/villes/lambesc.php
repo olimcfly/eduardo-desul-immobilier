@@ -1,6 +1,6 @@
 <?php
-$pageTitle    = 'Immobilier Lambesc - Expert immobilier indépendant | Pascal Hamm';
-$metaDesc     = 'Achetez, vendez ou estimez votre bien à Lambesc avec Pascal Hamm, expert immobilier indépendant. Village provençal prisé à 25 km d\'Aix-en-Provence.';
+$pageTitle    = 'Immobilier Lambesc - Expert immobilier indépendant | ' . ADVISOR_NAME;
+$metaDesc     = 'Achetez, vendez ou estimez votre bien à Lambesc avec ' . ADVISOR_NAME . ', expert immobilier indépendant. Village provençal prisé à 25 km d\'Aix-en-Provence.';
 $metaKeywords = 'immobilier Lambesc, expert immobilier Lambesc, estimation immobilière Lambesc, achat immobilier Lambesc, vente immobilière Lambesc';
 $extraCss     = ['/assets/css/villes.css'];
 

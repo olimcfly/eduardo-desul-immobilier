@@ -1,6 +1,6 @@
 <?php
-$pageTitle    = 'Immobilier Le Puy-Sainte-Réparade - Expert immobilier | Pascal Hamm';
-$metaDesc     = 'Achetez, vendez ou estimez votre bien au Puy-Sainte-Réparade avec Pascal Hamm, expert immobilier indépendant. Village résidentiel prisé au nord d\'Aix-en-Provence.';
+$pageTitle    = 'Immobilier Le Puy-Sainte-Réparade - Expert immobilier | ' . ADVISOR_NAME;
+$metaDesc     = 'Achetez, vendez ou estimez votre bien au Puy-Sainte-Réparade avec ' . ADVISOR_NAME . ', expert immobilier indépendant. Village résidentiel prisé au nord d\'Aix-en-Provence.';
 $metaKeywords = 'immobilier Le Puy-Sainte-Réparade, expert immobilier Puy-Sainte-Réparade, estimation immobilière Puy-Sainte-Réparade, achat vente immobilier';
 $extraCss     = ['/assets/css/villes.css'];
 

@@ -1,7 +1,7 @@
 <?php
-require_once __DIR__ . '/../../core/bootstrap.php';
 
-$advisor = $db->query("SELECT * FROM advisors WHERE id = 1")->fetch();
+
+$advisor = ['name' => trim(setting('advisor_firstname','')." ".setting('advisor_lastname','')) ?: ADVISOR_NAME, 'email' => setting('advisor_email', APP_EMAIL), 'phone' => setting('advisor_phone', APP_PHONE), 'city' => setting('zone_city', APP_CITY)];
 
 $pageTitle       = 'Guide Complet Acheteur — Acheter votre bien immobilier à Aix-en-Provence';
 $pageDescription = 'Tout ce que vous devez savoir pour réussir votre achat immobilier à Aix-en-Provence et le Pays d\'Aix : budget, recherche, offre, financement, signature. Guide gratuit 2025.';
@@ -83,7 +83,7 @@ ob_start();
                     </a>
                     <a href="/contact" class="btn btn--outline btn--lg">
                         <i class="fas fa-comments"></i>
-                        Parler à Pascal Hamm
+                        Parler à ' . ADVISOR_NAME . '
                     </a>
                 </div>
 
@@ -634,7 +634,7 @@ ob_start();
                             </div>
                             <h2>Prêt à acheter sur le Pays d\'Aix ?</h2>
                             <p>
-                                Pascal Hamm vous accompagne de A à Z dans votre
+                                ' . ADVISOR_NAME . ' vous accompagne de A à Z dans votre
                                 projet immobilier à Aix-en-Provence et ses environs.
                                 Estimation, recherche, négociation, financement :
                                 un seul interlocuteur pour tout.
@@ -642,7 +642,7 @@ ob_start();
                             <div class="guide-cta-final__actions">
                                 <a href="/contact" class="btn btn--primary btn--lg">
                                     <i class="fas fa-comments"></i>
-                                    Parler à Pascal Hamm
+                                    Parler à ' . ADVISOR_NAME . '
                                 </a>
                                 <a href="/biens" class="btn btn--outline btn--lg">
                                     <i class="fas fa-search"></i>

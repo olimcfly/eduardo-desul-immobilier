@@ -1,5 +1,5 @@
 <?php
-$pageTitle    = 'Immobilier Saint-Cannat - Expert immobilier indépendant | Pascal Hamm';
+$pageTitle    = 'Immobilier Saint-Cannat - Expert immobilier indépendant | ' . ADVISOR_NAME;
 $metaDesc     = 'Achetez, vendez ou estimez votre bien à Saint-Cannat avec Pascal Hamm. Village provençal à 25 km d\'Aix-en-Provence, idéal pour les familles cherchant espace et tranquillité.';
 $metaKeywords = 'immobilier Saint-Cannat, expert immobilier Saint-Cannat, estimation immobilière Saint-Cannat, achat vente maison Saint-Cannat';
 $extraCss     = ['/assets/css/villes.css'];

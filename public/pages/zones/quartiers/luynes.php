@@ -1,5 +1,5 @@
 <?php
-$pageTitle    = 'Immobilier Luynes Aix-en-Provence - Expert | Pascal Hamm';
+$pageTitle    = 'Immobilier Luynes Aix-en-Provence - Expert | ' . ADVISOR_NAME;
 $metaDesc     = 'Expert immobilier à Luynes, quartier résidentiel à l\'ouest d\'Aix-en-Provence. Maisons pavillonnaires, résidences et appartements dans un cadre calme et bien desservi.';
 $metaKeywords = 'immobilier Luynes, maison Luynes Aix, appartement Luynes, expert immobilier ouest Aix-en-Provence, Luynes résidentiel';
 $extraCss     = ['/assets/css/villes.css'];

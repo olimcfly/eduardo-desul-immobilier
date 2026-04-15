@@ -1,5 +1,5 @@
 <?php
-$pageTitle    = 'Immobilier Jas de Bouffan Aix-en-Provence - Expert | Pascal Hamm';
+$pageTitle    = 'Immobilier Jas de Bouffan Aix-en-Provence - Expert | ' . ADVISOR_NAME;
 $metaDesc     = 'Expert immobilier dans le quartier Jas de Bouffan à Aix-en-Provence. Quartier résidentiel familial avec maisons et appartements, proche des écoles et commerces.';
 $metaKeywords = 'immobilier Jas de Bouffan Aix, appartement Jas de Bouffan, maison Jas de Bouffan, expert immobilier quartier ouest Aix';
 $extraCss     = ['/assets/css/villes.css'];

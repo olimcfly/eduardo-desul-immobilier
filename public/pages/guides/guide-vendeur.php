@@ -1,7 +1,7 @@
 <?php
-require_once __DIR__ . '/../../core/bootstrap.php';
 
-$advisor = $db->query("SELECT * FROM advisors WHERE id = 1")->fetch();
+
+$advisor = ['name' => trim(setting('advisor_firstname','')." ".setting('advisor_lastname','')) ?: ADVISOR_NAME, 'email' => setting('advisor_email', APP_EMAIL), 'phone' => setting('advisor_phone', APP_PHONE), 'city' => setting('zone_city', APP_CITY)];
 
 $pageTitle       = 'Guide Complet Vendeur — Vendre votre bien immobilier à Aix-en-Provence';
 $pageDescription = 'Tout ce que vous devez savoir pour réussir votre vente immobilière à Aix-en-Provence et le Pays d\'Aix : estimation, préparation, mandat, négociation, signature. Guide gratuit 2025.';
@@ -659,7 +659,7 @@ ob_start();
                                     la plus-value est <strong>totalement exonérée</strong> d'impôt.
                                     Pour une résidence secondaire ou un investissement locatif,
                                     des abattements progressifs s'appliquent à partir de 6 ans
-                                    de détention. Pascal Hamm peut vous orienter vers un notaire
+                                    de détention. ' . ADVISOR_NAME . ' peut vous orienter vers un notaire
                                     partenaire pour simuler votre situation fiscale.
                                 </p>
                             </div>
@@ -751,7 +751,7 @@ ob_start();
                             </div>
                             <h2>Prêt à vendre sur le Pays d\'Aix ?</h2>
                             <p>
-                                Pascal Hamm vous accompagne de A à Z dans votre
+                                ' . ADVISOR_NAME . ' vous accompagne de A à Z dans votre
                                 projet de vente à Aix-en-Provence et ses environs.
                                 Estimation gratuite, stratégie de vente, diffusion,
                                 négociation et signature : un seul interlocuteur pour tout.
@@ -763,7 +763,7 @@ ob_start();
                                 </a>
                                 <a href="/contact" class="btn btn--outline btn--lg">
                                     <i class="fas fa-comments"></i>
-                                    Parler à Pascal Hamm
+                                    Parler à ' . ADVISOR_NAME . '
                                 </a>
                             </div>
                             <p class="guide-cta-final__reassurance">

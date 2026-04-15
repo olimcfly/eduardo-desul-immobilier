@@ -1,5 +1,5 @@
 <?php
-$pageTitle    = 'Immobilier Les Milles Aix-en-Provence - Expert | Pascal Hamm';
+$pageTitle    = 'Immobilier Les Milles Aix-en-Provence - Expert | ' . ADVISOR_NAME;
 $metaDesc     = 'Expert immobilier aux Milles, secteur résidentiel et d\'activités au sud d\'Aix-en-Provence. Appartements, maisons et locaux professionnels à proximité du technopôle.';
 $metaKeywords = 'immobilier Les Milles, appartement Les Milles Aix, maison Les Milles, expert immobilier sud Aix-en-Provence, technopôle Milles';
 $extraCss     = ['/assets/css/villes.css'];

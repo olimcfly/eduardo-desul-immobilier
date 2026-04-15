@@ -1,5 +1,5 @@
 <?php
-$pageTitle = 'Ressources immobilières — Pascal Hamm';
+$pageTitle = 'Ressources immobilières — ' . ADVISOR_NAME . '';
 $metaDesc  = 'Guides gratuits pour acheter ou vendre votre bien immobilier : guide vendeur, guide acheteur, check-lists, simulateurs.';
 $extraCss  = ['/assets/css/guide.css'];
 $guidesByPersona = require __DIR__ . '/guides-data.php';
@@ -84,7 +84,7 @@ foreach ($guidesByPersona as $catalog) {
         <div style="max-width:750px;margin:0 auto" data-animate>
             <?php
             $faqs = [
-                ['Combien coûte une estimation immobilière ?', 'L\'estimation de votre bien par Pascal Hamm est entièrement gratuite et sans engagement. Vous recevrez un rapport détaillé sous 48h.'],
+                ['Combien coûte une estimation immobilière ?', 'L\'estimation de votre bien par ' . ADVISOR_NAME . ' est entièrement gratuite et sans engagement. Vous recevrez un rapport détaillé sous 48h.'],
                 ['Combien de temps prend une vente immobilière à Aix-en-Provence ?', 'En moyenne, une vente se conclut en 60 à 90 jours à Aix-en-Provence. Avec un bien bien préparé et au bon prix, certaines ventes se font en moins de 4 semaines.'],
                 ['Quels sont les honoraires d\'un conseiller immobilier ?', 'Mes honoraires de vente représentent entre 4% et 6% du prix de vente TTC. Ils ne sont dus qu\'en cas de vente réussie. L\'estimation est toujours gratuite.'],
                 ['Puis-je acheter et vendre en même temps ?', 'Oui, c\'est ce qu\'on appelle une "vente-achat" ou achat en chaîne. Pascal vous accompagne pour coordonner les deux transactions et éviter le prêt-relais si possible.'],

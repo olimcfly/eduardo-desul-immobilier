@@ -1,5 +1,5 @@
 <?php
-$pageTitle = 'Guide du vendeur immobilier — Pascal Hamm';
+$pageTitle = 'Guide du vendeur immobilier — ' . ADVISOR_NAME . '';
 $metaDesc  = 'Guide complet pour vendre votre bien immobilier à Aix-en-Provence : estimation, diagnostics, home staging, négociation.';
 $extraCss  = ['/assets/css/guide.css'];
 ?>

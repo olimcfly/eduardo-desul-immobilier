@@ -1,7 +1,7 @@
 <?php
 // Définition des métadonnées pour la page
 $pageTitle = "Immobilier Simiane-Collongue - Expert immobilier indépendant";
-$pageDescription = "Découvrez l'immobilier à Simiane-Collongue avec Pascal Hamm, expert immobilier indépendant. Estimation gratuite, vente et achat d'appartements et maisons.";
+$pageDescription = "Découvrez l'immobilier à Simiane-Collongue avec ' . ADVISOR_NAME . ', expert immobilier indépendant. Estimation gratuite, vente et achat d'appartements et maisons.";
 $metaKeywords = 'immobilier Simiane-Collongue, expert immobilier Simiane-Collongue, estimation immobilière Simiane-Collongue, achat immobilier Simiane-Collongue, vente immobilière Simiane-Collongue, conseiller immobilier indépendant Simiane-Collongue';
 
 // CSS supplémentaire pour cette page

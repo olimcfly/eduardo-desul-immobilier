@@ -1,6 +1,6 @@
 <?php
 $slug      = $slug ?? '';
-$pageTitle = 'Actualité — Pascal Hamm Immobilier';
+$pageTitle = 'Actualité — ' . ADVISOR_NAME . ' Immobilier';
 $metaDesc  = '';
 $extraCss  = ['/assets/css/guide.css'];
 $extraJs   = ['/assets/js/guide.js'];
@@ -14,7 +14,7 @@ $articles = [
         'titre'   => 'Prix au m² & étude de marché Aix-en-Provence : analyse assistée par Perplexity',
         'cat'     => 'Analyse IA',
         'date'    => '3 avril 2026',
-        'auteur'  => 'Pascal Hamm',
+        'auteur'  => '' . ADVISOR_NAME . '',
         'img'     => $publicDomainImages['city'],
         'intro'   => "Cette page centralise les repères essentiels pour comprendre le marché local : prix au m², dynamique de demande et signaux d'évolution. Les recherches sont appuyées par Perplexity pour accélérer la veille et croiser les sources.",
         'sections' => [
@@ -51,7 +51,7 @@ $articles = [
         'titre'   => 'Le marché immobilier aixois au T1 2026 : reprise prudente',
         'cat'     => 'Marché',
         'date'    => '2 avril 2026',
-        'auteur'  => 'Pascal Hamm',
+        'auteur'  => '' . ADVISOR_NAME . '',
         'img'     => $publicDomainImages['map'],
         'intro'   => "Le premier trimestre 2026 confirme la tendance prudente d'un marché en cours de stabilisation après deux années de correction. Les volumes de transactions à Aix-en-Provence métropole restent en retrait de 12% par rapport à 2023, mais les premiers signes de reprise sont encourageants.",
         'sections' => [
@@ -67,7 +67,7 @@ $articles = [
     ],
 ];
 $article = $articles[$slug] ?? $articles['default'];
-$pageTitle = e($article['titre']) . ' — Pascal Hamm';
+$pageTitle = e($article['titre']) . ' — ' . ADVISOR_NAME . '';
 ?>
 
 <div class="page-header" style="padding-bottom:2rem">

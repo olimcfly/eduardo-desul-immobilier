@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../../core/bootstrap.php';
 
 $pageTitle = 'Merci — Votre demande a bien été reçue';
-$metaDesc  = 'Votre demande d\'estimation a été transmise. Pascal Hamm vous recontactera sous 24h.';
+$metaDesc  = 'Votre demande d\'estimation a été transmise. ADVISOR_NAME vous recontactera sous 24h.';
 $extraCss  = ['/assets/css/merci.css'];
 
 // Articles blog récents pour ressources
@@ -32,7 +32,7 @@ ob_start();
                 </div>
                 <h1>Demande bien reçue !</h1>
                 <p class="merci-lead">
-                    Pascal Hamm vous recontactera <strong>dans les 24 heures</strong>
+                    ADVISOR_NAME vous recontactera <strong>dans les 24 heures</strong>
                     pour confirmer votre rendez-vous et préparer votre estimation personnalisée.
                 </p>
                 <div class="merci-next-steps">

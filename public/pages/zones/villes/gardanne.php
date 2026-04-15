@@ -1,6 +1,6 @@
 <?php
-$pageTitle    = 'Immobilier Gardanne - Expert immobilier indépendant | Pascal Hamm';
-$metaDesc     = 'Achetez, vendez ou estimez votre bien à Gardanne avec Pascal Hamm, expert immobilier indépendant. Connaissance approfondie du marché local et accompagnement personnalisé.';
+$pageTitle    = 'Immobilier Gardanne - Expert immobilier indépendant | ' . ADVISOR_NAME;
+$metaDesc     = 'Achetez, vendez ou estimez votre bien à Gardanne avec ' . ADVISOR_NAME . ', expert immobilier indépendant. Connaissance approfondie du marché local et accompagnement personnalisé.';
 $metaKeywords = 'immobilier Gardanne, expert immobilier Gardanne, estimation immobilière Gardanne, achat immobilier Gardanne, vente immobilière Gardanne';
 $extraCss     = ['/assets/css/villes.css'];
 

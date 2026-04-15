@@ -1,5 +1,5 @@
 <?php
-$pageTitle    = 'Immobilier Quartier Mazarin Aix-en-Provence - Expert | Pascal Hamm';
+$pageTitle    = 'Immobilier Quartier Mazarin Aix-en-Provence - Expert | ' . ADVISOR_NAME;
 $metaDesc     = 'Expert immobilier dans le quartier Mazarin à Aix-en-Provence. Le quartier le plus prestigieux d\'Aix — hôtels particuliers, appartements haussmanniens, rues arborées.';
 $metaKeywords = 'immobilier quartier Mazarin Aix-en-Provence, appartement Mazarin, hôtel particulier Mazarin, expert immobilier Mazarin Aix';
 $extraCss     = ['/assets/css/villes.css'];
