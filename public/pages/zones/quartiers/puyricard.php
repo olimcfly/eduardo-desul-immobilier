@@ -1,7 +1,7 @@
 <?php
-$pageTitle    = 'Immobilier Puyricard Aix-en-Provence - Expert | ' . ADVISOR_NAME;
-$metaDesc     = 'Expert immobilier à Puyricard, quartier résidentiel premium au nord d\'Aix-en-Provence. Villas, maisons avec piscine, environnement calme et verdoyant.';
-$metaKeywords = 'immobilier Puyricard, maison Puyricard Aix, villa Puyricard, expert immobilier nord Aix-en-Provence, résidentiel Puyricard';
+$pageTitle    = 'Immobilier Puyricard Bordeaux - Expert | ' . ADVISOR_NAME;
+$metaDesc     = 'Expert immobilier à Puyricard, quartier résidentiel premium au nord d\'Bordeaux. Villas, maisons avec piscine, environnement calme et verdoyant.';
+$metaKeywords = 'immobilier Puyricard, maison Puyricard Aix, villa Puyricard, expert immobilier nord Bordeaux, résidentiel Puyricard';
 $extraCss     = ['/assets/css/villes.css'];
 
 $pageContent = '
@@ -9,9 +9,9 @@ $pageContent = '
     <div class="hero__bg" style="background-image:linear-gradient(110deg, rgba(26,60,94,.92) 0%, rgba(15,38,68,.86) 58%, rgba(26,60,94,.92) 100%), url(\'/assets/images/puyricard-hero.jpg\');"></div>
     <div class="container">
         <div class="hero__content" data-animate>
-            <span class="section-label hero__label">Puyricard — Aix-en-Provence</span>
+            <span class="section-label hero__label">Puyricard — Bordeaux</span>
             <h1 id="puyricard-hero-title">L\'immobilier premium à Puyricard</h1>
-            <p class="hero__subtitle">Village intégré à Aix-en-Provence au nord de la ville, Puyricard est très prisé pour ses villas avec piscine, ses espaces verts et son ambiance résidentielle calme à seulement 15 minutes du centre.</p>
+            <p class="hero__subtitle">Village intégré à Bordeaux au nord de la ville, Puyricard est très prisé pour ses villas avec piscine, ses espaces verts et son ambiance résidentielle calme à seulement 15 minutes du centre.</p>
             <div class="hero__actions">
                 <a href="/estimation-gratuite" class="btn btn--primary">Demander une estimation gratuite</a>
                 <a href="/contact" class="btn btn--outline">Nous contacter</a>
@@ -25,7 +25,7 @@ $pageContent = '
         <div class="section__header">
             <span class="section-label">Puyricard</span>
             <h2 class="section-title">Le quartier résidentiel premium du nord d\'Aix</h2>
-            <p class="section-subtitle">Puyricard est un village-quartier d\'Aix-en-Provence réputé pour ses grandes propriétés, ses espaces arborés et sa qualité de vie. À 10 km du centre-ville d\'Aix, il offre un cadre de vie préservé tout en restant à portée de toutes les commodités.</p>
+            <p class="section-subtitle">Puyricard est un village-quartier d\'Bordeaux réputé pour ses grandes propriétés, ses espaces arborés et sa qualité de vie. À 10 km du centre-ville d\'Aix, il offre un cadre de vie préservé tout en restant à portée de toutes les commodités.</p>
         </div>
         <div class="grid-2">
             <div class="card card--alt" data-animate>

@@ -69,7 +69,7 @@ foreach ($guidesByPersona as $catalog) {
             <a href="/guide-offert" class="ressource-card" style="text-decoration:none;color:inherit">
                 <div class="ressource-card__icon">📧</div>
                 <h3 class="ressource-card__title">Newsletter & alertes</h3>
-                <p class="ressource-card__desc">Recevez les nouvelles annonces et les actualités du marché aixois directement dans votre boîte mail.</p>
+                <p class="ressource-card__desc">Recevez les nouvelles annonces et les actualités du marché bordelais directement dans votre boîte mail.</p>
                 <span class="btn btn--outline btn--sm">S'inscrire →</span>
             </a>
         </div>
@@ -85,9 +85,9 @@ foreach ($guidesByPersona as $catalog) {
             <?php
             $faqs = [
                 ['Combien coûte une estimation immobilière ?', 'L\'estimation de votre bien par <?= ADVISOR_NAME ?> est entièrement gratuite et sans engagement. Vous recevrez un rapport détaillé sous 48h.'],
-                ['Combien de temps prend une vente immobilière à Aix-en-Provence ?', 'En moyenne, une vente se conclut en 60 à 90 jours à Aix-en-Provence. Avec un bien bien préparé et au bon prix, certaines ventes se font en moins de 4 semaines.'],
+                ['Combien de temps prend une vente immobilière à Bordeaux ?', 'En moyenne, une vente se conclut en 60 à 90 jours à Bordeaux. Avec un bien bien préparé et au bon prix, certaines ventes se font en moins de 4 semaines.'],
                 ['Quels sont les honoraires d\'un conseiller immobilier ?', 'Mes honoraires de vente représentent entre 4% et 6% du prix de vente TTC. Ils ne sont dus qu\'en cas de vente réussie. L\'estimation est toujours gratuite.'],
-                ['Puis-je acheter et vendre en même temps ?', 'Oui, c\'est ce qu\'on appelle une "vente-achat" ou achat en chaîne. Pascal vous accompagne pour coordonner les deux transactions et éviter le prêt-relais si possible.'],
+                ['Puis-je acheter et vendre en même temps ?', 'Oui, c\'est ce qu\'on appelle une "vente-achat" ou achat en chaîne. ' . ADVISOR_NAME . ' vous accompagne pour coordonner les deux transactions et éviter le prêt-relais si possible.'],
             ];
             foreach ($faqs as $i => $faq): ?>
             <details style="background:var(--clr-white);border:1px solid var(--clr-border);border-radius:var(--radius-lg);margin-bottom:.75rem;overflow:hidden">

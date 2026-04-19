@@ -36,7 +36,7 @@ $bodyClass  = 'page-capture';
             <div style="color:white">
                 <span class="section-label" style="color:rgba(255,255,255,.9)">Offert · Téléchargeable instantanément</span>
                 <h1 style="color:white;margin-bottom:1rem">Le Guide Complet<br>de l'Immobilier Bordelais</h1>
-                <p style="opacity:.85;font-size:1.05rem;margin-bottom:2rem">Tout ce qu'il faut savoir pour réussir votre projet immobilier à Aix-en-Provence en 2026 : prix, quartiers, financement, stratégies.</p>
+                <p style="opacity:.85;font-size:1.05rem;margin-bottom:2rem">Tout ce qu'il faut savoir pour réussir votre projet immobilier à Bordeaux en 2026 : prix, quartiers, financement, stratégies.</p>
 
                 <div style="background:rgba(255,255,255,.1);border-radius:var(--radius-lg);padding:1.5rem;margin-bottom:2rem">
                     <div style="font-weight:700;margin-bottom:1rem">Au programme :</div>

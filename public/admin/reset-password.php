@@ -15,8 +15,7 @@ $tokenData = null;
 if ($tokenHash !== '') {
     try {
         $stmt = db()->prepare("
-            SELECT prt.id, prt.user_id, prt.expires_at, prt.used_at, u.email,
-                   CONCAT(COALESCE(u.firstname,''), ' ', COALESCE(u.lastname,'')) AS name
+            SELECT prt.id, prt.user_id, prt.expires_at, prt.used_at, u.email, u.name
             FROM   password_reset_tokens prt
             JOIN   users u ON u.id = prt.user_id
             WHERE  prt.token_hash = ?
@@ -58,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $tokenData !== null) {
             $hash = Auth::hashPassword($password);
 
             // Mettre à jour le mot de passe
-            $pdo->prepare("UPDATE users SET password_hash = ? WHERE id = ?")
+            $pdo->prepare("UPDATE users SET password = ? WHERE id = ?")
                 ->execute([$hash, $tokenData['user_id']]);
 
             // Marquer le token comme utilisé

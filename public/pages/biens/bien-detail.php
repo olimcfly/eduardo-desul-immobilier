@@ -36,7 +36,7 @@ $similairesStmt->execute([':id' => $b['id'], ':type_bien' => $b['type_bien']]);
 $similaires = $similairesStmt->fetchAll(PDO::FETCH_ASSOC);
 
 // ── Aliases de colonnes pour rétro-compatibilité du template ─
-$b['secteur_name'] = $b['secteur'] ?: $b['ville'] ?: 'Aix-en-Provence';
+$b['secteur_name'] = $b['secteur'] ?: $b['ville'] ?: 'Bordeaux';
 $b['type_label']   = ucfirst($b['type_bien'] ?? 'Bien');
 $typeIcons = ['appartement'=>'fa-building','maison'=>'fa-home','terrain'=>'fa-mountain','local'=>'fa-store','autre'=>'fa-key'];
 $b['type_icon']    = $typeIcons[$b['type_bien'] ?? ''] ?? 'fa-home';
@@ -113,7 +113,7 @@ $extraJs  = ['/assets/js/bien-detail.js'];
     "address": {
         "@type":           "PostalAddress",
         "addressLocality": "<?= htmlspecialchars($b['secteur_name']) ?>",
-        "addressRegion":   "Bouches-du-Rhône",
+        "addressRegion":   "Gironde",
         "addressCountry":  "FR"
     }
 }
@@ -459,16 +459,16 @@ $extraJs  = ['/assets/js/bien-detail.js'];
                         La localisation exacte est communiquée lors de la prise de contact.
                     </p>
 
-                    <!-- Points d'intérêt Aix -->
+                    <!-- Points d'intérêt Bordeaux -->
                     <div class="bien-poi-grid">
                         <?php
                         $pois = [
                             ['icon' => 'fa-graduation-cap', 'label' => 'Universités / Grandes écoles'],
-                            ['icon' => 'fa-train',          'label' => 'Gare TGV Aix-en-Provence'],
-                            ['icon' => 'fa-bus',            'label' => 'Bus / Navettes'],
-                            ['icon' => 'fa-shopping-bag',   'label' => 'Cours Mirabeau / commerces'],
-                            ['icon' => 'fa-plane',          'label' => 'Aéroport Marseille-Provence'],
-                            ['icon' => 'fa-road',           'label' => 'A8 / A51 — accès autoroute'],
+                            ['icon' => 'fa-train',          'label' => 'Gare Saint-Jean TGV'],
+                            ['icon' => 'fa-tram',           'label' => 'Tram / Bus TBM'],
+                            ['icon' => 'fa-shopping-bag',   'label' => 'Quais de Bordeaux / commerces'],
+                            ['icon' => 'fa-plane',          'label' => 'Aéroport Bordeaux-Mérignac'],
+                            ['icon' => 'fa-road',           'label' => 'Rocade A630 — accès autoroute'],
                         ];
                         foreach ($pois as $poi): ?>
                         <div class="bien-poi-item">

@@ -213,7 +213,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $action === 'api_create_social_sequ
             ':user_id' => $userId,
             ':nom' => 'SEO → Social · ' . mb_substr((string)($article['titre'] ?? 'Article'), 0, 120),
             ':persona' => $persona !== '' ? $persona : 'Persona libre',
-            ':zone' => (string)setting('zone_city', 'Aix-en-Provence'),
+            ':zone' => (string)setting('zone_city', 'Bordeaux'),
             ':statut' => 'active',
             ':objectif' => $objectif,
         ]);

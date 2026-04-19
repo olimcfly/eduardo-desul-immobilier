@@ -3,7 +3,7 @@
 // CONFIG GLOBALE — Core (legacy)
 // ============================================================
 
-define('APP_NAME',      $_ENV['APP_NAME'] ?? 'Pascal Hamm Immobilier');
+define('APP_NAME',      $_ENV['APP_NAME'] ?? 'Eduardo Desul Immobilier');
 
 $configuredAppUrl = trim((string) ($_ENV['APP_URL'] ?? ''));
 $appHost          = strtolower((string) parse_url($configuredAppUrl, PHP_URL_HOST));
@@ -37,7 +37,7 @@ define('ADVISOR_NAME',  $_ENV['ADVISOR_NAME'] ?? '');
 define('ADVISOR_CARTE', $_ENV['ADVISOR_CARTE'] ?? '');
 define('ADVISOR_RSAC',  $_ENV['ADVISOR_RSAC'] ?? '');
 
-define('ROOT_PATH',     $_ENV['ROOT_PATH'] ?? dirname(__DIR__, 2));
+defined('ROOT_PATH') || define('ROOT_PATH',     $_ENV['ROOT_PATH'] ?? dirname(__DIR__, 2));
 define('PUBLIC_PATH',   ROOT_PATH . '/public');
 define('STORAGE_PATH',  ROOT_PATH . '/storage');
 define('MODULES_PATH',  ROOT_PATH . '/modules');

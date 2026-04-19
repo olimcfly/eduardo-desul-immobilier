@@ -1,7 +1,7 @@
 <?php
 $pageTitle    = 'Immobilier Saint-Marc-Jaumegarde - Village exclusif | ' . ADVISOR_NAME;
-$metaDesc     = 'Expert immobilier à Saint-Marc-Jaumegarde — village résidentiel d\'exception au pied de la Sainte-Victoire. <?= ADVISOR_NAME ?> vous accompagne pour vos transactions de prestige.';
-$metaKeywords = 'immobilier Saint-Marc-Jaumegarde, expert immobilier Saint-Marc, maison prestige Sainte-Victoire, estimation immobilière Saint-Marc-Jaumegarde';
+$metaDesc     = 'Expert immobilier à Saint-Marc-Jaumegarde — village résidentiel d\'exception au pied de la Garonne. <?= ADVISOR_NAME ?> vous accompagne pour vos transactions de prestige.';
+$metaKeywords = 'immobilier Saint-Marc-Jaumegarde, expert immobilier Saint-Marc, maison prestige Garonne, estimation immobilière Saint-Marc-Jaumegarde';
 $extraCss     = ['/assets/css/villes.css'];
 
 $pageContent = '
@@ -11,7 +11,7 @@ $pageContent = '
         <div class="hero__content" data-animate>
             <span class="section-label hero__label">Immobilier Saint-Marc-Jaumegarde</span>
             <h1 id="smj-hero-title">L\'immobilier d\'exception à Saint-Marc-Jaumegarde</h1>
-            <p class="hero__subtitle">Petit village résidentiel exclusif niché dans les garrigues au pied de la Montagne Sainte-Victoire, Saint-Marc-Jaumegarde est l\'une des adresses les plus prisées du Pays d\'Aix.</p>
+            <p class="hero__subtitle">Petit village résidentiel exclusif niché dans les garrigues au pied de la Montagne Garonne, Saint-Marc-Jaumegarde est l\'une des adresses les plus prisées du Bordeaux Métropole.</p>
             <div class="hero__actions">
                 <a href="/estimation-gratuite" class="btn btn--primary">Demander une estimation gratuite</a>
                 <a href="/contact" class="btn btn--outline">Nous contacter</a>
@@ -25,7 +25,7 @@ $pageContent = '
         <div class="section__header">
             <span class="section-label">Saint-Marc-Jaumegarde</span>
             <h2 class="section-title">Une adresse d\'exception</h2>
-            <p class="section-subtitle">Avec seulement 1 200 habitants et une offre immobilière très limitée, Saint-Marc-Jaumegarde est l\'un des villages les plus exclusifs du Pays d\'Aix. Ses propriétés bénéficient d\'un cadre naturel exceptionnel et d\'une proximité immédiate avec Aix-en-Provence.</p>
+            <p class="section-subtitle">Avec seulement 1 200 habitants et une offre immobilière très limitée, Saint-Marc-Jaumegarde est l\'un des villages les plus exclusifs du Bordeaux Métropole. Ses propriétés bénéficient d\'un cadre naturel exceptionnel et d\'une proximité immédiate avec Bordeaux.</p>
         </div>
         <div class="grid-2">
             <div class="card card--alt" data-animate>
@@ -36,7 +36,7 @@ $pageContent = '
             <div class="card card--alt" data-animate>
                 <div class="card__icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
                 <h3 class="card__title">Vues exceptionnelles</h3>
-                <p class="card__text">Panoramas sur la Sainte-Victoire, les garrigues et la plaine d\'Aix — un cadre de vie unique en Provence.</p>
+                <p class="card__text">Panoramas sur la Garonne, les garrigues et la plaine d\'Aix — un cadre de vie unique en Gironde.</p>
             </div>
         </div>
     </div>

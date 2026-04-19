@@ -3,8 +3,8 @@
 
 $advisor = ['name' => trim(setting('advisor_firstname','')." ".setting('advisor_lastname','')) ?: ADVISOR_NAME, 'email' => setting('advisor_email', APP_EMAIL), 'phone' => setting('advisor_phone', APP_PHONE), 'city' => setting('zone_city', APP_CITY)];
 
-$pageTitle       = 'Guide Complet Acheteur — Acheter votre bien immobilier à Aix-en-Provence';
-$pageDescription = 'Tout ce que vous devez savoir pour réussir votre achat immobilier à Aix-en-Provence et le Pays d\'Aix : budget, recherche, offre, financement, signature. Guide gratuit 2025.';
+$pageTitle       = 'Guide Complet Acheteur — Acheter votre bien immobilier à Bordeaux';
+$pageDescription = 'Tout ce que vous devez savoir pour réussir votre achat immobilier à Bordeaux et la Métropole : budget, recherche, offre, financement, signature. Guide gratuit 2025.';
 $pageCanonical   = '/guide-acheteur';
 
 ob_start();
@@ -17,8 +17,8 @@ ob_start();
 {
     "@context": "https://schema.org",
     "@type": "HowTo",
-    "name": "Comment acheter un bien immobilier à Aix-en-Provence",
-    "description": "Guide complet pour réussir votre achat immobilier à Aix-en-Provence et dans le Pays d\'Aix en <?= date('Y') ?>",
+    "name": "Comment acheter un bien immobilier à Bordeaux",
+    "description": "Guide complet pour réussir votre achat immobilier à Bordeaux et dans la Métropole en <?= date('Y') ?>",
     "totalTime": "PT25M",
     "step": [
         {"@type":"HowToStep","name":"Définir votre budget","position":1},
@@ -48,13 +48,13 @@ ob_start();
 
                 <h1 class="guide-hero__title">
                     Acheter votre bien immobilier<br>
-                    <span class="guide-hero__highlight">à Aix-en-Provence en toute sérénité</span>
+                    <span class="guide-hero__highlight">à Bordeaux en toute sérénité</span>
                 </h1>
 
                 <p class="guide-hero__subtitle">
                     De la définition de votre budget jusqu'à la remise des clés :
-                    les 6 étapes pour réussir votre achat immobilier sur Aix-en-Provence
-                    et le Pays d\'Aix, éviter les pièges et acheter au bon prix.
+                    les 6 étapes pour réussir votre achat immobilier sur Bordeaux
+                    et la Métropole, éviter les pièges et acheter au bon prix.
                 </p>
 
                 <div class="guide-hero__stats">
@@ -119,7 +119,7 @@ ob_start();
                                 visiter des biens avant d'avoir validé leur financement.
                                 Résultat : coups de cœur impossibles, déceptions, et parfois
                                 offres refusées faute de dossier solide.
-                                Sur le marché d\'Aix-en-Provence, très tendu, un dossier
+                                Sur le marché de Bordeaux, très tendu, un dossier
                                 bancaire validé est souvent décisif.
                             </p>
 
@@ -195,7 +195,7 @@ ob_start();
                             <p>
                                 Les banques exigent en général un apport minimum de
                                 <strong>10 % du prix d'achat</strong> pour couvrir les frais de notaire.
-                                Sur Aix-en-Provence où le prix moyen au m² dépasse <strong>4 500 €</strong>,
+                                Sur Bordeaux où le prix moyen au m² avoisine <strong>4 000 €</strong>,
                                 un apport solide renforce considérablement votre dossier face à la concurrence.
                             </p>
 
@@ -219,10 +219,10 @@ ob_start();
                         <div class="guide-step__content">
 
                             <p>
-                                Le Pays d\'Aix offre une grande diversité de biens :
-                                appartements en centre-ville, bastides en périphérie,
-                                maisons de village à Éguilles ou Venelles, programmes neufs
-                                à Luynes ou Les Milles. Définir précisément votre projet
+                                Bordeaux Métropole offre une grande diversité de biens :
+                                appartements en centre-ville, maisons de ville aux Chartrons
+                                ou à Caudéran, bastides girondines en périphérie, programmes neufs
+                                à Mérignac ou Pessac. Définir précisément votre projet
                                 vous évitera de vous éparpiller.
                             </p>
 
@@ -238,7 +238,7 @@ ob_start();
                                         <li>Surface minimale (m²)</li>
                                         <li>Nombre de pièces / chambres</li>
                                         <li>Budget maximum</li>
-                                        <li>Secteur géographique (Aix centre, Jas de Bouffan, campagne…)</li>
+                                        <li>Secteur géographique (Bordeaux centre, Chartrons, Caudéran, périphérie…)</li>
                                         <li>Type de bien (appartement, maison, bastide)</li>
                                     </ul>
                                 </div>
@@ -249,7 +249,7 @@ ob_start();
                                         <span class="criteria-badge criteria-badge--want">Important</span>
                                     </div>
                                     <ul>
-                                        <li>Parking / garage (indispensable centre Aix)</li>
+                                        <li>Parking / garage (indispensable centre Bordeaux)</li>
                                         <li>Extérieur (balcon, terrasse, jardin, piscine)</li>
                                         <li>Étage (pas RDC)</li>
                                         <li>Double exposition / luminosité</li>
@@ -267,7 +267,7 @@ ob_start();
                                         <li>Gardien / résidence sécurisée</li>
                                         <li>Parquet / matériaux anciens</li>
                                         <li>Hauteur sous plafond</li>
-                                        <li>Vue Sainte-Victoire ou dégagée</li>
+                                        <li>Vue Garonne ou dégagée</li>
                                     </ul>
                                 </div>
                             </div>
@@ -304,9 +304,9 @@ ob_start();
                                             <td>Moderne</td>
                                         </tr>
                                         <tr>
-                                            <td>Prix au m² Aix</td>
-                                            <td>4 000 – 6 500 €</td>
-                                            <td>5 000 – 7 500 €</td>
+                                            <td>Prix au m² Bordeaux</td>
+                                            <td>3 500 – 5 500 €</td>
+                                            <td>4 200 – 6 000 €</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -325,7 +325,7 @@ ob_start();
                                 <h2 class="guide-step__title">Organiser votre recherche</h2>
                                 <p class="guide-step__subtitle">
                                     Méthode, sources et checklist de visite pour ne rien laisser au hasard
-                                    sur le marché du Pays d\'Aix.
+                                    sur le marché de Bordeaux Métropole.
                                 </p>
                             </div>
                         </div>
@@ -334,14 +334,14 @@ ob_start();
                             <!-- Sources -->
                             <?php
                             $sources = [
-                                ['icon'=>'fa-building-user', 'name'=>'Agences locales Pays d\'Aix',   'pct'=>'45%',
-                                 'tip'=>'Relation directe, biens off-market sur Aix, Le Tholonet, Éguilles, Venelles…', 'color'=>'blue'],
+                                ['icon'=>'fa-building-user', 'name'=>'Agences locales Bordeaux Métropole', 'pct'=>'45%',
+                                 'tip'=>'Relation directe, biens off-market sur Bordeaux, Chartrons, Caudéran, Pessac…', 'color'=>'blue'],
                                 ['icon'=>'fa-globe',         'name'=>'Portails (SeLoger, BienIci…)',  'pct'=>'35%',
-                                 'tip'=>'Large choix, alertes email — filtrer sur 13100 et communes limitrophes',       'color'=>'green'],
+                                 'tip'=>'Large choix, alertes email — filtrer sur 33000 et communes limitrophes',       'color'=>'green'],
                                 ['icon'=>'fa-people-group',  'name'=>'Réseau personnel',              'pct'=>'12%',
-                                 'tip'=>'Bouche à oreille — souvent les meilleures affaires en Provence',              'color'=>'purple'],
+                                 'tip'=>'Bouche à oreille — souvent les meilleures affaires en Gironde',               'color'=>'purple'],
                                 ['icon'=>'fa-gavel',         'name'=>'Notaires / ventes judiciaires', 'pct'=>'5%',
-                                 'tip'=>'Successions, licitations — opportunités sur bastides et corps de ferme',      'color'=>'orange'],
+                                 'tip'=>'Successions, licitations — opportunités sur bastides girondines et domaines', 'color'=>'orange'],
                                 ['icon'=>'fa-newspaper',     'name'=>'PAP / particuliers',            'pct'=>'3%',
                                  'tip'=>'Sans frais agence, mais plus de risques juridiques',                          'color'=>'gray'],
                             ];
@@ -377,12 +377,12 @@ ob_start();
                                         'Pression et qualité de l\'eau',
                                     ],
                                     'Environnement' => [
-                                        'Bruit (avenue, voisins, terrasses, route D9/A8) ?',
-                                        'Ensoleillement aux heures clés (exposition sud appréciée en Provence)',
+                                        'Bruit (avenue, voisins, terrasses, rocade A630) ?',
+                                        'Ensoleillement aux heures clés (exposition ouest/Garonne très recherchée)',
                                         'Vis-à-vis et intimité (mitoyenneté, résidence fermée ?)',
-                                        'Stationnement disponible (centre Aix — zone bleue / parking résidentiel)',
-                                        'Proximité écoles, tramway, Cours Mirabeau, commerces',
-                                        'Proximité Montagne Sainte-Victoire ou espaces naturels (valeur +)',
+                                        'Stationnement disponible (centre Bordeaux — zone payante / parking résidentiel)',
+                                        'Proximité écoles, tramway, Quais de Bordeaux, commerces',
+                                        'Proximité Garonne, Parc Bordelais ou espaces naturels (valeur +)',
                                     ],
                                     'Copropriété' => [
                                         'Montant des charges mensuelles',
@@ -418,7 +418,7 @@ ob_start();
                             <div>
                                 <h2 class="guide-step__title">Faire une offre</h2>
                                 <p class="guide-step__subtitle">
-                                    Comment négocier intelligemment sur le marché aixois
+                                    Comment négocier intelligemment sur le marché bordelais
                                     sans perdre le bien convoité.
                                 </p>
                             </div>
@@ -426,10 +426,10 @@ ob_start();
                         <div class="guide-step__content">
 
                             <p>
-                                Le marché du Pays d\'Aix est structurellement tendu.
-                                Certains secteurs (Mazarin, Cours Mirabeau, Célony)
+                                Le marché de Bordeaux Métropole est structurellement tendu.
+                                Certains secteurs (Triangle d'Or, Chartrons, bords de Garonne)
                                 se vendent au prix affiché voire au-dessus.
-                                D'autres communes limitrophes offrent plus de marge.
+                                D'autres communes de la Métropole offrent plus de marge.
                             </p>
 
                             <!-- Grille de négociation -->
@@ -437,12 +437,12 @@ ob_start();
                                 <div class="nego-card nego-card--low">
                                     <div class="nego-card__pct">0 – 2 %</div>
                                     <div class="nego-card__label">Marché tendu</div>
-                                    <p>Bien rare, Aix centre / Mazarin / vue Sainte-Victoire. Offrir au prix ou au-dessus si concurrence.</p>
+                                    <p>Bien rare, Triangle d'Or / Chartrons / vue Garonne. Offrir au prix ou au-dessus si concurrence.</p>
                                 </div>
                                 <div class="nego-card nego-card--mid">
                                     <div class="nego-card__pct">3 – 5 %</div>
                                     <div class="nego-card__label">Marché équilibré</div>
-                                    <p>Marge standard sur périphérie Aix, Éguilles, Venelles — justifiée par travaux ou comparaison de marché.</p>
+                                    <p>Marge standard sur périphérie Bordeaux, Mérignac, Pessac — justifiée par travaux ou comparaison de marché.</p>
                                 </div>
                                 <div class="nego-card nego-card--high">
                                     <div class="nego-card__pct">6 – 10 %</div>
@@ -452,7 +452,7 @@ ob_start();
                                 <div class="nego-card nego-card--max">
                                     <div class="nego-card__pct">> 10 %</div>
                                     <div class="nego-card__label">Situation particulière</div>
-                                    <p>Succession urgente, mutation, problème de copropriété. Rare mais possible en communes rurales du Pays d\'Aix.</p>
+                                    <p>Succession urgente, mutation, problème de copropriété. Rare mais possible en communes rurales de la Métropole bordelaise.</p>
                                 </div>
                             </div>
 
@@ -525,10 +525,10 @@ ob_start();
                             <h3>Aides disponibles en 2025</h3>
                             <?php
                             $aides = [
-                                ['PTZ',          'Prêt à Taux Zéro — primo-accédants, sous conditions de revenus. Disponible sur certaines communes du Pays d\'Aix (zone B1).'],
+                                ['PTZ',          'Prêt à Taux Zéro — primo-accédants, sous conditions de revenus. Disponible sur certaines communes de Bordeaux Métropole (zone B1).'],
                                 ['Action Logement', 'Prêt à 1 % employeur si votre entreprise cotise. Cumulable avec le PTZ.'],
-                                ['Éco-PTZ',      'Jusqu\'à 50 000 € pour travaux de rénovation énergétique (toiture, isolation, pompe à chaleur). Très pertinent sur l\'ancien aixois.'],
-                                ['PACA Région',  'Aides régionales PACA pour primo-accédants et travaux. Se renseigner auprès de la Région Sud.'],
+                                ['Éco-PTZ',      'Jusqu\'à 50 000 € pour travaux de rénovation énergétique (toiture, isolation, pompe à chaleur). Très pertinent sur l\'ancien bordelais.'],
+                                ['Région Nouvelle-Aquitaine', 'Aides régionales pour primo-accédants et travaux de rénovation. Se renseigner auprès du Conseil Régional.'],
                             ];
                             foreach ($aides as $a): ?>
                             <div class="aide-item">
@@ -614,7 +614,7 @@ ob_start();
                                             Signature définitive, paiement du solde
                                             et remise des clés.
                                             Bienvenue dans votre nouveau bien
-                                            à Aix-en-Provence !
+                                            à Bordeaux !
                                         </p>
                                     </div>
                                 </div>
@@ -632,10 +632,10 @@ ob_start();
                             <div class="guide-cta-final__icon">
                                 <i class="fas fa-key"></i>
                             </div>
-                            <h2>Prêt à acheter sur le Pays d\'Aix ?</h2>
+                            <h2>Prêt à acheter sur Bordeaux Métropole ?</h2>
                             <p>
                                 <?= ADVISOR_NAME ?> vous accompagne de A à Z dans votre
-                                projet immobilier à Aix-en-Provence et ses environs.
+                                projet immobilier à Bordeaux et sa Métropole.
                                 Estimation, recherche, négociation, financement :
                                 un seul interlocuteur pour tout.
                             </p>
@@ -646,12 +646,12 @@ ob_start();
                                 </a>
                                 <a href="/biens" class="btn btn--outline btn--lg">
                                     <i class="fas fa-search"></i>
-                                    Voir les biens disponibles à Aix et Pays d\'Aix
+                                    Voir les biens disponibles à Bordeaux et Métropole
                                 </a>
                             </div>
                             <p class="guide-cta-final__reassurance">
                                 <i class="fas fa-lock"></i>
-                                Sans engagement · Réponse sous 24h · 100% gratuit · Expert local Aix-en-Provence
+                                Sans engagement · Réponse sous 24h · 100% gratuit · Expert local Bordeaux Métropole
                             </p>
                         </div>
                     </section>
@@ -706,7 +706,7 @@ ob_start();
                             </div>
                         </div>
                         <p class="sidebar-advisor__quote">
-                            "<?= htmlspecialchars($advisor['quote'] ?? 'Je vous accompagne dans votre projet d\'achat sur Aix et le Pays d\'Aix, de A à Z.') ?>"
+                            "<?= htmlspecialchars($advisor['quote'] ?? 'Je vous accompagne dans votre projet d\'achat sur Bordeaux et la Métropole, de A à Z.') ?>"
                         </p>
                         <a href="tel:<?= htmlspecialchars(preg_replace('/\s+/', '', $advisor['phone'])) ?>"
                            class="btn btn--outline btn--block">
@@ -730,15 +730,15 @@ ob_start();
                             <i class="fas fa-star"></i>
                         </div>
                         <blockquote class="sidebar-testimonial__text">
-                            "Grâce à ce guide et à l'accompagnement de Pascal,
-                            j'ai trouvé mon appartement en centre d\'Aix en 3 semaines
-                            et j'ai négocié 15 000 € sous le prix affiché."
+                            "Grâce à ce guide et à l'accompagnement d'Eduardo,
+                            j'ai trouvé mon appartement aux Chartrons en 3 semaines
+                            et j'ai négocié 12 000 € sous le prix affiché."
                         </blockquote>
                         <div class="sidebar-testimonial__author">
                             <div class="sidebar-testimonial__avatar">S</div>
                             <div>
                                 <strong>Sophie R.</strong>
-                                <span>Acheteuse — Aix-en-Provence</span>
+                                <span>Acheteuse — Bordeaux Chartrons</span>
                             </div>
                         </div>
                     </div>
@@ -764,5 +764,5 @@ ob_start();
 
 <?php
 $pageContent = ob_get_clean();
-require_once __DIR__ . '/../templates/layout.php';
+require_once __DIR__ . '/../../templates/layout.php';
 ?>

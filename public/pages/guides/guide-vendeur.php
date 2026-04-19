@@ -3,8 +3,8 @@
 
 $advisor = ['name' => trim(setting('advisor_firstname','')." ".setting('advisor_lastname','')) ?: ADVISOR_NAME, 'email' => setting('advisor_email', APP_EMAIL), 'phone' => setting('advisor_phone', APP_PHONE), 'city' => setting('zone_city', APP_CITY)];
 
-$pageTitle       = 'Guide Complet Vendeur — Vendre votre bien immobilier à Aix-en-Provence';
-$pageDescription = 'Tout ce que vous devez savoir pour réussir votre vente immobilière à Aix-en-Provence et le Pays d\'Aix : estimation, préparation, mandat, négociation, signature. Guide gratuit 2025.';
+$pageTitle       = 'Guide Complet Vendeur — Vendre votre bien immobilier à Bordeaux';
+$pageDescription = 'Tout ce que vous devez savoir pour réussir votre vente immobilière à Bordeaux et la Métropole : estimation, préparation, mandat, négociation, signature. Guide gratuit 2025.';
 $pageCanonical   = '/guide-vendeur';
 
 ob_start();
@@ -17,8 +17,8 @@ ob_start();
 {
     "@context": "https://schema.org",
     "@type": "HowTo",
-    "name": "Comment vendre un bien immobilier à Aix-en-Provence",
-    "description": "Guide complet pour réussir votre vente immobilière à Aix-en-Provence et dans le Pays d\'Aix en <?= date('Y') ?>",
+    "name": "Comment vendre un bien immobilier à Bordeaux",
+    "description": "Guide complet pour réussir votre vente immobilière à Bordeaux et dans la Métropole en <?= date('Y') ?>",
     "totalTime": "PT25M",
     "step": [
         {"@type":"HowToStep","name":"Estimer votre bien au juste prix","position":1},
@@ -48,13 +48,13 @@ ob_start();
 
                 <h1 class="guide-hero__title">
                     Vendre votre bien immobilier<br>
-                    <span class="guide-hero__highlight">à Aix-en-Provence au meilleur prix</span>
+                    <span class="guide-hero__highlight">à Bordeaux au meilleur prix</span>
                 </h1>
 
                 <p class="guide-hero__subtitle">
                     De l'estimation jusqu'à la remise des clés :
-                    les 6 étapes pour vendre sereinement sur Aix-en-Provence
-                    et le Pays d\'Aix, éviter les erreurs classiques
+                    les 6 étapes pour vendre sereinement sur Bordeaux
+                    et la Métropole, éviter les erreurs classiques
                     et maximiser votre prix de vente.
                 </p>
 
@@ -111,7 +111,7 @@ ob_start();
                                 les mêmes erreurs : surestimer le prix, négliger
                                 la présentation, choisir le mauvais moment.
                                 Ce guide vous donne toutes les clés <em>avant</em>
-                                de mettre votre bien sur le marché aixois.
+                                de mettre votre bien sur le marché bordelais.
                             </p>
                         </div>
                     </div>
@@ -133,10 +133,10 @@ ob_start();
                         <div class="guide-step__content">
 
                             <p>
-                                Sur le marché du Pays d\'Aix, le prix au m² varie
-                                fortement selon le secteur : de <strong>3 500 €/m²</strong>
-                                en périphérie rurale à plus de <strong>7 000 €/m²</strong>
-                                en hypercentre aixois (Mazarin, Cours Mirabeau).
+                                Sur le marché de Bordeaux Métropole, le prix au m² varie
+                                fortement selon le secteur : de <strong>3 000 €/m²</strong>
+                                en périphérie à plus de <strong>6 000 €/m²</strong>
+                                en hypercentre (Triangle d'Or, Saint-Pierre, Chartrons).
                                 Une estimation précise est indispensable pour
                                 vendre dans les meilleurs délais.
                             </p>
@@ -144,16 +144,16 @@ ob_start();
                             <!-- Prix par secteur -->
                             <?php
                             $secteurs = [
-                                ['name' => 'Aix centre / Mazarin',       'min' => '5 500', 'max' => '7 000+', 'color' => 'red'],
-                                ['name' => 'Aix périphérie (Jas, Luynes)','min' => '4 000', 'max' => '5 500',  'color' => 'orange'],
-                                ['name' => 'Éguilles / Venelles',         'min' => '3 800', 'max' => '5 000',  'color' => 'yellow'],
-                                ['name' => 'Le Tholonet / Célony',        'min' => '4 500', 'max' => '6 500',  'color' => 'green'],
-                                ['name' => 'Gardanne / Meyreuil',         'min' => '3 200', 'max' => '4 200',  'color' => 'blue'],
-                                ['name' => 'Pertuis / Jouques',           'min' => '2 800', 'max' => '3 800',  'color' => 'purple'],
+                                ['name' => 'Triangle d\'Or / Saint-Pierre',    'min' => '5 000', 'max' => '6 500+', 'color' => 'red'],
+                                ['name' => 'Chartrons / Bord de Garonne',      'min' => '4 500', 'max' => '5 800',  'color' => 'orange'],
+                                ['name' => 'Caudéran / Mériadeck',             'min' => '3 800', 'max' => '5 000',  'color' => 'yellow'],
+                                ['name' => 'Saint-Augustin / Bordeaux Nord',   'min' => '3 500', 'max' => '4 500',  'color' => 'green'],
+                                ['name' => 'Mérignac / Pessac',                'min' => '3 000', 'max' => '4 200',  'color' => 'blue'],
+                                ['name' => 'Talence / Villenave-d\'Ornon',     'min' => '2 800', 'max' => '3 800',  'color' => 'purple'],
                             ];
                             ?>
                             <div class="secteur-grid">
-                                <h3>Prix au m² par secteur du Pays d\'Aix (2025)</h3>
+                                <h3>Prix au m² par secteur de Bordeaux Métropole (2025)</h3>
                                 <?php foreach ($secteurs as $s): ?>
                                 <div class="secteur-card secteur-card--<?= $s['color'] ?>">
                                     <div class="secteur-card__name">
@@ -181,14 +181,14 @@ ob_start();
                                 [
                                     'icon'  => 'fa-user-tie',
                                     'title' => 'Estimation par un professionnel local',
-                                    'desc'  => 'Un agent immobilier connaissant le Pays d\'Aix croise ventes récentes, caractéristiques intrinsèques et état du marché actuel. La méthode la plus précise et la plus rapide.',
+                                    'desc'  => 'Un agent immobilier connaissant Bordeaux Métropole croise ventes récentes, caractéristiques intrinsèques et état du marché actuel. La méthode la plus précise et la plus rapide.',
                                     'tag'   => 'Recommandé · Gratuit',
                                     'color' => 'blue',
                                 ],
                                 [
                                     'icon'  => 'fa-laptop',
                                     'title' => 'Outils en ligne (estimateurs automatiques)',
-                                    'desc'  => 'SeLoger, MeilleursAgents, Meilleurs Taux… donnent une fourchette indicative en quelques secondes. Utile pour un premier cadrage, mais insuffisant seul — les algorithmes ne connaissent pas votre vue sur la Sainte-Victoire.',
+                                    'desc'  => 'SeLoger, MeilleursAgents, Meilleurs Taux… donnent une fourchette indicative en quelques secondes. Utile pour un premier cadrage, mais insuffisant seul — les algorithmes ne connaissent pas la vue sur la Garonne ou le cachet de votre quartier.',
                                     'tag'   => 'Indicatif uniquement',
                                     'color' => 'gray',
                                 ],
@@ -246,7 +246,7 @@ ob_start();
                         <div class="guide-step__content">
 
                             <p>
-                                En Provence, la lumière et les extérieurs sont des
+                                À Bordeaux, le charme du bâti ancien et les extérieurs sont des
                                 atouts majeurs. Un bien bien présenté se vend
                                 en moyenne <strong>15 à 20 % plus vite</strong>
                                 et génère plus d'offres concurrentes.
@@ -263,11 +263,11 @@ ob_start();
                                     'Nettoyer en profondeur (vitres, cuisine, salle de bain)',
                                     'Optimiser l\'éclairage (ampoules, rideaux ouverts)',
                                 ],
-                                'Extérieur (atout Provence)' => [
+                                'Extérieur' => [
                                     'Tondre la pelouse et tailler les haies',
                                     'Nettoyer la terrasse / piscine si présente',
                                     'Peindre ou nettoyer le portail et la façade',
-                                    'Fleurir l\'entrée (lavande, olivier — ambiance provençale)',
+                                    'Fleurir l\'entrée (plantes de saison, bac à fleurs)',
                                     'Ranger le garage et les abris de jardin',
                                 ],
                                 'Administratif' => [
@@ -302,11 +302,11 @@ ob_start();
                                 ['DPE',          'Diagnostic de Performance Énergétique — obligatoire, validité 10 ans. Crucial depuis la loi Climat : un bien G ne peut plus être mis en location après 2025.'],
                                 ['Amiante',      'Obligatoire si permis de construire avant juillet 1997. Validité illimitée si négatif.'],
                                 ['Plomb (CREP)', 'Obligatoire si construction avant 1949. Validité 1 an si positif, illimitée si négatif.'],
-                                ['Termites',     'Obligatoire en zones à risque — vérifier arrêté préfectoral des Bouches-du-Rhône (13). Validité 6 mois.'],
+                                ['Termites',     'Obligatoire en zones à risque — vérifier arrêté préfectoral de la Gironde (33). Validité 6 mois.'],
                                 ['Gaz / Élec',   'Obligatoire si installation > 15 ans. Validité 3 ans.'],
-                                ['ERP',          'État des Risques et Pollutions — inclut risques naturels, miniers, sismiques. Validité 6 mois. Zone sismique 1 à Aix.'],
+                                ['ERP',          'État des Risques et Pollutions — inclut risques naturels, inondation (Garonne), sismiques. Validité 6 mois. Zonage PPRI à vérifier à Bordeaux.'],
                                 ['Mérule',       'Obligatoire dans les zones à risque définies par arrêté préfectoral.'],
-                                ['Assainissement','Non-collectif obligatoire si pas raccordé au réseau public (fréquent en campagne du Pays d\'Aix).'],
+                                ['Assainissement','Non-collectif obligatoire si pas raccordé au réseau public (fréquent en périphérie de Bordeaux Métropole).'],
                             ];
                             foreach ($diagnostics as $d): ?>
                             <div class="diag-item">
@@ -362,7 +362,7 @@ ob_start();
                                     </div>
                                     <ul class="compare-card__pros">
                                         <li><i class="fas fa-check"></i> Estimation précise au prix du marché</li>
-                                        <li><i class="fas fa-check"></i> Réseau acheteurs qualifiés Pays d\'Aix</li>
+                                        <li><i class="fas fa-check"></i> Réseau acheteurs qualifiés Bordeaux Métropole</li>
                                         <li><i class="fas fa-check"></i> Photos pro + diffusion multi-portails</li>
                                         <li><i class="fas fa-check"></i> Négociation sécurisée</li>
                                         <li><i class="fas fa-check"></i> Suivi jusqu'à la signature notaire</li>
@@ -435,10 +435,10 @@ ob_start();
                         <div class="guide-step__content">
 
                             <p>
-                                En Provence, la lumière naturelle est votre meilleur allié.
+                                À Bordeaux, la luminosité naturelle est votre meilleur allié.
                                 Planifiez les visites aux heures où votre bien est
-                                le plus lumineux. Un appartement exposé sud à Aix
-                                doit être visité en fin de matinée — pas en soirée.
+                                le plus lumineux. Un appartement exposé ouest sur la Garonne
+                                doit être visité en fin d'après-midi pour profiter du coucher de soleil.
                             </p>
 
                             <!-- Conseils visite -->
@@ -447,7 +447,7 @@ ob_start();
                                 [
                                     'icon'  => 'fa-sun',
                                     'title' => 'Lumière et aération',
-                                    'desc'  => 'Ouvrez tous les volets et fenêtres 30 minutes avant. En été, aérez tôt le matin pour éviter la chaleur — atout Provence à valoriser.',
+                                    'desc'  => 'Ouvrez tous les volets et fenêtres 30 minutes avant. La luminosité des pierres blondes bordelaises est un atout à valoriser.',
                                 ],
                                 [
                                     'icon'  => 'fa-thermometer-half',
@@ -457,7 +457,7 @@ ob_start();
                                 [
                                     'icon'  => 'fa-leaf',
                                     'title' => 'Jardin / terrasse en valeur',
-                                    'desc'  => 'Arrosez la veille, sortez le mobilier de jardin. Un extérieur soigné sur le Pays d\'Aix peut faire la différence à lui seul.',
+                                    'desc'  => 'Arrosez la veille, sortez le mobilier de jardin. Un extérieur soigné à Bordeaux Métropole peut faire la différence à lui seul.',
                                 ],
                                 [
                                     'icon'  => 'fa-comments',
@@ -472,7 +472,7 @@ ob_start();
                                 [
                                     'icon'  => 'fa-camera',
                                     'title' => 'Photos et visite virtuelle',
-                                    'desc'  => 'Des photos professionnelles réalisées sous le soleil provençal génèrent 3× plus de demandes de visite. La visite virtuelle 360° filtre les acheteurs peu motivés.',
+                                    'desc'  => 'Des photos professionnelles valorisant l\'architecture bordelaise génèrent 3× plus de demandes de visite. La visite virtuelle 360° filtre les acheteurs peu motivés.',
                                 ],
                             ];
                             foreach ($visit_tips as $tip): ?>
@@ -507,7 +507,7 @@ ob_start();
                         <div class="guide-step__content">
 
                             <p>
-                                Sur le marché aixois, si votre bien est correctement
+                                Sur le marché bordelais, si votre bien est correctement
                                 estimé et bien présenté, vous recevrez souvent
                                 plusieurs offres dans les 2 à 4 premières semaines.
                                 Voici comment les analyser.
@@ -533,7 +533,7 @@ ob_start();
                                 <div class="nego-card nego-card--max">
                                     <div class="nego-card__pct">> – 10 %</div>
                                     <div class="nego-card__label">Offre à refuser ou ignorer</div>
-                                    <p>Soit le bien est surestimé (réévaluez), soit l'acheteur n'est pas sérieux. Ne bradez pas — le marché aixois reste solide.</p>
+                                    <p>Soit le bien est surestimé (réévaluez), soit l'acheteur n'est pas sérieux. Ne bradez pas — le marché bordelais reste solide.</p>
                                 </div>
                             </div>
 
@@ -749,10 +749,10 @@ ob_start();
                             <div class="guide-cta-final__icon">
                                 <i class="fas fa-sign"></i>
                             </div>
-                            <h2>Prêt à vendre sur le Pays d\'Aix ?</h2>
+                            <h2>Prêt à vendre sur Bordeaux Métropole ?</h2>
                             <p>
                                 <?= ADVISOR_NAME ?> vous accompagne de A à Z dans votre
-                                projet de vente à Aix-en-Provence et ses environs.
+                                projet de vente à Bordeaux et sa Métropole.
                                 Estimation gratuite, stratégie de vente, diffusion,
                                 négociation et signature : un seul interlocuteur pour tout.
                             </p>
@@ -768,7 +768,7 @@ ob_start();
                             </div>
                             <p class="guide-cta-final__reassurance">
                                 <i class="fas fa-lock"></i>
-                                Sans engagement · Réponse sous 24h · 100% gratuit · Expert local Aix-en-Provence
+                                Sans engagement · Réponse sous 24h · 100% gratuit · Expert local Bordeaux Métropole
                             </p>
                         </div>
                     </section>
@@ -814,7 +814,7 @@ ob_start();
                             <i class="fas fa-calculator"></i>
                         </div>
                         <h4>Estimation gratuite</h4>
-                        <p>Obtenez une estimation précise de votre bien à Aix-en-Provence en 48h.</p>
+                        <p>Obtenez une estimation précise de votre bien à Bordeaux en 48h.</p>
                         <a href="/estimation-gratuite" class="btn btn--primary btn--block">
                             <i class="fas fa-arrow-right"></i>
                             Estimer mon bien
@@ -836,7 +836,7 @@ ob_start();
                             </div>
                         </div>
                         <p class="sidebar-advisor__quote">
-                            "<?= htmlspecialchars($advisor['quote'] ?? 'Je vous accompagne pour vendre votre bien au meilleur prix sur Aix et le Pays d\'Aix.') ?>"
+                            "<?= htmlspecialchars($advisor['quote'] ?? 'Je vous accompagne pour vendre votre bien au meilleur prix sur Bordeaux et sa Métropole.') ?>"
                         </p>
                         <a href="tel:<?= htmlspecialchars(preg_replace('/\s+/', '', $advisor['phone'])) ?>"
                            class="btn btn--outline btn--block">
@@ -860,15 +860,15 @@ ob_start();
                             <i class="fas fa-star"></i>
                         </div>
                         <blockquote class="sidebar-testimonial__text">
-                            "Pascal a vendu notre appartement en hypercentre d\'Aix
-                            en 18 jours, au prix demandé. Un accompagnement
+                            "Eduardo a vendu notre appartement dans les Chartrons
+                            en 21 jours, au prix demandé. Un accompagnement
                             professionnel du début à la fin."
                         </blockquote>
                         <div class="sidebar-testimonial__author">
                             <div class="sidebar-testimonial__avatar">J</div>
                             <div>
                                 <strong>Jean-Marc V.</strong>
-                                <span>Vendeur — Aix-en-Provence centre</span>
+                                <span>Vendeur — Bordeaux Chartrons</span>
                             </div>
                         </div>
                     </div>
@@ -894,5 +894,5 @@ ob_start();
 
 <?php
 $pageContent = ob_get_clean();
-require_once __DIR__ . '/../templates/layout.php';
+require_once __DIR__ . '/../../templates/layout.php';
 ?>

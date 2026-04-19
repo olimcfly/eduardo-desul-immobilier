@@ -84,8 +84,8 @@ $metaDesc   = 'Découvrez les avis vérifiés de nos clients satisfaits. ' . $_s
                     'note' => 5,
                     'date' => 'Juin 2024',
                     'service' => 'achat',
-                    'ville' => 'Aix-en-Provence',
-                    'text' => 'Pascal nous a trouvé la maison de nos rêves au Tholonet en seulement 3 semaines. Son expertise du marché aixois et son réseau nous ont fait gagner un temps précieux. Un accompagnement 360° vraiment professionnel !',
+                    'ville' => 'Bordeaux',
+                    'text' => 'Eduardo nous a trouvé la maison de nos rêves à Caudéran en seulement 3 semaines. Son expertise du marché bordelais et son réseau nous ont fait gagner un temps précieux. Un accompagnement 360° vraiment professionnel !',
                     'photo' => 'https://randomuser.me/api/portraits/family/1.jpg'
                 ],
                 [
@@ -93,8 +93,8 @@ $metaDesc   = 'Découvrez les avis vérifiés de nos clients satisfaits. ' . $_s
                     'note' => 5,
                     'date' => 'Mai 2024',
                     'service' => 'viager',
-                    'ville' => 'Puy-Sainte-Réparade',
-                    'text' => 'La solution de viager proposée par Pascal a été parfaite pour nous. Transparence totale, explications claires et un suivi impeccable. Nous recommandons vivement son approche éthique et humaine.',
+                    'ville' => 'Mérignac',
+                    'text' => 'La solution de viager proposée par Eduardo a été parfaite pour nous. Transparence totale, explications claires et un suivi impeccable. Nous recommandons vivement son approche éthique et humaine.',
                     'photo' => 'https://randomuser.me/api/portraits/women/44.jpg'
                 ],
                 [

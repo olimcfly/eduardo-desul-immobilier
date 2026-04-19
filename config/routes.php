@@ -141,6 +141,12 @@ $router->post('/estimation/tunnel', function () {
 $router->get('/estimation/resultat', function () {
     page('pages/estimation/resultat');
 });
+$router->get('/estimation-gratuite/resultat', function () {
+    page('pages/estimation/resultat');
+});
+$router->post('/estimation-gratuite/resultat', function () {
+    page('pages/estimation/resultat');
+});
 $router->get('/merci-estimation', function () {
     page('pages/estimation/merc-estimation');
 });
@@ -249,6 +255,46 @@ $router->get('/avis', function () {
 
 $router->get('/secteurs', function () {
     page('pages/secteurs/index');
+});
+
+// Alias secteurs/villes/{slug} → même logique que /immobilier/{slug}
+$router->get('/secteurs/villes/{slug}', function (string $slug) {
+    $tplFile = ROOT_PATH . '/public/pages/zones/villes/' . $slug . '.php';
+    if (file_exists($tplFile)) {
+        page('pages/zones/villes/' . $slug, ['slug' => $slug]);
+    } else {
+        try {
+            $pdo = db();
+            $stmt = $pdo->prepare(
+                "SELECT * FROM seo_city_pages WHERE slug = ? AND status = 'published' LIMIT 1"
+            );
+            $stmt->execute([$slug]);
+            $cityPage = $stmt->fetch(PDO::FETCH_ASSOC);
+            if ($cityPage) {
+                page('pages/page', [
+                    'page'      => $cityPage + ['template' => 'pages/city-price'],
+                    'pageTitle' => $cityPage['seo_title'] ?? $cityPage['city_name'],
+                    'metaDesc'  => $cityPage['meta_description'] ?? '',
+                ]);
+                return;
+            }
+        } catch (\Throwable $e) {
+            // rien
+        }
+        http_response_code(404);
+        page('pages/404');
+    }
+});
+
+// Alias secteurs/quartiers/{slug} → même logique que /quartier/{slug}
+$router->get('/secteurs/quartiers/{slug}', function (string $slug) {
+    $tplFile = ROOT_PATH . '/public/pages/zones/quartiers/' . $slug . '.php';
+    if (file_exists($tplFile)) {
+        page('pages/zones/quartiers/' . $slug, ['slug' => $slug]);
+    } else {
+        http_response_code(404);
+        page('pages/404');
+    }
 });
 
 // Pages villes SEO : /immobilier/{slug-ville}

@@ -1,6 +1,6 @@
 <?php
-$pageTitle = 'Appartements à vendre — Aix-en-Provence & Pays d\'Aix';
-$pageDescription = 'Découvrez notre sélection d’appartements à vendre à Aix-en-Provence et dans le Pays d\'Aix.';
+$pageTitle = 'Appartements à vendre — Bordeaux & Bordeaux Métropole';
+$pageDescription = 'Découvrez notre sélection d’appartements à vendre à Bordeaux et dans la Métropole bordelaise.';
 $extraCss = ['/assets/css/home.css'];
 
 require_once __DIR__ . '/../../../core/Database.php';
@@ -19,7 +19,7 @@ $biens = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="container">
         <div class="hero__content">
             <span class="section-label">Appartements</span>
-            <h1>Appartements à vendre dans le Pays d’Aix</h1>
+            <h1>Appartements à vendre dans Bordeaux Métropole</h1>
             <p class="hero__subtitle">
                 Du studio au grand appartement familial, découvrez une sélection de biens adaptés à tous les projets de vie et d’investissement.
             </p>

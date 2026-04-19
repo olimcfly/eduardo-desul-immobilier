@@ -75,7 +75,7 @@ $metaDesc = 'Notre site est actuellement en construction. Contactez-nous pour vo
 <div class="container">
 
     <div class="logo">
-        Eduardo De Sul — Immobilier à Bordeaux
+        Eduardo Desul — Immobilier à Bordeaux
     </div>
 
     <h1>Site en construction</h1>

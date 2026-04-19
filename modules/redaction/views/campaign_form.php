@@ -112,13 +112,13 @@ $niveauDescs = [
         <label class="cf-label">Nom de la campagne</label>
         <input type="text" name="nom" class="cf-input" required
                value="<?= htmlspecialchars($campaign['nom'] ?? '') ?>"
-               placeholder="Ex : Vendre un appartement à Aix-en-Provence">
+               placeholder="Ex : Vendre un appartement à Bordeaux">
       </div>
       <div class="cf-group">
         <label class="cf-label">Mot-clé cible principal</label>
         <input type="text" name="mot_cle" class="cf-input"
                value="<?= htmlspecialchars($campaign['mot_cle'] ?? '') ?>"
-               placeholder="Ex : vente appartement Aix-en-Provence">
+               placeholder="Ex : vente appartement Bordeaux">
       </div>
       <div class="cf-group">
         <label class="cf-label">Description <span style="font-weight:400;color:#94a3b8">(optionnel)</span></label>

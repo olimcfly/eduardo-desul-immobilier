@@ -1,6 +1,6 @@
 <?php
-$pageTitle    = 'Immobilier Jas de Bouffan Aix-en-Provence - Expert | ' . ADVISOR_NAME;
-$metaDesc     = 'Expert immobilier dans le quartier Jas de Bouffan à Aix-en-Provence. Quartier résidentiel familial avec maisons et appartements, proche des écoles et commerces.';
+$pageTitle    = 'Immobilier Jas de Bouffan Bordeaux - Expert | ' . ADVISOR_NAME;
+$metaDesc     = 'Expert immobilier dans le quartier Jas de Bouffan à Bordeaux. Quartier résidentiel familial avec maisons et appartements, proche des écoles et commerces.';
 $metaKeywords = 'immobilier Jas de Bouffan Aix, appartement Jas de Bouffan, maison Jas de Bouffan, expert immobilier quartier ouest Aix';
 $extraCss     = ['/assets/css/villes.css'];
 
@@ -9,9 +9,9 @@ $pageContent = '
     <div class="hero__bg" style="background-image:linear-gradient(110deg, rgba(26,60,94,.92) 0%, rgba(15,38,68,.86) 58%, rgba(26,60,94,.92) 100%), url(\'/assets/images/jas-de-bouffan-hero.jpg\');"></div>
     <div class="container">
         <div class="hero__content" data-animate>
-            <span class="section-label hero__label">Jas de Bouffan — Aix-en-Provence</span>
+            <span class="section-label hero__label">Jas de Bouffan — Bordeaux</span>
             <h1 id="jas-hero-title">L\'immobilier au Jas de Bouffan</h1>
-            <p class="hero__subtitle">Quartier résidentiel à l\'ouest d\'Aix-en-Provence, le Jas de Bouffan allie espaces verts, écoles réputées et bonne connexion au centre-ville. Une adresse familiale prisée des aixois.</p>
+            <p class="hero__subtitle">Quartier résidentiel à l\'ouest d\'Bordeaux, le Jas de Bouffan allie espaces verts, écoles réputées et bonne connexion au centre-ville. Une adresse familiale prisée des bordelais.</p>
             <div class="hero__actions">
                 <a href="/estimation-gratuite" class="btn btn--primary">Demander une estimation gratuite</a>
                 <a href="/contact" class="btn btn--outline">Nous contacter</a>
@@ -25,7 +25,7 @@ $pageContent = '
         <div class="section__header">
             <span class="section-label">Jas de Bouffan</span>
             <h2 class="section-title">Un quartier résidentiel familial</h2>
-            <p class="section-subtitle">Le Jas de Bouffan tire son nom de la propriété familiale de Cézanne. Aujourd\'hui quartier résidentiel de l\'ouest aixois, il propose une offre immobilière variée allant des appartements des années 70 aux villas contemporaines.</p>
+            <p class="section-subtitle">Le Jas de Bouffan tire son nom de la propriété familiale de Cézanne. Aujourd\'hui quartier résidentiel de l\'ouest bordelais, il propose une offre immobilière variée allant des appartements des années 70 aux villas contemporaines.</p>
         </div>
         <div class="grid-2">
             <div class="card card--alt" data-animate>
@@ -36,7 +36,7 @@ $pageContent = '
             <div class="card card--alt" data-animate>
                 <div class="card__icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
                 <h3 class="card__title">Prix accessibles</h3>
-                <p class="card__text">Marché plus accessible que le centre-ville tout en restant à 10 minutes du Cours Mirabeau.</p>
+                <p class="card__text">Marché plus accessible que le centre-ville tout en restant à 10 minutes du Quais de Bordeaux.</p>
             </div>
         </div>
     </div>

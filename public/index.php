@@ -36,18 +36,18 @@ if (file_exists($envFile)) {
 
 // Config & Core
 require ROOT_PATH . '/config/config.php';
-require ROOT_PATH . '/core/Database.php';
-require ROOT_PATH . '/core/Session.php';
-require ROOT_PATH . '/core/Auth.php';
-require ROOT_PATH . '/core/Controller.php';
-require ROOT_PATH . '/core/Model.php';
-require ROOT_PATH . '/core/Router.php';
-require ROOT_PATH . '/core/helpers/helpers.php';
-require ROOT_PATH . '/core/helpers/cms.php';
-require ROOT_PATH . '/core/services/ModuleService.php';
-require ROOT_PATH . '/core/services/LeadService.php';
-require ROOT_PATH . '/core/services/DvfEstimatorService.php';
-require ROOT_PATH . '/core/services/DvfImportService.php';
+require_once ROOT_PATH . '/core/Database.php';
+require_once ROOT_PATH . '/core/Session.php';
+require_once ROOT_PATH . '/core/Auth.php';
+require_once ROOT_PATH . '/core/Controller.php';
+require_once ROOT_PATH . '/core/Model.php';
+require_once ROOT_PATH . '/core/Router.php';
+require_once ROOT_PATH . '/core/helpers/helpers.php';
+require_once ROOT_PATH . '/core/helpers/cms.php';
+require_once ROOT_PATH . '/core/services/ModuleService.php';
+require_once ROOT_PATH . '/core/services/LeadService.php';
+require_once ROOT_PATH . '/core/services/DvfEstimatorService.php';
+require_once ROOT_PATH . '/core/services/DvfImportService.php';
 require_once ROOT_PATH . '/includes/settings.php';
 require_once ROOT_PATH . '/core/services/SectionRenderer.php';
 

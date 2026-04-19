@@ -1,6 +1,6 @@
 <?php
 $pageTitle    = 'Immobilier Lambesc - Expert immobilier indépendant | ' . ADVISOR_NAME;
-$metaDesc     = 'Achetez, vendez ou estimez votre bien à Lambesc avec <?= ADVISOR_NAME ?>, expert immobilier indépendant. Village provençal prisé à 25 km d\'Aix-en-Provence.';
+$metaDesc     = 'Achetez, vendez ou estimez votre bien à Lambesc avec <?= ADVISOR_NAME ?>, expert immobilier indépendant. Village girondin prisé à 25 km d\'Bordeaux.';
 $metaKeywords = 'immobilier Lambesc, expert immobilier Lambesc, estimation immobilière Lambesc, achat immobilier Lambesc, vente immobilière Lambesc';
 $extraCss     = ['/assets/css/villes.css'];
 
@@ -25,7 +25,7 @@ $pageContent = '
         <div class="section__header">
             <span class="section-label">Lambesc</span>
             <h2 class="section-title">Votre expert immobilier local</h2>
-            <p class="section-subtitle">Village provençal authentique à 25 km à l\'ouest d\'Aix-en-Provence, Lambesc séduit par son marché animé, ses ruelles historiques et sa qualité de vie préservée.</p>
+            <p class="section-subtitle">Village girondin authentique à 25 km à l\'ouest d\'Bordeaux, Lambesc séduit par son marché animé, ses ruelles historiques et sa qualité de vie préservée.</p>
         </div>
         <div class="grid-2">
             <div class="card card--alt" data-animate>
@@ -79,7 +79,7 @@ $pageContent = '
             </div>
             <div class="card" data-animate>
                 <h3 class="card__title">Vente immobilière</h3>
-                <p class="card__text">Valorisation optimale de votre bien sur le marché provençal.</p>
+                <p class="card__text">Valorisation optimale de votre bien sur le marché girondin.</p>
                 <a href="/contact" class="btn btn--outline">Vendre un bien</a>
             </div>
             <div class="card" data-animate>
@@ -116,8 +116,8 @@ $pageContent = '
                 <div class="accordion__content"><p>Les prix se situent entre 2 400 €/m² et 3 000 €/m² selon le type de bien et sa localisation. Les maisons avec terrain et les mas provençaux sont les plus recherchés.</p></div>
             </div>
             <div class="accordion__item">
-                <button class="accordion__button"><span class="accordion__title">Lambesc est-elle bien reliée à Aix-en-Provence ?</span><svg class="accordion__icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg></button>
-                <div class="accordion__content"><p>Lambesc se trouve à environ 30 minutes d\'Aix-en-Provence via la D7n. Des liaisons par car sont disponibles. La commune est aussi proche de l\'A7 et de l\'A8 pour rejoindre Marseille et la Côte d\'Azur.</p></div>
+                <button class="accordion__button"><span class="accordion__title">Lambesc est-elle bien reliée à Bordeaux ?</span><svg class="accordion__icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg></button>
+                <div class="accordion__content"><p>Lambesc se trouve à environ 30 minutes d\'Bordeaux via la D7n. Des liaisons par car sont disponibles. La commune est aussi proche de l\'A7 et de l\'A8 pour rejoindre Marseille et la Côte d\'Azur.</p></div>
             </div>
             <div class="accordion__item">
                 <button class="accordion__button"><span class="accordion__title">Quels types de biens trouve-t-on à Lambesc ?</span><svg class="accordion__icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg></button>

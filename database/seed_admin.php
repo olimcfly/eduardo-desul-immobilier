@@ -27,8 +27,8 @@ require_once ROOT_PATH . '/core/Auth.php';
 // ── Saisie interactive ───────────────────────────────────────
 echo "\n=== Création du compte administrateur ===\n\n";
 
-$name = readline("Nom complet [Pascal Hamm] : ");
-if (empty(trim($name))) $name = 'Pascal Hamm';
+$name = readline("Nom complet [Eduardo Desul] : ");
+if (empty(trim($name))) $name = 'Eduardo Desul';
 
 $email = '';
 while (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -76,7 +76,7 @@ try {
         echo "  Email    : {$email}\n";
         echo "  Nom      : {$name}\n";
         echo "  Rôle     : admin\n\n";
-        echo "  Connectez-vous sur : " . ($_ENV['APP_URL'] ?? 'https://pascal-hamm-immobilier.fr') . "/admin/login\n\n";
+        echo "  Connectez-vous sur : " . ($_ENV['APP_URL'] ?? 'https://eduardo-desul-immobilier.fr') . "/admin/login\n\n";
     }
 } catch (PDOException $e) {
     die("  ✗ Erreur DB : " . $e->getMessage() . "\n");

@@ -1,7 +1,7 @@
 <?php
-$pageTitle    = 'Immobilier Centre-Ville Aix-en-Provence - Expert | ' . ADVISOR_NAME;
-$metaDesc     = 'Expert immobilier au centre-ville d\'Aix-en-Provence. Appartements anciens, biens rénovés, commerces — <?= ADVISOR_NAME ?> vous accompagne pour votre projet en hyper-centre.';
-$metaKeywords = 'immobilier centre-ville Aix-en-Provence, appartement centre Aix, achat vente immobilier hyper-centre Aix, expert immobilier Aix centre';
+$pageTitle    = 'Immobilier Centre-Ville Bordeaux - Expert | ' . ADVISOR_NAME;
+$metaDesc     = 'Expert immobilier au centre-ville d\'Bordeaux. Appartements anciens, biens rénovés, commerces — <?= ADVISOR_NAME ?> vous accompagne pour votre projet en hyper-centre.';
+$metaKeywords = 'immobilier centre-ville Bordeaux, appartement centre Aix, achat vente immobilier hyper-centre Aix, expert immobilier Aix centre';
 $extraCss     = ['/assets/css/villes.css'];
 
 $pageContent = '
@@ -9,9 +9,9 @@ $pageContent = '
     <div class="hero__bg" style="background-image:linear-gradient(110deg, rgba(26,60,94,.92) 0%, rgba(15,38,68,.86) 58%, rgba(26,60,94,.92) 100%), url(\'/assets/images/centre-ville-hero.jpg\');"></div>
     <div class="container">
         <div class="hero__content" data-animate>
-            <span class="section-label hero__label">Centre-Ville — Aix-en-Provence</span>
-            <h1 id="centre-ville-hero-title">L\'immobilier au cœur d\'Aix-en-Provence</h1>
-            <p class="hero__subtitle">Le centre historique d\'Aix-en-Provence concentre les biens les plus recherchés : appartements anciens, rez-de-chaussée commerciaux et immeubles de caractère. Un marché exigeant qui nécessite un expert local.</p>
+            <span class="section-label hero__label">Centre-Ville — Bordeaux</span>
+            <h1 id="centre-ville-hero-title">L\'immobilier au cœur d\'Bordeaux</h1>
+            <p class="hero__subtitle">Le centre historique d\'Bordeaux concentre les biens les plus recherchés : appartements anciens, rez-de-chaussée commerciaux et immeubles de caractère. Un marché exigeant qui nécessite un expert local.</p>
             <div class="hero__actions">
                 <a href="/estimation-gratuite" class="btn btn--primary">Demander une estimation gratuite</a>
                 <a href="/contact" class="btn btn--outline">Nous contacter</a>
@@ -24,8 +24,8 @@ $pageContent = '
     <div class="container">
         <div class="section__header">
             <span class="section-label">Centre-Ville</span>
-            <h2 class="section-title">Au cœur de la vie aixoise</h2>
-            <p class="section-subtitle">Le centre-ville d\'Aix-en-Provence regroupe le Cours Mirabeau, les rues commerçantes, les places animées et un patrimoine architectural exceptionnel. Son immobilier est l\'un des plus recherchés de Provence.</p>
+            <h2 class="section-title">Au cœur de la vie bordelaise</h2>
+            <p class="section-subtitle">Le centre-ville d\'Bordeaux regroupe le Quais de Bordeaux, les rues commerçantes, les places animées et un patrimoine architectural exceptionnel. Son immobilier est l\'un des plus recherchés de Gironde.</p>
         </div>
         <div class="grid-2">
             <div class="card card--alt" data-animate>
@@ -94,7 +94,7 @@ $pageContent = '
 <section class="cta-banner" id="centre-ville-cta">
     <div class="container">
         <div class="cta-banner__content">
-            <h2 class="cta-banner__title">Votre projet au centre-ville d\'Aix-en-Provence</h2>
+            <h2 class="cta-banner__title">Votre projet au centre-ville d\'Bordeaux</h2>
             <p class="cta-banner__text">Contactez-moi pour une consultation personnalisée sans engagement.</p>
             <div class="cta-banner__actions">
                 <a href="/contact" class="btn btn--primary">Contactez-moi</a>

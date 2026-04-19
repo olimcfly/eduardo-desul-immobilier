@@ -1,5 +1,5 @@
 <?php
-$kitVilles = ['Bordeaux', 'Aix-en-Provence', 'Nantes', 'Lyon', 'Toulouse', 'Montpellier', 'Rennes', 'Strasbourg'];
+$kitVilles = ['Bordeaux', 'Mérignac', 'Pessac', 'Talence', 'Bègles', 'Le Bouscat', 'Caudéran', 'Villenave-d'Ornon'];
 $kitPersonas = [
     'primo' => [
         'label' => 'Primo-Accédant',
@@ -40,7 +40,7 @@ $kitPersonas = [
             Ville ciblée
             <select id="kit-ville" style="padding:10px;border:1px solid #cbd5e1;border-radius:10px;">
                 <?php foreach ($kitVilles as $ville): ?>
-                    <option value="<?= e($ville) ?>" <?= $ville === 'Aix-en-Provence' ? 'selected' : '' ?>><?= e($ville) ?></option>
+                    <option value="<?= e($ville) ?>" <?= $ville === 'Bordeaux' ? 'selected' : '' ?>><?= e($ville) ?></option>
                 <?php endforeach; ?>
             </select>
         </label>

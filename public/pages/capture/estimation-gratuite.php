@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $pageTitle  = 'Estimation gratuite de votre bien — ' . ADVISOR_NAME . '';
-$metaDesc   = 'Estimez gratuitement votre bien immobilier à Aix-en-Provence. Résultat personnalisé sous 48h par <?= ADVISOR_NAME ?>.';
+$metaDesc   = 'Estimez gratuitement votre bien immobilier à Bordeaux. Résultat personnalisé sous 48h par <?= ADVISOR_NAME ?>.';
 $extraCss   = ['/assets/css/estimation.css'];
 $extraJs    = ['/assets/js/estimation.js'];
 $bodyClass  = 'page-capture';
@@ -45,7 +45,7 @@ $bodyClass  = 'page-capture';
             <div style="color:white">
                 <span class="section-label" style="color:var(--clr-accent)">100% gratuit • Sans engagement</span>
                 <h1 style="color:white;font-size:clamp(1.75rem,4vw,3rem);margin-bottom:1rem">Quelle est la valeur<br>de votre bien ?</h1>
-                <p style="opacity:.85;font-size:1.1rem;margin-bottom:2rem">Obtenez une estimation personnalisée de votre bien à Aix-en-Provence, basée sur les données réelles du marché.</p>
+                <p style="opacity:.85;font-size:1.1rem;margin-bottom:2rem">Obtenez une estimation personnalisée de votre bien à Bordeaux, basée sur les données réelles du marché.</p>
                 <div style="display:flex;flex-direction:column;gap:.75rem">
                     <?php foreach (['Estimation basée sur les transactions récentes','Rapport détaillé envoyé sous 48h','Pascal vous rappelle pour affiner l\'estimation','Gratuit, sans engagement, sans spam'] as $item): ?>
                     <div style="display:flex;gap:.75rem;align-items:center;font-size:.9rem">
@@ -58,7 +58,7 @@ $bodyClass  = 'page-capture';
                     <div style="width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;font-size:1.75rem;border:2px solid var(--clr-accent)">👤</div>
                     <div>
                         <div style="font-weight:600"><?= e(ADVISOR_NAME) ?></div>
-                        <div style="font-size:.8rem;opacity:.7">Conseiller immobilier indépendant · Aix-en-Provence</div>
+                        <div style="font-size:.8rem;opacity:.7">Conseiller immobilier indépendant · Bordeaux</div>
                     </div>
                 </div>
             </div>
@@ -82,7 +82,7 @@ $bodyClass  = 'page-capture';
                     </div>
                     <div class="form-group">
                         <label class="form-label" for="cap-adresse">Adresse du bien <span>*</span></label>
-                        <input type="text" id="cap-adresse" name="adresse" class="form-control" placeholder="12 rue des Chartrons, Aix-en-Provence" required>
+                        <input type="text" id="cap-adresse" name="adresse" class="form-control" placeholder="12 rue des Chartrons, Bordeaux" required>
                     </div>
                     <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
                         <div class="form-group">

@@ -17,7 +17,7 @@ $schemaMarkup = '
   "address": {
     "@type": "PostalAddress",
     "addressLocality": "Beaurecueil",
-    "addressRegion": "Bouches-du-Rhône",
+    "addressRegion": "Gironde",
     "postalCode": "13470",
     "streetAddress": "Votre adresse"
   },
@@ -104,8 +104,8 @@ $pageContent = '
         <h2 id="related-cities-title">Autres villes proches</h2>
         <div class="cities-grid">
             <a href="/villes/aix-en-provence-immobilier" class="city-card">
-                <img src="/assets/images/aix-en-provence-thumb.jpg" alt="Immobilier Aix-en-Provence" loading="lazy">
-                <h3>Aix-en-Provence</h3>
+                <img src="/assets/images/aix-en-provence-thumb.jpg" alt="Immobilier Bordeaux" loading="lazy">
+                <h3>Bordeaux</h3>
             </a>
             <a href="/villes/eguilles-immobilier" class="city-card">
                 <img src="/assets/images/eguilles-thumb.jpg" alt="Immobilier Eguilles" loading="lazy">

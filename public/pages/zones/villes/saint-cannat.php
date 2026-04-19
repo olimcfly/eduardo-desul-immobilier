@@ -1,6 +1,6 @@
 <?php
 $pageTitle    = 'Immobilier Saint-Cannat - Expert immobilier indépendant | ' . ADVISOR_NAME;
-$metaDesc     = 'Achetez, vendez ou estimez votre bien à Saint-Cannat avec <?= ADVISOR_NAME ?>. Village provençal à 25 km d\'Aix-en-Provence, idéal pour les familles cherchant espace et tranquillité.';
+$metaDesc     = 'Achetez, vendez ou estimez votre bien à Saint-Cannat avec <?= ADVISOR_NAME ?>. Village girondin à 25 km d\'Bordeaux, idéal pour les familles cherchant espace et tranquillité.';
 $metaKeywords = 'immobilier Saint-Cannat, expert immobilier Saint-Cannat, estimation immobilière Saint-Cannat, achat vente maison Saint-Cannat';
 $extraCss     = ['/assets/css/villes.css'];
 
@@ -11,7 +11,7 @@ $pageContent = '
         <div class="hero__content" data-animate>
             <span class="section-label hero__label">Immobilier Saint-Cannat</span>
             <h1 id="saint-cannat-hero-title">Vendre, acheter et estimer sereinement à Saint-Cannat</h1>
-            <p class="hero__subtitle">Village dynamique à l\'ouest d\'Aix-en-Provence, Saint-Cannat offre un cadre de vie familial avec commerces, écoles et un bon accès aux grands axes.</p>
+            <p class="hero__subtitle">Village dynamique à l\'ouest d\'Bordeaux, Saint-Cannat offre un cadre de vie familial avec commerces, écoles et un bon accès aux grands axes.</p>
             <div class="hero__actions">
                 <a href="/estimation-gratuite" class="btn btn--primary">Demander une estimation gratuite</a>
                 <a href="/contact" class="btn btn--outline">Nous contacter</a>
@@ -25,7 +25,7 @@ $pageContent = '
         <div class="section__header">
             <span class="section-label">Saint-Cannat</span>
             <h2 class="section-title">Un village familial et bien équipé</h2>
-            <p class="section-subtitle">Situé à 25 km à l\'ouest d\'Aix-en-Provence, Saint-Cannat propose un environnement idéal pour les familles : commerces, collège, espace sportif, tout en offrant des prix immobiliers encore accessibles par rapport à Aix.</p>
+            <p class="section-subtitle">Situé à 25 km à l\'ouest d\'Bordeaux, Saint-Cannat propose un environnement idéal pour les familles : commerces, collège, espace sportif, tout en offrant des prix immobiliers encore accessibles par rapport à Aix.</p>
         </div>
         <div class="grid-2">
             <div class="card card--alt" data-animate>
@@ -117,7 +117,7 @@ $pageContent = '
             </div>
             <div class="accordion__item">
                 <button class="accordion__button"><span class="accordion__title">Quels sont les avantages de Saint-Cannat pour une famille ?</span><svg class="accordion__icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg></button>
-                <div class="accordion__content"><p>Saint-Cannat dispose d\'une école maternelle et primaire, d\'un collège, de nombreux commerces de proximité, d\'équipements sportifs et culturels. La commune est desservie par des lignes de car vers Aix-en-Provence et Marseille.</p></div>
+                <div class="accordion__content"><p>Saint-Cannat dispose d\'une école maternelle et primaire, d\'un collège, de nombreux commerces de proximité, d\'équipements sportifs et culturels. La commune est desservie par des lignes de car vers Bordeaux et Marseille.</p></div>
             </div>
         </div>
     </div>

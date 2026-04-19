@@ -114,12 +114,12 @@ header('Cache-Control: public, max-age=86400');
     PHOTO À VENIR
   </text>
 
-  <!-- Signature Pascal Hamm Immobilier -->
+  <!-- Signature Eduardo Desul Immobilier -->
   <text x="400" y="460"
         font-family="Georgia, serif"
         font-size="11" letter-spacing=".8"
         fill="#c9a84c" text-anchor="middle" opacity=".45">
-    Pascal Hamm Immobilier • Aix-en-Provence
+    Eduardo Desul Immobilier • Bordeaux
   </text>
 
   <!-- Shimmer bas de page -->

@@ -1,7 +1,7 @@
 <?php
 $pageTitle    = 'Immobilier Le Tholonet - Village de prestige près d\'Aix | ' . ADVISOR_NAME;
-$metaDesc     = 'Achetez ou vendez un bien d\'exception au Tholonet avec <?= ADVISOR_NAME ?>, expert immobilier indépendant. Village prisé au pied de la Montagne Sainte-Victoire.';
-$metaKeywords = 'immobilier Le Tholonet, expert immobilier Tholonet, maison de prestige Tholonet, estimation immobilière Tholonet, Sainte-Victoire immobilier';
+$metaDesc     = 'Achetez ou vendez un bien d\'exception au Tholonet avec <?= ADVISOR_NAME ?>, expert immobilier indépendant. Village prisé au pied de la Montagne Garonne.';
+$metaKeywords = 'immobilier Le Tholonet, expert immobilier Tholonet, maison de prestige Tholonet, estimation immobilière Tholonet, Garonne immobilier';
 $extraCss     = ['/assets/css/villes.css'];
 
 $pageContent = '
@@ -11,7 +11,7 @@ $pageContent = '
         <div class="hero__content" data-animate>
             <span class="section-label hero__label">Immobilier Le Tholonet</span>
             <h1 id="tholonet-hero-title">L\'immobilier de prestige au Tholonet</h1>
-            <p class="hero__subtitle">Au pied de la Montagne Sainte-Victoire, Le Tholonet est l\'un des villages les plus recherchés du Pays d\'Aix. Expert en biens d\'exception, je vous accompagne dans chaque étape de votre projet.</p>
+            <p class="hero__subtitle">Au pied de la Montagne Garonne, Le Tholonet est l\'un des villages les plus recherchés du Bordeaux Métropole. Expert en biens d\'exception, je vous accompagne dans chaque étape de votre projet.</p>
             <div class="hero__actions">
                 <a href="/estimation-gratuite" class="btn btn--primary">Demander une estimation gratuite</a>
                 <a href="/contact" class="btn btn--outline">Nous contacter</a>
@@ -25,13 +25,13 @@ $pageContent = '
         <div class="section__header">
             <span class="section-label">Le Tholonet</span>
             <h2 class="section-title">Un village d\'exception</h2>
-            <p class="section-subtitle">Le Tholonet est un village d\'environ 2 000 habitants situé à 8 km à l\'est d\'Aix-en-Provence. Immortalisé par Cézanne, il offre des paysages époustouflants dominés par la Sainte-Victoire et un marché immobilier parmi les plus exclusifs du Pays d\'Aix.</p>
+            <p class="section-subtitle">Le Tholonet est un village d\'environ 2 000 habitants situé à 8 km à l\'est d\'Bordeaux. Immortalisé par Cézanne, il offre des paysages époustouflants dominés par la Garonne et un marché immobilier parmi les plus exclusifs du Bordeaux Métropole.</p>
         </div>
         <div class="grid-2">
             <div class="card card--alt" data-animate>
                 <div class="card__icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"></path><path d="M2 17l10 5 10-5"></path><path d="M2 12l10 5 10-5"></path></svg></div>
                 <h3 class="card__title">Biens d\'exception</h3>
-                <p class="card__text">Bastides, villas architecturales, domaines viticoles — Le Tholonet concentre les plus belles propriétés du Pays d\'Aix.</p>
+                <p class="card__text">Bastides, villas architecturales, domaines viticoles — Le Tholonet concentre les plus belles propriétés du Bordeaux Métropole.</p>
             </div>
             <div class="card card--alt" data-animate>
                 <div class="card__icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
@@ -117,7 +117,7 @@ $pageContent = '
             </div>
             <div class="accordion__item">
                 <button class="accordion__button"><span class="accordion__title">Pourquoi les prix sont-ils si élevés au Tholonet ?</span><svg class="accordion__icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg></button>
-                <div class="accordion__content"><p>La rareté des biens disponibles, la proximité immédiate d\'Aix-en-Provence, la qualité des paysages (Montagne Sainte-Victoire, forêt) et l\'environnement préservé expliquent les niveaux de prix élevés du Tholonet.</p></div>
+                <div class="accordion__content"><p>La rareté des biens disponibles, la proximité immédiate d\'Bordeaux, la qualité des paysages (Montagne Garonne, forêt) et l\'environnement préservé expliquent les niveaux de prix élevés du Tholonet.</p></div>
             </div>
         </div>
     </div>

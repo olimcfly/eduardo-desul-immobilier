@@ -252,41 +252,45 @@ class DvfEstimatorService
         $minSurface = max(9.0, $surface * (1 - $surfaceBand));
         $maxSurface = $surface * (1 + $surfaceBand);
 
-        $distanceExpr = '9999';
+        // NOTE: PDO::ATTR_EMULATE_PREPARES est false → pas de répétition de params nommés.
+        // On utilise des paramètres positionnels (?) pour la formule de distance.
+        $params = [];
+
         if ($lat !== null && $lng !== null) {
-            $distanceExpr = '(6371 * ACOS(COS(RADIANS(:lat)) * COS(RADIANS(latitude)) * COS(RADIANS(longitude) - RADIANS(:lng)) + SIN(RADIANS(:lat)) * SIN(RADIANS(latitude))))';
+            // Formule haversine avec paramètres positionnels pour éviter HY093
+            $distanceExpr = '(6371 * ACOS(LEAST(1.0, COS(RADIANS(?)) * COS(RADIANS(latitude)) * COS(RADIANS(longitude) - RADIANS(?)) + SIN(RADIANS(?)) * SIN(RADIANS(latitude)))))';
+            $params[] = $lat;  // premier ?
+            $params[] = $lng;  // deuxième ?
+            $params[] = $lat;  // troisième ?
+        } else {
+            $distanceExpr = '9999';
         }
 
         $sql = "SELECT price_m2, mutation_date, city, {$distanceExpr} AS distance_km
                 FROM dvf_transactions
-                WHERE property_type = :type
-                  AND surface BETWEEN :min_surface AND :max_surface
-                  AND mutation_date >= DATE_SUB(CURDATE(), INTERVAL :months MONTH)
+                WHERE property_type = ?
+                  AND surface BETWEEN ? AND ?
+                  AND mutation_date >= DATE_SUB(CURDATE(), INTERVAL ? MONTH)
                   AND price_m2 > 100";
 
+        // Paramètres WHERE principaux (après les params lat/lng du SELECT)
+        $params[] = $type;
+        $params[] = $minSurface;
+        $params[] = $maxSurface;
+        $params[] = $months;
+
         if ($lat !== null && $lng !== null) {
-            $sql .= ' AND latitude IS NOT NULL AND longitude IS NOT NULL HAVING distance_km <= :radius_km ORDER BY mutation_date DESC LIMIT 250';
+            $sql .= ' AND latitude IS NOT NULL AND longitude IS NOT NULL HAVING distance_km <= ? ORDER BY mutation_date DESC LIMIT 250';
+            $params[] = $radiusKm;
         } elseif ($city !== '') {
-            $sql .= ' AND city = :city ORDER BY mutation_date DESC LIMIT 250';
+            $sql .= ' AND city = ? ORDER BY mutation_date DESC LIMIT 250';
+            $params[] = $city;
         } else {
             $sql .= ' ORDER BY mutation_date DESC LIMIT 250';
         }
 
         $stmt = db()->prepare($sql);
-        $stmt->bindValue(':type', $type);
-        $stmt->bindValue(':min_surface', $minSurface);
-        $stmt->bindValue(':max_surface', $maxSurface);
-        $stmt->bindValue(':months', $months, PDO::PARAM_INT);
-
-        if ($lat !== null && $lng !== null) {
-            $stmt->bindValue(':lat', $lat);
-            $stmt->bindValue(':lng', $lng);
-            $stmt->bindValue(':radius_km', $radiusKm);
-        } elseif ($city !== '') {
-            $stmt->bindValue(':city', $city);
-        }
-
-        $stmt->execute();
+        $stmt->execute($params);
         return $stmt->fetchAll() ?: [];
     }
 

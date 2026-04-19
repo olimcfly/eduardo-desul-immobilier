@@ -1,6 +1,6 @@
 <?php
 // ============================================================
-// WIZARD D'INSTALLATION - Pascal Hamm Immobilier
+// WIZARD D'INSTALLATION - Eduardo Desul Immobilier
 // Fichier: agence-init.php
 // ============================================================
 
@@ -35,7 +35,7 @@ function displayHeader($step)
     ];
 
     echo "<div class='wizard-header'>";
-    echo "<h1>Installation de Pascal Hamm Immobilier</h1>";
+    echo "<h1>Installation de Eduardo Desul Immobilier</h1>";
     echo "<div class='progress-bar'>";
     for ($i = 1; $i <= 6; $i++) {
         $active = ($i == $step) ? 'active' : ($i < $step ? 'completed' : '');
@@ -78,13 +78,13 @@ function displayStep($step)
 function displayStep1()
 {
     $defaults = [
-        'app_name' => 'Pascal Hamm Immobilier',
-        'app_url' => 'pascal-hamm-immobilier-aix-en-provence.fr',
-        'app_email' => 'contact@pascal-hamm-immobilier-aix-en-provence.fr',
-        'app_phone' => '+33 4 42 27 00 00',
-        'app_address' => '24 Av. Victor Hugo',
-        'app_city' => 'Aix-en-Provence',
-        'app_siret' => '80894761200024',
+        'app_name' => 'Eduardo Desul Immobilier',
+        'app_url' => 'eduardo-desul-immobilier.fr',
+        'app_email' => 'contact@eduardo-desul-immobilier.fr',
+        'app_phone' => '+33 5 56 00 00 00',
+        'app_address' => '1 Allée de Tourny',
+        'app_city' => 'Bordeaux',
+        'app_siret' => '',
     ];
     ?>
     <form method="post" action="agence-init.php" class="install-form">
@@ -150,15 +150,15 @@ function displayStep1()
 }
 
 // ============================================================
-// ÉTAPE 2 : Informations du conseiller (Pascal Hamm)
+// ÉTAPE 2 : Informations du conseiller (Eduardo Desul)
 // ============================================================
 function displayStep2()
 {
     $defaults = [
-        'advisor_name' => 'Pascal Hamm',
-        'advisor_carte' => 'CPI 13102 2017 0000001',
-        'advisor_rsac' => 'RSAC 808947612',
-        'advisor_bio' => 'Expert en immobilier depuis 20 ans, spécialisé dans les biens haut de gamme en Provence.',
+        'advisor_name' => 'Eduardo Desul',
+        'advisor_carte' => 'CPI 33062 2020 0000001',
+        'advisor_rsac' => 'RSAC',
+        'advisor_bio' => 'Expert en immobilier spécialisé dans les biens de Bordeaux et sa Métropole.',
     ];
     ?>
     <form method="post" action="agence-init.php" class="install-form">
@@ -187,9 +187,9 @@ function displayStep2()
                 <label for="advisor_bio">Bio professionnelle (pour la page "À propos")*</label>
                 <div class="input-with-ai">
                     <textarea id="advisor_bio" name="advisor_bio" rows="4" required><?php echo htmlspecialchars($defaults['advisor_bio']); ?></textarea>
-                    <button type="button" class="ai-btn" onclick="generateSuggestion('advisor_bio', 'Bio professionnelle pour un agent immobilier en Provence')">✨ IA</button>
+                    <button type="button" class="ai-btn" onclick="generateSuggestion('advisor_bio', 'Bio professionnelle pour un agent immobilier à Bordeaux')">✨ IA</button>
                 </div>
-                <small>Exemple: "Expert en immobilier depuis 15 ans, spécialisé dans les biens d'exception à Aix-en-Provence."</small>
+                <small>Exemple: "Expert en immobilier depuis 15 ans, spécialisé dans les biens d'exception à Bordeaux."</small>
             </div>
         </div>
 
@@ -263,23 +263,23 @@ function displayStep3()
 function displayStep4()
 {
     $defaultCities = [
-        'Aix-en-Provence',
-        'Marseille',
-        'Avignon',
-        'Toulon',
-        'Nice',
-        'Arles',
-        'Nîmes',
-        'Montpellier',
+        'Bordeaux',
+        'Mérignac',
+        'Pessac',
+        'Talence',
+        'Mérignac',
+        'Bègles',
+        'Villenave-d\'Ornon',
+        'Bruges',
     ];
 
     $defaultStrategy = [
-        'pillar' => 'Immobilier haut de gamme en Provence',
+        'pillar' => 'Immobilier à Bordeaux et Bordeaux Métropole',
         'satellites' => [
-            'Les quartiers premium d\'Aix-en-Provence',
-            'Investir dans l\'immobilier à Marseille',
-            'Les tendances du marché immobilier en 2024',
-            'Comment bien estimer son bien ?',
+            'Les quartiers premium de Bordeaux',
+            'Investir dans l\'immobilier à Bordeaux Métropole',
+            'Les tendances du marché immobilier bordelais en 2025',
+            'Comment bien estimer son bien à Bordeaux ?',
             'Les erreurs à éviter lors d\'un achat immobilier',
         ],
     ];
@@ -595,7 +595,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $data = $_SESSION['install_data'];
                 $date = date('d/m/Y H:i');
 
-                $configContent = "<?php\n/**\n * Fichier de configuration - Pascal Hamm Immobilier\n * Généré automatiquement par le wizard d'installation\n * Date: {$date}\n */\n";
+                $configContent = "<?php\n/**\n * Fichier de configuration - Eduardo Desul Immobilier\n * Généré automatiquement par le wizard d'installation\n * Date: {$date}\n */\n";
                 $configContent .= "define('APP_NAME', '" . addslashes($data['app_name']) . "');\n";
                 $configContent .= "define('APP_URL', 'https://" . addslashes($data['app_url']) . "');\n";
                 file_put_contents($configPath, $configContent);
@@ -616,7 +616,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 function generateSeoStrategyFile($data)
 {
     $date = date('d/m/Y H:i');
-    $content = "<?php\n/**\n * Stratégie SEO - Pascal Hamm Immobilier\n * Généré automatiquement par le wizard d'installation\n * Date: {$date}\n */\n\nreturn " . var_export([
+    $content = "<?php\n/**\n * Stratégie SEO - Eduardo Desul Immobilier\n * Généré automatiquement par le wizard d'installation\n * Date: {$date}\n */\n\nreturn " . var_export([
         'cities' => $data['target_cities'],
         'strategy' => [
             'silos' => $data['silos'],
@@ -649,7 +649,7 @@ function generateSuggestion(fieldId, prompt) {
     let suggestion = '';
     switch(fieldId) {
         case 'app_name':
-            suggestion = 'Agence Immobilière ' + (currentValue || 'Pascal Hamm') + ' - ' + document.getElementById('app_city').value;
+            suggestion = 'Agence Immobilière ' + (currentValue || 'Eduardo Desul') + ' - ' + document.getElementById('app_city').value;
             break;
         case 'app_email':
             suggestion = 'contact@' + document.getElementById('app_url').value;

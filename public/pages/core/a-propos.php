@@ -18,16 +18,16 @@ $speciality3 = $siteSettings['speciality_3'] ?? 'estimation immobilière';
 $yearsExperience = $siteSettings['years_experience'] ?? '10+ ans';
 $approachLabel = $siteSettings['approach_label'] ?? 'Accompagnement humain';
 $territoryTitle = $siteSettings['territory_title'] ?? $advisorCity;
-$territoryDescription = $siteSettings['territory_description'] ?? "J’accompagne mes clients sur {$advisorCity} et ses environs avec une approche locale, claire et personnalisée.";
+$territoryDescription = $siteSettings['territory_description'] ?? "J'accompagne mes clients sur {$advisorCity} et ses environs avec une approche locale, claire et personnalisée.";
 $aboutHeroTitle = $siteSettings['about_hero_title'] ?? "{$advisorName} - Votre partenaire immobilier à {$advisorCity}";
 $aboutHeroSubtitle = $siteSettings['about_hero_subtitle'] ?? "{$advisorTitle} à {$advisorCity}";
 $aboutIntroTitle = $siteSettings['about_intro_title'] ?? "Votre allié immobilier pour concrétiser votre projet à {$advisorCity}";
-$aboutIntroText = $siteSettings['about_intro_text'] ?? "J’accompagne vendeurs, acheteurs et investisseurs avec une approche humaine, locale et structurée pour faire avancer chaque projet dans les meilleures conditions.";
-$aboutStoryTitle = $siteSettings['about_story_title'] ?? "Une approche fondée sur l’écoute, la clarté et l’action";
+$aboutIntroText = $siteSettings['about_intro_text'] ?? "J'accompagne vendeurs, acheteurs et investisseurs avec une approche humaine, locale et structurée pour faire avancer chaque projet dans les meilleures conditions.";
+$aboutStoryTitle = $siteSettings['about_story_title'] ?? "Une approche fondée sur l'écoute, la clarté et l'action";
 $aboutStoryText1 = $siteSettings['about_story_text_1'] ?? "Mon rôle ne se limite pas à ouvrir des portes ou diffuser une annonce. Mon objectif est de vous aider à prendre les bonnes décisions, au bon moment, avec une vraie stratégie.";
 $aboutStoryText2 = $siteSettings['about_story_text_2'] ?? "Je privilégie une relation simple, directe et transparente, avec une attention particulière portée à la qualité du suivi et à la compréhension du marché local.";
 $ctaTitle = $siteSettings['about_cta_title'] ?? "Parlons de votre projet immobilier";
-$ctaText = $siteSettings['about_cta_text'] ?? "Vous avez un projet de vente, d’achat ou besoin d’un avis de valeur ? Échangeons ensemble sur la meilleure stratégie à mettre en place.";
+$ctaText = $siteSettings['about_cta_text'] ?? "Vous avez un projet de vente, d'achat ou besoin d'un avis de valeur ? Échangeons ensemble sur la meilleure stratégie à mettre en place.";
 $ctaPrimaryLabel = $siteSettings['about_cta_primary_label'] ?? 'Contactez-moi';
 $ctaPrimaryUrl = $siteSettings['about_cta_primary_url'] ?? '/contact';
 $ctaSecondaryLabel = $siteSettings['about_cta_secondary_label'] ?? 'Demander une estimation';
@@ -48,24 +48,35 @@ if (is_string($territories)) {
     $territories = is_array($decoded) ? $decoded : array_map('trim', explode(',', $territories));
 }
 
+$iconSvgs = [
+    'home'      => '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
+    'pin'       => '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',
+    'handshake' => '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>',
+    'trending'  => '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',
+    'shield'    => '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
+    'target'    => '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>',
+    'award'     => '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>',
+];
+$renderIcon = fn(string $icon): string => $iconSvgs[$icon] ?? '<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/></svg>';
+
 $values = $siteSettings['about_values'] ?? [
     [
-        'icon' => '🏡',
+        'icon' => 'home',
         'title' => 'Accompagnement sur mesure',
-        'text' => 'Chaque projet est différent. Mon rôle est d’adapter la stratégie à votre situation réelle.',
+        'text' => 'Chaque projet est différent. Mon rôle est d\'adapter la stratégie à votre situation réelle.',
     ],
     [
-        'icon' => '📍',
+        'icon' => 'pin',
         'title' => 'Expertise locale',
-        'text' => "Je m’appuie sur une vraie lecture du marché de {$advisorCity} et de son environnement.",
+        'text' => "Je m'appuie sur une vraie lecture du marché de {$advisorCity} et de son environnement.",
     ],
     [
-        'icon' => '🤝',
+        'icon' => 'handshake',
         'title' => 'Relation de confiance',
         'text' => 'Je privilégie une communication claire, un suivi régulier et des engagements tenus.',
     ],
     [
-        'icon' => '📈',
+        'icon' => 'trending',
         'title' => 'Vision stratégique',
         'text' => 'Mon objectif est de faire avancer votre projet avec méthode, pas juste de multiplier les actions.',
     ],
@@ -78,17 +89,17 @@ if (is_string($values)) {
 
 $certifications = $siteSettings['about_certifications'] ?? [
     [
-        'icon' => '📜',
+        'icon' => 'award',
         'title' => 'Accompagnement professionnel',
         'text' => 'Un cadre clair, structuré et sérieux pour sécuriser votre projet.',
     ],
     [
-        'icon' => '🛡️',
+        'icon' => 'shield',
         'title' => 'Suivi rigoureux',
         'text' => 'Une attention portée aux détails, aux délais et à la bonne coordination des étapes.',
     ],
     [
-        'icon' => '🎯',
+        'icon' => 'target',
         'title' => 'Conseil orienté résultat',
         'text' => 'Des recommandations concrètes pour faire avancer votre vente ou votre achat.',
     ],
@@ -137,12 +148,12 @@ if (is_string($certifications)) {
                     <li>✓ Accompagnement local et personnalisé</li>
                 </ul>
 
-                <p>J’interviens principalement sur <strong><?= e($advisorCity) ?></strong> et les secteurs environnants, avec une volonté simple : vous aider à avancer avec plus de clarté et moins de friction.</p>
+                <p>J'interviens principalement sur <strong><?= e($advisorCity) ?></strong> et les secteurs environnants, avec une volonté simple : vous aider à avancer avec plus de clarté et moins de friction.</p>
 
                 <div class="stats-grid">
                     <div class="stat-item">
                         <div class="stat-value"><?= e($yearsExperience) ?></div>
-                        <div class="stat-label">d’expérience terrain</div>
+                        <div class="stat-label">d'expérience terrain</div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-value">Local</div>
@@ -157,13 +168,13 @@ if (is_string($certifications)) {
                 <div class="contact-info">
                     <?php if (!empty($advisorPhone)): ?>
                         <a href="tel:<?= e(preg_replace('/\s+/', '', (string) $advisorPhone)) ?>" class="contact-link">
-                            <span class="contact-icon">📞</span> <?= e($advisorPhoneDisplay) ?>
+                            <span class="contact-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 14a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 3.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 10a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span> <?= e($advisorPhoneDisplay) ?>
                         </a>
                     <?php endif; ?>
 
                     <?php if (!empty($advisorEmail)): ?>
                         <a href="mailto:<?= e($advisorEmail) ?>" class="contact-link">
-                            <span class="contact-icon">✉️</span> <?= e($advisorEmail) ?>
+                            <span class="contact-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span> <?= e($advisorEmail) ?>
                         </a>
                     <?php endif; ?>
                 </div>
@@ -185,7 +196,7 @@ if (is_string($certifications)) {
         <div class="grid-3" data-animate>
             <?php foreach ($values as $value): ?>
                 <div class="value-card">
-                    <div class="value-icon"><?= e($value['icon'] ?? '•') ?></div>
+                    <div class="value-icon"><?= $renderIcon((string)($value['icon'] ?? '')) ?></div>
                     <h3><?= e($value['title'] ?? '') ?></h3>
                     <p><?= e($value['text'] ?? '') ?></p>
                 </div>
@@ -232,7 +243,7 @@ if (is_string($certifications)) {
         <div class="certifications-grid" data-animate>
             <?php foreach ($certifications as $item): ?>
                 <div class="certification-card">
-                    <div class="certification-icon"><?= e($item['icon'] ?? '•') ?></div>
+                    <div class="certification-icon"><?= $renderIcon((string)($item['icon'] ?? '')) ?></div>
                     <h3><?= e($item['title'] ?? '') ?></h3>
                     <p><?= e($item['text'] ?? '') ?></p>
                 </div>
@@ -263,7 +274,7 @@ if (is_string($certifications)) {
                     <?php endforeach; ?>
                 </div>
 
-                <p>Que votre projet concerne une résidence principale, un investissement ou une vente, je m’appuie sur une lecture concrète du terrain pour vous orienter dans la bonne direction.</p>
+                <p>Que votre projet concerne une résidence principale, un investissement ou une vente, je m'appuie sur une lecture concrète du terrain pour vous orienter dans la bonne direction.</p>
             </div>
         </div>
     </div>

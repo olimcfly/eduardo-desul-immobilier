@@ -91,7 +91,7 @@ VALUES
 ('agency_opening_hours','','Horaires d''ouverture','JSON des horaires par jour','json','agence',0,'',11),
 ('zone_city','','Ville principale','Votre ville de prospection principale','text','zone',1,'max:100',1),
 ('zone_postal_code','','Code postal','','text','zone',1,'max:10',2),
-('zone_department','','Département','Ex: Rhône, Bouches-du-Rhône','text','zone',0,'max:50',3),
+('zone_department','','Département','Ex: Rhône, Gironde','text','zone',0,'max:50',3),
 ('zone_region','','Région','Ex: Auvergne-Rhône-Alpes','text','zone',0,'max:50',4),
 ('zone_neighborhoods','[]','Quartiers/Arrondissements','JSON array des zones couvertes','json','zone',0,'',5),
 ('zone_radius_km','15','Rayon de prospection (km)','Rayon autour de votre ville principale','number','zone',0,'min:1|max:100',6),

@@ -1,6 +1,6 @@
 <?php
 $pageTitle    = 'Immobilier Ventabren - Village avec vue panoramique | ' . ADVISOR_NAME;
-$metaDesc     = 'Achetez, vendez ou estimez votre bien à Ventabren avec <?= ADVISOR_NAME ?>. Village provençal offrant des vues exceptionnelles sur l\'Étang de Berre et la Sainte-Victoire.';
+$metaDesc     = 'Achetez, vendez ou estimez votre bien à Ventabren avec <?= ADVISOR_NAME ?>. Village girondin offrant des vues exceptionnelles sur l\'Étang de Berre et la Garonne.';
 $metaKeywords = 'immobilier Ventabren, expert immobilier Ventabren, estimation immobilière Ventabren, maison vue panoramique Ventabren, achat vente Ventabren';
 $extraCss     = ['/assets/css/villes.css'];
 
@@ -11,7 +11,7 @@ $pageContent = '
         <div class="hero__content" data-animate>
             <span class="section-label hero__label">Immobilier Ventabren</span>
             <h1 id="ventabren-hero-title">Vendre, acheter et estimer sereinement à Ventabren</h1>
-            <p class="hero__subtitle">Village perché offrant des panoramas à 360° sur la Sainte-Victoire et l\'Étang de Berre, Ventabren est une adresse très prisée pour ses vues exceptionnelles et son ambiance provençale authentique.</p>
+            <p class="hero__subtitle">Village perché offrant des panoramas à 360° sur la Garonne et l\'Étang de Berre, Ventabren est une adresse très prisée pour ses vues exceptionnelles et son ambiance girondine authentique.</p>
             <div class="hero__actions">
                 <a href="/estimation-gratuite" class="btn btn--primary">Demander une estimation gratuite</a>
                 <a href="/contact" class="btn btn--outline">Nous contacter</a>
@@ -25,18 +25,18 @@ $pageContent = '
         <div class="section__header">
             <span class="section-label">Ventabren</span>
             <h2 class="section-title">Le village aux panoramas exceptionnels</h2>
-            <p class="section-subtitle">Ventabren est un village provençal d\'environ 5 500 habitants, perché à 250 mètres d\'altitude à 20 km à l\'ouest d\'Aix-en-Provence. Ses ruines médiévales, ses ruelles pittoresques et ses vues panoramiques en font l\'un des villages les plus pittoresques du Pays d\'Aix.</p>
+            <p class="section-subtitle">Ventabren est un village girondin d\'environ 5 500 habitants, perché à 250 mètres d\'altitude à 20 km à l\'ouest d\'Bordeaux. Ses ruines médiévales, ses ruelles pittoresques et ses vues panoramiques en font l\'un des villages les plus pittoresques du Bordeaux Métropole.</p>
         </div>
         <div class="grid-2">
             <div class="card card--alt" data-animate>
                 <div class="card__icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 6l10 4 10-4-10-4-10 4z"></path><path d="M1 12l10 4 10-4"></path><path d="M1 18l10 4 10-4"></path></svg></div>
                 <h3 class="card__title">Vues panoramiques</h3>
-                <p class="card__text">Les biens avec vue dégagée sur l\'Étang de Berre ou la Sainte-Victoire bénéficient d\'une forte prime sur le marché.</p>
+                <p class="card__text">Les biens avec vue dégagée sur l\'Étang de Berre ou la Garonne bénéficient d\'une forte prime sur le marché.</p>
             </div>
             <div class="card card--alt" data-animate>
                 <div class="card__icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
                 <h3 class="card__title">Village authentique</h3>
-                <p class="card__text">Architecture provençale préservée, rues pavées, marché local — une qualité de vie rare et recherchée.</p>
+                <p class="card__text">Architecture girondine préservée, rues pavées, marché local — une qualité de vie rare et recherchée.</p>
             </div>
         </div>
     </div>
@@ -79,7 +79,7 @@ $pageContent = '
             </div>
             <div class="card" data-animate>
                 <h3 class="card__title">Vente immobilière</h3>
-                <p class="card__text">Mise en valeur des atouts de votre bien, notamment ses panoramas et son cachet provençal.</p>
+                <p class="card__text">Mise en valeur des atouts de votre bien, notamment ses panoramas et son cachet girondin.</p>
                 <a href="/contact" class="btn btn--outline">Vendre un bien</a>
             </div>
             <div class="card" data-animate>
@@ -113,11 +113,11 @@ $pageContent = '
         <div class="accordion" data-animate>
             <div class="accordion__item">
                 <button class="accordion__button"><span class="accordion__title">Quelle est la valeur d\'une vue panoramique à Ventabren ?</span><svg class="accordion__icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg></button>
-                <div class="accordion__content"><p>Une vue dégagée peut représenter une plus-value de 15 à 25% par rapport à un bien identique sans vue. Les biens situés sur les hauteurs du village avec panorama sur l\'Étang de Berre ou la Sainte-Victoire sont les plus valorisés.</p></div>
+                <div class="accordion__content"><p>Une vue dégagée peut représenter une plus-value de 15 à 25% par rapport à un bien identique sans vue. Les biens situés sur les hauteurs du village avec panorama sur l\'Étang de Berre ou la Garonne sont les plus valorisés.</p></div>
             </div>
             <div class="accordion__item">
                 <button class="accordion__button"><span class="accordion__title">Ventabren est-elle accessible depuis Aix ?</span><svg class="accordion__icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg></button>
-                <div class="accordion__content"><p>Ventabren se trouve à environ 25 minutes d\'Aix-en-Provence et 20 minutes de l\'aéroport Marseille-Provence. L\'accès à l\'A8 et à l\'A7 est facile, offrant une bonne connexion avec Marseille, Lyon et la Côte d\'Azur.</p></div>
+                <div class="accordion__content"><p>Ventabren se trouve à environ 25 minutes d\'Bordeaux et 20 minutes de l\'aéroport Marseille-Gironde. L\'accès à l\'A8 et à l\'A7 est facile, offrant une bonne connexion avec Marseille, Lyon et la Côte d\'Azur.</p></div>
             </div>
         </div>
     </div>

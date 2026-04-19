@@ -92,7 +92,7 @@ class ArticleService
             }
         }
 
-        $ville = 'Aix-en-Provence';
+        $ville = 'Bordeaux';
         $hashtags = match ($reseau) {
             'gmb'       => '',
             'facebook'  => "\n\n#immobilier #$ville #vendremaison",

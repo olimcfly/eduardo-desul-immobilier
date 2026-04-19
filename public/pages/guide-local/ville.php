@@ -10,16 +10,16 @@ $secteurs = [
 
     /* ── CENTRE-VILLE ──────────────────────────────────────── */
     'aix-en-provence-centre' => [
-        'nom'        => 'Aix-en-Provence Centre',
+        'nom'        => 'Bordeaux Centre',
         'prix'       => '5 200',
         'tendance'   => '↗ +3%',
         'delai'      => '38 jours',
         'biens'      => 14,
         'img'        => '/assets/images/aix-centre.jpg',
-        'img_credit' => 'Cours Mirabeau — © <a href="https://commons.wikimedia.org/wiki/File:Cours_Mirabeau_Aix-en-Provence.jpg" target="_blank" rel="noopener">Wikimedia Commons</a> (CC BY-SA 4.0)',
-        'desc'       => 'Le cœur historique d\'Aix-en-Provence réunit le Cours Mirabeau, la vieille ville et ses hôtels particuliers du XVIIe siècle. Un secteur de prestige, plébiscité par les acquéreurs nationaux et internationaux.',
+        'img_credit' => 'Cours Mirabeau — © <a href="https://commons.wikimedia.org/wiki/File:Cours_Mirabeau_Bordeaux.jpg" target="_blank" rel="noopener">Wikimedia Commons</a> (CC BY-SA 4.0)',
+        'desc'       => 'Le cœur historique d\'Bordeaux réunit le Cours Mirabeau, la vieille ville et ses hôtels particuliers du XVIIe siècle. Un secteur de prestige, plébiscité par les acquéreurs nationaux et internationaux.',
         'marche'     => 'Les prix atteignent 5 200 €/m² en moyenne, avec des pointes à 7 000 €/m² pour les hôtels particuliers avec jardin privatif. La demande est soutenue malgré la tension des taux, notamment pour les appartements de caractère avec parquet et moulures. Les biens correctement estimés partent en moins de 40 jours.',
-        'transports' => 'Toutes les lignes de bus Aix en Bus convergent vers le centre. La gare routière La Rotonde dessert Marseille, l\'aéroport Marseille-Provence et Avignon. La gare TGV Aix-en-Provence est à 10 minutes en navette. L\'accès en voiture est limité en hypercentre (zone piétonne).',
+        'transports' => 'Toutes les lignes de bus Aix en Bus convergent vers le centre. La gare routière La Rotonde dessert Marseille, l\'aéroport Marseille-Provence et Avignon. La gare TGV Bordeaux est à 10 minutes en navette. L\'accès en voiture est limité en hypercentre (zone piétonne).',
         'commerces'  => 'Le marché provençal, trois fois par semaine place Richelme et place des Prêcheurs, est l\'un des plus réputés de la région. La rue d\'Italie et le Cours Mirabeau concentrent les commerces haut de gamme, librairies et cafés historiques. Les halles couvertes proposent produits frais et artisanat local.',
         'habitat_pros' => [
             ['nom' => 'Saint-Maclou Aix',      'categorie' => 'Revêtements de sol',    'zone' => 'Zone Les Milles',  'note' => 'Parquet, carrelage, moquette sur mesure.'],
@@ -35,7 +35,7 @@ $secteurs = [
         'delai'      => '45 jours',
         'biens'      => 7,
         'img'        => '/assets/images/aix-mazarin.jpg',
-        'img_credit' => 'Fontaine des Quatre-Dauphins — © <a href="https://commons.wikimedia.org/wiki/File:Fontaine_des_Quatre-Dauphins_Aix-en-Provence.jpg" target="_blank" rel="noopener">Wikimedia Commons</a> (CC BY-SA 3.0)',
+        'img_credit' => 'Fontaine des Quatre-Dauphins — © <a href="https://commons.wikimedia.org/wiki/File:Fontaine_des_Quatre-Dauphins_Bordeaux.jpg" target="_blank" rel="noopener">Wikimedia Commons</a> (CC BY-SA 3.0)',
         'desc'       => 'Construit au XVIIe siècle selon un plan en damier, le quartier Mazarin est le secteur le plus prisé d\'Aix. Ses hôtels particuliers, ses musées et son architecture classique en font un lieu de vie d\'exception.',
         'marche'     => 'Mazarin affiche les prix les plus élevés de l\'agglomération, souvent au-delà de 6 000 €/m² pour les biens d\'exception. Le marché est peu liquide mais très qualitatif. Les acheteurs sont souvent des profils patrimoniaux, cadres supérieurs ou retraités aisés. Les négociations restent limitées sur les biens rares.',
         'transports' => 'Le quartier est desservi par plusieurs lignes de bus Aix en Bus et est entièrement accessible à pied depuis le Cours Mirabeau. La proximité du centre permet de se passer de voiture au quotidien. La gare TGV est à 15 minutes en navette.',
@@ -72,10 +72,10 @@ $secteurs = [
         'biens'      => 5,
         'img'        => '/assets/images/eguilles.jpg',
         'img_credit' => '© <a href="https://commons.wikimedia.org/wiki/File:%C3%89guilles_-_panoramio.jpg" target="_blank" rel="noopener">Wikimedia Commons</a> (CC BY 3.0)',
-        'desc'       => 'Village perché dominant la plaine de la Durance, Éguilles séduit par son cadre provençal authentique, ses bastides et ses panoramas sur la Sainte-Victoire. Un des villages les plus recherchés du Pays d\'Aix.',
+        'desc'       => 'Village perché dominant la plaine de la Durance, Éguilles séduit par son cadre provençal authentique, ses bastides et ses panoramas sur la Sainte-Victoire. Un des villages les plus recherchés du Bordeaux Métropole.',
         'marche'     => 'Le marché à Éguilles est très tendu sur les maisons avec terrain et piscine. La rareté du foncier constructible tire les prix vers le haut. Les bastides rénovées avec jardin dépassent souvent 800 000 €. Les acquéreurs sont majoritairement des familles et des profils retraités aisés cherchant le calme à proximité d\'Aix.',
         'transports' => 'Éguilles est accessible en bus depuis Aix (ligne 200). La voiture reste indispensable. L\'accès à l\'A8 se fait en 10 minutes. La gare TGV Aix est à 20 minutes.',
-        'commerces'  => 'Le village dispose de commerces de première nécessité, boulangerie, épicerie et pharmacie. Les marchés provençaux animent la place du village en saison. Aix-en-Provence est à 15 minutes pour toute l\'offre commerciale.',
+        'commerces'  => 'Le village dispose de commerces de première nécessité, boulangerie, épicerie et pharmacie. Les marchés provençaux animent la place du village en saison. Bordeaux est à 15 minutes pour toute l\'offre commerciale.',
         'habitat_pros' => [],
     ],
 
@@ -90,7 +90,7 @@ $secteurs = [
         'img_credit' => '© <a href="https://commons.wikimedia.org/wiki/File:Venelles_-_panoramio.jpg" target="_blank" rel="noopener">Wikimedia Commons</a> (CC BY 3.0)',
         'desc'       => 'Commune résidentielle au nord d\'Aix, Venelles conjugue cadre verdoyant, écoles réputées et accès rapide à la métropole. Très prisée des familles pour la qualité de vie qu\'elle offre.',
         'marche'     => 'Venelles enregistre une progression régulière des prix, tirée par la demande familiale et la faible vacance locative. Les maisons de 120 à 180 m² avec jardin constituent le cœur du marché. Les délais de vente restent raisonnables pour des biens bien présentés.',
-        'transports' => 'Plusieurs lignes de bus relient Venelles à Aix-en-Provence. La voiture est recommandée pour les déplacements professionnels. L\'A51 est accessible rapidement.',
+        'transports' => 'Plusieurs lignes de bus relient Venelles à Bordeaux. La voiture est recommandée pour les déplacements professionnels. L\'A51 est accessible rapidement.',
         'commerces'  => 'Le village dispose d\'une offre commerciale de proximité complète. Les grandes surfaces et services spécialisés sont à Aix à 15 minutes.',
         'habitat_pros' => [],
     ],
@@ -105,7 +105,7 @@ $secteurs = [
         'img'        => '/assets/images/pertuis.jpg',
         'img_credit' => '© <a href="https://commons.wikimedia.org/wiki/File:Pertuis_-_panoramio.jpg" target="_blank" rel="noopener">Wikimedia Commons</a> (CC BY 3.0)',
         'desc'       => 'Ville dynamique aux portes du Luberon, Pertuis attire de plus en plus d\'acquéreurs cherchant un cadre de vie provençal à prix maîtrisé, avec toutes les commodités d\'une ville de 20 000 habitants.',
-        'marche'     => 'Pertuis enregistre la plus forte progression du Pays d\'Aix, portée par l\'exode des ménages aixois vers des prix plus accessibles. Les maisons avec jardin représentent l\'essentiel des transactions. Le marché locatif est dynamique, porté par les salariés travaillant sur Aix ou Marseille.',
+        'marche'     => 'Pertuis enregistre la plus forte progression du Bordeaux Métropole, portée par l\'exode des ménages bordelais vers des prix plus accessibles. Les maisons avec jardin représentent l\'essentiel des transactions. Le marché locatif est dynamique, porté par les salariés travaillant sur Aix ou Marseille.',
         'transports' => 'Pertuis est desservi par des lignes de cars vers Aix et Marseille. L\'A51 permet de rejoindre Aix en 25 minutes. La gare TGV Aix est à 30 minutes. La voiture est indispensable.',
         'commerces'  => 'Pertuis dispose d\'un centre-ville commerçant complet, d\'une zone commerciale et d\'un marché hebdomadaire réputé. Toutes les enseignes nationales sont présentes.',
         'habitat_pros' => [
@@ -130,7 +130,7 @@ if (!$s) {
 /* ── Meta dynamiques ──────────────────────────────────────── */
 $pageTitle = 'Immobilier ' . $s['nom'] . ' — Prix, marché & conseils | ' . ADVISOR_NAME;
 $metaDesc  = 'Prix au m², tendances et analyse du marché immobilier à ' . $s['nom']
-           . '. Conseils terrain de <?= ADVISOR_NAME ?>, expert immobilier 360° dans le Pays d\'Aix.';
+           . '. Conseils terrain de <?= ADVISOR_NAME ?>, expert immobilier 360° dans le Bordeaux Métropole.';
 
 $autresSecteurs = array_filter($secteurs, fn($k) => $k !== $slug, ARRAY_FILTER_USE_KEY);
 ?>

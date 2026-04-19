@@ -1,6 +1,6 @@
 <?php
-$pageTitle = 'Biens vendus — Aix-en-Provence & Pays d\'Aix';
-$pageDescription = 'Découvrez les biens récemment vendus à Aix-en-Provence et dans le Pays d\'Aix.';
+$pageTitle = 'Biens vendus — Bordeaux & Bordeaux Métropole';
+$pageDescription = 'Découvrez les biens récemment vendus à Bordeaux et dans la Métropole bordelaise.';
 $extraCss = ['/assets/css/home.css'];
 
 require_once __DIR__ . '/../../../core/Database.php';
@@ -18,7 +18,7 @@ $biens = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="container">
         <div class="hero__content">
             <span class="section-label">Références</span>
-            <h1>Biens récemment vendus dans le Pays d'Aix</h1>
+            <h1>Biens récemment vendus dans Bordeaux Métropole</h1>
             <p class="hero__subtitle">
                 Découvrez des exemples concrets de ventes réalisées avec succès.
             </p>
@@ -85,7 +85,7 @@ $biens = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <!-- CTA -->
 <section class="cta-banner">
     <div class="container">
-        <h2>Vous souhaitez vendre votre bien à Aix-en-Provence ?</h2>
+        <h2>Vous souhaitez vendre votre bien à Bordeaux ?</h2>
         <p>Bénéficiez d'une stratégie efficace basée sur des résultats concrets.</p>
         <div class="cta-banner__actions">
             <a href="/estimation-gratuite" class="btn btn--accent btn--lg">Obtenir une estimation</a>

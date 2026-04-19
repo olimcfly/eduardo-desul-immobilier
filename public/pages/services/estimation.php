@@ -34,8 +34,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$pageTitle = 'Estimation gratuite — <?= ADVISOR_NAME ?> | Expert Immobilier 360° Aix-en-Provence';
-$metaDesc  = 'Estimez gratuitement votre bien immobilier à Aix-en-Provence avec <?= ADVISOR_NAME ?>. Réponse personnalisée sous 48h.';
+$pageTitle = 'Estimation gratuite — <?= ADVISOR_NAME ?> | Expert Immobilier 360° Bordeaux';
+$metaDesc  = 'Estimez gratuitement votre bien immobilier à Bordeaux avec <?= ADVISOR_NAME ?>. Réponse personnalisée sous 48h.';
 $extraCss  = ['/assets/css/estimation.css'];
 $extraJs   = ['/assets/js/estimation.js'];
 ?>
@@ -104,7 +104,7 @@ $extraJs   = ['/assets/js/estimation.js'];
                                 id="adresse"
                                 name="adresse"
                                 class="form-control"
-                                placeholder="12 avenue du Général de Gaulle, Aix-en-Provence"
+                                placeholder="12 cours du Chapeau Rouge, Bordeaux"
                                 required
                                 autocomplete="street-address"
                                 aria-describedby="adresse-err">

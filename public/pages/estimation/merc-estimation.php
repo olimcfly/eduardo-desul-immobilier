@@ -119,5 +119,5 @@ ob_start();
 
 <?php
 $pageContent = ob_get_clean();
-require_once __DIR__ . '/../templates/layout.php';
+require_once __DIR__ . '/../../templates/layout.php';
 ?>

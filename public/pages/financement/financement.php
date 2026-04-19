@@ -62,8 +62,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$pageTitle = 'Financement immobilier à Aix-en-Provence — Accompagnement personnalisé';
-$metaDesc = 'Demandez un accompagnement au financement immobilier à Aix-en-Provence : projet clarifié, dossier simplifié, retour rapide et humain.';
+$pageTitle = 'Financement immobilier à Bordeaux — Accompagnement personnalisé';
+$metaDesc = 'Demandez un accompagnement au financement immobilier à Bordeaux : projet clarifié, dossier simplifié, retour rapide et humain.';
 $extraCss = ['/assets/css/financement.css'];
 ?>
 
@@ -71,7 +71,7 @@ $extraCss = ['/assets/css/financement.css'];
     <div class="container">
         <nav class="breadcrumb" aria-label="Fil d'Ariane"><a href="/">Accueil</a><span>Financement</span></nav>
         <h1>Financer votre projet immobilier en toute sérénité</h1>
-        <p>Un accompagnement clair, humain et premium pour structurer votre demande de prêt immobilier à Aix-en-Provence et dans le Pays d’Aix.</p>
+        <p>Un accompagnement clair, humain et premium pour structurer votre demande de prêt immobilier à Bordeaux et dans le Bordeaux Métropole.</p>
         <div class="fin-hero-actions">
             <a href="#formulaire-financement" class="btn btn--accent btn--lg">Envoyer ma demande</a>
             <a href="/contact" class="btn btn--outline-white btn--lg">Échanger avec un conseiller</a>

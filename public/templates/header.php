@@ -18,12 +18,12 @@ $advisorFirstname = trim((string) setting('advisor_firstname', ''));
 $advisorLastname  = trim((string) setting('advisor_lastname', ''));
 $advisorName      = trim($advisorFirstname . ' ' . $advisorLastname);
 if ($advisorName === '') {
-    // Fallback : ADVISOR_NAME ou 'Pascal Hamm' (pas APP_NAME qui contient "Immobilier")
+    // Fallback : ADVISOR_NAME ou 'Eduardo Desul' (pas APP_NAME qui contient "Immobilier")
     if (defined('ADVISOR_NAME') && ADVISOR_NAME !== '') {
         $advisorName = ADVISOR_NAME;
     } else {
         // Extraire juste le nom (sans " Immobilier") depuis APP_NAME si besoin
-        $advisorName = defined('APP_NAME') ? preg_replace('/\s+Immobilier$/i', '', APP_NAME) : 'Pascal Hamm';
+        $advisorName = defined('APP_NAME') ? preg_replace('/\s+Immobilier$/i', '', APP_NAME) : 'Eduardo Desul';
     }
 }
 $advisorPhoto = setting('advisor_photo', '');

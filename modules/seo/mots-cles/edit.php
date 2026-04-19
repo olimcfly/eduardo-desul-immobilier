@@ -52,10 +52,10 @@ $formData = [
         <?= csrfField() ?>
 
         <label>Mot-clé *</label>
-        <input type="text" name="keyword" maxlength="190" required value="<?= e($formData['keyword']) ?>" placeholder="ex: estimation appartement Aix-en-Provence">
+        <input type="text" name="keyword" maxlength="190" required value="<?= e($formData['keyword']) ?>" placeholder="ex: estimation appartement Bordeaux">
 
         <label>Ville / zone</label>
-        <input type="text" name="city_name" maxlength="160" value="<?= e($formData['city_name']) ?>" placeholder="ex: Aix-en-Provence">
+        <input type="text" name="city_name" maxlength="160" value="<?= e($formData['city_name']) ?>" placeholder="ex: Bordeaux">
 
         <label>Intention</label>
         <select name="intent" required>

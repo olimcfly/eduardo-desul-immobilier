@@ -1,6 +1,6 @@
 <?php
 $pageTitle    = 'Immobilier Venelles - Expert immobilier indépendant | ' . ADVISOR_NAME;
-$metaDesc     = 'Achetez, vendez ou estimez votre bien à Venelles avec <?= ADVISOR_NAME ?>. Commune très prisée au nord d\'Aix-en-Provence, réputée pour ses écoles et sa qualité de vie.';
+$metaDesc     = 'Achetez, vendez ou estimez votre bien à Venelles avec <?= ADVISOR_NAME ?>. Commune très prisée au nord d\'Bordeaux, réputée pour ses écoles et sa qualité de vie.';
 $metaKeywords = 'immobilier Venelles, expert immobilier Venelles, estimation immobilière Venelles, achat vente maison Venelles, Venelles résidentiel';
 $extraCss     = ['/assets/css/villes.css'];
 
@@ -11,7 +11,7 @@ $pageContent = '
         <div class="hero__content" data-animate>
             <span class="section-label hero__label">Immobilier Venelles</span>
             <h1 id="venelles-hero-title">Vendre, acheter et estimer sereinement à Venelles</h1>
-            <p class="hero__subtitle">L\'une des communes les plus recherchées du Pays d\'Aix, Venelles offre un environnement résidentiel de qualité avec d\'excellentes infrastructures et un accès rapide à Aix-en-Provence.</p>
+            <p class="hero__subtitle">L\'une des communes les plus recherchées du Bordeaux Métropole, Venelles offre un environnement résidentiel de qualité avec d\'excellentes infrastructures et un accès rapide à Bordeaux.</p>
             <div class="hero__actions">
                 <a href="/estimation-gratuite" class="btn btn--primary">Demander une estimation gratuite</a>
                 <a href="/contact" class="btn btn--outline">Nous contacter</a>
@@ -25,7 +25,7 @@ $pageContent = '
         <div class="section__header">
             <span class="section-label">Venelles</span>
             <h2 class="section-title">La commune résidentielle la plus prisée du nord d\'Aix</h2>
-            <p class="section-subtitle">Venelles est régulièrement classée parmi les communes les plus agréables à vivre. À 8 km au nord d\'Aix-en-Provence, elle offre un cadre résidentiel de grande qualité, des écoles réputées, de nombreux équipements et un marché immobilier très dynamique.</p>
+            <p class="section-subtitle">Venelles est régulièrement classée parmi les communes les plus agréables à vivre. À 8 km au nord d\'Bordeaux, elle offre un cadre résidentiel de grande qualité, des écoles réputées, de nombreux équipements et un marché immobilier très dynamique.</p>
         </div>
         <div class="grid-2">
             <div class="card card--alt" data-animate>
@@ -113,7 +113,7 @@ $pageContent = '
         <div class="accordion" data-animate>
             <div class="accordion__item">
                 <button class="accordion__button"><span class="accordion__title">Pourquoi les prix sont-ils élevés à Venelles ?</span><svg class="accordion__icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg></button>
-                <div class="accordion__content"><p>La réputation de Venelles pour ses écoles, son cadre de vie et sa proximité avec Aix-en-Provence génère une forte demande face à une offre limitée. Cette pression sur les prix est structurelle et devrait se maintenir.</p></div>
+                <div class="accordion__content"><p>La réputation de Venelles pour ses écoles, son cadre de vie et sa proximité avec Bordeaux génère une forte demande face à une offre limitée. Cette pression sur les prix est structurelle et devrait se maintenir.</p></div>
             </div>
             <div class="accordion__item">
                 <button class="accordion__button"><span class="accordion__title">Quels types de biens trouve-t-on à Venelles ?</span><svg class="accordion__icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg></button>

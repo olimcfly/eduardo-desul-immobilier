@@ -307,7 +307,7 @@ $niveaux  = [1=>'Inconscient',2=>'Douleur',3=>'Solution',4=>'Produit',5=>'Plus c
             <label class="af-label">Mot-clé principal</label>
             <input type="text" name="mot_cle_principal" id="kw-main" class="af-input"
                    value="<?= htmlspecialchars($article['mot_cle_principal'] ?? '') ?>"
-                   placeholder="Ex : appartement Aix-en-Provence">
+                   placeholder="Ex : appartement Bordeaux">
           </div>
           <div class="af-group">
             <label class="af-label">

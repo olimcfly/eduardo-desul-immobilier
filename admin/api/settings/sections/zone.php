@@ -10,7 +10,7 @@ $v = fn(string $k, string $d = '') => htmlspecialchars($s[$k] ?? $d);
     <div class="form-row">
         <div class="form-group">
             <label>Ville principale</label>
-            <input type="text" name="zone_ville" value="<?= $v('zone_ville', 'Aix-en-Provence') ?>">
+            <input type="text" name="zone_ville" value="<?= $v('zone_ville', 'Bordeaux') ?>">
         </div>
         <div class="form-group">
             <label>Département</label>
@@ -32,7 +32,7 @@ $v = fn(string $k, string $d = '') => htmlspecialchars($s[$k] ?? $d);
     <div class="form-group">
         <label>Communes couvertes <span class="label-hint">Séparées par des virgules</span></label>
         <textarea name="zone_communes" rows="3"
-            placeholder="Aix-en-Provence, Mérignac, Pessac, Talence, Gradignan…"><?= $v('zone_communes') ?></textarea>
+            placeholder="Bordeaux, Mérignac, Pessac, Talence, Bègles…"><?= $v('zone_communes') ?></textarea>
     </div>
 
     <div class="form-section-title">Coordonnées GPS <span class="label-hint">(pour la carte)</span></div>

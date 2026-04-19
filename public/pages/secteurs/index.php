@@ -10,7 +10,7 @@ $extraCss     = ['/assets/css/villes.css'];
         <div class="hero__content" style="max-width:700px">
             <span class="section-label">Secteurs</span>
             <h1 id="secteurs-hero-title" style="color:var(--clr-primary)">Nos secteurs immobiliers en Provence</h1>
-            <p class="hero__subtitle" style="color:var(--clr-text-muted)">Expertise locale pour une transaction immobilière sereine dans toute la région d'Aix-en-Provence et le Pays d'Aix.</p>
+            <p class="hero__subtitle" style="color:var(--clr-text-muted)">Expertise locale pour une transaction immobilière sereine dans toute la région de Bordeaux et la Métropole bordelaise.</p>
         </div>
     </div>
 </section>
@@ -26,7 +26,7 @@ $extraCss     = ['/assets/css/villes.css'];
         <div class="cities-grid">
             <a href="<?= url('/immobilier/aix-en-provence') ?>" class="city-card">
                 <div class="city-card__body">
-                    <h3 class="city-card__name">Aix-en-Provence</h3>
+                    <h3 class="city-card__name">Bordeaux</h3>
                     <p class="city-card__desc">Zone principale d'intervention — quartiers historiques, résidentiels et périphérie.</p>
                     <span class="city-card__cta">Découvrir →</span>
                 </div>
@@ -116,9 +116,9 @@ $extraCss     = ['/assets/css/villes.css'];
 <section class="section section--alt" aria-labelledby="quartiers-title">
     <div class="container">
         <div class="section__header">
-            <span class="section-label">Quartiers d'Aix-en-Provence</span>
+            <span class="section-label">Quartiers d'Bordeaux</span>
             <h2 id="quartiers-title" class="section-title">Quartiers couverts</h2>
-            <p class="section-subtitle">Une connaissance fine de chaque quartier aixois pour vous orienter vers le bien qui correspond à votre projet.</p>
+            <p class="section-subtitle">Une connaissance fine de chaque quartier bordelais pour vous orienter vers le bien qui correspond à votre projet.</p>
         </div>
         <div class="cities-grid">
             <a href="<?= url('/quartier/mazarin') ?>" class="city-card">

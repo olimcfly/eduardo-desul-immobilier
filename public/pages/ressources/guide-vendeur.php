@@ -1,6 +1,6 @@
 <?php
 $pageTitle = 'Guide du vendeur immobilier — ' . ADVISOR_NAME . '';
-$metaDesc  = 'Guide complet pour vendre votre bien immobilier à Aix-en-Provence : estimation, diagnostics, home staging, négociation.';
+$metaDesc  = 'Guide complet pour vendre votre bien immobilier à Bordeaux : estimation, diagnostics, home staging, négociation.';
 $extraCss  = ['/assets/css/guide.css'];
 ?>
 

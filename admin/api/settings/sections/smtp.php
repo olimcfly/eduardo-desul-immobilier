@@ -10,7 +10,7 @@ $v = fn(string $k, string $d = '') => htmlspecialchars((string)($s[$k] ?? $d), E
     <div class="form-row">
         <div class="form-group">
             <label>Hôte SMTP</label>
-            <input type="text" name="smtp_host" value="<?= $v('smtp_host', 'mail.pascal-hamm-immobilier-aix-en-provence.fr') ?>" placeholder="mail.pascal-hamm-immobilier-aix-en-provence.fr">
+            <input type="text" name="smtp_host" value="<?= $v('smtp_host', 'mail.eduardo-desul-immobilier.fr') ?>" placeholder="mail.eduardo-desul-immobilier.fr">
         </div>
         <div class="form-group">
             <label>Port</label>
@@ -30,7 +30,7 @@ $v = fn(string $k, string $d = '') => htmlspecialchars((string)($s[$k] ?? $d), E
     <div class="form-row">
         <div class="form-group">
             <label>Utilisateur SMTP</label>
-            <input type="text" name="smtp_user" value="<?= $v('smtp_user', 'contact@pascal-hamm-immobilier-aix-en-provence.fr') ?>" placeholder="contact@pascal-hamm-immobilier-aix-en-provence.fr">
+            <input type="text" name="smtp_user" value="<?= $v('smtp_user', 'contact@eduardo-desul-immobilier.fr') ?>" placeholder="contact@eduardo-desul-immobilier.fr">
         </div>
         <div class="form-group">
             <label>Mot de passe SMTP</label>
@@ -43,11 +43,11 @@ $v = fn(string $k, string $d = '') => htmlspecialchars((string)($s[$k] ?? $d), E
     <div class="form-row">
         <div class="form-group">
             <label>Email expéditeur</label>
-            <input type="email" name="smtp_from" value="<?= $v('smtp_from', 'contact@pascal-hamm-immobilier-aix-en-provence.fr') ?>" placeholder="contact@pascal-hamm-immobilier-aix-en-provence.fr">
+            <input type="email" name="smtp_from" value="<?= $v('smtp_from', 'contact@eduardo-desul-immobilier.fr') ?>" placeholder="contact@eduardo-desul-immobilier.fr">
         </div>
         <div class="form-group">
             <label>Nom expéditeur</label>
-            <input type="text" name="smtp_from_name" value="<?= $v('smtp_from_name') ?>" placeholder="Pascal Hamm Immobilier">
+            <input type="text" name="smtp_from_name" value="<?= $v('smtp_from_name') ?>" placeholder="Eduardo Desul Immobilier">
         </div>
     </div>
 

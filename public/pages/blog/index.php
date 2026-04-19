@@ -1,6 +1,6 @@
 <?php
 $pageTitle = 'Blog immobilier — Conseils & Actualités | ' . ADVISOR_NAME;
-$metaDesc  = 'Conseils, guides et actualités du marché immobilier à Aix-en-Provence et dans le Pays d\'Aix. Expertise locale par <?= ADVISOR_NAME ?>, expert immobilier indépendant.';
+$metaDesc  = 'Conseils, guides et actualités du marché immobilier à Bordeaux et dans le Bordeaux Métropole. Expertise locale par <?= ADVISOR_NAME ?>, expert immobilier indépendant.';
 $extraCss  = ['/assets/css/guide.css'];
 
 require_once ROOT_PATH . '/core/helpers/articles.php';
@@ -17,7 +17,7 @@ try {
         <div class="hero__content" style="max-width:700px">
             <span class="section-label">Blog immobilier</span>
             <h1 id="blog-hero-title" style="color:var(--clr-primary)">Conseils & Actualités immobilières</h1>
-            <p class="hero__subtitle" style="color:var(--clr-text-muted)">Guides pratiques, analyses de marché et conseils d'expert pour réussir votre projet immobilier dans le Pays d'Aix.</p>
+            <p class="hero__subtitle" style="color:var(--clr-text-muted)">Guides pratiques, analyses de marché et conseils d'expert pour réussir votre projet immobilier sur Bordeaux Métropole.</p>
         </div>
     </div>
 </section>
@@ -31,7 +31,7 @@ try {
                 <div style="font-size:4rem;margin-bottom:1.5rem">📝</div>
                 <h2 style="margin-bottom:1rem">Des articles arrivent bientôt</h2>
                 <p style="color:var(--clr-text-muted);margin-bottom:2rem">
-                    Notre équipe prépare des guides et analyses du marché immobilier aixois. En attendant, consultez nos ressources ci-dessous.
+                    Notre équipe prépare des guides et analyses du marché immobilier bordelais. En attendant, consultez nos ressources ci-dessous.
                 </p>
                 <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
                     <a href="<?= url('/guides/guide-vendeur') ?>" class="btn btn--primary">Guide du vendeur</a>
@@ -50,7 +50,7 @@ try {
                         <div style="padding:1.75rem">
                             <div style="font-size:2.5rem;margin-bottom:1rem">🏠</div>
                             <h3 class="card__title">Guide du vendeur</h3>
-                            <p class="card__text">Tout ce qu'il faut savoir pour vendre votre bien au meilleur prix dans le Pays d'Aix.</p>
+                            <p class="card__text">Tout ce qu'il faut savoir pour vendre votre bien au meilleur prix sur Bordeaux Métropole.</p>
                             <span style="color:var(--clr-primary);font-weight:600;font-size:.875rem;margin-top:1rem;display:inline-block">Lire le guide →</span>
                         </div>
                     </a>
@@ -119,7 +119,7 @@ try {
 <section class="cta-banner">
     <div class="container">
         <div class="cta-banner__content">
-            <h2 class="cta-banner__title">Une question sur le marché immobilier aixois ?</h2>
+            <h2 class="cta-banner__title">Une question sur le marché immobilier bordelais ?</h2>
             <p class="cta-banner__text">Contactez Pascal directement pour un conseil personnalisé et gratuit.</p>
             <div class="cta-banner__actions">
                 <a href="<?= url('/contact') ?>" class="btn btn--accent">Poser ma question</a>

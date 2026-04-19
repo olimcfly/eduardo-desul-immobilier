@@ -3,7 +3,7 @@
  * ESTIMATION TUNNEL — Page publique multi-étapes
  * Route GET : /estimation
  */
-$pageTitle = 'Estimation immobilière gratuite — Pays d\'Aix | ' . ADVISOR_NAME;
+$pageTitle = 'Estimation immobilière gratuite — Bordeaux Métropole | ' . ADVISOR_NAME;
 $metaDesc  = 'Obtenez une fourchette de prix en 60 secondes. Basée sur les ventes réelles DVF. Sans inscription, sans engagement.';
 $extraCss  = ['/assets/css/estimation-tunnel.css'];
 $extraJs   = ['/assets/js/estimation-tunnel.js'];
@@ -13,8 +13,8 @@ $extraJs   = ['/assets/js/estimation-tunnel.js'];
 <section class="tunnel-hero" aria-label="Estimation immobilière">
     <div class="container">
         <div class="tunnel-hero__inner">
-            <span class="section-label">Estimation gratuite · Pays d'Aix</span>
-            <h1>Combien vaut votre bien<br><span class="tunnel-hero__accent">à Aix-en-Provence ?</span></h1>
+            <span class="section-label">Estimation gratuite · Bordeaux Métropole</span>
+            <h1>Combien vaut votre bien<br><span class="tunnel-hero__accent">à Bordeaux ?</span></h1>
             <p class="tunnel-hero__sub">Fourchette indicative basée sur les ventes DVF et le marché actuel · 60 secondes · Sans inscription</p>
             <div class="tunnel-hero__badges">
                 <span class="badge">🔒 Aucune donnée personnelle requise</span>
@@ -141,7 +141,7 @@ $extraJs   = ['/assets/js/estimation-tunnel.js'];
                                id="t-city"
                                name="ville"
                                class="form-control"
-                               placeholder="Ex : Aix-en-Provence"
+                               placeholder="Ex : Bordeaux"
                                autocomplete="off">
                         <div class="field-error" id="err-city" role="alert" hidden></div>
                     </div>
@@ -273,7 +273,7 @@ $extraJs   = ['/assets/js/estimation-tunnel.js'];
                         <h3>Données insuffisantes pour ce secteur</h3>
                         <p id="result-insufficient-msg">
                             Les données disponibles ne permettent pas de calculer une fourchette fiable pour ce secteur et ce type de bien.
-                            Demandez un avis de valeur personnalisé — <?= ADVISOR_NAME ?> se déplace dans tout le Pays d'Aix.
+                            Demandez un avis de valeur personnalisé — <?= ADVISOR_NAME ?> se déplace dans tout le Bordeaux Métropole.
                         </p>
                         <div class="result-insufficient__actions">
                             <a href="/avis-de-valeur" class="btn btn--accent">Demander un avis de valeur</a>
@@ -402,7 +402,7 @@ $extraJs   = ['/assets/js/estimation-tunnel.js'];
                     <p class="card__text">
                         Une estimation algorithmique reste indicative. <?= ADVISOR_NAME ?> peut affiner
                         cette fourchette grâce à une visite terrain et une connaissance fine
-                        du marché local à Aix-en-Provence et dans le Pays d'Aix.
+                        du marché local à Bordeaux et dans le Bordeaux Métropole.
                     </p>
                 </div>
             </article>
@@ -414,7 +414,7 @@ $extraJs   = ['/assets/js/estimation-tunnel.js'];
 <section class="cta-banner">
     <div class="container">
         <h2>Besoin d'une estimation certifiée ?</h2>
-        <p><?= ADVISOR_NAME ?> se déplace dans tout le Pays d'Aix pour une évaluation précise, sur place, sans engagement.</p>
+        <p><?= ADVISOR_NAME ?> se déplace dans tout le Bordeaux Métropole pour une évaluation précise, sur place, sans engagement.</p>
         <div class="cta-banner__actions">
             <a href="/prendre-rendez-vous" class="btn btn--accent btn--lg">Prendre rendez-vous</a>
             <a href="/avis-de-valeur" class="btn btn--outline-white btn--lg">Avis de valeur</a>

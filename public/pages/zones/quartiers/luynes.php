@@ -1,7 +1,7 @@
 <?php
-$pageTitle    = 'Immobilier Luynes Aix-en-Provence - Expert | ' . ADVISOR_NAME;
-$metaDesc     = 'Expert immobilier à Luynes, quartier résidentiel à l\'ouest d\'Aix-en-Provence. Maisons pavillonnaires, résidences et appartements dans un cadre calme et bien desservi.';
-$metaKeywords = 'immobilier Luynes, maison Luynes Aix, appartement Luynes, expert immobilier ouest Aix-en-Provence, Luynes résidentiel';
+$pageTitle    = 'Immobilier Luynes Bordeaux - Expert | ' . ADVISOR_NAME;
+$metaDesc     = 'Expert immobilier à Luynes, quartier résidentiel à l\'ouest d\'Bordeaux. Maisons pavillonnaires, résidences et appartements dans un cadre calme et bien desservi.';
+$metaKeywords = 'immobilier Luynes, maison Luynes Aix, appartement Luynes, expert immobilier ouest Bordeaux, Luynes résidentiel';
 $extraCss     = ['/assets/css/villes.css'];
 
 $pageContent = '
@@ -9,9 +9,9 @@ $pageContent = '
     <div class="hero__bg" style="background-image:linear-gradient(110deg, rgba(26,60,94,.92) 0%, rgba(15,38,68,.86) 58%, rgba(26,60,94,.92) 100%), url(\'/assets/images/luynes-hero.jpg\');"></div>
     <div class="container">
         <div class="hero__content" data-animate>
-            <span class="section-label hero__label">Luynes — Aix-en-Provence</span>
+            <span class="section-label hero__label">Luynes — Bordeaux</span>
             <h1 id="luynes-hero-title">L\'immobilier à Luynes</h1>
-            <p class="hero__subtitle">Quartier résidentiel et commune associée à Aix-en-Provence, Luynes offre un cadre de vie calme avec de bonnes infrastructures et un accès facile aux axes autoroutiers.</p>
+            <p class="hero__subtitle">Quartier résidentiel et commune associée à Bordeaux, Luynes offre un cadre de vie calme avec de bonnes infrastructures et un accès facile aux axes autoroutiers.</p>
             <div class="hero__actions">
                 <a href="/estimation-gratuite" class="btn btn--primary">Demander une estimation gratuite</a>
                 <a href="/contact" class="btn btn--outline">Nous contacter</a>
@@ -25,7 +25,7 @@ $pageContent = '
         <div class="section__header">
             <span class="section-label">Luynes</span>
             <h2 class="section-title">Un quartier résidentiel bien positionné</h2>
-            <p class="section-subtitle">Luynes est un secteur résidentiel à l\'ouest d\'Aix-en-Provence qui attire les familles pour ses lotissements de qualité, son école et sa proximité avec les zones commerciales et les axes routiers (A8 et A7).</p>
+            <p class="section-subtitle">Luynes est un secteur résidentiel à l\'ouest d\'Bordeaux qui attire les familles pour ses lotissements de qualité, son école et sa proximité avec les zones commerciales et les axes routiers (A8 et A7).</p>
         </div>
         <div class="grid-2">
             <div class="card card--alt" data-animate>

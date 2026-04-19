@@ -50,7 +50,7 @@ $canPublish = $cityPageService->isPublishable($values);
 
         <div class="fv-block">
             <h3>1. Infos générales</h3>
-            <input type="text" name="city_name" value="<?= e((string)$values['city_name']) ?>" placeholder="Commune (ex: Aix-en-Provence)" required>
+            <input type="text" name="city_name" value="<?= e((string)$values['city_name']) ?>" placeholder="Commune (ex: Bordeaux)" required>
             <input type="text" name="slug" value="<?= e((string)$values['slug']) ?>" placeholder="slug-ville" required>
         </div>
 

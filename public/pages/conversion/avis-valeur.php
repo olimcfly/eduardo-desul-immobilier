@@ -35,7 +35,7 @@ $extraCss  = ['/assets/css/estimation.css'];
         <div class="hero__content" style="max-width:700px">
             <span class="section-label hero__label">Avis de valeur</span>
             <h1 id="avis-valeur-hero">Quelle est la valeur réelle de votre bien ?</h1>
-            <p class="hero__subtitle">Obtenez une estimation précise et gratuite, réalisée par un expert immobilier indépendant qui connaît parfaitement le marché aixois.</p>
+            <p class="hero__subtitle">Obtenez une estimation précise et gratuite, réalisée par un expert immobilier indépendant qui connaît parfaitement le marché bordelais.</p>
         </div>
     </div>
 </section>
@@ -88,7 +88,7 @@ $extraCss  = ['/assets/css/estimation.css'];
                         </div>
                         <div class="form-group">
                             <label class="form-label">Adresse du bien *</label>
-                            <input class="form-control" name="address" placeholder="Ex : 12 rue Mirabeau, Aix-en-Provence" required>
+                            <input class="form-control" name="address" placeholder="Ex : 12 Allées de Tourny, Bordeaux" required>
                         </div>
                         <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
                             <div class="form-group">

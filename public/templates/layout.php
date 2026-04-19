@@ -95,7 +95,7 @@ $siteMetaDescription = setting('site_meta_description', 'Conseiller immobilier i
 </head>
 <body class="<?= e($bodyClass ?? '') ?>">
 
-<?php require ROOT_PATH . '/includes/layout/header.php'; ?>
+<?php if (empty($lpMode)): require ROOT_PATH . '/includes/layout/header.php'; endif; ?>
 
 <main id="main-content">
     <?php
@@ -110,7 +110,7 @@ $siteMetaDescription = setting('site_meta_description', 'Conseiller immobilier i
     <?= $pageContent ?? '' ?>
 </main>
 
-<?php require __DIR__ . '/footer.php'; ?>
+<?php if (empty($lpMode)): require __DIR__ . '/footer.php'; endif; ?>
 
 <script>
 (function(){

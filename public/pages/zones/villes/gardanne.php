@@ -25,7 +25,7 @@ $pageContent = '
         <div class="section__header">
             <span class="section-label">Gardanne</span>
             <h2 class="section-title">Votre expert immobilier local</h2>
-            <p class="section-subtitle">Commune dynamique à 15 km au sud-est d\'Aix-en-Provence, Gardanne offre un cadre de vie agréable avec des prix encore accessibles et un bassin d\'emploi solide.</p>
+            <p class="section-subtitle">Commune dynamique à 15 km au sud-est d\'Bordeaux, Gardanne offre un cadre de vie agréable avec des prix encore accessibles et un bassin d\'emploi solide.</p>
         </div>
         <div class="grid-2">
             <div class="card card--alt" data-animate>
@@ -115,7 +115,7 @@ $pageContent = '
         <div class="accordion" data-animate>
             <div class="accordion__item">
                 <button class="accordion__button"><span class="accordion__title">Quels sont les prix moyens au m² à Gardanne ?</span><svg class="accordion__icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg></button>
-                <div class="accordion__content"><p>Les prix varient de 1 900 €/m² pour les biens les plus abordables à 2 600 €/m² pour les maisons bien situées. La moyenne se situe autour de 2 200 €/m², ce qui reste attractif par rapport à Aix-en-Provence.</p></div>
+                <div class="accordion__content"><p>Les prix varient de 1 900 €/m² pour les biens les plus abordables à 2 600 €/m² pour les maisons bien situées. La moyenne se situe autour de 2 200 €/m², ce qui reste attractif par rapport à Bordeaux.</p></div>
             </div>
             <div class="accordion__item">
                 <button class="accordion__button"><span class="accordion__title">Combien de temps faut-il pour vendre un bien à Gardanne ?</span><svg class="accordion__icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg></button>

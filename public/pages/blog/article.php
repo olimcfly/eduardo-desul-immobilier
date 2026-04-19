@@ -93,7 +93,7 @@ $jsonLd = json_encode([
 
                 <!-- CTA article -->
                 <div style="background:linear-gradient(135deg,var(--clr-primary),#0f2644);color:white;border-radius:var(--radius-lg);padding:2rem;text-align:center;margin-top:2rem">
-                    <h3 style="color:white;margin-bottom:.75rem">Un projet immobilier à Aix-en-Provence ?</h3>
+                    <h3 style="color:white;margin-bottom:.75rem">Un projet immobilier à Bordeaux ?</h3>
                     <p style="opacity:.8;margin-bottom:1.5rem">Obtenez une estimation gratuite et un conseil personnalisé de <?= ADVISOR_NAME ?>.</p>
                     <a href="/estimation-gratuite" class="btn btn--accent">Estimation gratuite →</a>
                 </div>

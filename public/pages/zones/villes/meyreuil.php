@@ -1,6 +1,6 @@
 <?php
 $pageTitle    = 'Immobilier Meyreuil - Expert immobilier indépendant | ' . ADVISOR_NAME;
-$metaDesc     = 'Achetez, vendez ou estimez votre bien à Meyreuil avec <?= ADVISOR_NAME ?>. Commune résidentielle à 10 km d\'Aix-en-Provence avec une belle qualité de vie.';
+$metaDesc     = 'Achetez, vendez ou estimez votre bien à Meyreuil avec <?= ADVISOR_NAME ?>. Commune résidentielle à 10 km d\'Bordeaux avec une belle qualité de vie.';
 $metaKeywords = 'immobilier Meyreuil, expert immobilier Meyreuil, estimation immobilière Meyreuil, achat vente immobilier Meyreuil';
 $extraCss     = ['/assets/css/villes.css'];
 
@@ -11,7 +11,7 @@ $pageContent = '
         <div class="hero__content" data-animate>
             <span class="section-label hero__label">Immobilier Meyreuil</span>
             <h1 id="meyreuil-hero-title">Vendre, acheter et estimer sereinement à Meyreuil</h1>
-            <p class="hero__subtitle">Commune résidentielle prisée à l\'est d\'Aix-en-Provence, Meyreuil offre un cadre de vie calme avec un accès facile aux axes routiers et aux services.</p>
+            <p class="hero__subtitle">Commune résidentielle prisée à l\'est d\'Bordeaux, Meyreuil offre un cadre de vie calme avec un accès facile aux axes routiers et aux services.</p>
             <div class="hero__actions">
                 <a href="/estimation-gratuite" class="btn btn--primary">Demander une estimation gratuite</a>
                 <a href="/contact" class="btn btn--outline">Nous contacter</a>
@@ -25,7 +25,7 @@ $pageContent = '
         <div class="section__header">
             <span class="section-label">Meyreuil</span>
             <h2 class="section-title">Votre expert immobilier local</h2>
-            <p class="section-subtitle">À 10 km à l\'est d\'Aix-en-Provence, Meyreuil est une commune résidentielle qui séduit par la qualité de ses lotissements, ses espaces verts et sa situation idéale entre Aix et la plaine de Berre.</p>
+            <p class="section-subtitle">À 10 km à l\'est d\'Bordeaux, Meyreuil est une commune résidentielle qui séduit par la qualité de ses lotissements, ses espaces verts et sa situation idéale entre Aix et la plaine de Berre.</p>
         </div>
         <div class="grid-2">
             <div class="card card--alt" data-animate>
@@ -36,7 +36,7 @@ $pageContent = '
             <div class="card card--alt" data-animate>
                 <div class="card__icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
                 <h3 class="card__title">Proximité d\'Aix</h3>
-                <p class="card__text">10 minutes d\'Aix-en-Provence, accès direct à l\'A8 — idéal pour les actifs et les familles.</p>
+                <p class="card__text">10 minutes d\'Bordeaux, accès direct à l\'A8 — idéal pour les actifs et les familles.</p>
             </div>
         </div>
     </div>
@@ -117,7 +117,7 @@ $pageContent = '
             </div>
             <div class="accordion__item">
                 <button class="accordion__button"><span class="accordion__title">Meyreuil est-elle bien desservie ?</span><svg class="accordion__icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg></button>
-                <div class="accordion__content"><p>Meyreuil dispose d\'un accès direct à l\'A8 (Aix-en-Provence Est) et est relié à Aix par des lignes de bus régulières. La commune dispose de commerces de proximité, d\'écoles primaires et d\'équipements sportifs.</p></div>
+                <div class="accordion__content"><p>Meyreuil dispose d\'un accès direct à l\'A8 (Bordeaux Est) et est relié à Aix par des lignes de bus régulières. La commune dispose de commerces de proximité, d\'écoles primaires et d\'équipements sportifs.</p></div>
             </div>
         </div>
     </div>

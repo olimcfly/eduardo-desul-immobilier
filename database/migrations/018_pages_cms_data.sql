@@ -61,7 +61,7 @@ INSERT IGNORE INTO `cms_pages`
     (`site_id`, `slug`, `title`, `template`, `page_type`, `status`, `show_in_menu`, `show_in_footer`, `show_in_sitemap`)
 VALUES
 -- Zone : villes
-(1, 'immobilier/aix-en-provence',       'Immobilier Aix-en-Provence',      'pages/zones/villes/aix-en-provence',       'zone', 'published', 0, 0, 1),
+(1, 'immobilier/aix-en-provence',       'Immobilier Bordeaux',      'pages/zones/villes/aix-en-provence',       'zone', 'published', 0, 0, 1),
 (1, 'immobilier/beaurecueil',            'Immobilier Beaurecueil',           'pages/zones/villes/beaurecueil',            'zone', 'published', 0, 0, 1),
 (1, 'immobilier/bouc-bel-air',           'Immobilier Bouc-Bel-Air',          'pages/zones/villes/bouc-bel-air',           'zone', 'published', 0, 0, 1),
 (1, 'immobilier/eguilles',               'Immobilier Éguilles',              'pages/zones/villes/eguilles',               'zone', 'published', 0, 0, 1),

@@ -5,8 +5,8 @@ declare(strict_types=1);
 return [
     'advisor' => [
         'name' => trim((string) setting('advisor_fullname', ADVISOR_NAME)),
-        'city' => trim((string) setting('city_name', 'Aix-en-Provence')),
-        'zone' => trim((string) setting('advisor_zone', 'Pays d\'Aix')),
+        'city' => trim((string) setting('city_name', 'Bordeaux')),
+        'zone' => trim((string) setting('advisor_zone', 'Bordeaux Métropole')),
         'phone' => trim((string) setting('contact_phone', defined('APP_PHONE') ? APP_PHONE : '+33 6 67 19 83 66')),
         'email' => trim((string) setting('contact_email', defined('APP_EMAIL') ? APP_EMAIL : 'contact@pascalhamm.fr')),
     ],
@@ -16,26 +16,26 @@ return [
             'html_lang' => 'fr',
             'og_locale' => 'fr_FR',
             'meta' => [
-                'title' => 'Estimation immobilière Aix-en-Provence | Accompagnement local premium',
-                'description' => 'Estimation immobilière à Aix-en-Provence avec accompagnement humain pour vendre ou acheter sereinement dans le Pays d\'Aix.',
+                'title' => 'Estimation immobilière Bordeaux | Accompagnement local premium',
+                'description' => 'Estimation immobilière à Bordeaux avec accompagnement humain pour vendre ou acheter sereinement dans le Bordeaux Métropole.',
             ],
             'hero' => [
-                'label' => 'Estimation immobilière à Aix-en-Provence',
-                'title' => 'Vendre ou acheter à Aix-en-Provence commence par une estimation juste.',
+                'label' => 'Estimation immobilière à Bordeaux',
+                'title' => 'Vendre ou acheter à Bordeaux commence par une estimation juste.',
                 'subtitle' => 'Un accompagnement local, transparent et humain pour prendre la bonne décision au bon moment.',
                 'primaryCta' => 'Demander une estimation',
                 'secondaryCta' => 'Prendre rendez-vous',
                 'trust' => ['Conseiller local unique', 'Réponse sous 24h', 'Approche sans promesse irréaliste'],
             ],
             'motivation' => [
-                'title' => 'Vous connaissez votre projet. Nous apportons la lecture du marché aixois.',
-                'text' => 'Sur Aix-en-Provence, deux rues proches peuvent afficher des écarts de valeur importants. Sans repères locaux, il est facile de surévaluer, sous-évaluer ou rater une opportunité.',
+                'title' => 'Vous connaissez votre projet. Nous apportons la lecture du marché bordelais.',
+                'text' => 'Sur Bordeaux, deux rues proches peuvent afficher des écarts de valeur importants. Sans repères locaux, il est facile de surévaluer, sous-évaluer ou rater une opportunité.',
             ],
             'positioning' => [
                 'title' => 'Un conseiller de proximité pour un projet exigeant',
                 'text' => '<?= ADVISOR_NAME ?> accompagne vendeurs, acheteurs et expatriés avec une méthode claire : données de marché, stratégie personnalisée et suivi continu.',
                 'points' => [
-                    'Connaissance terrain : Aix-en-Provence et Pays d\'Aix.',
+                    'Connaissance terrain : Bordeaux et Bordeaux Métropole.',
                     'Interlocuteur unique, du premier échange à la signature.',
                     'Communication claire, sans jargon ni pression commerciale.',
                 ],
@@ -46,7 +46,7 @@ return [
                     ['title' => 'Estimation fiable', 'text' => 'Avis de valeur argumenté à partir de comparables locaux.'],
                     ['title' => 'Accompagnement vente', 'text' => 'Positionnement, mise en marché, qualification des acheteurs.'],
                     ['title' => 'Accompagnement achat', 'text' => 'Sélection ciblée et sécurisation de l\'offre au bon prix.'],
-                    ['title' => 'Stratégie locale', 'text' => 'Lecture fine des quartiers et de la dynamique du Pays d\'Aix.'],
+                    ['title' => 'Stratégie locale', 'text' => 'Lecture fine des quartiers et de la dynamique du Bordeaux Métropole.'],
                     ['title' => 'Fluidité internationale', 'text' => 'Cadre clair pour clients non résidents ou mobiles à l\'étranger.'],
                 ],
             ],
@@ -61,16 +61,16 @@ return [
             'reassurance' => [
                 'title' => 'Des signaux de confiance clairs',
                 'testimonials' => [
-                    '“Estimation précise et explications très pédagogiques. Nous avons vendu sereinement.” — Claire, Aix-en-Provence',
+                    '“Estimation précise et explications très pédagogiques. Nous avons vendu sereinement.” — Claire, Bordeaux',
                     '“Excellent accompagnement en tant qu\'expatriés. Processus simple et humain.” — David & Emma, London',
                 ],
                 'faq' => [
                     ['q' => 'L\'estimation est-elle gratuite ?', 'a' => 'Oui, le premier échange et l\'avis de valeur sont sans engagement.'],
-                    ['q' => 'Intervenez-vous hors centre-ville ?', 'a' => 'Oui, sur Aix-en-Provence et les communes principales du Pays d\'Aix.'],
+                    ['q' => 'Intervenez-vous hors centre-ville ?', 'a' => 'Oui, sur Bordeaux et les communes principales du Bordeaux Métropole.'],
                 ],
             ],
             'finalCta' => [
-                'title' => 'Parlons de votre projet immobilier à Aix-en-Provence',
+                'title' => 'Parlons de votre projet immobilier à Bordeaux',
                 'text' => 'Obtenez une estimation claire et les prochaines étapes adaptées à votre situation.',
                 'button' => 'Réserver un rendez-vous',
             ],
@@ -80,12 +80,12 @@ return [
             'html_lang' => 'en',
             'og_locale' => 'en_US',
             'meta' => [
-                'title' => 'Property valuation in Aix-en-Provence | Local guidance for international clients',
-                'description' => 'Get a local property valuation in Aix-en-Provence with premium, human support for sellers, buyers and expatriates.',
+                'title' => 'Property valuation in Bordeaux | Local guidance for international clients',
+                'description' => 'Get a local property valuation in Bordeaux with premium, human support for sellers, buyers and expatriates.',
             ],
             'hero' => [
-                'label' => 'Aix-en-Provence Property Valuation',
-                'title' => 'Make confident property decisions in Aix-en-Provence.',
+                'label' => 'Bordeaux Property Valuation',
+                'title' => 'Make confident property decisions in Bordeaux.',
                 'subtitle' => 'Local market insight, clear communication and tailored support for international sellers and buyers.',
                 'primaryCta' => 'Request a valuation',
                 'secondaryCta' => 'Book a consultation',
@@ -93,13 +93,13 @@ return [
             ],
             'motivation' => [
                 'title' => 'Knowing the city is not the same as reading its micro-markets.',
-                'text' => 'In Aix-en-Provence, pricing can shift significantly between nearby streets and neighborhoods. International buyers and expats need local context to avoid costly mistakes.',
+                'text' => 'In Bordeaux, pricing can shift significantly between nearby streets and neighborhoods. International buyers and expats need local context to avoid costly mistakes.',
             ],
             'positioning' => [
                 'title' => 'A local advisor with an international mindset',
                 'text' => '<?= ADVISOR_NAME ?> provides structured guidance for sales and acquisitions, with straightforward communication and reliable local execution.',
                 'points' => [
-                    'On-the-ground knowledge of Aix-en-Provence and the Pays d\'Aix area.',
+                    'On-the-ground knowledge of Bordeaux and the Bordeaux Métropole area.',
                     'Single point of contact from strategy to signature.',
                     'No inflated promises, only data-backed recommendations.',
                 ],
@@ -135,7 +135,7 @@ return [
             ],
             'finalCta' => [
                 'title' => 'Start with a local valuation you can trust',
-                'text' => 'Get practical guidance for your next move in Aix-en-Provence.',
+                'text' => 'Get practical guidance for your next move in Bordeaux.',
                 'button' => 'Schedule a consultation',
             ],
         ],
@@ -144,26 +144,26 @@ return [
             'html_lang' => 'es',
             'og_locale' => 'es_ES',
             'meta' => [
-                'title' => 'Valoración inmobiliaria en Aix-en-Provence | Acompañamiento local',
-                'description' => 'Solicita una valoración inmobiliaria en Aix-en-Provence con asesoramiento cercano para vendedores, compradores y clientes internacionales.',
+                'title' => 'Valoración inmobiliaria en Bordeaux | Acompañamiento local',
+                'description' => 'Solicita una valoración inmobiliaria en Bordeaux con asesoramiento cercano para vendedores, compradores y clientes internacionales.',
             ],
             'hero' => [
-                'label' => 'Valoración inmobiliaria en Aix-en-Provence',
+                'label' => 'Valoración inmobiliaria en Bordeaux',
                 'title' => 'Tu proyecto inmobiliario merece una valoración local y realista.',
-                'subtitle' => 'Acompañamiento profesional y humano para vender o comprar con seguridad en Aix-en-Provence.',
+                'subtitle' => 'Acompañamiento profesional y humano para vender o comprar con seguridad en Bordeaux.',
                 'primaryCta' => 'Solicitar valoración',
                 'secondaryCta' => 'Pedir cita',
                 'trust' => ['Asesor local único', 'Respuesta en 24h', 'Enfoque claro y honesto'],
             ],
             'motivation' => [
                 'title' => 'Sin contexto local, es fácil perder valor o tiempo.',
-                'text' => 'En Aix-en-Provence hay diferencias de precio importantes entre zonas muy cercanas. Para un comprador o vendedor internacional, la orientación local marca la diferencia.',
+                'text' => 'En Bordeaux hay diferencias de precio importantes entre zonas muy cercanas. Para un comprador o vendedor internacional, la orientación local marca la diferencia.',
             ],
             'positioning' => [
                 'title' => 'Asesoramiento cercano, criterio profesional',
                 'text' => '<?= ADVISOR_NAME ?> acompaña operaciones de compraventa con una metodología clara, sin promesas exageradas y con seguimiento continuo.',
                 'points' => [
-                    'Conocimiento real del mercado de Aix-en-Provence y Pays d\'Aix.',
+                    'Conocimiento real del mercado de Bordeaux y Bordeaux Métropole.',
                     'Un solo interlocutor durante todo el proceso.',
                     'Comunicación fluida para clientes expatriados o internacionales.',
                 ],
@@ -189,7 +189,7 @@ return [
             'reassurance' => [
                 'title' => 'Confianza para decidir con tranquilidad',
                 'testimonials' => [
-                    '“Muy profesional y cercano. La valoración fue clara y útil para vender bien.” — Laura, Aix-en-Provence',
+                    '“Muy profesional y cercano. La valoración fue clara y útil para vender bien.” — Laura, Bordeaux',
                     '“Vivimos fuera de Francia y todo fue fácil de coordinar.” — Miguel y Sofía, Barcelona',
                 ],
                 'faq' => [
@@ -199,7 +199,7 @@ return [
             ],
             'finalCta' => [
                 'title' => 'Da el primer paso con una valoración fiable',
-                'text' => 'Hablemos de tu proyecto inmobiliario en Aix-en-Provence.',
+                'text' => 'Hablemos de tu proyecto inmobiliario en Bordeaux.',
                 'button' => 'Reservar una cita',
             ],
         ],

@@ -2,7 +2,7 @@
 $activeAction = isset($_GET['action']) ? (string) $_GET['action'] : 'sequences';
 $isJournal    = $activeAction === 'journal';
 
-$advisorCity = setting('zone_city', 'Aix-en-Provence');
+$advisorCity = setting('zone_city', 'Bordeaux');
 
 $personaFilters = [
     ''             => 'Tous',

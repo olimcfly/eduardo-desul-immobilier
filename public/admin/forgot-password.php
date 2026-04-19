@@ -9,8 +9,8 @@ if (Auth::check()) {
 // Créer la table si elle n'existe pas encore
 db()->exec("
     CREATE TABLE IF NOT EXISTS `password_reset_tokens` (
-        `id`         BIGINT UNSIGNED  NOT NULL AUTO_INCREMENT,
-        `user_id`    BIGINT UNSIGNED  NOT NULL,
+        `id`         INT UNSIGNED     NOT NULL AUTO_INCREMENT,
+        `user_id`    INT UNSIGNED     NOT NULL,
         `token_hash` VARCHAR(255)     NOT NULL,
         `expires_at` DATETIME         NOT NULL,
         `used_at`    DATETIME         DEFAULT NULL,
@@ -36,13 +36,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $pdo  = db();
             $stmt = $pdo->prepare(
-                "SELECT id, firstname, lastname FROM users WHERE email = ? AND role IN ('admin','superadmin') AND status = 'active' LIMIT 1"
+                "SELECT id, name FROM users WHERE email = ? AND role IN ('admin','superadmin') AND is_active = 1 LIMIT 1"
             );
             $stmt->execute([$email]);
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($user) {
-                $user['name'] = trim(($user['firstname'] ?? '') . ' ' . ($user['lastname'] ?? ''));
                 // Invalider les anciens tokens de cet utilisateur
                 $pdo->prepare("DELETE FROM password_reset_tokens WHERE user_id = ?")
                     ->execute([$user['id']]);
@@ -57,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                      VALUES (?, ?, ?)"
                 )->execute([$user['id'], $tokenHash, $expires]);
 
-                $appUrl   = rtrim($_ENV['APP_URL'] ?? 'https://pascal-hamm-immobilier-aix-en-provence.fr', '/');
+                $appUrl   = rtrim($_ENV['APP_URL'] ?? 'https://eduardo-desul-immobilier.fr', '/');
                 $resetUrl = $appUrl . '/admin/reset-password?token=' . urlencode($token);
 
                 MailService::send(

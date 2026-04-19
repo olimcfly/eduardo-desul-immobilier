@@ -2,7 +2,7 @@
 // biens.php
 
 // Définir les métadonnées spécifiques à la page
-$pageTitle = 'Nos biens immobiliers à Bordeaux — Eduardo De Sul | Vente & Location';
+$pageTitle = 'Nos biens immobiliers à Bordeaux — Eduardo Desul | Vente & Location';
 $metaDesc = 'Découvrez notre sélection de biens immobiliers à Bordeaux et dans la métropole bordelaise : appartements, maisons, immeubles, terrains et biens de prestige.';
 $metaKeywords = 'biens immobiliers Bordeaux, appartements à vendre Bordeaux, maisons Bordeaux, immobilier Bordeaux Métropole, acheter à Bordeaux, location Bordeaux';
 

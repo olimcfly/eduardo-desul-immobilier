@@ -21,7 +21,7 @@ $metaRobots = 'noindex, nofollow';
             <?php if (APP_SIRET): ?>SIRET : <?= e(APP_SIRET) ?><?php endif; ?>
             </p>
             <h2>Activité réglementée</h2>
-            <p><?= ADVISOR_NAME ?> exerce l'activité de transaction immobilière en qualité de mandataire indépendant, titulaire d'une carte professionnelle délivrée par la CCI d'Aix-en-Provence conformément à la loi Hoguet n° 70-9 du 2 janvier 1970.</p>
+            <p><?= ADVISOR_NAME ?> exerce l'activité de transaction immobilière en qualité de mandataire indépendant, titulaire d'une carte professionnelle délivrée par la CCI de Bordeaux-Gironde conformément à la loi Hoguet n° 70-9 du 2 janvier 1970.</p>
             <h2>Hébergement</h2>
             <p>Ce site est hébergé par un prestataire d'hébergement professionnel.</p>
             <h2>Propriété intellectuelle</h2>

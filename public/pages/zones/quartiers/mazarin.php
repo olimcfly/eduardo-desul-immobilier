@@ -1,7 +1,7 @@
 <?php
-$pageTitle    = 'Immobilier Quartier Mazarin Aix-en-Provence - Expert | ' . ADVISOR_NAME;
-$metaDesc     = 'Expert immobilier dans le quartier Mazarin à Aix-en-Provence. Le quartier le plus prestigieux d\'Aix — hôtels particuliers, appartements haussmanniens, rues arborées.';
-$metaKeywords = 'immobilier quartier Mazarin Aix-en-Provence, appartement Mazarin, hôtel particulier Mazarin, expert immobilier Mazarin Aix';
+$pageTitle    = 'Immobilier Quartier Mazarin Bordeaux - Expert | ' . ADVISOR_NAME;
+$metaDesc     = 'Expert immobilier dans le quartier Mazarin à Bordeaux. Le quartier le plus prestigieux d\'Aix — hôtels particuliers, appartements haussmanniens, rues arborées.';
+$metaKeywords = 'immobilier quartier Mazarin Bordeaux, appartement Mazarin, hôtel particulier Mazarin, expert immobilier Mazarin Aix';
 $extraCss     = ['/assets/css/villes.css'];
 
 $pageContent = '
@@ -9,9 +9,9 @@ $pageContent = '
     <div class="hero__bg" style="background-image:linear-gradient(110deg, rgba(26,60,94,.92) 0%, rgba(15,38,68,.86) 58%, rgba(26,60,94,.92) 100%), url(\'/assets/images/mazarin-hero.jpg\');"></div>
     <div class="container">
         <div class="hero__content" data-animate>
-            <span class="section-label hero__label">Quartier Mazarin — Aix-en-Provence</span>
+            <span class="section-label hero__label">Quartier Mazarin — Bordeaux</span>
             <h1 id="mazarin-hero-title">L\'immobilier de prestige dans le quartier Mazarin</h1>
-            <p class="hero__subtitle">Quartier du XVIIe siècle, le Mazarin est l\'adresse la plus prisée d\'Aix-en-Provence. Hôtels particuliers, appartements haussmanniens et rues arborées forment un patrimoine immobilier exceptionnel.</p>
+            <p class="hero__subtitle">Quartier du XVIIe siècle, le Mazarin est l\'adresse la plus prisée d\'Bordeaux. Hôtels particuliers, appartements haussmanniens et rues arborées forment un patrimoine immobilier exceptionnel.</p>
             <div class="hero__actions">
                 <a href="/estimation-gratuite" class="btn btn--primary">Demander une estimation gratuite</a>
                 <a href="/contact" class="btn btn--outline">Nous contacter</a>

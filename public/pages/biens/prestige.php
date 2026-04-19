@@ -1,6 +1,6 @@
 <?php
-$pageTitle = 'Biens de prestige — Aix-en-Provence & Pays d\'Aix';
-$pageDescription = 'Découvrez une sélection exclusive de biens immobiliers de prestige à Aix-en-Provence et dans le Pays d\'Aix.';
+$pageTitle = 'Biens de prestige — Bordeaux & Bordeaux Métropole';
+$pageDescription = 'Découvrez une sélection exclusive de biens immobiliers de prestige à Bordeaux et dans la Métropole bordelaise.';
 $extraCss = ['/assets/css/home.css'];
 
 require_once __DIR__ . '/../../../core/Database.php';
@@ -8,7 +8,7 @@ require_once __DIR__ . '/../../../core/Database.php';
 $pdo = Database::getInstance();
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-$stmt = $pdo->query("SELECT * FROM biens WHERE prestige = 1 ORDER BY created_at DESC");
+$stmt = $pdo->query("SELECT * FROM biens WHERE exclusif = 1 AND statut = 'actif' ORDER BY created_at DESC");
 $biens = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
@@ -17,7 +17,7 @@ $biens = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="container">
         <div class="hero__content">
             <span class="section-label">Collection prestige</span>
-            <h1>Biens d’exception dans le Pays d’Aix</h1>
+            <h1>Biens d’exception à Bordeaux Métropole</h1>
             <p class="hero__subtitle">
                 Villas contemporaines, propriétés de caractère et emplacements rares : une sélection confidentielle de biens haut de gamme.
             </p>

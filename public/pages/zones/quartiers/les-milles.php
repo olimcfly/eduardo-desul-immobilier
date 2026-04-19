@@ -1,7 +1,7 @@
 <?php
-$pageTitle    = 'Immobilier Les Milles Aix-en-Provence - Expert | ' . ADVISOR_NAME;
-$metaDesc     = 'Expert immobilier aux Milles, secteur résidentiel et d\'activités au sud d\'Aix-en-Provence. Appartements, maisons et locaux professionnels à proximité du technopôle.';
-$metaKeywords = 'immobilier Les Milles, appartement Les Milles Aix, maison Les Milles, expert immobilier sud Aix-en-Provence, technopôle Milles';
+$pageTitle    = 'Immobilier Les Milles Bordeaux - Expert | ' . ADVISOR_NAME;
+$metaDesc     = 'Expert immobilier aux Milles, secteur résidentiel et d\'activités au sud d\'Bordeaux. Appartements, maisons et locaux professionnels à proximité du technopôle.';
+$metaKeywords = 'immobilier Les Milles, appartement Les Milles Aix, maison Les Milles, expert immobilier sud Bordeaux, technopôle Milles';
 $extraCss     = ['/assets/css/villes.css'];
 
 $pageContent = '
@@ -9,9 +9,9 @@ $pageContent = '
     <div class="hero__bg" style="background-image:linear-gradient(110deg, rgba(26,60,94,.92) 0%, rgba(15,38,68,.86) 58%, rgba(26,60,94,.92) 100%), url(\'/assets/images/les-milles-hero.jpg\');"></div>
     <div class="container">
         <div class="hero__content" data-animate>
-            <span class="section-label hero__label">Les Milles — Aix-en-Provence</span>
+            <span class="section-label hero__label">Les Milles — Bordeaux</span>
             <h1 id="les-milles-hero-title">L\'immobilier aux Milles</h1>
-            <p class="hero__subtitle">Secteur résidentiel et économique au sud d\'Aix-en-Provence, Les Milles abrite le technopôle de l\'Arbois, des résidences modernes et une offre immobilière diversifiée à des prix plus accessibles que le centre d\'Aix.</p>
+            <p class="hero__subtitle">Secteur résidentiel et économique au sud d\'Bordeaux, Les Milles abrite le technopôle de l\'Arbois, des résidences modernes et une offre immobilière diversifiée à des prix plus accessibles que le centre d\'Aix.</p>
             <div class="hero__actions">
                 <a href="/estimation-gratuite" class="btn btn--primary">Demander une estimation gratuite</a>
                 <a href="/contact" class="btn btn--outline">Nous contacter</a>
@@ -25,7 +25,7 @@ $pageContent = '
         <div class="section__header">
             <span class="section-label">Les Milles</span>
             <h2 class="section-title">Un secteur en plein développement</h2>
-            <p class="section-subtitle">Les Milles est un secteur en pleine mutation, combinant zones résidentielles, parc d\'activités technologiques (technopôle de l\'Arbois) et projets de développement urbain. Sa proximité avec l\'aéroport de Marseille-Provence et les axes autoroutiers en fait une localisation stratégique.</p>
+            <p class="section-subtitle">Les Milles est un secteur en pleine mutation, combinant zones résidentielles, parc d\'activités technologiques (technopôle de l\'Arbois) et projets de développement urbain. Sa proximité avec l\'aéroport de Marseille-Gironde et les axes autoroutiers en fait une localisation stratégique.</p>
         </div>
         <div class="grid-2">
             <div class="card card--alt" data-animate>
@@ -36,7 +36,7 @@ $pageContent = '
             <div class="card card--alt" data-animate>
                 <div class="card__icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
                 <h3 class="card__title">Prix accessibles</h3>
-                <p class="card__text">Des prix encore en dessous de la moyenne aixoise, offrant de belles opportunités d\'investissement.</p>
+                <p class="card__text">Des prix encore en dessous de la moyenne bordelaise, offrant de belles opportunités d\'investissement.</p>
             </div>
         </div>
     </div>

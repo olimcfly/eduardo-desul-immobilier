@@ -357,7 +357,7 @@ class EstimationTunnelService
     // ── Emails ────────────────────────────────────────────────
     public static function sendEmailReport(string $to, string $name, array $req, array $result): void
     {
-        $appName   = defined('APP_NAME') ? APP_NAME : 'Pascal Hamm Immobilier';
+        $appName   = defined('APP_NAME') ? APP_NAME : 'Eduardo Desul Immobilier';
         $appEmail  = defined('APP_EMAIL') ? APP_EMAIL : '';
         $type      = ucfirst((string)($req['property_type'] ?? ''));
         $surface   = (float)($req['surface'] ?? 0);
@@ -458,17 +458,17 @@ class EstimationTunnelService
 
     public static function sendConfirmationProspect(string $to, string $name, string $actionType): void
     {
-        $appName = defined('APP_NAME') ? APP_NAME : 'Pascal Hamm Immobilier';
+        $appName = defined('APP_NAME') ? APP_NAME : 'Eduardo Desul Immobilier';
         $rdv     = defined('APP_URL') ? APP_URL . '/prendre-rendez-vous' : '/prendre-rendez-vous';
 
         $messages = [
             'contact_request' => [
                 'subject' => 'Votre demande de contact a bien été reçue',
-                'body'    => "Nous avons bien reçu votre demande. Pascal Hamm vous contactera dans les plus brefs délais (généralement sous 24h).",
+                'body'    => "Nous avons bien reçu votre demande. Eduardo Desul vous contactera dans les plus brefs délais (généralement sous 24h).",
             ],
             'rdv_request' => [
                 'subject' => 'Votre demande de rendez-vous a bien été reçue',
-                'body'    => "Nous avons bien reçu votre demande de rendez-vous. Pascal Hamm reviendra vers vous pour confirmer un créneau.",
+                'body'    => "Nous avons bien reçu votre demande de rendez-vous. Eduardo Desul reviendra vers vous pour confirmer un créneau.",
             ],
         ];
 
@@ -563,7 +563,7 @@ class EstimationTunnelService
 
     private static function htmlWrap(string $title, string $body): string
     {
-        $appName = defined('APP_NAME') ? APP_NAME : 'Pascal Hamm Immobilier';
+        $appName = defined('APP_NAME') ? APP_NAME : 'Eduardo Desul Immobilier';
         $appUrl  = defined('APP_URL')  ? APP_URL  : '#';
         return "<!DOCTYPE html>
 <html lang='fr'>

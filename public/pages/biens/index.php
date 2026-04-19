@@ -1,6 +1,6 @@
 <?php
 $pageTitle = 'Nos biens immobiliers à ' . APP_CITY . ' — ' . ADVISOR_NAME;
-$metaDesc = 'Découvrez notre sélection exclusive de biens immobiliers à Aix-en-Provence et dans le Pays d\'Aix.';
+$metaDesc = 'Découvrez notre sélection exclusive de biens immobiliers à Bordeaux et dans la Métropole bordelaise.';
 $extraCss = ['/assets/css/style.css', '/assets/css/biens.css'];
 
 require_once __DIR__ . '/../../../core/Database.php';
@@ -83,9 +83,9 @@ $nbBiensTotal = count($biens);
     <div class="container">
         <div class="hero__content">
             <span class="section-label">Biens immobiliers</span>
-            <h1>Maisons et appartements à Aix-en-Provence</h1>
+            <h1>Maisons et appartements à Bordeaux</h1>
             <p class="hero__subtitle">
-                Découvrez notre sélection de biens disponibles à la vente et à la location dans le Pays d’Aix.
+                Découvrez notre sélection de biens disponibles à la vente et à la location dans Bordeaux Métropole.
             </p>
             <div class="hero__stats">
                 <div class="stat-item">
