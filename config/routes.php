@@ -17,15 +17,22 @@ function siteData(): array
         return $cache;
     }
     try {
+        $pdo = db();
         $user = Auth::user();
         if (!$user) {
-            return $cache = [];
+            // Pages publiques : charger les settings du propriétaire du site (rôle user)
+            $row = $pdo->query("SELECT id FROM users WHERE role = 'user' ORDER BY id LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+            if (!$row) {
+                return $cache = [];
+            }
+            $userId = (int) $row['id'];
+        } else {
+            $userId = (int) $user['id'];
         }
-        $pdo = db();
         $stmt = $pdo->prepare(
             'SELECT setting_key, setting_value FROM settings WHERE user_id = ? ORDER BY setting_key'
         );
-        $stmt->execute([$user['id']]);
+        $stmt->execute([$userId]);
         $cache = $stmt->fetchAll(PDO::FETCH_KEY_PAIR) ?: [];
     } catch (\Throwable $e) {
         $cache = [];
