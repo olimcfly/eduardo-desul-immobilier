@@ -62,3 +62,6 @@ Stack trace:
 #0 Command line code(3): PDO->query()
 #1 {main}
   thrown in Command line code on line 3
+[24-Apr-2026 03:10:38 Europe/Paris] [DB] getPDOSafe échoué : DB_NAME / DB_USER manquants dans le fichier .env
+[24-Apr-2026 03:10:48 Europe/Paris] DB Connection failed: SQLSTATE[HY000] [1045] Access denied for user ''@'localhost' (using password: NO)
+[24-Apr-2026 03:31:27 Europe/Paris] [REDIRECT DEBUG] Redirecting from  to /admin/login

@@ -45,11 +45,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim((string) ($_POST['email'] ?? ''));
     $password = (string) ($_POST['password'] ?? '');
 
+    error_log("[LOGIN DEBUG] Email: $email, Password length: " . strlen($password));
+
     if (empty($email) || empty($password)) {
         $error = 'Veuillez remplir tous les champs.';
     } else {
         $user = null;
-        
+
         // Étape 1: Chercher dans la base de données (si disponible)
         try {
             $dbHost = $_ENV['DB_HOST'] ?? $_ENV['DATABASE_HOST'] ?? 'localhost';
@@ -70,7 +72,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt = $pdo->prepare('SELECT id, email, password, role, name FROM users WHERE email = ? AND is_active = 1 LIMIT 1');
                 $stmt->execute([$email]);
                 $user = $stmt->fetch(PDO::FETCH_ASSOC);
-                
+
+                error_log("[LOGIN DEBUG] User found: " . ($user ? 'YES' : 'NO'));
+                if ($user) {
+                    $verify = password_verify($password, (string) $user['password']);
+                    error_log("[LOGIN DEBUG] Password verify: " . ($verify ? 'YES' : 'NO'));
+                }
+
                 if ($user && password_verify($password, (string) $user['password'])) {
                     // Succès avec l'utilisateur de la BDD
                     session_regenerate_id(true);
@@ -79,6 +87,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_SESSION['user_role']  = $user['role'] ?? 'admin';
                     $_SESSION['user_name']  = $user['name'] ?? '';
                     $_SESSION['last_activity'] = time();
+
+                    error_log("[LOGIN DEBUG] Session set, about to redirect to /admin/");
 
                     // Enregistrer la connexion et envoyer alerte
                     try {
@@ -107,14 +117,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
         } catch (Exception $e) {
-            error_log('DB Connection failed: ' . $e->getMessage());
+            error_log('[LOGIN DEBUG] DB Connection exception: ' . $e->getMessage());
         }
         
         // Étape 2: Fallback sur les defines du config.php
+        error_log("[LOGIN DEBUG] Fallback check - ADMIN_EMAIL defined: " . (defined('ADMIN_EMAIL') ? 'YES' : 'NO'));
+        error_log("[LOGIN DEBUG] Fallback check - ADMIN_PASSWORD_HASH defined: " . (defined('ADMIN_PASSWORD_HASH') ? 'YES' : 'NO'));
+        error_log("[LOGIN DEBUG] Fallback check - Email match: " . ($email === ADMIN_EMAIL ? 'YES' : 'NO'));
+
+        if (defined('ADMIN_EMAIL') && defined('ADMIN_PASSWORD_HASH')) {
+            $fallbackVerify = password_verify($password, ADMIN_PASSWORD_HASH);
+            error_log("[LOGIN DEBUG] Fallback password verify: " . ($fallbackVerify ? 'YES' : 'NO'));
+        }
+
         if (
-            defined('ADMIN_EMAIL') && 
+            defined('ADMIN_EMAIL') &&
             defined('ADMIN_PASSWORD_HASH') &&
-            $email === ADMIN_EMAIL && 
+            $email === ADMIN_EMAIL &&
             password_verify($password, ADMIN_PASSWORD_HASH)
         ) {
             // Connexion réussie avec le compte config
