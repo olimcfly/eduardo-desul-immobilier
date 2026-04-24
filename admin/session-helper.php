@@ -45,16 +45,7 @@ function redirectAdmin(string $url): void
         return;
     }
 
-    // Si on est sur /admin/login* et qu'on essaie de rediriger vers /admin, arrêter
-    if (strpos($currentPath, '/admin/login') !== false && strpos($url, '/admin/') !== false && strpos($url, '/admin/login') === false) {
-        return;
-    }
-
-    // Si on est sur /admin/* et qu'on essaie de rediriger vers /admin/login, arrêter
-    if (strpos($currentPath, '/admin/') !== false && strpos($currentPath, '/admin/login') === false && strpos($url, '/admin/login') !== false) {
-        return;
-    }
-
+    error_log("[REDIRECT DEBUG] Redirecting from $currentPath to $url");
     session_write_close();
     header('Location: ' . $url);
     exit;
