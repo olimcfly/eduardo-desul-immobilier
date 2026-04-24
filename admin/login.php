@@ -20,6 +20,7 @@ $email = '';
 
 // ── Charger les identifiants admin ──────────────────────────
 require_once __DIR__ . '/../includes/config.php';
+require_once __DIR__ . '/includes/mailer.php';
 
 // ── Charger les variables d'environnement (.env) ─────────────
 $envFile = dirname(__DIR__) . '/.env';
@@ -78,7 +79,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_SESSION['user_role']  = $user['role'] ?? 'admin';
                     $_SESSION['user_name']  = $user['name'] ?? '';
                     $_SESSION['last_activity'] = time();
-                    
+
+                    // Enregistrer la connexion et envoyer alerte
+                    try {
+                        $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+                        $pdo->prepare("INSERT INTO login_logs (user_email, ip_address, success) VALUES (?, ?, 1)")
+                            ->execute([$email, $ip]);
+
+                        // Envoyer alerte email
+                        require_once __DIR__ . '/../includes/config.php';
+                        if (function_exists('sendEmail')) {
+                            sendEmail(
+                                ADMIN_EMAIL,
+                                'Administrateur',
+                                "🔐 Connexion au tableau de bord - " . date('d/m/Y H:i:s'),
+                                "<h3>Connexion réussie au tableau de bord</h3>
+                                <p><strong>Email :</strong> $email</p>
+                                <p><strong>Heure :</strong> " . date('d/m/Y H:i:s') . "</p>
+                                <p><strong>Adresse IP :</strong> $ip</p>"
+                            );
+                        }
+                    } catch (Throwable $e) {
+                        error_log('Login alert error: ' . $e->getMessage());
+                    }
+
                     redirectAdmin('/admin/');
                 }
             }
