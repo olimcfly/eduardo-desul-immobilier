@@ -186,6 +186,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
+        .password-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-wrapper input {
+            flex: 1;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #667eea;
+            font-size: 18px;
+            padding: 4px;
+        }
+
+        .toggle-password:hover {
+            color: #764ba2;
+        }
+
         .alert {
             padding: 12px 16px;
             border-radius: 6px;
@@ -285,12 +310,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <div class="form-group">
                 <label for="password">Mot de passe</label>
-                <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    required
-                >
+                <div class="password-wrapper">
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        required
+                    >
+                    <button type="button" class="toggle-password" id="togglePassword" aria-label="Afficher/masquer le mot de passe">
+                        👁️
+                    </button>
+                </div>
             </div>
 
             <button type="submit" class="submit-btn">Connexion</button>
@@ -300,5 +330,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             © 2026 Eduardo Desul Immobilier - Tous droits réservés
         </div>
     </div>
+
+    <script>
+        document.getElementById('togglePassword').addEventListener('click', function(e) {
+            e.preventDefault();
+            const passwordInput = document.getElementById('password');
+            const isPassword = passwordInput.type === 'password';
+            passwordInput.type = isPassword ? 'text' : 'password';
+            this.textContent = isPassword ? '🙈' : '👁️';
+        });
+    </script>
 </body>
 </html>
