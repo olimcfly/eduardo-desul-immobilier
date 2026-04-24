@@ -11,10 +11,8 @@ RewriteRule ^ - [L]
 # Bloquer l'accès direct aux dossiers sensibles
 RewriteRule ^(config|logs|vendor|storage)(/.*)?$ - [F,L]
 
-# Ne pas réécrire le dossier /admin/
-RewriteCond %{REQUEST_URI} ^/admin/ [OR]
-RewriteCond %{REQUEST_URI} ^/admin\.php
-RewriteRule ^ - [L]
+# Ne pas réécrire le dossier /admin/ (dossier administrateur)
+RewriteRule ^admin(/|$) - [L]
 
 # Router front: si le vhost pointe sur la racine du dépôt,
 # on délègue toutes les URLs applicatives à public/index.php.
