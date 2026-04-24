@@ -7,32 +7,18 @@ if (!defined('ROOT_PATH')) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verifyCsrf();
 
-    $typeBien = trim($_POST['type_bien'] ?? '');
-    $surface  = trim($_POST['surface']   ?? '');
-    $localite = trim($_POST['localite']  ?? '');
-    $budget   = trim($_POST['budget']    ?? '');
-    $projet   = trim($_POST['projet']    ?? '');
-    $lat      = trim($_POST['lat']       ?? '');
-    $lng      = trim($_POST['lng']       ?? '');
+    $typeBien  = trim($_POST['type_bien']  ?? '');
+    $surface   = trim($_POST['surface']    ?? '');
+    $localite  = trim($_POST['localite']   ?? '');
+    $budget    = trim($_POST['budget']     ?? '');
+    $projet    = trim($_POST['projet']     ?? '');
+    $lat       = trim($_POST['lat']        ?? '');
+    $lng       = trim($_POST['lng']        ?? '');
 
     if ($typeBien && $surface && $localite && $projet) {
 
-        // ── Création de la table estimation_zones si besoin ────────
-        db()->exec("CREATE TABLE IF NOT EXISTS estimation_zones (
-            id         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-            type_bien  VARCHAR(40)   NOT NULL DEFAULT '',
-            surface    VARCHAR(20)   NOT NULL DEFAULT '',
-            localite   VARCHAR(255)  NOT NULL DEFAULT '',
-            budget     VARCHAR(50)   NULL,
-            projet     VARCHAR(50)   NOT NULL DEFAULT '',
-            lat        DECIMAL(10,7) NULL,
-            lng        DECIMAL(10,7) NULL,
-            ip         VARCHAR(45)   NOT NULL DEFAULT '',
-            created_at DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
-
-        // ── Capture anonyme ────────────────────────────────────────
-        db()->prepare("
+        // ── Capture anonyme pour géolocalisation (aucun email/tel) ──
+        $db->prepare("
             INSERT INTO estimation_zones
                 (type_bien, surface, localite, budget, projet, lat, lng, ip, created_at)
             VALUES
@@ -41,111 +27,67 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':type_bien' => $typeBien,
             ':surface'   => $surface,
             ':localite'  => $localite,
-            ':budget'    => $budget ?: null,
+            ':budget'    => $budget,
             ':projet'    => $projet,
-            ':lat'       => $lat !== '' ? $lat : null,
-            ':lng'       => $lng !== '' ? $lng : null,
+            ':lat'       => $lat ?: null,
+            ':lng'       => $lng ?: null,
             ':ip'        => $_SERVER['REMOTE_ADDR'] ?? '',
         ]);
 
-        $zoneId = db()->lastInsertId();
+        $zoneId = $db->lastInsertId();
 
-        // ── Extraction de la ville depuis le champ localite ────────
-        // Accepte : "Bordeaux", "13100 Bordeaux", "Bordeaux 13100"
-        $cityForEst = '';
-        if (preg_match('/([a-zA-ZÀ-ÖØ-öø-ÿ][a-zA-ZÀ-ÖØ-öø-ÿ\s\-\']{2,})/u', $localite, $m)) {
-            $cityForEst = trim($m[0]);
-        }
-
-        // ── Calcul via DvfEstimatorService ────────────────────────
-        DvfEstimatorService::ensureTables();
-
-        $dvfResult = DvfEstimatorService::estimate([
-            'property_type' => $typeBien,
-            'surface'       => (float) $surface,
-            'lat'           => $lat !== '' ? (float) $lat : null,
-            'lng'           => $lng !== '' ? (float) $lng : null,
-            'city'          => $cityForEst,
+        // ── Calcul fourchette DVF ──────────────────────────────────
+        $dvf = $db->prepare("
+            SELECT
+                ROUND(AVG(prix_m2))   AS prix_moyen,
+                ROUND(MIN(prix_m2))   AS prix_min,
+                ROUND(MAX(prix_m2))   AS prix_max,
+                COUNT(*)              AS nb_transactions
+            FROM dvf_transactions
+            WHERE type_bien   = :type_bien
+            AND   code_postal LIKE :cp
+            AND   date_vente >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
+            AND   surface BETWEEN :surf_min AND :surf_max
+        ");
+        $dvf->execute([
+            ':type_bien' => $typeBien,
+            ':cp'        => substr($localite, 0, 2) . '%',
+            ':surf_min'  => max(0, (int)$surface - 20),
+            ':surf_max'  => (int)$surface + 20,
         ]);
+        $dvfData = $dvf->fetch(PDO::FETCH_ASSOC);
 
+        // ── Calcul fourchette ──────────────────────────────────────
         $fourchette = null;
-        if ($dvfResult['ok']) {
+        if ($dvfData && $dvfData['prix_moyen']) {
+            $surf = (int)$surface;
             $fourchette = [
-                'min'        => number_format((int) $dvfResult['estimate_low'],    0, ',', ' '),
-                'moy'        => number_format((int) $dvfResult['estimate_median'], 0, ',', ' '),
-                'max'        => number_format((int) $dvfResult['estimate_high'],   0, ',', ' '),
-                'pm2'        => number_format((int) $dvfResult['price_m2_median'], 0, ',', ' '),
-                'nb'         => $dvfResult['comparables_count'],
-                'confidence' => $dvfResult['confidence_level'] ?? '',
+                'min'  => number_format((int)$dvfData['prix_min'] * $surf, 0, ',', ' '),
+                'moy'  => number_format((int)$dvfData['prix_moyen'] * $surf, 0, ',', ' '),
+                'max'  => number_format((int)$dvfData['prix_max'] * $surf, 0, ',', ' '),
+                'pm2'  => number_format((int)$dvfData['prix_moyen'], 0, ',', ' '),
+                'nb'   => $dvfData['nb_transactions'],
             ];
         }
 
-        // ── Comparables DVF (colonnes réelles du service) ─────────
-        $comps = [];
-        try {
-            $hasLoc = $lat !== '' && $lng !== '';
-            // Utilise des paramètres positionnels (?) — PDO::ATTR_EMULATE_PREPARES=false
-            // interdit la répétition des paramètres nommés dans une même requête.
-            $compParams = [];
+        // ── Comparables récents ────────────────────────────────────
+        $comparables = $db->prepare("
+            SELECT adresse, surface, prix, prix_m2, date_vente
+            FROM   dvf_transactions
+            WHERE  type_bien   = :type_bien
+            AND    code_postal LIKE :cp
+            AND    date_vente >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
+            ORDER  BY ABS(surface - :surface) ASC
+            LIMIT  5
+        ");
+        $comparables->execute([
+            ':type_bien' => $typeBien,
+            ':cp'        => substr($localite, 0, 2) . '%',
+            ':surface'   => (int)$surface,
+        ]);
+        $comps = $comparables->fetchAll(PDO::FETCH_ASSOC);
 
-            if ($hasLoc) {
-                $compSql = "
-                    SELECT
-                        address_label AS adresse,
-                        surface,
-                        value_amount  AS prix,
-                        price_m2      AS prix_m2,
-                        mutation_date AS date_vente
-                    FROM dvf_transactions
-                    WHERE property_type = ?
-                      AND mutation_date  >= DATE_SUB(CURDATE(), INTERVAL 24 MONTH)
-                      AND price_m2 > 100
-                      AND latitude IS NOT NULL
-                    ORDER BY ((latitude - ?)*(latitude - ?) + (longitude - ?)*(longitude - ?)) ASC,
-                             ABS(surface - ?) ASC
-                    LIMIT 5";
-                $compParams = [$typeBien, (float)$lat, (float)$lat, (float)$lng, (float)$lng, (int)$surface];
-            } elseif ($cityForEst !== '') {
-                $compSql = "
-                    SELECT
-                        address_label AS adresse,
-                        surface,
-                        value_amount  AS prix,
-                        price_m2      AS prix_m2,
-                        mutation_date AS date_vente
-                    FROM dvf_transactions
-                    WHERE property_type = ?
-                      AND mutation_date  >= DATE_SUB(CURDATE(), INTERVAL 24 MONTH)
-                      AND price_m2 > 100
-                      AND city = ?
-                    ORDER BY ABS(surface - ?) ASC
-                    LIMIT 5";
-                $compParams = [$typeBien, $cityForEst, (int)$surface];
-            } else {
-                $compSql = "
-                    SELECT
-                        address_label AS adresse,
-                        surface,
-                        value_amount  AS prix,
-                        price_m2      AS prix_m2,
-                        mutation_date AS date_vente
-                    FROM dvf_transactions
-                    WHERE property_type = ?
-                      AND mutation_date  >= DATE_SUB(CURDATE(), INTERVAL 24 MONTH)
-                      AND price_m2 > 100
-                    ORDER BY mutation_date DESC
-                    LIMIT 5";
-                $compParams = [$typeBien];
-            }
-
-            $compStmt = db()->prepare($compSql);
-            $compStmt->execute($compParams);
-            $comps = $compStmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (Exception $e) {
-            $comps = [];
-        }
-
-        // ── Stockage session ────────────────────────────────────────
+        // ── Stockage session pour page résultat ───────────────────
         $_SESSION['estimation'] = [
             'zone_id'     => $zoneId,
             'type_bien'   => $typeBien,
@@ -155,70 +97,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'projet'      => $projet,
             'fourchette'  => $fourchette,
             'comparables' => $comps,
-            'city'        => $cityForEst,
         ];
 
         redirect('/estimation-gratuite/resultat');
     }
 }
 
-// ── Meta ────────────────────────────────────────────────────────────────────
-$advisorNameStr  = defined('ADVISOR_NAME') ? ADVISOR_NAME : APP_NAME;
-$appCity         = (defined('APP_CITY') && APP_CITY) ? APP_CITY : 'Bordeaux';
-$pageTitle       = 'Estimation gratuite — ' . $advisorNameStr . ' | Expert Immobilier ' . $appCity;
-$metaDesc        = 'Estimez votre bien immobilier gratuitement en 60 secondes. Fourchette basée sur les ventes DVF officielles. Sans inscription.';
-$bodyClass       = 'lp-mode';
-$lpMode          = true;
-$extraCss        = ['/assets/css/estimation.css'];
-$extraJs         = ['/assets/js/estimation.js'];
-$metaRobots      = 'noindex, nofollow'; // page LP, pas besoin d'indexation
+$pageTitle = 'Estimation gratuite — Eduardo Desul | Conseiller Immobilier Bordeaux';
+$metaDesc  = 'Obtenez une fourchette d\'estimation basée sur les ventes réelles de Bordeaux et sa métropole (33). Gratuit, instantané, sans inscription.';
+$extraCss  = ['/assets/css/estimation.css'];
+$extraJs   = ['/assets/js/estimation.js'];
 
 ob_start();
 ?>
 
-<!-- ══ MINI-HEADER LP ════════════════════════════════════════════════════════ -->
-<div class="lp-header">
-    <div class="container lp-header__inner">
-        <a href="/" class="lp-header__logo" aria-label="Accueil">
-            <span class="logo-icon" aria-hidden="true">🏡</span>
-            <strong><?= e($advisorNameStr) ?></strong>
-        </a>
-        <?php if (defined('APP_PHONE') && APP_PHONE): ?>
-        <a href="tel:<?= e(preg_replace('/\s+/', '', APP_PHONE)) ?>"
-           class="lp-header__phone">
-            📞 <?= e(APP_PHONE) ?>
-        </a>
-        <?php endif; ?>
+<!-- ══ PAGE HEADER ══════════════════════════════════════════════════════════ -->
+<div class="page-header page-header--estimation">
+    <div class="container">
+        <nav class="breadcrumb" aria-label="Fil d'Ariane">
+            <a href="/">Accueil</a>
+            <span>Estimation gratuite</span>
+        </nav>
+        <h1>Estimation gratuite<br><span>de votre bien immobilier</span></h1>
+        <p>Basée sur les ventes réelles de Bordeaux Métropole (33) · Instantané · Sans inscription</p>
     </div>
 </div>
 
-<!-- ══ HERO ══════════════════════════════════════════════════════════════════ -->
-<section class="lp-hero">
-    <div class="container">
-        <div class="lp-hero__content">
-            <h1 class="lp-hero__title">
-                Combien vaut votre bien<br>
-                <span>à <?= e($appCity) ?> ?</span>
-            </h1>
-            <p class="lp-hero__sub">
-                Fourchette indicative · Données DVF officielles · 60 secondes · Sans inscription
-            </p>
-            <div class="lp-trust-strip">
-                <span class="lp-trust-item">
-                    <span aria-hidden="true">✅</span> Gratuit &amp; immédiat
-                </span>
-                <span class="lp-trust-item">
-                    <span aria-hidden="true">🔒</span> Aucune donnée personnelle requise
-                </span>
-                <span class="lp-trust-item">
-                    <span aria-hidden="true">📊</span> Basé sur les ventes réelles
-                </span>
-            </div>
-        </div>
-    </div>
-</section>
-
-<!-- ══ SECTION PRINCIPALE ════════════════════════════════════════════════════ -->
+<!-- ══ SECTION PRINCIPALE ══════════════════════════════════════════════════ -->
 <section class="section section--estimation">
     <div class="container">
         <div class="estimation-layout">
@@ -226,11 +131,18 @@ ob_start();
             <!-- ── Formulaire ─────────────────────────────────────────────── -->
             <div class="estimation-form-wrap">
 
-                <div class="estimation-disclaimer" role="note">
+                <!-- Disclaimer pédagogique -->
+                <div class="estimation-disclaimer" role="alert">
                     <span class="disclaimer-icon" aria-hidden="true">ℹ️</span>
                     <div>
-                        <strong>Estimation indicative</strong> — basée sur les données DVF
-                        (Demandes de Valeurs Foncières). Ne constitue pas une expertise officielle.
+                        <strong>Information importante</strong>
+                        <p>
+                            Cette estimation est basée sur des statistiques de marché issues des données
+                            DVF (Demandes de Valeurs Foncières). Elle donne une <strong>fourchette indicative</strong>
+                            et ne constitue pas une expertise officielle.
+                            Seul un professionnel agréé peut établir une estimation certifiée
+                            (divorce, succession, etc.).
+                        </p>
                     </div>
                 </div>
 
@@ -240,13 +152,14 @@ ob_start();
                       novalidate>
                     <?= csrfField() ?>
 
+                    <!-- Champs cachés géolocalisation -->
                     <input type="hidden" name="lat" id="geo-lat">
                     <input type="hidden" name="lng" id="geo-lng">
 
-                    <!-- ── Étape 1 : Type de bien ──────────────────────── -->
+                    <!-- ── Ligne 1 : Type de bien ──────────────────────── -->
                     <div class="form-section">
                         <h3 class="form-section-title">
-                            <span class="form-step-num" aria-hidden="true">1</span>
+                            <span class="form-step-num">1</span>
                             Quel type de bien ?
                         </h3>
                         <div class="type-grid" role="group" aria-label="Type de bien">
@@ -271,19 +184,18 @@ ob_start();
                             </label>
                             <?php endforeach; ?>
                         </div>
-                        <p class="form-error" id="err-type" hidden>Veuillez sélectionner un type de bien.</p>
                     </div>
 
-                    <!-- ── Étape 2 : Surface + Localité ───────────────── -->
+                    <!-- ── Ligne 2 : Surface + Localité ───────────────── -->
                     <div class="form-section">
                         <h3 class="form-section-title">
-                            <span class="form-step-num" aria-hidden="true">2</span>
-                            Surface &amp; localisation
+                            <span class="form-step-num">2</span>
+                            Caractéristiques & localisation
                         </h3>
                         <div class="form-row">
                             <div class="form-group">
                                 <label class="form-label" for="est-surface">
-                                    Surface habitable <span class="required-star" aria-hidden="true">*</span>
+                                    Surface habitable <span class="required-star">*</span>
                                 </label>
                                 <div class="input-with-unit">
                                     <input type="number"
@@ -299,9 +211,9 @@ ob_start();
                             </div>
                             <div class="form-group">
                                 <label class="form-label" for="est-localite">
-                                    Ville ou code postal <span class="required-star" aria-hidden="true">*</span>
+                                    Ville / Code postal <span class="required-star">*</span>
                                 </label>
-                                <div class="input-with-icon" style="position:relative">
+                                <div class="input-with-icon">
                                     <input type="text"
                                            id="est-localite"
                                            name="localite"
@@ -311,21 +223,22 @@ ob_start();
                                            required>
                                     <span class="input-icon" aria-hidden="true">📍</span>
                                 </div>
-                                <ul id="localite-suggestions" class="autocomplete-list" hidden aria-live="polite"></ul>
+                                <!-- Suggestions autocomplete -->
+                                <ul id="localite-suggestions" class="autocomplete-list" hidden></ul>
                             </div>
                         </div>
                     </div>
 
-                    <!-- ── Étape 3 : Projet + Budget estimé ───────────── -->
+                    <!-- ── Ligne 3 : Budget + Projet ──────────────────── -->
                     <div class="form-section">
                         <h3 class="form-section-title">
-                            <span class="form-step-num" aria-hidden="true">3</span>
+                            <span class="form-step-num">3</span>
                             Votre projet
                         </h3>
                         <div class="form-row">
                             <div class="form-group">
                                 <label class="form-label" for="est-budget">
-                                    Combien pensez-vous que vaut votre bien ?
+                                    Votre estimation personnelle
                                 </label>
                                 <div class="input-with-unit">
                                     <input type="number"
@@ -336,23 +249,33 @@ ob_start();
                                            min="0">
                                     <span class="input-unit">€</span>
                                 </div>
-                                <small class="form-hint">Optionnel · sera comparé aux prix du marché</small>
+                                <small class="form-hint">Optionnel — Pour comparer avec le marché</small>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">
-                                    Votre projet <span class="required-star" aria-hidden="true">*</span>
+                                    Votre projet <span class="required-star">*</span>
                                 </label>
                                 <div class="projet-toggle" role="group" aria-label="Type de projet">
                                     <label class="projet-btn">
-                                        <input type="radio" name="projet" value="vendre"   class="sr-only" required>
+                                        <input type="radio"
+                                               name="projet"
+                                               value="vendre"
+                                               class="sr-only"
+                                               required>
                                         <span>🏷️ Vendre</span>
                                     </label>
                                     <label class="projet-btn">
-                                        <input type="radio" name="projet" value="acheter"  class="sr-only">
+                                        <input type="radio"
+                                               name="projet"
+                                               value="acheter"
+                                               class="sr-only">
                                         <span>🔑 Acheter</span>
                                     </label>
                                     <label class="projet-btn">
-                                        <input type="radio" name="projet" value="les_deux" class="sr-only">
+                                        <input type="radio"
+                                               name="projet"
+                                               value="les_deux"
+                                               class="sr-only">
                                         <span>🔄 Les deux</span>
                                     </label>
                                 </div>
@@ -362,15 +285,12 @@ ob_start();
 
                     <!-- ── Submit ──────────────────────────────────────── -->
                     <div class="form-submit-wrap">
-                        <button type="submit"
-                                class="btn btn--accent btn--lg btn--full btn--submit-estimation"
-                                id="btn-submit-estimation">
+                        <button type="submit" class="btn btn--accent btn--lg btn--full btn--submit-estimation">
                             <span class="btn-text">Obtenir mon estimation gratuite</span>
-                            <span class="btn-loader" hidden aria-hidden="true">Calcul en cours…</span>
                             <span class="btn-icon" aria-hidden="true">→</span>
                         </button>
                         <p class="form-submit-hint">
-                            🔒 Aucun email ni téléphone requis · Résultat en quelques secondes
+                            🔒 Aucun email ni téléphone requis · Résultat instantané
                         </p>
                     </div>
 
@@ -378,14 +298,15 @@ ob_start();
             </div>
 
             <!-- ── Sidebar ─────────────────────────────────────────────────── -->
-            <aside class="estimation-sidebar" aria-label="Ce que vous obtiendrez">
+            <aside class="estimation-sidebar" aria-label="Informations complémentaires">
 
+                <!-- Ce que vous obtiendrez -->
                 <div class="sidebar-card sidebar-card--what">
                     <h3>📊 Ce que vous obtiendrez</h3>
                     <ul class="what-list">
                         <li>
                             <span class="what-icon" aria-hidden="true">✅</span>
-                            <span>Fourchette basse / médiane / haute</span>
+                            <span>Fourchette de prix basée sur les <strong>ventes réelles DVF</strong></span>
                         </li>
                         <li>
                             <span class="what-icon" aria-hidden="true">✅</span>
@@ -393,37 +314,65 @@ ob_start();
                         </li>
                         <li>
                             <span class="what-icon" aria-hidden="true">✅</span>
-                            <span>Transactions réelles des <strong>12–24 derniers mois</strong></span>
+                            <span>Comparables des <strong>5 biens similaires</strong> vendus récemment</span>
                         </li>
                         <li>
                             <span class="what-icon" aria-hidden="true">✅</span>
-                            <span>Comparaison avec <strong>votre propre estimation</strong></span>
+                            <span>Comparaison avec <strong>votre estimation</strong></span>
+                        </li>
+                        <li>
+                            <span class="what-icon" aria-hidden="true">✅</span>
+                            <span>Accès à des <strong>guides gratuits</strong> téléchargeables</span>
                         </li>
                     </ul>
                 </div>
 
+                <!-- Avertissement officiel -->
                 <div class="sidebar-card sidebar-card--warning">
-                    <h3>⚖️ Expertise officielle</h3>
+                    <h3>⚖️ Estimation officielle</h3>
                     <p>
-                        Divorce, succession, prêt bancaire ?
-                        Une <strong>expertise certifiée par un professionnel agréé</strong> peut être obligatoire.
+                        Dans certains cas (divorce, succession, prêt, fiscalité),
+                        une <strong>expertise immobilière certifiée</strong> est obligatoire.
                     </p>
+                    <p>Seul un professionnel agréé peut délivrer ce document officiel.</p>
                     <a href="/contact" class="btn btn--outline btn--sm btn--full">
-                        Demander une expertise officielle →
+                        Demander une expertise officielle
                     </a>
                 </div>
 
+                <!-- Données marché Bordeaux -->
+                <div class="sidebar-card sidebar-card--market">
+                    <h3>📈 Marché Bordeaux Métropole</h3>
+                    <div class="market-stats">
+                        <div class="market-stat">
+                            <span class="market-stat__value">4 050 €</span>
+                            <span class="market-stat__label">Prix moyen/m² appartement</span>
+                        </div>
+                        <div class="market-stat">
+                            <span class="market-stat__value">4 800 €</span>
+                            <span class="market-stat__label">Prix moyen/m² maison</span>
+                        </div>
+                        <div class="market-stat">
+                            <span class="market-stat__value">-2,1 %</span>
+                            <span class="market-stat__label">Évolution sur 12 mois</span>
+                        </div>
+                    </div>
+                    <small class="market-source">Source : DVF · Mise à jour mensuelle</small>
+                </div>
+
+                <!-- Conseiller -->
                 <div class="sidebar-card sidebar-card--advisor">
                     <div class="advisor-mini">
                         <div class="advisor-mini__avatar" aria-hidden="true">👤</div>
                         <div class="advisor-mini__info">
-                            <strong><?= e($advisorNameStr) ?></strong>
-                            <span>Expert immobilier 360° — <?= e($appCity) ?></span>
+                            <strong><?= e(defined('ADVISOR_NAME') ? ADVISOR_NAME : 'Eduardo Desul') ?></strong>
+                            <span>Conseiller immobilier — Bordeaux & Métropole (33)</span>
                         </div>
                     </div>
                     <p class="advisor-mini__quote">
-                        « La seule vraie estimation est celle négociée entre
-                        un acheteur et un vendeur. Je vous accompagne. »
+                        « Chaque bien est unique. Mon rôle est de vous donner une vision
+                        claire du marché bordelais pour que vous preniez la meilleure
+                        décision, en toute confiance. »
                     </p>
                 </div>
 
@@ -432,18 +381,7 @@ ob_start();
     </div>
 </section>
 
-<!-- ══ LP FOOTER MINIMAL ═════════════════════════════════════════════════════ -->
-<div class="lp-footer">
-    <div class="container">
-        <p>
-            &copy; <?= date('Y') ?> <?= e(APP_NAME) ?> —
-            <a href="/mentions-legales">Mentions légales</a> ·
-            <a href="/politique-confidentialite">Confidentialité</a>
-        </p>
-    </div>
-</div>
-
 <?php
 $pageContent = ob_get_clean();
-require_once __DIR__ . '/../../templates/layout.php';
+require_once __DIR__ . '/../templates/layout.php';
 ?>

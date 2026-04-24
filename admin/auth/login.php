@@ -4,40 +4,27 @@ declare(strict_types=1);
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
 
-// ── Charger la fonction de gestion de session ────────────────
-require_once __DIR__ . '/session-helper.php';
-
 // ── Démarrer la session ──────────────────────────────────────
-startAdminSession();
+if (session_status() === PHP_SESSION_NONE) {
+    session_name('edo_immo_sess');
+    session_set_cookie_params([
+        'lifetime' => 28800,
+        'path'     => '/',
+        'secure'   => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on',
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+    session_start();
+}
 
 // ── Si déjà connecté, rediriger ─────────────────────────────
-if (isAdminLoggedIn()) {
-    redirectAdmin('/admin/');
+if (!empty($_SESSION['user_id']) && !empty($_SESSION['user_role'])) {
+    header('Location: /admin/');
+    exit;
 }
 
 $error = null;
 $email = '';
-
-// ── Charger les identifiants admin ──────────────────────────
-require_once __DIR__ . '/../includes/config.php';
-
-// ── Charger les variables d'environnement (.env) ─────────────
-$envFile = dirname(__DIR__) . '/.env';
-if (file_exists($envFile)) {
-    foreach (file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
-        $line = trim($line);
-        if ($line === '' || str_starts_with($line, '#') || !str_contains($line, '=')) {
-            continue;
-        }
-        [$key, $value] = explode('=', $line, 2);
-        $key = trim($key);
-        $value = trim($value);
-        if (strlen($value) >= 2 && (($value[0] === '"' && $value[-1] === '"') || ($value[0] === "'" && $value[-1] === "'"))) {
-            $value = substr($value, 1, -1);
-        }
-        $_ENV[$key] = $value;
-    }
-}
 
 // ── Logique du login (formulaire POST) ───────────────────────
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -47,65 +34,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($email) || empty($password)) {
         $error = 'Veuillez remplir tous les champs.';
     } else {
-        $user = null;
+        // Identifiants de test (à remplacer par une vraie base de données)
+        $adminEmail = 'admin@eduardo-desul.fr';
+        $adminPassword = 'admin123'; // À CHANGER en production !
         
-        // Étape 1: Chercher dans la base de données (si disponible)
-        try {
-            $dbHost = $_ENV['DB_HOST'] ?? $_ENV['DATABASE_HOST'] ?? 'localhost';
-            $dbPort = $_ENV['DB_PORT'] ?? $_ENV['DATABASE_PORT'] ?? 3306;
-            $dbName = $_ENV['DB_NAME'] ?? $_ENV['DB_DATABASE'] ?? $_ENV['DATABASE_NAME'] ?? '';
-            $dbUser = $_ENV['DB_USER'] ?? $_ENV['DB_USERNAME'] ?? $_ENV['DATABASE_USER'] ?? '';
-            $dbPass = $_ENV['DB_PASS'] ?? $_ENV['DB_PASSWORD'] ?? $_ENV['DATABASE_PASSWORD'] ?? '';
-            
-            if ($dbName && $dbUser) {
-                $pdo = new PDO(
-                    "mysql:host={$dbHost};port={$dbPort};dbname={$dbName};charset=utf8mb4",
-                    $dbUser,
-                    $dbPass,
-                    [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-                );
-                
-                // Chercher l'utilisateur
-                $stmt = $pdo->prepare('SELECT id, email, password, role, name FROM users WHERE email = ? AND is_active = 1 LIMIT 1');
-                $stmt->execute([$email]);
-                $user = $stmt->fetch(PDO::FETCH_ASSOC);
-                
-                if ($user && password_verify($password, (string) $user['password'])) {
-                    // Succès avec l'utilisateur de la BDD
-                    session_regenerate_id(true);
-                    $_SESSION['user_id']    = $user['id'];
-                    $_SESSION['user_email'] = $user['email'];
-                    $_SESSION['user_role']  = $user['role'] ?? 'admin';
-                    $_SESSION['user_name']  = $user['name'] ?? '';
-                    $_SESSION['last_activity'] = time();
-                    
-                    redirectAdmin('/admin/');
-                }
-            }
-        } catch (Exception $e) {
-            error_log('DB Connection failed: ' . $e->getMessage());
-        }
-        
-        // Étape 2: Fallback sur les defines du config.php
-        if (
-            defined('ADMIN_EMAIL') && 
-            defined('ADMIN_PASSWORD_HASH') &&
-            $email === ADMIN_EMAIL && 
-            password_verify($password, ADMIN_PASSWORD_HASH)
-        ) {
-            // Connexion réussie avec le compte config
+        if ($email === $adminEmail && $password === $adminPassword) {
+            // Connexion réussie
             session_regenerate_id(true);
             $_SESSION['user_id']    = 1;
             $_SESSION['user_email'] = $email;
-            $_SESSION['user_role']  = 'superadmin';
+            $_SESSION['user_role']  = 'admin';
             $_SESSION['user_name']  = 'Administrateur';
-            $_SESSION['last_activity'] = time();
             
-            redirectAdmin('/admin/');
+            header('Location: /admin/');
+            exit;
+        } else {
+            $error = 'Email ou mot de passe incorrect.';
         }
-        
-        // Authentification échouée
-        $error = 'Email ou mot de passe incorrect.';
     }
 }
 ?>
@@ -199,6 +144,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border: 1px solid #fcc;
         }
 
+        .alert-success {
+            background-color: #efe;
+            color: #3c3;
+            border: 1px solid #cfc;
+        }
+
         .submit-btn {
             width: 100%;
             padding: 12px;
@@ -226,28 +177,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin-top: 20px;
             padding-top: 20px;
             border-top: 1px solid #eee;
-            color: #999;
-            font-size: 12px;
         }
 
-        .test-credentials {
-            background: #f0f4ff;
-            border: 1px solid #d4dff5;
-            padding: 12px;
-            border-radius: 6px;
+        .login-footer a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .login-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .forgot-password-link {
+            text-align: right;
+            margin-top: -8px;
             margin-bottom: 20px;
-            font-size: 12px;
         }
 
-        .test-credentials strong {
-            color: #333;
+        .forgot-password-link a {
+            color: #667eea;
+            font-size: 13px;
+            text-decoration: none;
         }
 
-        .test-credentials code {
-            background: #fff;
-            padding: 2px 4px;
-            border-radius: 2px;
-            font-family: monospace;
+        .forgot-password-link a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -263,12 +218,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?= htmlspecialchars($error) ?>
             </div>
         <?php endif; ?>
-
-        <div class="test-credentials">
-            <strong>Identifiant de connexion :</strong><br>
-            Email: <code><?= htmlspecialchars(defined('ADMIN_EMAIL') ? ADMIN_EMAIL : 'admin@example.com') ?></code><br>
-            <em>Utilisez votre mot de passe administrateur</em>
-        </div>
 
         <form method="POST" action="">
             <div class="form-group">
@@ -293,11 +242,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 >
             </div>
 
+            <div class="forgot-password-link">
+                <a href="/admin/forgot-password.php">Mot de passe oublié ?</a>
+            </div>
+
             <button type="submit" class="submit-btn">Connexion</button>
         </form>
 
         <div class="login-footer">
-            © 2026 Eduardo Desul Immobilier - Tous droits réservés
+            <p style="color: #999; font-size: 12px;">
+                © 2026 Eduardo Desul Immobilier - Tous droits réservés
+            </p>
         </div>
     </div>
 </body>

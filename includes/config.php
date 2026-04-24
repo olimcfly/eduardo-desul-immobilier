@@ -1,15 +1,7 @@
 <?php
-
 declare(strict_types=1);
 
-if (!defined('ADMIN_EMAIL')) {
-    define('ADMIN_EMAIL', 'admin@example.com');
-}
+define('ADMIN_EMAIL', 'contact@eduardo-desul-immobilier.fr');
+define('ADMIN_PASSWORD_HASH', '$2y$10$LGDaPgh9xZWvGc4r76o0W.iiJEv9GIkWm/RUVpgW8girGh2ZyPP/G');
+define('ADMIN_PASSWORD_RESET_REQUIRED', false);
 
-if (!defined('ADMIN_PASSWORD_HASH')) {
-    define('ADMIN_PASSWORD_HASH', '$2y$10$replace.with.generated.hash');
-}
-
-if (!defined('ADMIN_PASSWORD_RESET_REQUIRED')) {
-    define('ADMIN_PASSWORD_RESET_REQUIRED', true);
-}

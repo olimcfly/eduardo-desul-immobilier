@@ -1,8 +1,8 @@
 <?php
 require_once ROOT_PATH . '/core/services/InstantEstimationService.php';
 
-$pageTitle = 'Estimation instantanée — ADVISOR_NAME Immobilier';
-$metaDesc = 'Obtenez une estimation immobilière indicative instantanée basée sur des comparables DVF.';
+$pageTitle = 'Estimation instantanée — Eduardo Desul Conseiller Immobilier Bordeaux';
+$metaDesc = 'Obtenez une estimation immobilière indicative instantanée basée sur des comparables DVF pour Bordeaux et sa métropole.';
 $extraCss = ['/assets/css/estimation.css'];
 $extraJs = ['/assets/js/estimation-instantanee.js'];
 
@@ -12,13 +12,13 @@ $googleApiKey = (string) setting('api_google_maps', '');
 <section class="section">
     <div class="container" style="max-width: 980px;">
         <h1>Estimation instantanée</h1>
-        <p class="lead">Renseignez votre bien pour obtenir une fourchette indicative basée sur les données DVF.</p>
+        <p class="lead">Renseignez votre bien pour obtenir une fourchette indicative basée sur les données DVF de Bordeaux et sa métropole.</p>
 
         <form id="instant-estimation-form" class="estimation-form" style="margin-top:1.5rem;">
             <?= csrfField() ?>
             <div class="form-group">
                 <label class="form-label" for="ie-location">Lieu du bien</label>
-                <input id="ie-location" name="location" class="form-control" type="text" required placeholder="Adresse, ville ou quartier">
+                <input id="ie-location" name="location" class="form-control" type="text" required placeholder="Adresse, quartier ou commune (ex : Bordeaux, Mérignac, Pessac…)">
                 <input type="hidden" id="ie-place-id" name="place_id">
                 <input type="hidden" id="ie-lat" name="lat">
                 <input type="hidden" id="ie-lng" name="lng">
@@ -51,8 +51,11 @@ $googleApiKey = (string) setting('api_google_maps', '');
                 <div><strong>Haute</strong><div id="result-high">—</div></div>
             </div>
             <p style="margin-top:1rem;"><strong>Comparables:</strong> <span id="result-comparables">0</span></p>
-            <p style="font-size:.9rem;color:var(--clr-text-muted)">Cette estimation est strictement indicative et ne remplace pas une expertise sur place.</p>
-            <a href="/prendre-rendez-vous" class="btn btn--accent" style="margin-top:.5rem;">Prendre rendez-vous avec un conseiller</a>
+            <p style="font-size:.9rem;color:var(--clr-text-muted)">
+                Cette estimation est strictement indicative et ne remplace pas une expertise sur place.
+                Les données sont issues des ventes réelles enregistrées sur Bordeaux Métropole (33).
+            </p>
+            <a href="/prendre-rendez-vous" class="btn btn--accent" style="margin-top:.5rem;">Prendre rendez-vous avec Eduardo Desul</a>
         </div>
 
         <div id="instant-estimation-error" style="display:none;margin-top:1rem;color:#b42318;font-weight:600;"></div>

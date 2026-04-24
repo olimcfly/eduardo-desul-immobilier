@@ -1,6 +1,6 @@
 <?php
 /** @deprecated SEO legacy freeze: no new feature here. Use /admin?module=seo&action=keywords */
-require_once '../../includes/auth.php';
+require_once '../../includes/auth_functions.php';
 require_once '../../includes/db.php';
 
 $user_id = $_SESSION['user_id'];

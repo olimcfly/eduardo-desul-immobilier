@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../../core/bootstrap.php';
 
 $pageTitle = 'Merci — Votre demande a bien été reçue';
-$metaDesc  = 'Votre demande d\'estimation a été transmise. ADVISOR_NAME vous recontactera sous 24h.';
+$metaDesc  = 'Votre demande d\'estimation a été transmise. Eduardo Desul vous recontactera sous 24h.';
 $extraCss  = ['/assets/css/merci.css'];
 
 // Articles blog récents pour ressources
@@ -32,8 +32,9 @@ ob_start();
                 </div>
                 <h1>Demande bien reçue !</h1>
                 <p class="merci-lead">
-                    ADVISOR_NAME vous recontactera <strong>dans les 24 heures</strong>
-                    pour confirmer votre rendez-vous et préparer votre estimation personnalisée.
+                    Eduardo Desul vous recontactera <strong>dans les 24 heures</strong>
+                    pour confirmer votre rendez-vous et préparer votre estimation personnalisée
+                    sur Bordeaux et sa métropole.
                 </p>
                 <div class="merci-next-steps">
                     <div class="merci-step">
@@ -61,7 +62,7 @@ ob_start();
         <div class="container">
             <h2>En attendant, explorez nos ressources</h2>
             <p class="section-lead">
-                Préparez votre projet avec nos guides et articles gratuits.
+                Préparez votre projet immobilier à Bordeaux avec nos guides et articles gratuits.
             </p>
             <div class="articles-grid articles-grid--4">
                 <?php foreach ($articles as $art): ?>
@@ -99,7 +100,7 @@ ob_start();
                     <span class="guide-cta-card__icon" aria-hidden="true">🏷️</span>
                     <div>
                         <h3>Guide Vendeur</h3>
-                        <p>Toutes les étapes pour vendre au meilleur prix.</p>
+                        <p>Toutes les étapes pour vendre au meilleur prix à Bordeaux.</p>
                     </div>
                     <span class="guide-cta-card__arrow">→</span>
                 </a>
@@ -107,7 +108,7 @@ ob_start();
                     <span class="guide-cta-card__icon" aria-hidden="true">🔑</span>
                     <div>
                         <h3>Guide Acheteur</h3>
-                        <p>De la recherche à la signature, pas à pas.</p>
+                        <p>De la recherche à la signature sur la métropole bordelaise.</p>
                     </div>
                     <span class="guide-cta-card__arrow">→</span>
                 </a>
@@ -119,5 +120,5 @@ ob_start();
 
 <?php
 $pageContent = ob_get_clean();
-require_once __DIR__ . '/../../templates/layout.php';
+require_once __DIR__ . '/../templates/layout.php';
 ?>

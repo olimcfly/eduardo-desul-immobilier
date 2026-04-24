@@ -1,9 +1,21 @@
 <?php
-
 declare(strict_types=1);
 
-require_once __DIR__ . '/../includes/auth.php';
+// ── Charger la fonction de gestion de session ────────────────
+require_once __DIR__ . '/session-helper.php';
 
-logout();
-header('Location: /admin/login.php?logged_out=1');
-exit;
+// ── Démarrer la session ──────────────────────────────────────
+startAdminSession();
+
+// ── Détruire la session ──────────────────────────────────────
+$_SESSION = [];
+if (ini_get('session.use_cookies')) {
+    $params = session_get_cookie_params();
+    setcookie(session_name(), '', time() - 42000,
+        $params['path'], $params['domain'],
+        $params['secure'], $params['httponly']
+    );
+}
+session_destroy();
+
+redirectAdmin('/admin/login');
