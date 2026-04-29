@@ -77,3 +77,6 @@ const API_KEYS = [
     'ig_token'      => '',
     'li_token'      => '',
 ];
+
+/** Photo conseiller neutre — peut être remplacée par advisor_photo dans les settings. */
+const DEFAULT_ADVISOR_PHOTO_URL = '/assets/images/advisor-photo.jpg';
