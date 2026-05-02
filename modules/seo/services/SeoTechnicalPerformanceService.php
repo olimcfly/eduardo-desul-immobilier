@@ -473,9 +473,15 @@ final class SeoTechnicalPerformanceService
 
     private function tableExists(string $table): bool
     {
-        $stmt = $this->pdo->prepare('SHOW TABLES LIKE ?');
+        if (!preg_match('/^[a-zA-Z0-9_]+$/', $table)) {
+            return false;
+        }
+        $stmt = $this->pdo->prepare(
+            'SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = ?'
+        );
         $stmt->execute([$table]);
-        return (bool)$stmt->fetchColumn();
+
+        return (int) $stmt->fetchColumn() > 0;
     }
 
     public function getHubPerformanceSummary(): array

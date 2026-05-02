@@ -1,7 +1,7 @@
 <?php
 $pageTitle    = 'Immobilier Luynes Bordeaux - Expert | ' . ADVISOR_NAME;
 $metaDesc     = 'Expert immobilier à Luynes, quartier résidentiel à l\'ouest d\'Bordeaux. Maisons pavillonnaires, résidences et appartements dans un cadre calme et bien desservi.';
-$metaKeywords = 'immobilier Luynes, maison Luynes Aix, appartement Luynes, expert immobilier ouest Bordeaux, Luynes résidentiel';
+$metaKeywords = 'immobilier Luynes Bordeaux, maison Luynes, appartement Luynes, expert immobilier ouest Bordeaux, Luynes résidentiel';
 $extraCss     = ['/assets/css/villes.css'];
 
 $pageContent = '
@@ -36,7 +36,7 @@ $pageContent = '
             <div class="card card--alt" data-animate>
                 <div class="card__icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
                 <h3 class="card__title">Bonne accessibilité</h3>
-                <p class="card__text">Accès rapide à l\'A8, aux zones d\'activités et au centre d\'Aix en 15 minutes.</p>
+                <p class="card__text">Accès rapide aux zones d’activités et au centre de Bordeaux.</p>
             </div>
         </div>
     </div>
@@ -84,7 +84,7 @@ $pageContent = '
             </div>
             <div class="card" data-animate>
                 <h3 class="card__title">Achat immobilier</h3>
-                <p class="card__text">Sélection de biens correspondant à votre projet à Luynes et dans le secteur ouest d\'Aix.</p>
+                <p class="card__text">Sélection de biens correspondant à votre projet à Luynes et dans l’ouest bordelais.</p>
                 <a href="/biens" class="btn btn--outline">Voir les biens</a>
             </div>
         </div>
@@ -105,5 +105,3 @@ $pageContent = '
 </section>
 ';
 ?>
-
-<?php include(__DIR__ . '/../../../templates/page.php'); ?>

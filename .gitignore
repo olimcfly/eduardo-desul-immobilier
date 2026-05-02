@@ -40,4 +40,10 @@ Thumbs.db
 *.sublime-*
 storage/logs/
 public/error_log
-storage/logs/
+
+# Racine / admin (éviter de versionner les journaux PHP)
+/error_log
+admin/error_log
+
+# Sauvegardes outils
+.codex-backups/

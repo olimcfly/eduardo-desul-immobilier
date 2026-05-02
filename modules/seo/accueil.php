@@ -11,14 +11,36 @@ $pageDescription = 'Attirez plus de vendeurs depuis Google';
 $user = Auth::user();
 $userId = (int) ($user['id'] ?? 0);
 $seoService = new SeoService(db());
-$stats = $seoService->getHubStats($userId);
+$stats = array_merge([
+    'keywords_count' => 0,
+    'top10_count' => 0,
+    'villes_count' => 0,
+    'villes_published' => 0,
+    'sitemap_last_generated' => null,
+    'sitemap_status' => 'idle',
+    'sitemap_issues_count' => 0,
+    'last_audit_score' => null,
+], $seoService->getHubStats($userId));
 $action = preg_replace('/[^a-z-]/', '', (string) ($_GET['action'] ?? 'index'));
 
 function renderSeoHub(array $stats): void
 {
-    $activated  = ($stats['villes_published'] > 0 ? 1 : 0)
-                + ($stats['keywords_count']    > 0 ? 1 : 0)
-                + ($stats['last_audit_score'] !== null ? 1 : 0);
+    $stats = array_merge([
+        'keywords_count' => 0,
+        'top10_count' => 0,
+        'villes_count' => 0,
+        'villes_published' => 0,
+        'sitemap_last_generated' => null,
+        'sitemap_status' => 'idle',
+        'sitemap_issues_count' => 0,
+        'last_audit_score' => null,
+    ], $stats);
+
+    $lastAuditScore = $stats['last_audit_score'] ?? null;
+
+    $activated  = (($stats['villes_published'] ?? 0) > 0 ? 1 : 0)
+                + (($stats['keywords_count'] ?? 0)    > 0 ? 1 : 0)
+                + ($lastAuditScore !== null ? 1 : 0);
     $total      = 3;
     $pct        = $total > 0 ? (int) round($activated / $total * 100) : 0;
     ?>
@@ -140,25 +162,6 @@ function renderSeoHub(array $stats): void
             </div>
         </section>
 
-        <section class="seo-hub-narrative">
-            <article class="seo-hub-narrative-card">
-                <h3><i class="fas fa-triangle-exclamation" style="color:#ef4444;"></i> Le constat</h3>
-                <p>Vos futurs clients recherchent un conseiller local sur Google et ne vous trouvent pas encore.</p>
-            </article>
-            <article class="seo-hub-narrative-card">
-                <h3><i class="fas fa-diagram-project" style="color:#3b82f6;"></i> La logique</h3>
-                <p>Des pages locales optimisées, des mots-clés ciblés, un site rapide et bien indexé.</p>
-            </article>
-            <article class="seo-hub-narrative-card">
-                <h3><i class="fas fa-chart-line" style="color:#10b981;"></i> Ce que vous gagnez</h3>
-                <p>Une présence constante sur les recherches locales et plus de demandes entrantes chaque mois.</p>
-            </article>
-            <article class="seo-hub-narrative-card">
-                <h3><i class="fas fa-play-circle" style="color:#f59e0b;"></i> ACTION</h3>
-                <p>Choisissez un levier ci-dessous, activez-le cette semaine et mesurez les premiers retours.</p>
-            </article>
-        </section>
-
         <section class="seo-hub-pillars" aria-label="Leviers SEO">
 
             <article class="seo-hub-pillar">
@@ -171,7 +174,7 @@ function renderSeoHub(array $stats): void
                             <span class="seo-hub-state seo-hub-state--available"><i class="fas fa-check-circle"></i> Disponible</span>
                         </div>
                         <p>Couvrez vos villes clés avec des pages utiles et bien référencées.</p>
-                        <small><?= (int) $stats['villes_count'] ?> pages créées · <?= (int) $stats['villes_published'] ?> publiées</small>
+                        <small><?= (int) ($stats['villes_count'] ?? 0) ?> pages créées · <?= (int) ($stats['villes_published'] ?? 0) ?> publiées</small>
                         <a href="/admin?module=seo&action=villes" class="seo-hub-action"><i class="fas fa-arrow-right"></i> Ouvrir</a>
                     </div>
                     <div class="seo-hub-module">
@@ -180,7 +183,7 @@ function renderSeoHub(array $stats): void
                             <span class="seo-hub-state seo-hub-state--available"><i class="fas fa-check-circle"></i> Disponible</span>
                         </div>
                         <p>Suivez les expressions qui amènent des vendeurs sur votre site.</p>
-                        <small><?= (int) $stats['keywords_count'] ?> expressions suivies</small>
+                        <small><?= (int) ($stats['keywords_count'] ?? 0) ?> expressions suivies</small>
                         <a href="/admin?module=seo&action=keywords" class="seo-hub-action"><i class="fas fa-arrow-right"></i> Ouvrir</a>
                     </div>
                 </div>
@@ -205,8 +208,17 @@ function renderSeoHub(array $stats): void
                             <span class="seo-hub-state seo-hub-state--available"><i class="fas fa-check-circle"></i> Disponible</span>
                         </div>
                         <p>Un site rapide améliore votre classement et l'expérience visiteur.</p>
-                        <small>Dernier score : <?= $stats['last_audit_score'] !== null ? (int) $stats['last_audit_score'] . '/100' : 'Non mesuré' ?></small>
+                        <small>Dernier score : <?= $lastAuditScore !== null ? (int) $lastAuditScore . '/100' : 'Non mesuré' ?></small>
                         <a href="/admin?module=seo&action=performance" class="seo-hub-action"><i class="fas fa-arrow-right"></i> Ouvrir</a>
+                    </div>
+                    <div class="seo-hub-module">
+                        <div class="seo-hub-module-head">
+                            <h3>Checklist lancement SEO</h3>
+                            <span class="seo-hub-state seo-hub-state--available"><i class="fas fa-clipboard-check"></i> Disponible</span>
+                        </div>
+                        <p>SSL, sitemaps, Analytics, Search Console, pages légales : note auto + validations manuelles.</p>
+                        <small>Liste standard « launch » (anglais) pour homogénéiser tous les sites.</small>
+                        <a href="/admin?module=seo&action=launch-checklist" class="seo-hub-action"><i class="fas fa-arrow-right"></i> Ouvrir la checklist</a>
                     </div>
                 </div>
             </article>
@@ -237,6 +249,10 @@ function renderContent(): void
         require __DIR__ . '/fiches-villes.php';
     } elseif ($action === 'performance') {
         require __DIR__ . '/performance.php';
+    } elseif ($action === 'launch-checklist') {
+        require __DIR__ . '/checklist-lancement.php';
+    } elseif ($action === 'keywords' && is_file(__DIR__ . '/mots-cles/index.php')) {
+        require __DIR__ . '/mots-cles/index.php';
     } else {
         renderSeoHub($stats);
     }

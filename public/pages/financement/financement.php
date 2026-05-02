@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($formData['rgpd'] === '') { $errors['rgpd'] = 'Vous devez accepter la politique de confidentialité.'; }
 
     if ($errors === []) {
-        LeadService::capture([
+        $leadId = LeadService::capture([
             'source_type' => LeadService::SOURCE_FINANCEMENT,
             'pipeline' => LeadService::SOURCE_FINANCEMENT,
             'stage' => 'nouveau',
@@ -57,13 +57,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ],
         ]);
 
-        Session::flash('success', 'Votre demande de financement a bien été envoyée. Nous revenons vers vous rapidement.');
+        if ($leadId > 0) {
+            require_once ROOT_PATH . '/core/services/FinancementNotificationService.php';
+            try {
+                FinancementNotificationService::afterCapture($leadId, $formData);
+            } catch (Throwable $e) {
+                error_log('[financement] afterCapture: ' . $e->getMessage());
+            }
+        }
+
+        Session::flash('success', 'Votre demande de financement a bien été envoyée. Nous revenons vers vous rapidement (vérifiez aussi votre boîte e-mail).');
         redirect('/financement#formulaire-financement');
     }
 }
 
-$pageTitle = 'Financement immobilier à Bordeaux — Accompagnement personnalisé';
-$metaDesc = 'Demandez un accompagnement au financement immobilier à Bordeaux : projet clarifié, dossier simplifié, retour rapide et humain.';
+$pageTitle = 'Financement immobilier à Bordeaux | Eduardo Desul Immobilier';
+$metaDesc = 'Préparez votre financement immobilier à Bordeaux avec un accompagnement clair : budget, capacité, dossier et prochaines étapes de votre projet.';
 $extraCss = ['/assets/css/financement.css'];
 ?>
 

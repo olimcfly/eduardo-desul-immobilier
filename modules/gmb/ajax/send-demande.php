@@ -3,14 +3,19 @@ require_once '../../../core/bootstrap.php';
 require_once '../includes/GmbService.php';
 
 header('Content-Type: application/json');
-if (!Auth::check()) { http_response_code(401); echo json_encode(['success' => false, 'message' => 'Non autorisé']); exit; }
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') { http_response_code(405); echo json_encode(['success' => false, 'message' => 'Méthode non autorisée']); exit; }
+function gmb_json(bool $success, string $message, array $data = [], int $status = 200): void {
+    http_response_code($status);
+    echo json_encode(['success' => $success, 'message' => $message, 'data' => $data], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+if (!Auth::check()) { gmb_json(false, 'Non autorisé', [], 401); }
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') { gmb_json(false, 'Méthode non autorisée', [], 405); }
+if (!verifyCsrf((string) ($_POST['csrf_token'] ?? ''))) { gmb_json(false, 'Token CSRF invalide.', [], 403); }
 
 try {
     $service = new GmbService((int) Auth::user()['id']);
     $id = $service->createDemandeAvis($_POST);
-    echo json_encode(['success' => true, 'message' => 'Demande d\'avis envoyée par email.', 'demande_id' => $id]);
+    gmb_json(true, 'Demande d\'avis envoyée par email.', ['demande_id' => $id]);
 } catch (Throwable $e) {
-    http_response_code(400);
-    echo json_encode(['success' => false, 'message' => $e->getMessage() ?: 'Envoi impossible']);
+    gmb_json(false, $e->getMessage() ?: 'Envoi impossible', [], 400);
 }

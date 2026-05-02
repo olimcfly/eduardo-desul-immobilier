@@ -1,98 +1,69 @@
 <?php
 
-require_once __DIR__ . '/services/MonthlyReportService.php';
+declare(strict_types=1);
 
-$allowedActions = ['index', 'rapport-mensuel'];
-$action = isset($_GET['action']) ? preg_replace('/[^a-z-]/', '', (string) $_GET['action']) : 'index';
-if (!in_array($action, $allowedActions, true)) {
-    $action = 'index';
-}
+$optimiserView = preg_replace('/[^a-z0-9_-]/i', '', (string) ($_GET['view'] ?? ''));
+$optimiserView = $optimiserView === '' ? 'hub' : strtolower($optimiserView);
 
-$pageTitle = $action === 'rapport-mensuel' ? 'Optimiser — Rapport mensuel' : 'Optimiser';
-$pageDescription = 'Améliorez vos résultats avec des décisions simples';
+$optimiserTitles = [
+    'hub' => 'Optimiser',
+    'parcours' => 'Parcours d\'optimisation',
+    'guide' => 'Parcours d\'optimisation',
+    'etape-analytics' => 'Étape 1 — Analytics',
+    'etape-kpis' => 'Étape 2 — KPIs',
+    'etape-dashboard' => 'Étape 3 — Dashboard',
+    'etape-tests' => 'Étape 4 — Tests',
+    'etape-analyse' => 'Étape 5 — Analyse',
+    'analytics' => 'Tableau de bord Analytics',
+    'rapport-mensuel' => 'Rapport mensuel',
+    'ab-testing' => 'A/B Testing',
+    'recommandations' => 'Recommandations IA',
+];
+$pageTitle = $optimiserTitles[$optimiserView] ?? 'Optimiser';
+$pageDescription = 'Pilotage acquisition, analytics et performance.';
+
+$GLOBALS['optimiser_view'] = $optimiserView;
 
 function renderContent(): void
 {
-    global $action;
+    $v = (string) ($GLOBALS['optimiser_view'] ?? 'hub');
 
-    if ($action === 'rapport-mensuel') {
-        require __DIR__ . '/views/rapport-mensuel.php';
-        return;
+    switch ($v) {
+        case 'analytics':
+            require __DIR__ . '/analytics.php';
+            return;
+        case 'rapport-mensuel':
+            require_once __DIR__ . '/services/MonthlyReportService.php';
+            require __DIR__ . '/views/rapport-mensuel.php';
+            return;
+        case 'ab-testing':
+            require __DIR__ . '/views/ab-testing.php';
+            return;
+        case 'recommandations':
+            require __DIR__ . '/views/recommandations.php';
+            return;
+        case 'parcours':
+        case 'guide':
+            require __DIR__ . '/views/guide-parcours.php';
+            return;
+        case 'etape-analytics':
+            require __DIR__ . '/views/etape-analytics.php';
+            return;
+        case 'etape-kpis':
+            require __DIR__ . '/views/etape-kpis.php';
+            return;
+        case 'etape-dashboard':
+            require __DIR__ . '/views/etape-dashboard.php';
+            return;
+        case 'etape-tests':
+            require __DIR__ . '/views/etape-tests.php';
+            return;
+        case 'etape-analyse':
+            require __DIR__ . '/views/etape-analyse.php';
+            return;
+        case 'hub':
+        default:
+            require __DIR__ . '/index.php';
+            return;
     }
-    ?>
-    <section class="hub-page">
-
-        <header class="hub-hero">
-            <div class="hub-hero-badge"><i class="fas fa-chart-line"></i> Amélioration continue</div>
-            <h1>Gagnez en résultats chaque semaine</h1>
-            <p>Voyez ce qui marche, corrigez vite, avancez en continu.</p>
-        </header>
-
-        <section class="hub-narrative" aria-label="Méthode d'amélioration">
-            <article class="hub-narrative-card hub-narrative-card--motivation">
-                <h3><i class="fas fa-triangle-exclamation" style="color:#ef4444;"></i> Problème</h3>
-                <p>Vous agissez sans repère clair.</p>
-            </article>
-            <article class="hub-narrative-card hub-narrative-card--explanation">
-                <h3><i class="fas fa-diagram-project" style="color:#3b82f6;"></i> Logique</h3>
-                <p>Mesurer, ajuster, vérifier.</p>
-            </article>
-            <article class="hub-narrative-card hub-narrative-card--resultat">
-                <h3><i class="fas fa-chart-line" style="color:#10b981;"></i> Bénéfice</h3>
-                <p>Chaque action devient plus rentable.</p>
-            </article>
-            <article class="hub-narrative-card hub-narrative-card--action">
-                <h3><i class="fas fa-play-circle" style="color:#f59e0b;"></i> Action</h3>
-                <p>Commencez par un seul levier.</p>
-            </article>
-        </section>
-
-        <div class="hub-modules-grid">
-            <a href="?module=optimiser&view=analytics" class="hub-module-card">
-                <div class="hub-module-card-head">
-                    <div class="hub-module-card-icon" style="background:#dbeafe;color:#2563eb;"><i class="fas fa-chart-bar"></i></div>
-                    <h3>Lire les résultats</h3>
-                </div>
-                <p>Comprenez en un coup d'œil ce qui monte ou baisse.</p>
-                <span class="hub-module-card-action"><i class="fas fa-arrow-right"></i> Ouvrir</span>
-            </a>
-
-            <div class="hub-module-card hub-module-card--soon">
-                <div class="hub-module-card-head">
-                    <div class="hub-module-card-icon" style="background:#fef3c7;color:#d97706;"><i class="fas fa-lightbulb"></i></div>
-                    <h3>Trouver le frein</h3>
-                </div>
-                <p>Identifiez le point qui bloque votre progression.</p>
-                <span class="hub-state hub-state--soon"><i class="fas fa-clock"></i> Bientôt</span>
-            </div>
-
-            <div class="hub-module-card hub-module-card--soon">
-                <div class="hub-module-card-head">
-                    <div class="hub-module-card-icon" style="background:#eafaf1;color:#16a34a;"><i class="fas fa-vials"></i></div>
-                    <h3>Tester une amélioration</h3>
-                </div>
-                <p>Comparez deux versions et gardez la meilleure.</p>
-                <span class="hub-state hub-state--soon"><i class="fas fa-clock"></i> Bientôt</span>
-            </div>
-
-            <a href="/admin?module=optimiser&action=rapport-mensuel" class="hub-module-card">
-                <div class="hub-module-card-head">
-                    <div class="hub-module-card-icon" style="background:#fdedec;color:#dc2626;"><i class="fas fa-file-chart-line"></i></div>
-                    <h3>Bilan mensuel</h3>
-                </div>
-                <p>Gardez une vision claire et prenez vos décisions plus vite.</p>
-                <span class="hub-module-card-action"><i class="fas fa-arrow-right"></i> Ouvrir</span>
-            </a>
-        </div>
-
-        <section class="hub-final-cta" aria-label="Progression optimiser">
-            <div>
-                <h2>Progression : Mesurer → Corriger → Vérifier → Répéter</h2>
-                <p>Commencez par un levier, puis développez votre système.</p>
-            </div>
-            <a href="?module=optimiser&view=analytics" class="hub-btn hub-btn--gold"><i class="fas fa-rocket"></i> Lancer ma première amélioration</a>
-        </section>
-
-    </section>
-    <?php
 }

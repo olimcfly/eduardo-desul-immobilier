@@ -3,7 +3,7 @@
 
 require_once MODULES_PATH . '/funnels/services/FunnelService.php';
 
-function renderContent(): string
+function renderContent(): void
 {
     $db      = \Database::getInstance();
     $service = new FunnelService($db);
@@ -13,13 +13,17 @@ function renderContent(): string
 
     switch ($action) {
         case 'wizard':
-            return renderWizard($service, $id);
+            echo renderWizard($service, $id);
+            return;
         case 'edit':
-            return renderEdit($service, $id);
+            echo renderEdit($service, $id);
+            return;
         case 'stats':
-            return renderStats($service, $id);
+            echo renderStats($service, $id);
+            return;
         default:
-            return renderList($service);
+            echo renderList($service);
+            return;
     }
 }
 

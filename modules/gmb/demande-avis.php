@@ -12,6 +12,7 @@ $emailTemplates = $service->templates('email');
     </div>
 
     <form id="gmb-demande-form" class="gmb-form">
+        <?= csrfField() ?>
         <label>Nom client<input name="client_nom" required></label>
         <label>Email client<input type="email" name="client_email"></label>
         <label>Téléphone client<input name="client_tel"></label>
@@ -38,6 +39,7 @@ $emailTemplates = $service->templates('email');
 
     <h3>Nouveau template</h3>
     <form id="gmb-template-form" class="gmb-form">
+        <?= csrfField() ?>
         <label>Nom<input name="nom" required></label>
         <label>Canal
             <select name="canal"><option value="email">Email</option><option value="sms">SMS</option></select>

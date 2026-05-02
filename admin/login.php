@@ -45,8 +45,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim((string) ($_POST['email'] ?? ''));
     $password = (string) ($_POST['password'] ?? '');
 
-    error_log("[LOGIN DEBUG] Email: $email, Password length: " . strlen($password));
-
     if (empty($email) || empty($password)) {
         $error = 'Veuillez remplir tous les champs.';
     } else {
@@ -69,15 +67,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 );
                 
                 // Chercher l'utilisateur
-                $stmt = $pdo->prepare('SELECT id, email, password, role, name FROM users WHERE email = ? AND is_active = 1 LIMIT 1');
+                $stmt = $pdo->prepare('SELECT id, email, password, role, name FROM users WHERE email = ? LIMIT 1');
                 $stmt->execute([$email]);
                 $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-                error_log("[LOGIN DEBUG] User found: " . ($user ? 'YES' : 'NO'));
-                if ($user) {
-                    $verify = password_verify($password, (string) $user['password']);
-                    error_log("[LOGIN DEBUG] Password verify: " . ($verify ? 'YES' : 'NO'));
-                }
 
                 if ($user && password_verify($password, (string) $user['password'])) {
                     // Succès avec l'utilisateur de la BDD
@@ -87,8 +79,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $_SESSION['user_role']  = $user['role'] ?? 'admin';
                     $_SESSION['user_name']  = $user['name'] ?? '';
                     $_SESSION['last_activity'] = time();
-
-                    error_log("[LOGIN DEBUG] Session set, about to redirect to /admin/");
 
                     // Enregistrer la connexion et envoyer alerte
                     try {
@@ -117,19 +107,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
         } catch (Exception $e) {
-            error_log('[LOGIN DEBUG] DB Connection exception: ' . $e->getMessage());
+            error_log('Admin login DB error: ' . $e->getMessage());
         }
         
         // Étape 2: Fallback sur les defines du config.php
-        error_log("[LOGIN DEBUG] Fallback check - ADMIN_EMAIL defined: " . (defined('ADMIN_EMAIL') ? 'YES' : 'NO'));
-        error_log("[LOGIN DEBUG] Fallback check - ADMIN_PASSWORD_HASH defined: " . (defined('ADMIN_PASSWORD_HASH') ? 'YES' : 'NO'));
-        error_log("[LOGIN DEBUG] Fallback check - Email match: " . ($email === ADMIN_EMAIL ? 'YES' : 'NO'));
-
-        if (defined('ADMIN_EMAIL') && defined('ADMIN_PASSWORD_HASH')) {
-            $fallbackVerify = password_verify($password, ADMIN_PASSWORD_HASH);
-            error_log("[LOGIN DEBUG] Fallback password verify: " . ($fallbackVerify ? 'YES' : 'NO'));
-        }
-
         if (
             defined('ADMIN_EMAIL') &&
             defined('ADMIN_PASSWORD_HASH') &&
@@ -144,6 +125,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $_SESSION['user_name']  = 'Administrateur';
             $_SESSION['last_activity'] = time();
             
+            redirectAdmin('/admin/');
+        }
+
+        // Développement local uniquement : mot de passe en clair dans .env (jamais en production)
+        $appEnv = strtolower(trim((string) ($_ENV['APP_ENV'] ?? '')));
+        $devPass = (string) ($_ENV['DEV_ADMIN_PASSWORD'] ?? '');
+        if (
+            $appEnv === 'development'
+            && $devPass !== ''
+            && defined('ADMIN_EMAIL')
+            && $email === ADMIN_EMAIL
+            && hash_equals($devPass, $password)
+        ) {
+            session_regenerate_id(true);
+            $_SESSION['user_id']    = 1;
+            $_SESSION['user_email'] = $email;
+            $_SESSION['user_role']  = 'superadmin';
+            $_SESSION['user_name']  = 'Développement (Cursor)';
+            $_SESSION['last_activity'] = time();
             redirectAdmin('/admin/');
         }
         
@@ -166,8 +166,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #1f3a5e 0%, #2d5a8c 100%);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -177,27 +177,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .login-container {
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
             width: 100%;
             max-width: 420px;
-            padding: 40px;
+            padding: 45px;
         }
 
         .login-header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 35px;
         }
 
         .login-header h1 {
-            font-size: 28px;
-            color: #333;
-            margin-bottom: 8px;
+            font-size: 26px;
+            font-weight: 700;
+            color: #1f3a5e;
+            margin-bottom: 6px;
         }
 
         .login-header p {
-            color: #666;
+            color: #6b7280;
             font-size: 14px;
+            font-weight: 500;
         }
 
         .form-group {
@@ -215,18 +217,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         input[type="email"],
         input[type="password"] {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
+            padding: 12px 14px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
             font-size: 14px;
-            transition: border-color 0.3s;
+            transition: border-color 0.3s, background-color 0.3s;
+            background-color: #f9fafb;
+        }
+
+        input[type="email"]::placeholder,
+        input[type="password"]::placeholder {
+            color: #9ca3af;
         }
 
         input[type="email"]:focus,
         input[type="password"]:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            border-color: #1f3a5e;
+            box-shadow: 0 0 0 3px rgba(31, 58, 94, 0.1);
         }
 
         .password-wrapper {
@@ -245,13 +253,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background: none;
             border: none;
             cursor: pointer;
-            color: #667eea;
+            color: #1f3a5e;
             font-size: 18px;
             padding: 4px;
+            transition: opacity 0.2s;
         }
 
         .toggle-password:hover {
-            color: #764ba2;
+            opacity: 0.7;
         }
 
         .alert {
@@ -269,11 +278,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .submit-btn {
             width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 13px;
+            background: linear-gradient(135deg, #1f3a5e 0%, #2d5a8c 100%);
             color: white;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
@@ -282,7 +291,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .submit-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 8px 24px rgba(31, 58, 94, 0.35);
         }
 
         .submit-btn:active {
@@ -298,24 +307,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-size: 12px;
         }
 
-        .test-credentials {
-            background: #f0f4ff;
-            border: 1px solid #d4dff5;
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            font-size: 12px;
+        .login-footer-webmail {
+            margin-top: 10px;
         }
 
-        .test-credentials strong {
-            color: #333;
+        .login-footer-webmail a {
+            color: #b0b8c4;
+            font-size: 11px;
+            text-decoration: none;
         }
 
-        .test-credentials code {
-            background: #fff;
-            padding: 2px 4px;
-            border-radius: 2px;
-            font-family: monospace;
+        .login-footer-webmail a:hover {
+            color: #6b7280;
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -332,32 +336,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         <?php endif; ?>
 
-        <div class="test-credentials">
-            <strong>Identifiant de connexion :</strong><br>
-            Email: <code><?= htmlspecialchars(defined('ADMIN_EMAIL') ? ADMIN_EMAIL : 'admin@example.com') ?></code><br>
-            <em>Utilisez votre mot de passe administrateur</em>
-        </div>
+        <?php
+        $webmailScheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+        $webmailHost = $_SERVER['HTTP_HOST'] ?? 'eduardo-desul-immobilier.fr';
+        $webmailUrl = $webmailScheme . '://' . $webmailHost . '/webmail';
+        ?>
 
         <form method="POST" action="">
             <div class="form-group">
-                <label for="email">Email</label>
                 <input
                     type="email"
                     id="email"
                     name="email"
                     value="<?= htmlspecialchars($email) ?>"
+                    placeholder="Identifiant"
                     required
                     autofocus
                 >
             </div>
 
             <div class="form-group">
-                <label for="password">Mot de passe</label>
+                <label for="password" style="display:none;">Mot de passe</label>
                 <div class="password-wrapper">
                     <input
                         type="password"
                         id="password"
                         name="password"
+                        placeholder="Mot de passe"
                         required
                     >
                     <button type="button" class="toggle-password" id="togglePassword" aria-label="Afficher/masquer le mot de passe">
@@ -371,6 +376,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <div class="login-footer">
             © 2026 Eduardo Desul Immobilier - Tous droits réservés
+            <div class="login-footer-webmail">
+                <a href="<?= htmlspecialchars($webmailUrl, ENT_QUOTES, 'UTF-8') ?>" rel="noopener noreferrer">Messagerie web</a>
+            </div>
         </div>
     </div>
 

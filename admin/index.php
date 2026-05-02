@@ -79,6 +79,11 @@ if (!function_exists('get_ia_status')) {
     }
 }
 
+// ── Charger la config globale pour avoir les constantes ──────
+if (file_exists(ROOT_PATH . '/core/config/config.php')) {
+    require_once ROOT_PATH . '/core/config/config.php';
+}
+
 // ── Définir les constantes manquantes ────────────────────────
 if (!defined('ADVISOR_NAME')) {
     define('ADVISOR_NAME', 'Eduardo Desul');
@@ -94,6 +99,19 @@ if (file_exists(ROOT_PATH . '/core/Session.php')) {
 
 if (file_exists(ROOT_PATH . '/core/Auth.php')) {
     require_once ROOT_PATH . '/core/Auth.php';
+}
+
+// ── Charger les services ────────────────────────────────────
+if (file_exists(ROOT_PATH . '/core/services/LeadService.php')) {
+    require_once ROOT_PATH . '/core/services/LeadService.php';
+}
+
+if (file_exists(ROOT_PATH . '/core/services/ConversionTrackingService.php')) {
+    require_once ROOT_PATH . '/core/services/ConversionTrackingService.php';
+}
+
+if (file_exists(ROOT_PATH . '/core/services/EmailSequenceService.php')) {
+    require_once ROOT_PATH . '/core/services/EmailSequenceService.php';
 }
 
 // ── Créer une classe Auth minimale si nécessaire ───────────
@@ -112,6 +130,17 @@ if (!class_exists('Auth')) {
 // ── Déterminer le module demandé ────────────────────────────
 $module = $_GET['module'] ?? 'dashboard';
 $module = preg_replace('/[^a-z0-9_-]/i', '', $module);
+// Rétro-compat : ancien nom du module annuaire
+if ($module === 'guide-local-crm') {
+    $q = $_GET;
+    $q['module'] = 'annuaire-local';
+    header('Location: /admin?' . http_build_query($q), true, 301);
+    exit;
+}
+
+// ── Métadonnées « plugin » du module actif (voir modules/<slug>/admin_plugin.php) ──
+require_once ROOT_PATH . '/core/AdminModulePlugin.php';
+$adminModulePlugin = AdminModulePlugin::tryFromModuleDir(ROOT_PATH . '/modules/' . $module) ?? null;
 
 // ── Préparer les données par défaut ──────────────────────────
 $pageTitle = 'Tableau de bord';
@@ -124,7 +153,7 @@ $stats = [
 $modulePath = ROOT_PATH . '/modules/' . $module . '/accueil.php';
 $moduleLoaded = false;
 
-if (is_file($modulePath) && $module !== 'dashboard') {
+if (is_file($modulePath)) {
     try {
         require $modulePath;
         $moduleLoaded = function_exists('renderContent');
@@ -143,7 +172,7 @@ if (!$moduleLoaded) {
     // Créer renderContent pour le dashboard (si pas déjà défini)
     if (!function_exists('renderContent')) {
         function renderContent() {
-            global $stats;
+            echo '<!-- Dashboard renderContent called -->';
             require __DIR__ . '/views/dashboard/index.php';
         }
     }

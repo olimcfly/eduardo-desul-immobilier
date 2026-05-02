@@ -449,6 +449,21 @@ if (!function_exists('settings_group')) {
 }
 
 
+if (!function_exists('openrouterApiKey')) {
+    /**
+     * Clé OpenRouter : paramètre site (api_openrouter) prioritaire, sinon OPENROUTER_API_KEY dans .env.
+     */
+    function openrouterApiKey(int $userId = 0): string
+    {
+        $k = trim((string) setting('api_openrouter', '', $userId));
+        if ($k !== '') {
+            return $k;
+        }
+
+        return trim((string) ($_ENV['OPENROUTER_API_KEY'] ?? ''));
+    }
+}
+
 if (!function_exists('get_ia_status')) {
     function get_ia_status(int $userId = 0): string
     {
@@ -458,6 +473,7 @@ if (!function_exists('get_ia_status')) {
             (string)($_ENV['ANTHROPIC_API_KEY'] ?? ''),
             (string)($_ENV['OPENAI_API_KEY'] ?? ''),
             (string)($_ENV['MISTRAL_API_KEY'] ?? ''),
+            openrouterApiKey($userId),
         ];
 
         if ($userId > 0) {
@@ -507,12 +523,16 @@ if (!function_exists('replacePlaceholders')) {
             $advisorFull = ADVISOR_NAME ?: APP_NAME;
         }
 
-        $zoneCity = (string)setting('zone_city', APP_CITY, $userId);
+        $zoneCity = trim((string)setting('zone_city', APP_CITY ?: 'Bordeaux', $userId));
+        if ($zoneCity === '') {
+            $zoneCity = 'Bordeaux';
+        }
         $zoneNeighborhoods = setting('zone_neighborhoods', [], $userId);
         $neighborhoodA = is_array($zoneNeighborhoods) && isset($zoneNeighborhoods[0]) ? (string)$zoneNeighborhoods[0] : 'Centre';
         $neighborhoodB = is_array($zoneNeighborhoods) && isset($zoneNeighborhoods[1]) ? (string)$zoneNeighborhoods[1] : 'Quartier 2';
 
         $map = [
+            '{{city}}'                => $zoneCity,
             '{{advisor_name}}'        => $advisorFull,
             '{{agency_name}}'         => (string)setting('agency_name', APP_NAME, $userId),
             '{{advisor_email}}'       => (string)setting('advisor_email', APP_EMAIL, $userId),
@@ -524,7 +544,16 @@ if (!function_exists('replacePlaceholders')) {
             '{{advisor_photo}}'       => (string)setting('advisor_photo', '/assets/images/advisor-photo.jpg', $userId),
         ];
 
-        return strtr($template, $map);
+        $legacyMap = [
+            'Votre ville' => $zoneCity,
+            'Votre conseiller immobilier' => $advisorFull,
+            'Conseiller immobilier local à Votre ville' => 'Conseiller immobilier local à ' . $zoneCity,
+            'Votre partenaire immobilier à Votre ville' => 'Votre partenaire immobilier à ' . $zoneCity,
+            'secteur de Votre ville' => 'secteur de ' . $zoneCity,
+            'Guide local local' => 'Guide local ' . $zoneCity,
+        ];
+
+        return strtr(strtr($template, $map), $legacyMap);
     }
 }
 if (!function_exists('setting_set')) {
@@ -562,4 +591,3 @@ if (!function_exists('setting_delete')) {
         }
     }
 }
-

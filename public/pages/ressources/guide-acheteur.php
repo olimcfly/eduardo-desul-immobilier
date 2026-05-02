@@ -1,6 +1,6 @@
 <?php
-$pageTitle = 'Guide de l\'acheteur immobilier — ' . ADVISOR_NAME . '';
-$metaDesc  = 'Guide complet pour acheter votre premier bien immobilier à Bordeaux : financement, recherche, offre, signature.';
+$pageTitle = 'Acheter un bien immobilier à Bordeaux | Guide Eduardo Desul';
+$metaDesc  = 'Guide pratique pour acheter un bien immobilier à Bordeaux : budget, financement, recherche, visites, offre, compromis et signature.';
 $extraCss  = ['/assets/css/guide.css'];
 ?>
 

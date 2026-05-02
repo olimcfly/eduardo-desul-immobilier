@@ -52,25 +52,6 @@ function renderSocialHub(): void
             <p>Planifiez vos contenus, automatisez vos séquences et entretenez la relation avec votre audience locale.</p>
         </header>
 
-        <section class="hub-narrative" aria-label="Méthode social">
-            <article class="hub-narrative-card hub-narrative-card--motivation">
-                <h3><i class="fas fa-triangle-exclamation" style="color:#ef4444;"></i> Problème</h3>
-                <p>Publier manuellement prend du temps et manque de régularité.</p>
-            </article>
-            <article class="hub-narrative-card hub-narrative-card--explanation">
-                <h3><i class="fas fa-diagram-project" style="color:#3b82f6;"></i> Logique</h3>
-                <p>Des séquences planifiées, un journal de bord, un kit de contenus réutilisables.</p>
-            </article>
-            <article class="hub-narrative-card hub-narrative-card--resultat">
-                <h3><i class="fas fa-chart-line" style="color:#10b981;"></i> Bénéfice</h3>
-                <p>Vous restez visible chaque semaine sans effort supplémentaire.</p>
-            </article>
-            <article class="hub-narrative-card hub-narrative-card--action">
-                <h3><i class="fas fa-play-circle" style="color:#f59e0b;"></i> Action</h3>
-                <p>Créez votre première séquence ou rédigez un post maintenant.</p>
-            </article>
-        </section>
-
         <div class="hub-modules-grid">
             <a href="?module=social&action=sequences" class="hub-module-card">
                 <div class="hub-module-card-head">

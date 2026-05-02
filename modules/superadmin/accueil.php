@@ -18,6 +18,11 @@ if ($action === 'toggle_user') {
     return;
 }
 
+if ($action === 'update_setting') {
+    require __DIR__ . '/update_setting.php';
+    return;
+}
+
 if ($action === 'page_request' || $action === 'poll_request' || $action === 'respond_request') {
     require __DIR__ . '/page_request.php';
     return;
@@ -31,9 +36,7 @@ if (!$user || ($user['role'] ?? '') !== 'superadmin') {
 }
 
 $pageTitle = 'Superadmin';
-$pageDescription = 'Pilotage global des modules et demandes de session';
-
-require_once __DIR__ . '/../../admin/views/layout.php';
+$pageDescription = 'Pilotage global des modules, comptes et paramètres plateforme';
 
 function renderContent(): void
 {

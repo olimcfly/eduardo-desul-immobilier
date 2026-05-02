@@ -1,0 +1,43 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        $prefix = config('blog.table_prefix', 'blog_');
+
+        Schema::create($prefix . 'media', function (Blueprint $table) use ($prefix) {
+            $table->id();
+
+            // Fichier
+            $table->string('path', 500);
+            $table->string('filename', 255)->index();
+            $table->string('mime_type', 100);
+
+            // Métadonnées
+            $table->text('alt_text')->nullable();
+            $table->unsignedBigInteger('size')->default(0);
+            $table->unsignedInteger('width')->nullable();
+            $table->unsignedInteger('height')->nullable();
+
+            // Multi-tenant
+            $table->uuid('tenant_id')->index();
+
+            // Timestamps
+            $table->timestamps();
+
+            // Indexes
+            $table->index(['tenant_id', 'mime_type']);
+            $table->index('created_at');
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists(config('blog.table_prefix', 'blog_') . 'media');
+    }
+};

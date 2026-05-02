@@ -9,7 +9,14 @@ function renderContent(): void
     <style>
         /* ── Layout ── */
         .scrap-page { display: flex; flex-direction: column; gap: 20px; }
-        .page-header { margin-bottom: 4px; }
+        .start-hero { background: linear-gradient(135deg, #0f2237 0%, #1a3a5c 100%); border-radius: 16px; padding: 36px 40px; color: #fff; margin-bottom: 12px; box-shadow: 0 4px 20px rgba(15,34,55,.18); }
+        .start-hero-badge { display: inline-block; background: rgba(201,168,76,.2); color: #c9a84c; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 4px 12px; border-radius: 20px; margin-bottom: 14px; border: 1px solid rgba(201,168,76,.35); }
+        .start-hero h1 { font-size: 28px; font-weight: 700; color: #fff; margin: 0 0 12px; line-height: 1.25; }
+        .start-hero p { font-size: 15px; color: rgba(255,255,255,.7); line-height: 1.65; max-width: 720px; margin: 0; }
+        .start-cta { background: #fff; border-radius: 12px; padding: 24px 26px; box-shadow: 0 1px 6px rgba(0,0,0,.07); display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+        .start-cta-text strong { display: block; font-size: 15px; font-weight: 600; color: #1e293b; margin-bottom: 4px; }
+        .start-cta-text span { font-size: 13px; color: #64748b; }
+        .start-cta-btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 22px; background: #c9a84c; color: #0f2237; border-radius: 8px; font-size: 14px; font-weight: 700; text-decoration: none; white-space: nowrap; }
 
         /* ── Barre de recherche ── */
         .scrap-search-bar {
@@ -142,12 +149,14 @@ function renderContent(): void
         #scrap-toast.success { background: #27ae60; }
         #scrap-toast.error   { background: #e74c3c; }
         #scrap-toast.info    { background: #2d70b3; }
+        @media (max-width: 600px) { .start-hero { padding: 24px 20px; } }
     </style>
 
     <div class="scrap-page">
 
-        <div class="page-header">
-            <h1><i class="fas fa-satellite-dish page-icon"></i> Scraping <span class="page-title-accent">eXp France</span></h1>
+        <div class="start-hero">
+            <div class="start-hero-badge">Import biens</div>
+            <h1>Scraping eXp France</h1>
             <p>Recherchez des biens sur la plateforme eXp France, sélectionnez-les et importez-les dans votre catalogue.</p>
         </div>
 
@@ -197,6 +206,14 @@ function renderContent(): void
                 <i class="fas fa-satellite-dish"></i>
                 Lancez une recherche par ville ou par agent pour voir les biens disponibles.
             </div>
+        </div>
+
+        <div class="start-cta">
+            <div class="start-cta-text">
+                <strong>Prêt à importer ?</strong>
+                <span>Commencez par une recherche ciblée, sélectionnez les biens pertinents puis choisissez le type d’import.</span>
+            </div>
+            <a href="/admin/?module=scraping" class="start-cta-btn"><i class="fas fa-magnifying-glass"></i> Nouvelle recherche</a>
         </div>
 
     </div>

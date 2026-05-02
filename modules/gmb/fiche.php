@@ -9,10 +9,13 @@ $fiche = $service->getFiche();
 <section class="gmb-panel">
     <div class="gmb-panel-head">
         <h2>Ma fiche GMB</h2>
-        <button class="btn-gmb" data-action="sync-fiche">Synchroniser Google</button>
+        <button class="btn-gmb" data-action="sync-fiche">Préremplir depuis mes paramètres</button>
     </div>
 
+    <p class="gmb-mode-note">Mode manuel : ces informations préparent votre fiche locale. Elles ne sont pas encore synchronisées avec Google.</p>
+
     <form id="gmb-fiche-form" class="gmb-form">
+        <?= csrfField() ?>
         <input type="hidden" name="gmb_location_id" value="<?= htmlspecialchars($fiche['gmb_location_id'] ?? '') ?>">
         <input type="hidden" name="gmb_account_id" value="<?= htmlspecialchars($fiche['gmb_account_id'] ?? '') ?>">
 

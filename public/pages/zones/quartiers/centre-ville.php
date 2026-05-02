@@ -1,7 +1,7 @@
 <?php
 $pageTitle    = 'Immobilier Centre-Ville Bordeaux - Expert | ' . ADVISOR_NAME;
 $metaDesc     = 'Expert immobilier au centre-ville d\'Bordeaux. Appartements anciens, biens rénovés, commerces — <?= ADVISOR_NAME ?> vous accompagne pour votre projet en hyper-centre.';
-$metaKeywords = 'immobilier centre-ville Bordeaux, appartement centre Aix, achat vente immobilier hyper-centre Aix, expert immobilier Aix centre';
+$metaKeywords = 'immobilier centre-ville Bordeaux, appartement centre Bordeaux, achat vente immobilier hyper-centre Bordeaux, expert immobilier Bordeaux centre';
 $extraCss     = ['/assets/css/villes.css'];
 
 $pageContent = '
@@ -69,7 +69,7 @@ $pageContent = '
     <div class="container">
         <div class="section__header">
             <span class="section-label">Nos services</span>
-            <h2 class="section-title">Nos services au centre-ville d\'Aix</h2>
+            <h2 class="section-title">Nos services au centre-ville de Bordeaux</h2>
         </div>
         <div class="grid-3">
             <div class="card" data-animate>
@@ -105,5 +105,3 @@ $pageContent = '
 </section>
 ';
 ?>
-
-<?php include(__DIR__ . '/../../../templates/page.php'); ?>

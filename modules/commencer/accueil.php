@@ -154,40 +154,40 @@ function renderContent()
     <!-- Bandeau d'accueil -->
     <div class="start-hero">
         <div class="start-hero-badge">Guide de démarrage</div>
-        <h1>Bienvenue sur votre espace marketing</h1>
+        <h1>Comment attirer les vendeurs qui vous choisissent</h1>
         <p>
-            Ce guide vous explique comment tirer le meilleur parti de votre tableau de bord.
-            Suivez les étapes dans l'ordre pour poser les bases de votre système d'acquisition.
+            Commencez par comprendre votre positionnement, puis générez le contenu qui fait la différence.
+            Suivez les 5 étapes pour construire un système d'acquisition efficace et automatisé.
         </p>
     </div>
 
     <!-- Étapes -->
-    <div class="start-steps-title">Les 5 étapes pour bien démarrer</div>
+    <div class="start-steps-title">Les 5 étapes clés</div>
     <div class="start-steps">
 
-        <a href="/admin/?module=construire" class="start-step">
+        <a href="/admin/?module=positionnement" class="start-step">
             <div class="start-step-num">1</div>
             <div class="start-step-body">
-                <div class="start-step-label"><i class="fas fa-layer-group" style="color:#3b82f6;margin-right:6px;"></i>Construire votre positionnement</div>
-                <div class="start-step-desc">Commencez par ANCRE+, NeuroPersona, Offre, Zone et Synthèse pour poser des bases claires.</div>
+                <div class="start-step-label"><i class="fas fa-target" style="color:#3b82f6;margin-right:6px;"></i>Comprendre votre positionnement</div>
+                <div class="start-step-desc">Répondez à 6 questions pour identifier votre persona idéal et générer un message qui résonne vraiment.</div>
+            </div>
+            <div class="start-step-arrow"><i class="fas fa-chevron-right"></i></div>
+        </a>
+
+        <a href="/admin/?module=generateur-contenu" class="start-step">
+            <div class="start-step-num">2</div>
+            <div class="start-step-body">
+                <div class="start-step-label"><i class="fas fa-sparkles" style="color:#10b981;margin-right:6px;"></i>Générer 5 contenus personnalisés</div>
+                <div class="start-step-desc">Le système crée pour vous 5 contenus prêts à publier (titre, description, article, réseaux, email).</div>
             </div>
             <div class="start-step-arrow"><i class="fas fa-chevron-right"></i></div>
         </a>
 
         <a href="/admin/?module=attirer" class="start-step">
-            <div class="start-step-num">2</div>
-            <div class="start-step-body">
-                <div class="start-step-label"><i class="fas fa-bullseye" style="color:#10b981;margin-right:6px;"></i>Attirer des vendeurs qualifiés</div>
-                <div class="start-step-desc">Créez un plan de contenu régulier pour générer des contacts de manière organique et continue.</div>
-            </div>
-            <div class="start-step-arrow"><i class="fas fa-chevron-right"></i></div>
-        </a>
-
-        <a href="/admin/?module=capturer" class="start-step">
             <div class="start-step-num">3</div>
             <div class="start-step-body">
-                <div class="start-step-label"><i class="fas fa-inbox" style="color:#f59e0b;margin-right:6px;"></i>Capturer vos prospects</div>
-                <div class="start-step-desc">Mettez en place des formulaires et lead magnets pour transformer vos visiteurs en contacts qualifiés.</div>
+                <div class="start-step-label"><i class="fas fa-bullseye" style="color:#f59e0b;margin-right:6px;"></i>Publier et attirer</div>
+                <div class="start-step-desc">Publiez vos contenus de manière régulière pour générer des contacts qualifiés en continu.</div>
             </div>
             <div class="start-step-arrow"><i class="fas fa-chevron-right"></i></div>
         </a>
@@ -195,8 +195,8 @@ function renderContent()
         <a href="/admin/?module=convertir" class="start-step">
             <div class="start-step-num">4</div>
             <div class="start-step-body">
-                <div class="start-step-label"><i class="fas fa-arrow-trend-up" style="color:#ef4444;margin-right:6px;"></i>Convertir en clients</div>
-                <div class="start-step-desc">Utilisez des scripts d'appel et des séquences de suivi pour transformer vos leads en mandats signés.</div>
+                <div class="start-step-label"><i class="fas fa-handshake" style="color:#ef4444;margin-right:6px;"></i>Convertir en mandats</div>
+                <div class="start-step-desc">Suivez vos prospects et fermez les mandats avec les vendeurs qualifiés que vous attirez.</div>
             </div>
             <div class="start-step-arrow"><i class="fas fa-chevron-right"></i></div>
         </a>
@@ -204,8 +204,8 @@ function renderContent()
         <a href="/admin/?module=optimiser" class="start-step">
             <div class="start-step-num">5</div>
             <div class="start-step-body">
-                <div class="start-step-label"><i class="fas fa-chart-line" style="color:#8b5cf6;margin-right:6px;"></i>Optimiser vos résultats</div>
-                <div class="start-step-desc">Analysez vos KPIs, identifiez les points de friction et améliorez continuellement votre système.</div>
+                <div class="start-step-label"><i class="fas fa-chart-line" style="color:#8b5cf6;margin-right:6px;"></i>Mesurer et améliorer</div>
+                <div class="start-step-desc">Suivez vos résultats, ajustez votre positionnement et optimisez votre acquisition au fur et à mesure.</div>
             </div>
             <div class="start-step-arrow"><i class="fas fa-chevron-right"></i></div>
         </a>
@@ -216,10 +216,10 @@ function renderContent()
     <div class="start-cta">
         <div class="start-cta-text">
             <strong>Prêt à commencer ?</strong>
-            <span>Rendez-vous sur votre tableau de bord pour voir l'état de votre activité en temps réel.</span>
+            <span>Cliquez sur "Comprendre votre positionnement" pour répondre aux 6 questions qui changeront tout.</span>
         </div>
-        <a href="/admin/?module=dashboard" class="start-cta-btn">
-            <i class="fas fa-gauge-high"></i> Voir le tableau de bord
+        <a href="/admin/?module=positionnement" class="start-cta-btn">
+            <i class="fas fa-arrow-right"></i> Démarrer maintenant
         </a>
     </div>
     <?php

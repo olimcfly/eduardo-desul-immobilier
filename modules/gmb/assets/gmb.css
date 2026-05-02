@@ -8,8 +8,13 @@
 .gmb-card:hover { border-color:#2563eb; transform:translateY(-1px); box-shadow:0 10px 25px rgba(15,23,42,.08); }
 .gmb-panel { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:18px; }
 .gmb-panel-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; gap:12px; }
+.gmb-manual-notice, .gmb-mode-note, .gmb-empty-state { background:#fffbeb; border:1px solid #fde68a; color:#92400e; border-radius:10px; padding:10px 12px; line-height:1.5; }
+.gmb-manual-notice { margin:0 0 18px; }
+.gmb-mode-note { margin:0 0 14px; }
+.gmb-empty-state { margin:14px 0 0; color:#64748b; background:#f8fafc; border-color:#e2e8f0; }
 .gmb-form { display:grid; gap:10px; }
 .gmb-form input, .gmb-form textarea, .gmb-form select, .reply-input { width:100%; border:1px solid #cbd5e1; border-radius:8px; padding:9px; font:inherit; }
+.gmb-stats-form { margin-top:16px; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); align-items:end; }
 .btn-gmb { display:inline-flex; justify-content:center; align-items:center; width:100%; background:#2563eb; color:#fff !important; border:none; border-radius:10px; padding:12px 16px; cursor:pointer; font-weight:700; text-decoration:none; }
 .gmb-avis-list { display:grid; gap:12px; }
 .gmb-avis-item { border:1px solid #e2e8f0; border-radius:10px; padding:12px; }

@@ -97,6 +97,13 @@ $v = fn(string $k, string $d = '') => htmlspecialchars($s[$k] ?? $d);
         </div>
     </div>
 
+    <div class="form-section-title">Réseaux sociaux</div>
+
+    <div class="form-group">
+        <label>Lien Facebook <span class="label-hint">Affiché dans les icônes du footer</span></label>
+        <input type="url" name="social_facebook" value="<?= $v('social_facebook') ?>" placeholder="https://www.facebook.com/...">
+    </div>
+
     <div class="drawer-footer">
         <button type="button" class="btn-cancel" onclick="closeSettingsDrawer()">Annuler</button>
         <button type="submit" class="btn-save"><i class="fas fa-check"></i> Enregistrer</button>

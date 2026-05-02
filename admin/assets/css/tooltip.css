@@ -1,0 +1,209 @@
+/* ========================================
+   TOOLTIPS / INFO-BULLES
+   ======================================== */
+
+/* Tooltip natif du navigateur stylisé */
+[title] {
+    position: relative;
+    cursor: help;
+}
+
+/* Alternative: info-bulle personnalisée en CSS */
+.tooltip-wrapper {
+    position: relative;
+    display: inline-block;
+    cursor: help;
+}
+
+.tooltip-wrapper::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+
+    background-color: rgba(0, 0, 0, 0.9);
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    z-index: 1000;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.tooltip-wrapper::before {
+    content: "";
+    position: absolute;
+    bottom: 115%;
+    left: 50%;
+    transform: translateX(-50%);
+
+    border: 5px solid transparent;
+    border-top-color: rgba(0, 0, 0, 0.9);
+    z-index: 1000;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.tooltip-wrapper:hover::after,
+.tooltip-wrapper:focus::after {
+    opacity: 1;
+}
+
+.tooltip-wrapper:hover::before,
+.tooltip-wrapper:focus::before {
+    opacity: 1;
+}
+
+/* Tooltip sur éléments de formulaire */
+.form-group [title],
+.input-wrapper [title],
+.select-wrapper [title] {
+    border-bottom: 1px dotted #999;
+}
+
+.form-group [title]:hover,
+.input-wrapper [title]:hover,
+.select-wrapper [title]:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* Tooltip sur les icônes */
+.icon-tooltip,
+.info-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background-color: #e3f2fd;
+    color: #1976d2;
+    font-size: 0.75rem;
+    font-weight: bold;
+    cursor: help;
+    margin-left: 4px;
+}
+
+.icon-tooltip:hover,
+.info-icon:hover {
+    background-color: #bbdefb;
+    color: #0d47a1;
+}
+
+/* Tooltip sur menu items */
+.menu-item[title] {
+    position: relative;
+}
+
+.menu-item[title]:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* Tooltip long - texte sur plusieurs lignes */
+[data-tooltip-long]::after {
+    white-space: normal;
+    max-width: 300px;
+    width: 300px;
+    bottom: 140%;
+}
+
+/* Tooltip à droite */
+[data-tooltip-right]::after {
+    bottom: auto;
+    left: 110%;
+    transform: translateX(0);
+    white-space: nowrap;
+}
+
+[data-tooltip-right]::before {
+    bottom: auto;
+    left: auto;
+    right: 100%;
+    transform: translateX(0);
+    border: 5px solid transparent;
+    border-right-color: rgba(0, 0, 0, 0.9);
+}
+
+/* Tooltip à gauche */
+[data-tooltip-left]::after {
+    bottom: auto;
+    left: auto;
+    right: 110%;
+    transform: translateX(0);
+    white-space: nowrap;
+}
+
+[data-tooltip-left]::before {
+    bottom: auto;
+    left: auto;
+    right: 100%;
+    transform: translateX(0);
+    border: 5px solid transparent;
+    border-left-color: rgba(0, 0, 0, 0.9);
+}
+
+/* Tooltip avec icône info */
+.help-text {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: help;
+}
+
+.help-text .icon {
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #ddd;
+    color: #666;
+    font-size: 0.75rem;
+    font-weight: bold;
+}
+
+.help-text:hover .icon {
+    background: #ccc;
+    color: #333;
+}
+
+/* Tooltip animation - entrance */
+@keyframes tooltip-fade-in {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+.tooltip-wrapper:hover::after {
+    animation: tooltip-fade-in 0.3s ease forwards;
+}
+
+/* Désactiver tooltip sur mobile si needed */
+@media (max-width: 768px) {
+    /* Optionnel: désactiver les tooltips sur mobile
+    [title]::after,
+    [title]::before {
+        display: none !important;
+    }
+    */
+}
+
+/* Accessible: Show tooltips on focus */
+@media (prefers-reduced-motion: reduce) {
+    .tooltip-wrapper::after,
+    .tooltip-wrapper::before {
+        transition: none;
+    }
+}

@@ -51,6 +51,11 @@ $v = fn(string $k, string $d = '') => htmlspecialchars($s[$k] ?? $d);
         <input type="text" name="profil_siret" value="<?= $v('profil_siret') ?>" placeholder="XXX XXX XXX XXXXX">
     </div>
 
+    <div class="form-group">
+        <label>N° RSAC / RCS <span class="label-hint">Affiché dans le footer légal</span></label>
+        <input type="text" name="profil_rsac" value="<?= $v('profil_rsac') ?>" placeholder="Ex: 811729276">
+    </div>
+
     <div class="form-section-title">Présentation</div>
 
     <div class="form-group">

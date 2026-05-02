@@ -32,6 +32,34 @@ $redirectUri  = (isset($_SERVER['HTTPS']) ? 'https' : 'http')
         </div>
     </div>
 
+    <!-- ── OpenRouter (agents IA / LLM) ─────────────────────── -->
+    <div class="form-section-title" style="margin-top:2rem">
+        <i class="fas fa-network-wired" style="color:#7c3aed"></i> OpenRouter
+        <small style="float:right;font-weight:400"><?= $status('api_openrouter') ?></small>
+    </div>
+    <div class="api-help-banner">
+        <i class="fas fa-circle-info"></i>
+        <div>
+            <strong>Multi-modèles LLM</strong><br>
+            <span>
+                Créez une clé sur
+                <a href="https://openrouter.ai/keys" target="_blank" rel="noopener">openrouter.ai/keys</a>
+                — utilisée par le module <strong>Agents IA</strong> (synchronisation des modèles et chat).
+                Alternative : variable d’environnement <code>OPENROUTER_API_KEY</code> sur le serveur.
+            </span>
+        </div>
+    </div>
+    <div class="form-group">
+        <label>Clé API OpenRouter</label>
+        <div class="api-key-row">
+            <input type="password" name="api_openrouter"
+                   value="<?= $v('api_openrouter') ?>" placeholder="sk-or-v1-…" autocomplete="new-password">
+            <button type="button" class="api-key-toggle">
+                <i class="fas fa-eye"></i>
+            </button>
+        </div>
+    </div>
+
     <!-- ── Google Maps + PSI ──────────────────────────────── -->
     <div class="form-section-title">
         <i class="fab fa-google" style="color:#4285f4"></i> Google

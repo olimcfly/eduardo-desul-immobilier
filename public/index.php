@@ -43,6 +43,7 @@ require_once ROOT_PATH . '/core/Controller.php';
 require_once ROOT_PATH . '/core/Model.php';
 require_once ROOT_PATH . '/core/Router.php';
 require_once ROOT_PATH . '/core/helpers/helpers.php';
+require_once ROOT_PATH . '/core/services/PageContentService.php';
 require_once ROOT_PATH . '/core/helpers/cms.php';
 require_once ROOT_PATH . '/core/services/ModuleService.php';
 require_once ROOT_PATH . '/core/services/LeadService.php';
@@ -84,9 +85,17 @@ function page(string $template, array $data = []): void
         else echo '<h1>404 — Page introuvable</h1>';
         return;
     }
+    $GLOBALS['__cms_page_text_slug'] = PageContentService::slugFromTemplate($template);
     ob_start();
     require $tplFile;
-    $pageContent = ob_get_clean();
+    $buffer = ob_get_clean();
+    // Gabarits qui font uniquement $pageContent = '...' (sans echo) : le buffer est vide ;
+    // ne pas écraser la variable déjà remplie par le template inclus.
+    if ($buffer !== '') {
+        $pageContent = $buffer;
+    } elseif (!isset($pageContent)) {
+        $pageContent = '';
+    }
     $pageContent = replacePlaceholders($pageContent);
     if (isset($pageTitle)) { $pageTitle = replacePlaceholders((string)$pageTitle); }
     if (isset($metaDesc)) { $metaDesc = replacePlaceholders((string)$metaDesc); }

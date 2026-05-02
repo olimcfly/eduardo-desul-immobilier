@@ -1,7 +1,7 @@
 <?php
 $pageTitle    = 'Immobilier Jas de Bouffan Bordeaux - Expert | ' . ADVISOR_NAME;
 $metaDesc     = 'Expert immobilier dans le quartier Jas de Bouffan à Bordeaux. Quartier résidentiel familial avec maisons et appartements, proche des écoles et commerces.';
-$metaKeywords = 'immobilier Jas de Bouffan Aix, appartement Jas de Bouffan, maison Jas de Bouffan, expert immobilier quartier ouest Aix';
+$metaKeywords = 'immobilier Jas de Bouffan Bordeaux, appartement Jas de Bouffan, maison Jas de Bouffan, expert immobilier quartier ouest Bordeaux';
 $extraCss     = ['/assets/css/villes.css'];
 
 $pageContent = '
@@ -105,5 +105,3 @@ $pageContent = '
 </section>
 ';
 ?>
-
-<?php include(__DIR__ . '/../../../templates/page.php'); ?>

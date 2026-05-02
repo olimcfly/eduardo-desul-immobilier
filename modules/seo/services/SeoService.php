@@ -6,6 +6,7 @@ require_once __DIR__ . '/KeywordTracker.php';
 require_once __DIR__ . '/SitemapGenerator.php';
 require_once __DIR__ . '/PerformanceAudit.php';
 require_once __DIR__ . '/SitemapService.php';
+require_once __DIR__ . '/SeoTechnicalPerformanceService.php';
 
 class SeoService
 {
@@ -37,46 +38,81 @@ class SeoService
 
     public function getHubStats(int $userId): array
     {
-        $stmt = $this->pdo->prepare('SELECT COUNT(*) FROM seo_keywords WHERE user_id = ? AND is_active = 1');
-        $stmt->execute([$userId]);
-        $keywordsCount = (int) $stmt->fetchColumn();
-
-        $stmt = $this->pdo->prepare('SELECT COUNT(*) FROM seo_city_pages WHERE user_id = ?');
-        $stmt->execute([$userId]);
-        $villesCount = (int) $stmt->fetchColumn();
-
-        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM seo_city_pages WHERE user_id = ? AND status = 'published'");
-        $stmt->execute([$userId]);
-        $villesPublished = (int) $stmt->fetchColumn();
-
-        $sitemapService = new SitemapService($this->pdo);
-        $sitemapData = $sitemapService->getDashboard($userId);
-        $sitemap = $sitemapData['sitemap'] ?? [];
-
-        $performanceSummary = ['score' => null, 'status' => 'non_audite'];
-        try {
-            $performanceSummary = (new SeoTechnicalPerformanceService($this->pdo, $userId))->getHubPerformanceSummary();
-        } catch (Throwable) {
-            // fallback sur ancien module d'audit si nécessaire
-            $stmt = $this->pdo->prepare('SELECT perf_score FROM seo_performance_audits WHERE user_id = ? ORDER BY created_at DESC LIMIT 1');
-            $stmt->execute([$userId]);
-            $legacyScore = $stmt->fetchColumn();
-            if ($legacyScore !== false) {
-                $performanceSummary['score'] = (int)$legacyScore;
-                $performanceSummary['status'] = (int)$legacyScore >= 80 ? 'bon' : ((int)$legacyScore >= 60 ? 'moyen' : 'a_corriger');
-            }
-        }
-
-        return [
-            'keywords_count' => $keywordsCount,
-            'top10_count' => $this->countTop10($userId),
-            'villes_count' => $villesCount,
-            'villes_published' => $villesPublished,
-            'sitemap_last_generated' => $sitemap['last_generated_at'] ?? null,
-            'sitemap_status' => $sitemap['status'] ?? 'idle',
-            'sitemap_issues_count' => (int) ($sitemap['issues_count'] ?? 0),
-            'last_audit_score' => $performanceSummary['score'],
+        $defaults = [
+            'keywords_count' => 0,
+            'top10_count' => 0,
+            'villes_count' => 0,
+            'villes_published' => 0,
+            'sitemap_last_generated' => null,
+            'sitemap_status' => 'idle',
+            'sitemap_issues_count' => 0,
+            'last_audit_score' => null,
         ];
+
+        try {
+            $stmt = $this->pdo->prepare('SELECT COUNT(*) FROM seo_keywords WHERE user_id = ? AND is_active = 1');
+            $stmt->execute([$userId]);
+            $keywordsCount = (int) $stmt->fetchColumn();
+
+            $villesCount = 0;
+            $villesPublished = 0;
+            try {
+                $stmt = $this->pdo->prepare('SELECT COUNT(*) FROM seo_city_pages WHERE user_id = ?');
+                $stmt->execute([$userId]);
+                $villesCount = (int) $stmt->fetchColumn();
+
+                $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM seo_city_pages WHERE user_id = ? AND status = 'published'");
+                $stmt->execute([$userId]);
+                $villesPublished = (int) $stmt->fetchColumn();
+            } catch (Throwable) {
+                // Table ou colonnes absentes selon version du schéma
+            }
+
+            $sitemap = [];
+            try {
+                $sitemapService = new SitemapService($this->pdo);
+                $sitemapData = $sitemapService->getDashboard($userId);
+                $sitemap = $sitemapData['sitemap'] ?? [];
+            } catch (Throwable) {
+            }
+
+            $performanceSummary = ['score' => null, 'status' => 'non_audite'];
+            try {
+                $performanceSummary = (new SeoTechnicalPerformanceService($this->pdo, $userId))->getHubPerformanceSummary();
+            } catch (Throwable) {
+                try {
+                    $stmt = $this->pdo->prepare('SELECT perf_score FROM seo_performance_audits WHERE user_id = ? ORDER BY created_at DESC LIMIT 1');
+                    $stmt->execute([$userId]);
+                    $legacyScore = $stmt->fetchColumn();
+                    if ($legacyScore !== false) {
+                        $performanceSummary['score'] = (int) $legacyScore;
+                        $performanceSummary['status'] = (int) $legacyScore >= 80 ? 'bon' : ((int) $legacyScore >= 60 ? 'moyen' : 'a_corriger');
+                    }
+                } catch (Throwable) {
+                }
+            }
+
+            $top10 = 0;
+            try {
+                $top10 = $this->countTop10($userId);
+            } catch (Throwable) {
+            }
+
+            return array_merge($defaults, [
+                'keywords_count' => $keywordsCount,
+                'top10_count' => $top10,
+                'villes_count' => $villesCount,
+                'villes_published' => $villesPublished,
+                'sitemap_last_generated' => $sitemap['last_generated_at'] ?? null,
+                'sitemap_status' => $sitemap['status'] ?? 'idle',
+                'sitemap_issues_count' => (int) ($sitemap['issues_count'] ?? 0),
+                'last_audit_score' => $performanceSummary['score'] ?? null,
+            ]);
+        } catch (Throwable $e) {
+            error_log('[SeoService::getHubStats] ' . $e->getMessage());
+
+            return $defaults;
+        }
     }
 
     private function countTop10(int $userId): int

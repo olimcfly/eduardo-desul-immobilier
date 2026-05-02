@@ -3,9 +3,15 @@ require_once '../../../core/bootstrap.php';
 require_once '../includes/GmbService.php';
 
 header('Content-Type: application/json');
-if (!Auth::check()) { http_response_code(401); echo json_encode(['success' => false, 'message' => 'Non autorisé']); exit; }
+function gmb_json(bool $success, string $message, array $data = [], int $status = 200): void {
+    http_response_code($status);
+    echo json_encode(['success' => $success, 'message' => $message, 'data' => $data], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+if (!Auth::check()) { gmb_json(false, 'Non autorisé', [], 401); }
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') { gmb_json(false, 'Méthode non autorisée', [], 405); }
+if (!verifyCsrf((string) ($_POST['csrf_token'] ?? ''))) { gmb_json(false, 'Token CSRF invalide.', [], 403); }
 
 $service = new GmbService((int) Auth::user()['id']);
-$count = $service->syncAvisFromGoogle();
 $avis = $service->avis();
-echo json_encode(['success' => true, 'message' => 'Avis synchronisés.', 'count' => $count, 'avis' => $avis]);
+gmb_json(true, 'Mode manuel actif : aucun avis Google n’est synchronisé automatiquement pour le moment.', ['avis' => $avis]);

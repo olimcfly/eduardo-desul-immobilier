@@ -1,8 +1,8 @@
-diff --git a/admin/modules/gmb/index.php b/admin/modules/gmb/index.php
+diff --git a/admin/features/gmb/index.php b/admin/features/gmb/index.php
 new file mode 100644
 index 0000000..22a8c4b
 --- /dev/null
-+++ b/admin/modules/gmb/index.php
++++ b/admin/features/gmb/index.php
 @@ -0,0 +1,17 @@
 +<?php
 +
@@ -21,11 +21,11 @@ index 0000000..22a8c4b
 +$action = gmbResolveAction($_GET['action'] ?? null);
 +
 +require __DIR__ . '/view.php';
-diff --git a/admin/modules/gmb/view.php b/admin/modules/gmb/view.php
+diff --git a/admin/features/gmb/view.php b/admin/features/gmb/view.php
 new file mode 100644
 index 0000000..1490d22
 --- /dev/null
-+++ b/admin/modules/gmb/view.php
++++ b/admin/features/gmb/view.php
 @@ -0,0 +1,82 @@
 +<?php
 +
@@ -109,11 +109,11 @@ index 0000000..1490d22
 +</div>
 +
 +<script src="/assets/admin/gmb/gmb-hub.js" defer></script>
-diff --git a/admin/modules/gmb/controller.php b/admin/modules/gmb/controller.php
+diff --git a/admin/features/gmb/controller.php b/admin/features/gmb/controller.php
 new file mode 100644
 index 0000000..bb9ddbe
 --- /dev/null
-+++ b/admin/modules/gmb/controller.php
++++ b/admin/features/gmb/controller.php
 @@ -0,0 +1,31 @@
 +<?php
 +
@@ -146,11 +146,11 @@ index 0000000..bb9ddbe
 +
 +    return $rawAction;
 +}
-diff --git a/admin/modules/gmb/Service/GmbService.php b/admin/modules/gmb/Service/GmbService.php
+diff --git a/admin/features/gmb/Service/GmbService.php b/admin/features/gmb/Service/GmbService.php
 new file mode 100644
 index 0000000..08d4571
 --- /dev/null
-+++ b/admin/modules/gmb/Service/GmbService.php
++++ b/admin/features/gmb/Service/GmbService.php
 @@ -0,0 +1,69 @@
 +<?php
 +
@@ -399,11 +399,11 @@ index 0000000..66e498b
 +.gmb-toast-warning{background:#d97706}
 +.gmb-toast-info{background:#2563eb}
 +.gmb-hub .btn.disabled{opacity:.6}
-diff --git a/admin/modules/gmb/README.md b/admin/modules/gmb/README.md
+diff --git a/admin/features/gmb/README.md b/admin/features/gmb/README.md
 new file mode 100644
 index 0000000..92f7765
 --- /dev/null
-+++ b/admin/modules/gmb/README.md
++++ b/admin/features/gmb/README.md
 @@ -0,0 +1,47 @@
 +# Module Admin GMB (Google My Business)
 +
@@ -411,10 +411,10 @@ index 0000000..92f7765
 +
 +## Fichiers à coller
 +
-+- `admin/modules/gmb/index.php`
-+- `admin/modules/gmb/view.php`
-+- `admin/modules/gmb/controller.php`
-+- `admin/modules/gmb/Service/GmbService.php`
++- `admin/features/gmb/index.php`
++- `admin/features/gmb/view.php`
++- `admin/features/gmb/controller.php`
++- `admin/features/gmb/Service/GmbService.php`
 +- `assets/admin/gmb/gmb-hub.js`
 +- `assets/admin/gmb/gmb-hub.css`
 +

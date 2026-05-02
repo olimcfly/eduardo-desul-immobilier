@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 $user = Auth::user() ?? [];
 $userId = (int) ($user['id'] ?? 0);
 $recipientDefault = (string) setting('advisor_email', (string) ($user['email'] ?? APP_EMAIL), $userId);
@@ -38,6 +40,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = $e->getMessage();
     }
 }
+
+$current = 'rapport-mensuel';
+require __DIR__ . '/_subnav.php';
 ?>
 
 <div class="page-header" style="margin-bottom:24px;">
@@ -62,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     <?php endif; ?>
 
-    <form method="post" action="/admin?module=optimiser&action=rapport-mensuel" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;align-items:end;">
+    <form method="post" action="/admin?module=optimiser&view=rapport-mensuel" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;align-items:end;">
         <label style="display:flex;flex-direction:column;gap:6px;">
             <span>Mois du rapport</span>
             <input type="month" name="month" value="<?= htmlspecialchars($monthInput, ENT_QUOTES, 'UTF-8') ?>" required>

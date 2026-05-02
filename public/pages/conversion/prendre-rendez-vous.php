@@ -47,6 +47,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'metadata' => ['estimation_request_id' => $requestId],
         ]);
 
+        // Track conversion
+        ConversionTrackingService::track(
+            ConversionTrackingService::TYPE_RDV_DEMANDE,
+            email: $email,
+            firstName: $firstName,
+            phone: trim((string) ($_POST['phone'] ?? null)),
+            metadata: [
+                'property_type' => trim((string) ($_POST['property_type'] ?? '')),
+                'address' => $address,
+                'surface' => (float) ($_POST['surface'] ?? 0),
+                'availability' => trim((string) ($_POST['availability'] ?? '')),
+            ]
+        );
+
         redirect('/merci');
     }
 }

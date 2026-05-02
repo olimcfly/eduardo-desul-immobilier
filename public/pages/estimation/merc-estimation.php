@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/../../core/bootstrap.php';
+require_once __DIR__ . '/../../../core/bootstrap.php';
 
 $pageTitle = 'Merci — Votre demande a bien été reçue';
 $metaDesc  = 'Votre demande d\'estimation a été transmise. Eduardo Desul vous recontactera sous 24h.';
@@ -120,5 +120,5 @@ ob_start();
 
 <?php
 $pageContent = ob_get_clean();
-require_once __DIR__ . '/../templates/layout.php';
+require_once __DIR__ . '/../../templates/layout.php';
 ?>

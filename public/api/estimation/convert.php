@@ -133,6 +133,27 @@ try {
     $leadId = 0; // Non bloquant
 }
 
+// ── Track conversion ───────────────────────────────────────────
+try {
+    if ($actionType === 'email_report') {
+        ConversionTrackingService::track(
+            ConversionTrackingService::TYPE_RAPPORT_DOWNLOAD,
+            email: $email,
+            firstName: $firstName,
+            phone: $phone ?: null,
+            metadata: [
+                'result_low' => $req['result_low'],
+                'result_med' => $req['result_med'],
+                'result_high' => $req['result_high'],
+                'property_type' => $req['property_type'] ?? '',
+            ]
+        );
+    }
+} catch (Throwable $e) {
+    error_log('[convert.php] ConversionTrackingService error: ' . $e->getMessage());
+    // Non bloquant
+}
+
 // ── Enregistrement de l'action ────────────────────────────────
 try {
     $actionId = EstimationTunnelService::saveAction([

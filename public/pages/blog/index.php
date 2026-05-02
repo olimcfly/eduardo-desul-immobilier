@@ -1,8 +1,8 @@
 <?php
 require_once ROOT_PATH . '/core/helpers/articles.php';
 
-$pageTitle = 'Blog immobilier — Conseils & Actualités | ' . ADVISOR_NAME;
-$metaDesc  = 'Conseils, guides et actualités du marché immobilier à Bordeaux et dans le Bordeaux Métropole.';
+$pageTitle = 'Blog immobilier à Bordeaux | Eduardo Desul Immobilier';
+$metaDesc  = 'Conseils pour vendre, acheter, estimer et financer un bien immobilier à Bordeaux et dans la métropole bordelaise.';
 $extraCss  = ['/assets/css/guide.css'];
 
 try {
@@ -171,7 +171,7 @@ try {
                 Une question sur le marché immobilier bordelais ?
             </h2>
             <p class="cta-banner__text">
-                Contactez Pascal directement pour un conseil personnalisé et gratuit.
+                Contactez Eduardo Desul directement pour un conseil personnalisé et gratuit.
             </p>
             <div class="cta-banner__actions">
                 <a href="<?= url('/contact') ?>"

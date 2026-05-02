@@ -1,7 +1,7 @@
 <?php
 $pageTitle    = 'Immobilier Puyricard Bordeaux - Expert | ' . ADVISOR_NAME;
 $metaDesc     = 'Expert immobilier à Puyricard, quartier résidentiel premium au nord d\'Bordeaux. Villas, maisons avec piscine, environnement calme et verdoyant.';
-$metaKeywords = 'immobilier Puyricard, maison Puyricard Aix, villa Puyricard, expert immobilier nord Bordeaux, résidentiel Puyricard';
+$metaKeywords = 'immobilier Puyricard Bordeaux, maison Puyricard, villa Puyricard, expert immobilier nord Bordeaux, résidentiel Puyricard';
 $extraCss     = ['/assets/css/villes.css'];
 
 $pageContent = '
@@ -24,8 +24,8 @@ $pageContent = '
     <div class="container">
         <div class="section__header">
             <span class="section-label">Puyricard</span>
-            <h2 class="section-title">Le quartier résidentiel premium du nord d\'Aix</h2>
-            <p class="section-subtitle">Puyricard est un village-quartier d\'Bordeaux réputé pour ses grandes propriétés, ses espaces arborés et sa qualité de vie. À 10 km du centre-ville d\'Aix, il offre un cadre de vie préservé tout en restant à portée de toutes les commodités.</p>
+            <h2 class="section-title">Un secteur résidentiel à qualifier dans la métropole bordelaise</h2>
+            <p class="section-subtitle">Cette fiche doit rester centrée sur Bordeaux et sa métropole : cadre de vie, accès, commerces et données de marché doivent être vérifiés localement avant publication.</p>
         </div>
         <div class="grid-2">
             <div class="card card--alt" data-animate>
@@ -105,5 +105,3 @@ $pageContent = '
 </section>
 ';
 ?>
-
-<?php include(__DIR__ . '/../../../templates/page.php'); ?>

@@ -65,12 +65,17 @@ require_once __DIR__ . '/Router.php';
 require_once __DIR__ . '/helpers/helpers.php';
 require_once __DIR__ . '/helpers/sanitize.php';
 require_once __DIR__ . '/helpers/auth.php';
+require_once __DIR__ . '/services/PageContentService.php';
 require_once __DIR__ . '/helpers/cms.php';
 require_once dirname(__DIR__) . '/includes/settings.php';
 require_once __DIR__ . '/services/MailService.php';
 require_once __DIR__ . '/services/LeadService.php';
 require_once __DIR__ . '/services/InstantEstimationService.php';
 require_once __DIR__ . '/services/EstimationTunnelService.php';
+require_once __DIR__ . '/services/ConversionTrackingService.php';
+require_once __DIR__ . '/services/EmailSequenceService.php';
+require_once __DIR__ . '/services/TelegramBotService.php';
+require_once __DIR__ . '/services/AgentService.php';
 require_once __DIR__ . '/controllers/ZoneController.php';
 require_once __DIR__ . '/controllers/LandingPageController.php';
 

@@ -160,6 +160,11 @@ try {
 }
 ?>
 
+<?php
+$current = 'analytics';
+require __DIR__ . '/views/_subnav.php';
+?>
+
 <style>
     .opt-toolbar{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1rem}
     .opt-periods{display:flex;gap:.5rem;flex-wrap:wrap}
@@ -181,10 +186,10 @@ try {
 </div>
 
 <div class="opt-toolbar">
-    <a class="opt-pill" href="?module=optimiser"><i class="fas fa-arrow-left"></i> Retour au module</a>
+    <a class="opt-pill" href="/admin?module=optimiser"><i class="fas fa-arrow-left"></i> Retour au module</a>
     <div class="opt-periods">
-        <a class="opt-pill <?= $period === 30 ? 'active' : '' ?>" href="?module=optimiser&view=analytics&period=30">30 jours</a>
-        <a class="opt-pill <?= $period === 90 ? 'active' : '' ?>" href="?module=optimiser&view=analytics&period=90">90 jours</a>
+        <a class="opt-pill <?= $period === 30 ? 'active' : '' ?>" href="/admin?module=optimiser&view=analytics&period=30">30 jours</a>
+        <a class="opt-pill <?= $period === 90 ? 'active' : '' ?>" href="/admin?module=optimiser&view=analytics&period=90">90 jours</a>
     </div>
 </div>
 

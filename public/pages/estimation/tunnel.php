@@ -9,7 +9,7 @@ $metaDesc     = 'Obtenez une fourchette de prix en 60 secondes. Basée sur les r
 $extraCss     = ['/assets/css/estimation-tunnel.css'];
 $extraJs      = ['/assets/js/estimation-tunnel.js'];
 $layoutMode   = 'landing';
-$googleApiKey = (string) setting('api_google_maps', GOOGLE_MAPS_KEY);
+$googleApiKey = (string) setting('api_google_maps', defined('GOOGLE_MAPS_KEY') ? (string) GOOGLE_MAPS_KEY : '');
 
 $_lpPhoneRaw     = trim((string) setting('advisor_phone', defined('APP_PHONE') ? APP_PHONE : ''));
 $_lpPhoneHref    = preg_replace('/[\s\.\-\(\)]/', '', $_lpPhoneRaw);

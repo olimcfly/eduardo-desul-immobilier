@@ -113,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $pdo->prepare($sql);
         $stmt->execute($data);
 
-        header('Location: /admin/index.php?module=landing-pages&saved=1');
+        header('Location: /admin/?module=landing-pages&saved=1');
         exit;
     }
 
@@ -129,17 +129,27 @@ function renderContent(): void
     global $landingPages, $defaults, $errors, $isEdit;
     ?>
     <style>
+        .start-hero{background:linear-gradient(135deg,#0f2237 0%,#1a3a5c 100%);border-radius:16px;padding:36px 40px;color:#fff;margin-bottom:32px;box-shadow:0 4px 20px rgba(15,34,55,.18)}
+        .start-hero-badge{display:inline-block;background:rgba(201,168,76,.2);color:#c9a84c;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:14px;border:1px solid rgba(201,168,76,.35)}
+        .start-hero h1{font-size:28px;font-weight:700;color:#fff;margin:0 0 12px;line-height:1.25}
+        .start-hero p{font-size:15px;color:rgba(255,255,255,.7);line-height:1.65;max-width:680px;margin:0}
         .lp-grid{display:grid;gap:1rem;grid-template-columns:1.1fr .9fr;align-items:start}
         .lp-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:1rem;box-shadow:0 10px 26px rgba(15,23,42,.06)}
         .lp-table{width:100%;border-collapse:collapse}.lp-table th,.lp-table td{padding:.55rem;border-bottom:1px solid #f1f5f9;text-align:left}
         .lp-form{display:grid;gap:.55rem}.lp-form label{font-size:.92rem;color:#334155}.lp-form input,.lp-form select,.lp-form textarea{width:100%;padding:.55rem .65rem;border:1px solid #cbd5e1;border-radius:10px}
         .lp-cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.6rem}.lp-actions{display:flex;gap:.6rem;align-items:center;flex-wrap:wrap}
         .btn{display:inline-block;background:#0f766e;color:#fff;border:none;border-radius:10px;padding:.6rem .9rem;text-decoration:none;font-weight:600}
+        .start-cta{background:#fff;border-radius:12px;padding:24px 26px;box-shadow:0 1px 6px rgba(0,0,0,.07);display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-top:16px}
+        .start-cta-text strong{display:block;font-size:15px;font-weight:600;color:#1e293b;margin-bottom:4px}
+        .start-cta-text span{font-size:13px;color:#64748b}
+        .start-cta-btn{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;background:#c9a84c;color:#0f2237;border-radius:8px;font-size:14px;font-weight:700;text-decoration:none;white-space:nowrap}
         @media (max-width:1000px){.lp-grid{grid-template-columns:1fr}.lp-cols{grid-template-columns:1fr}}
+        @media (max-width:600px){.start-hero{padding:24px 20px}}
     </style>
 
-    <div class="page-header">
-        <h1><i class="fas fa-bullseye page-icon"></i> Landing Pages <span class="page-title-accent">Google Ads</span></h1>
+    <div class="start-hero">
+        <div class="start-hero-badge">Acquisition Ads</div>
+        <h1>Landing Pages Google Ads</h1>
         <p>LP multi-sites, conformes RGPD et prêtes pour le Quality Score.</p>
     </div>
 
@@ -156,7 +166,7 @@ function renderContent(): void
                         <td><?= e((string)$lp['type']) ?></td>
                         <td><?= e((string)$lp['ville']) ?></td>
                         <td><?= ((int)$lp['active'] === 1) ? 'Active' : 'Inactive' ?></td>
-                        <td><a href="/admin/index.php?module=landing-pages&id=<?= (int)$lp['id'] ?>">Éditer</a></td>
+                        <td><a href="/admin/?module=landing-pages&id=<?= (int)$lp['id'] ?>">Éditer</a></td>
                     </tr>
                 <?php endforeach; ?>
                 </tbody>
@@ -197,10 +207,18 @@ function renderContent(): void
                 </div>
                 <div class="lp-actions">
                     <button class="btn" type="submit">Enregistrer</button>
-                    <a href="/admin/index.php?module=landing-pages">Nouvelle fiche</a>
+                    <a href="/admin/?module=landing-pages">Nouvelle fiche</a>
                 </div>
             </form>
         </section>
+    </div>
+
+    <div class="start-cta">
+        <div class="start-cta-text">
+            <strong>Créer une page prête à diffuser</strong>
+            <span>Renseignez le ciblage, le conseiller, les avis et les URLs légales avant activation.</span>
+        </div>
+        <a href="/admin/?module=landing-pages" class="start-cta-btn"><i class="fas fa-plus"></i> Nouvelle LP</a>
     </div>
     <?php
 }

@@ -18,7 +18,7 @@ const ALLOWED_FIELDS = [
     'profil' => [
         'profil_prenom', 'profil_nom', 'profil_email', 'profil_telephone',
         'profil_ville', 'profil_bio', 'profil_photo', 'profil_carte_pro',
-        'profil_reseau', 'profil_agence', 'profil_siret',
+        'profil_reseau', 'profil_agence', 'profil_siret', 'profil_rsac',
     ],
     'site' => [
         'site_nom', 'site_url', 'site_slogan', 'site_description',
@@ -26,13 +26,14 @@ const ALLOWED_FIELDS = [
         'site_home_hero_label', 'site_home_hero_title', 'site_home_hero_subtitle',
         'site_home_cta_primary_label', 'site_home_cta_primary_url',
         'site_home_cta_secondary_label', 'site_home_cta_secondary_url',
+        'social_facebook',
     ],
     'zone' => [
         'zone_ville', 'zone_departement', 'zone_region',
         'zone_communes', 'zone_rayon_km', 'zone_lat', 'zone_lng',
     ],
     'api' => [
-        'api_openai', 'api_google_maps', 'api_google_psi', 'api_gsc',
+        'api_openai', 'api_openrouter', 'api_google_maps', 'api_google_psi', 'api_gsc',
         'api_gsc_client_id', 'api_gsc_client_secret', 'api_gsc_site_url',
         'api_gmb_client_id', 'api_gmb_client_secret', 'api_gmb_account_id',
         'api_fb_page_id', 'api_fb_access_token', 'api_instagram_id',
@@ -47,6 +48,9 @@ const ALLOWED_FIELDS = [
     'smtp' => [
         'smtp_host', 'smtp_port', 'smtp_user', 'smtp_pass',
         'smtp_from', 'smtp_from_name', 'smtp_secure',
+    ],
+    'telegram' => [
+        'telegram_bot_token', 'telegram_webhook_token', 'telegram_admin_ids',
     ],
     'securite' => [
         'sec_2fa_active', 'sec_session_ttl', 'sec_ip_whitelist',
@@ -89,8 +93,8 @@ $allowed = ALLOWED_FIELDS[$section] ?? [];
 $data    = [];
 
 foreach ($allowed as $key) {
-    if ($key === 'smtp_pass' && empty($_POST[$key])) {
-        // Ne pas écraser un mot de passe SMTP vide
+    if (($key === 'smtp_pass' || $key === 'telegram_bot_token' || $key === 'telegram_webhook_token' || $key === 'api_openrouter') && empty($_POST[$key])) {
+        // Ne pas écraser un mot de passe/token vide
         continue;
     }
     // Checkboxes non cochées = absentes du POST → valeur '0'
@@ -110,6 +114,28 @@ if (empty($data)) {
 }
 
 $ok = settings_save($data, $section);
+
+if ($ok && $section === 'profil') {
+    $profilPrenom = trim((string)($data['profil_prenom'] ?? ''));
+    $profilNom = trim((string)($data['profil_nom'] ?? ''));
+    $profilPhone = trim((string)($data['profil_telephone'] ?? ''));
+    $profilEmail = trim((string)($data['profil_email'] ?? ''));
+    $profilRsac = trim((string)($data['profil_rsac'] ?? ''));
+    $profilSiret = trim((string)($data['profil_siret'] ?? ''));
+
+    $syncData = [
+        'advisor_firstname' => $profilPrenom,
+        'advisor_lastname' => $profilNom,
+        'advisor_phone' => $profilPhone,
+        'advisor_email' => $profilEmail,
+        'advisor_rsac' => $profilRsac,
+        'advisor_siret' => $profilSiret,
+        'contact_phone' => $profilPhone,
+        'contact_email' => $profilEmail,
+    ];
+
+    settings_save($syncData, 'profil');
+}
 
 echo json_encode(
     $ok

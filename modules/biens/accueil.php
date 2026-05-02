@@ -44,24 +44,6 @@ function renderBiensHubCards(): void
             <p>Centralisez vos annonces pour gagner du temps à chaque étape.</p>
         </header>
 
-        <section class="hub-narrative" aria-label="Méthode biens">
-            <article class="hub-narrative-card hub-narrative-card--motivation">
-                <h3><i class="fas fa-triangle-exclamation" style="color:#ef4444;"></i> Problème</h3>
-                <p>Les infos sont dispersées et lentes à retrouver.</p>
-            </article>
-            <article class="hub-narrative-card hub-narrative-card--explanation">
-                <h3><i class="fas fa-diagram-project" style="color:#3b82f6;"></i> Logique</h3>
-                <p>Une fiche unique, des photos rangées, un suivi clair.</p>
-            </article>
-            <article class="hub-narrative-card hub-narrative-card--resultat">
-                <h3><i class="fas fa-chart-line" style="color:#10b981;"></i> Bénéfice</h3>
-                <p>Vous répondez plus vite et inspirez confiance.</p>
-            </article>
-            <article class="hub-narrative-card hub-narrative-card--action">
-                <h3><i class="fas fa-play-circle" style="color:#f59e0b;"></i> Action</h3>
-                <p>Créez une nouvelle fiche dès maintenant.</p>
-            </article>
-        </section>
 
         <div class="hub-modules-grid">
             <a href="/admin/biens/nouveau" class="hub-module-card">
@@ -115,7 +97,10 @@ function renderBiensHubCards(): void
 
 function biensFetchCatalogue(): array
 {
-    $sql = 'SELECT id, titre, ville, prix, type_bien AS type, statut, created_at FROM biens ORDER BY created_at DESC LIMIT 200';
+    $sql = 'SELECT id, titre, ville, prix, type_bien AS type, statut, sort_order, source_provider, source_url, created_at
+            FROM biens
+            ORDER BY sort_order ASC, created_at DESC
+            LIMIT 300';
     $stmt = db()->query($sql);
 
     return $stmt ? $stmt->fetchAll(PDO::FETCH_ASSOC) : [];
@@ -127,13 +112,22 @@ function renderBiensCatalogue(): void
     ?>
     <style>
         .catalogue-table-wrap{background:#fff;border:1px solid #e8edf3;border-radius:12px;overflow:auto}
-        .catalogue-table{width:100%;border-collapse:collapse;min-width:820px}
+        .catalogue-table{width:100%;border-collapse:collapse;min-width:1080px}
         .catalogue-table th,.catalogue-table td{padding:12px 14px;border-bottom:1px solid #eef2f7;text-align:left;font-size:14px}
         .catalogue-table th{font-size:12px;text-transform:uppercase;letter-spacing:.03em;color:#5d6b82;background:#f8fafc}
         .catalogue-badge{display:inline-flex;align-items:center;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:600}
-        .catalogue-badge--disponible{background:#eafaf1;color:#1e7a46}
-        .catalogue-badge--option{background:#fff7e8;color:#9f5a00}
+        .catalogue-badge--actif{background:#eafaf1;color:#1e7a46}
+        .catalogue-badge--pending{background:#fff7e8;color:#9f5a00}
         .catalogue-badge--vendu{background:#fdecec;color:#a32525}
+        .catalogue-badge--archive{background:#eef2f7;color:#475569}
+        .catalogue-source{display:inline-flex;align-items:center;gap:6px;color:#64748b;font-size:12px}
+        .catalogue-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+        .catalogue-actions select,.catalogue-actions input{border:1px solid #d8dde6;border-radius:7px;padding:7px 8px;background:#fff}
+        .catalogue-actions input{width:72px}
+        .catalogue-btn{border:0;border-radius:7px;padding:8px 10px;font-weight:700;cursor:pointer;background:#e8edf3;color:#24364f}
+        .catalogue-btn--danger{background:#fee2e2;color:#991b1b}
+        .catalogue-btn:hover{filter:brightness(.97)}
+        .catalogue-status{margin:0 0 12px;color:#4f5d73;font-size:13px;min-height:18px}
         .catalogue-empty{padding:18px;border:1px dashed #d7deea;border-radius:10px;background:#fff;color:#5d6b82}
         .hub-back{display:inline-flex;gap:8px;align-items:center;margin-bottom:10px}
     </style>
@@ -141,8 +135,9 @@ function renderBiensCatalogue(): void
     <a class="hub-back" href="/admin?module=biens"><i class="fas fa-arrow-left"></i> Retour au hub Biens</a>
     <div class="page-header">
         <h1><i class="fas fa-list page-icon"></i> Catalogue des biens</h1>
-        <p>Liste de vos biens pour accéder rapidement aux informations principales.</p>
+        <p>Les biens importés restent hors ligne tant que leur statut n'est pas publié.</p>
     </div>
+    <p class="catalogue-status" id="catalogueStatus"></p>
 
     <?php if ($biens === []): ?>
         <div class="catalogue-empty">Aucun bien enregistré pour le moment.</div>
@@ -156,33 +151,133 @@ function renderBiensCatalogue(): void
                     <th>Ville</th>
                     <th>Type</th>
                     <th>Prix</th>
+                    <th>Source</th>
+                    <th>Ordre</th>
                     <th>Statut</th>
                     <th>Ajouté le</th>
+                    <th>Actions</th>
                 </tr>
                 </thead>
                 <tbody>
                 <?php foreach ($biens as $bien):
                     $statut = (string) ($bien['statut'] ?? '');
                     $badgeClass = match (mb_strtolower($statut, 'UTF-8')) {
-                        'disponible' => 'catalogue-badge catalogue-badge--disponible',
-                        'en option'  => 'catalogue-badge catalogue-badge--option',
+                        'actif' => 'catalogue-badge catalogue-badge--actif',
+                        'pending' => 'catalogue-badge catalogue-badge--pending',
                         'vendu'      => 'catalogue-badge catalogue-badge--vendu',
+                        'archive'    => 'catalogue-badge catalogue-badge--archive',
                         default      => 'catalogue-badge',
                     };
                     ?>
-                    <tr>
+                    <tr data-bien-row="<?= (int) ($bien['id'] ?? 0) ?>">
                         <td>#<?= (int) ($bien['id'] ?? 0) ?></td>
                         <td><?= e((string) ($bien['titre'] ?? 'Sans titre')) ?></td>
                         <td><?= e((string) ($bien['ville'] ?? '—')) ?></td>
                         <td><?= e((string) ($bien['type'] ?? '—')) ?></td>
                         <td><?= isset($bien['prix']) ? number_format((int) $bien['prix'], 0, ',', ' ') . ' €' : '—' ?></td>
-                        <td><span class="<?= e($badgeClass) ?>"><?= e($statut !== '' ? $statut : '—') ?></span></td>
+                        <td>
+                            <?php if (($bien['source_provider'] ?? '') === 'exp_france'): ?>
+                                <span class="catalogue-source">
+                                    <i class="fas fa-satellite-dish"></i>
+                                    <?php if (!empty($bien['source_url'])): ?>
+                                        <a href="<?= e((string) $bien['source_url']) ?>" target="_blank" rel="noopener">eXp France</a>
+                                    <?php else: ?>
+                                        eXp France
+                                    <?php endif; ?>
+                                </span>
+                            <?php else: ?>
+                                <span class="catalogue-source">Manuel</span>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <input type="number" value="<?= (int) ($bien['sort_order'] ?? 0) ?>" data-sort-input="<?= (int) ($bien['id'] ?? 0) ?>" style="width:72px;border:1px solid #d8dde6;border-radius:7px;padding:7px 8px;">
+                        </td>
+                        <td><span class="<?= e($badgeClass) ?>" data-status-badge="<?= (int) ($bien['id'] ?? 0) ?>"><?= e($statut !== '' ? $statut : '—') ?></span></td>
                         <td><?= !empty($bien['created_at']) ? e(date('d/m/Y', strtotime((string) $bien['created_at']))) : '—' ?></td>
+                        <td>
+                            <div class="catalogue-actions">
+                                <select data-status-select="<?= (int) ($bien['id'] ?? 0) ?>">
+                                    <option value="pending" <?= $statut === 'pending' ? 'selected' : '' ?>>Non publié</option>
+                                    <option value="actif" <?= $statut === 'actif' ? 'selected' : '' ?>>Publié</option>
+                                    <option value="vendu" <?= $statut === 'vendu' ? 'selected' : '' ?>>Vendu</option>
+                                    <option value="archive" <?= $statut === 'archive' ? 'selected' : '' ?>>Archivé</option>
+                                </select>
+                                <button class="catalogue-btn" type="button" data-save="<?= (int) ($bien['id'] ?? 0) ?>">Enregistrer</button>
+                                <button class="catalogue-btn catalogue-btn--danger" type="button" data-delete="<?= (int) ($bien['id'] ?? 0) ?>">Supprimer</button>
+                            </div>
+                        </td>
                     </tr>
                 <?php endforeach; ?>
                 </tbody>
             </table>
         </div>
+        <script>
+        (function () {
+            const csrfToken = <?= json_encode(csrfToken(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;
+            const statusEl = document.getElementById('catalogueStatus');
+
+            function setStatus(text, error) {
+                statusEl.textContent = text || '';
+                statusEl.style.color = error ? '#991b1b' : '#166534';
+            }
+
+            async function post(payload) {
+                const response = await fetch('/admin/api/biens/manage.php', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ...payload, csrf_token: csrfToken }),
+                });
+                const data = await response.json();
+                if (!response.ok || !data.success) {
+                    throw new Error(data.message || 'Erreur serveur.');
+                }
+                return data;
+            }
+
+            document.querySelectorAll('[data-save]').forEach((button) => {
+                button.addEventListener('click', async () => {
+                    const id = Number(button.dataset.save);
+                    const status = document.querySelector(`[data-status-select="${id}"]`)?.value || 'pending';
+                    const sortOrder = Number(document.querySelector(`[data-sort-input="${id}"]`)?.value || 0);
+                    button.disabled = true;
+                    try {
+                        await post({ action: 'status', id, status });
+                        await post({ action: 'sort', id, sort_order: sortOrder });
+                        const badge = document.querySelector(`[data-status-badge="${id}"]`);
+                        if (badge) {
+                            badge.textContent = status;
+                            badge.className = 'catalogue-badge catalogue-badge--' + status;
+                        }
+                        setStatus('Bien mis à jour.');
+                    } catch (error) {
+                        setStatus(error.message, true);
+                    } finally {
+                        button.disabled = false;
+                    }
+                });
+            });
+
+            document.querySelectorAll('[data-delete]').forEach((button) => {
+                button.addEventListener('click', async () => {
+                    const id = Number(button.dataset.delete);
+                    if (!confirm('Supprimer ce bien de la liste ?')) {
+                        return;
+                    }
+                    button.disabled = true;
+                    try {
+                        await post({ action: 'delete', id });
+                        document.querySelector(`[data-bien-row="${id}"]`)?.remove();
+                        setStatus('Bien supprimé.');
+                    } catch (error) {
+                        setStatus(error.message, true);
+                    } finally {
+                        button.disabled = false;
+                    }
+                });
+            });
+        })();
+        </script>
     <?php endif;
 }
 

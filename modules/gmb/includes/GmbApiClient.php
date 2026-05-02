@@ -49,15 +49,6 @@ class GmbApiClient
 
     public function fetchStats(string $startDate, string $endDate): array
     {
-        return [
-            'impressions' => random_int(120, 600),
-            'clics_site' => random_int(10, 140),
-            'appels' => random_int(4, 40),
-            'itineraires' => random_int(2, 30),
-            'photos_vues' => random_int(40, 300),
-            'recherches_dir' => random_int(20, 220),
-            'recherches_disc' => random_int(15, 180),
-            'date_stat' => $endDate,
-        ];
+        return [];
     }
 }

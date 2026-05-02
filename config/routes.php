@@ -40,9 +40,49 @@ function siteData(): array
     return $cache;
 }
 
+/**
+ * Slug canonique pour les fiches villes (fichiers en minuscules) + fautes de frappe fréquentes.
+ */
+function normalizeVilleSlug(string $slug): string
+{
+    static $aliases = [
+        'merignace' => 'merignac',
+    ];
+    $lower = strtolower($slug);
+
+    return $aliases[$lower] ?? $lower;
+}
+
+/**
+ * Slug canonique fiches quartiers (fusion / anciennes URLs).
+ */
+function normalizeQuartierSlug(string $slug): string
+{
+    static $aliases = [
+        'centre-ville' => 'bordeaux-centre',
+    ];
+    $lower = strtolower($slug);
+
+    return $aliases[$lower] ?? $lower;
+}
+
 // ── Page 404 ────────────────────────────────────────────────
 $router->set404(function () {
     page('pages/404');
+});
+
+// ════════════════════════════════════════════════════════════
+// FICHIERS TECHNIQUES (URL canoniques, hors CMS slug)
+// ════════════════════════════════════════════════════════════
+
+$router->get('/robots.txt', function (): void {
+    require ROOT_PATH . '/public/robots.php';
+    exit;
+});
+
+$router->get('/sitemap.xml', function (): void {
+    require ROOT_PATH . '/public/sitemap.php';
+    exit;
 });
 
 // ════════════════════════════════════════════════════════════
@@ -172,12 +212,29 @@ $router->post('/financement', function () {
 // ════════════════════════════════════════════════════════════
 // GUIDE LOCAL (secteurs / villes)
 // ════════════════════════════════════════════════════════════
-
+// Fiche annuaire par ville (commerces + présentation BDD) — AVANT le slug générique
+$router->get('/guide-local/annuaire/{ville_slug}', function (string $ville_slug) {
+    $v = normalizeVilleSlug($ville_slug);
+    if (strcasecmp($v, $ville_slug) !== 0) {
+        header('Location: ' . url('/guide-local/annuaire/' . rawurlencode($v)), true, 301);
+        exit;
+    }
+    page('pages/guide-local/annuaire-ville', ['ville_slug' => $v]);
+});
 $router->get('/guide-local/{slug}', function (string $slug) {
     page('pages/guide-local/ville', ['slug' => $slug]);
 });
 $router->get('/guide-local', function () {
     page('pages/guide-local/index');
+});
+
+$router->get('/commerces/{ville_slug}/{poi_slug}', function (string $ville_slug, string $poi_slug) {
+    $ville = normalizeVilleSlug($ville_slug);
+    if (strcasecmp($ville, $ville_slug) !== 0) {
+        header('Location: ' . url('/commerces/' . rawurlencode($ville) . '/' . rawurlencode($poi_slug)), true, 301);
+        exit;
+    }
+    page('pages/annuaire/fiche', ['ville_slug' => $ville, 'poi_slug' => $poi_slug]);
 });
 
 // ════════════════════════════════════════════════════════════
@@ -198,6 +255,14 @@ $router->get('/ressources/guide-acheteur', function () {
 });
 $router->get('/ressources', function () {
     page('pages/ressources/index');
+});
+
+// Alias raccourcis
+$router->get('/acheter', function () {
+    page('pages/ressources/guide-acheteur');
+});
+$router->get('/vendre', function () {
+    page('pages/ressources/guide-vendeur');
 });
 
 // ════════════════════════════════════════════════════════════
@@ -224,6 +289,12 @@ $router->get('/avis-valeur', function () {
     page('pages/conversion/avis-valeur');
 });
 $router->post('/avis-valeur', function () {
+    page('pages/conversion/avis-valeur');
+});
+$router->get('/avis-de-valeur', function () {
+    page('pages/conversion/avis-valeur');
+});
+$router->post('/avis-de-valeur', function () {
     page('pages/conversion/avis-valeur');
 });
 $router->get('/prendre-rendez-vous', function () {
@@ -266,16 +337,21 @@ $router->get('/secteurs', function () {
 
 // Alias secteurs/villes/{slug} → même logique que /immobilier/{slug}
 $router->get('/secteurs/villes/{slug}', function (string $slug) {
-    $tplFile = ROOT_PATH . '/public/pages/zones/villes/' . $slug . '.php';
+    $canonical = normalizeVilleSlug($slug);
+    if ($slug !== $canonical) {
+        header('Location: ' . url('/secteurs/villes/' . rawurlencode($canonical)), true, 301);
+        exit;
+    }
+    $tplFile = ROOT_PATH . '/public/pages/zones/villes/' . $canonical . '.php';
     if (file_exists($tplFile)) {
-        page('pages/zones/villes/' . $slug, ['slug' => $slug]);
+        page('pages/zones/villes/' . $canonical, ['slug' => $canonical]);
     } else {
         try {
             $pdo = db();
             $stmt = $pdo->prepare(
                 "SELECT * FROM seo_city_pages WHERE slug = ? AND status = 'published' LIMIT 1"
             );
-            $stmt->execute([$slug]);
+            $stmt->execute([$canonical]);
             $cityPage = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($cityPage) {
                 page('pages/page', [
@@ -295,9 +371,14 @@ $router->get('/secteurs/villes/{slug}', function (string $slug) {
 
 // Alias secteurs/quartiers/{slug} → même logique que /quartier/{slug}
 $router->get('/secteurs/quartiers/{slug}', function (string $slug) {
-    $tplFile = ROOT_PATH . '/public/pages/zones/quartiers/' . $slug . '.php';
+    $canonical = normalizeQuartierSlug($slug);
+    if ($slug !== $canonical) {
+        header('Location: ' . url('/secteurs/quartiers/' . rawurlencode($canonical)), true, 301);
+        exit;
+    }
+    $tplFile = ROOT_PATH . '/public/pages/zones/quartiers/' . $canonical . '.php';
     if (file_exists($tplFile)) {
-        page('pages/zones/quartiers/' . $slug, ['slug' => $slug]);
+        page('pages/zones/quartiers/' . $canonical, ['slug' => $canonical]);
     } else {
         http_response_code(404);
         page('pages/404');
@@ -306,9 +387,14 @@ $router->get('/secteurs/quartiers/{slug}', function (string $slug) {
 
 // Pages villes SEO : /immobilier/{slug-ville}
 $router->get('/immobilier/{slug}', function (string $slug) {
-    $tplFile = ROOT_PATH . '/public/pages/zones/villes/' . $slug . '.php';
+    $canonical = normalizeVilleSlug($slug);
+    if ($slug !== $canonical) {
+        header('Location: ' . url('/immobilier/' . rawurlencode($canonical)), true, 301);
+        exit;
+    }
+    $tplFile = ROOT_PATH . '/public/pages/zones/villes/' . $canonical . '.php';
     if (file_exists($tplFile)) {
-        page('pages/zones/villes/' . $slug, ['slug' => $slug]);
+        page('pages/zones/villes/' . $canonical, ['slug' => $canonical]);
     } else {
         // Fallback : tenter via seo_city_pages en DB
         try {
@@ -316,7 +402,7 @@ $router->get('/immobilier/{slug}', function (string $slug) {
             $stmt = $pdo->prepare(
                 "SELECT * FROM seo_city_pages WHERE slug = ? AND status = 'published' LIMIT 1"
             );
-            $stmt->execute([$slug]);
+            $stmt->execute([$canonical]);
             $cityPage = $stmt->fetch(PDO::FETCH_ASSOC);
             if ($cityPage) {
                 page('pages/page', [
@@ -336,9 +422,14 @@ $router->get('/immobilier/{slug}', function (string $slug) {
 
 // Pages quartiers : /quartier/{slug}
 $router->get('/quartier/{slug}', function (string $slug) {
-    $tplFile = ROOT_PATH . '/public/pages/zones/quartiers/' . $slug . '.php';
+    $canonical = normalizeQuartierSlug($slug);
+    if ($slug !== $canonical) {
+        header('Location: ' . url('/quartier/' . rawurlencode($canonical)), true, 301);
+        exit;
+    }
+    $tplFile = ROOT_PATH . '/public/pages/zones/quartiers/' . $canonical . '.php';
     if (file_exists($tplFile)) {
-        page('pages/zones/quartiers/' . $slug, ['slug' => $slug]);
+        page('pages/zones/quartiers/' . $canonical, ['slug' => $canonical]);
     } else {
         http_response_code(404);
         page('pages/404');

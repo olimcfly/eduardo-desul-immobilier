@@ -8,10 +8,13 @@ function startAdminSession(): void
 {
     if (session_status() === PHP_SESSION_NONE) {
         session_name('edo_immo_sess');
+        $isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+            || (isset($_SERVER['SERVER_PORT']) && (int) $_SERVER['SERVER_PORT'] === 443)
+            || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
         session_set_cookie_params([
             'lifetime' => 28800,
             'path'     => '/',
-            'secure'   => true, // ← Toujours true, ton site est full HTTPS
+            'secure'   => $isHttps,
             'httponly' => true,
             'samesite' => 'Lax',
         ]);

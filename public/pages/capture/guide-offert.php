@@ -16,10 +16,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'consent' => !empty($_POST['rgpd']),
             'metadata' => [
                 'profil' => trim((string)($_POST['profil'] ?? '')),
-                'ressource' => 'Guide Complet de l\'Immobilier Pays d\'Aix',
+                'ressource' => 'Guide complet de l\'immobilier à Bordeaux',
                 'origin_path' => $_SERVER['REQUEST_URI'] ?? '/guide-offert',
             ],
         ]);
+
+        // Track conversion
+        ConversionTrackingService::track(
+            ConversionTrackingService::TYPE_GUIDE_GRATUIT,
+            email: $email,
+            firstName: $prenom,
+            metadata: [
+                'profil' => trim((string)($_POST['profil'] ?? '')),
+                'guide_name' => 'Guide Complet de l\'Immobilier Bordelais',
+            ]
+        );
 
         redirect('/merci');
     }
@@ -89,7 +100,7 @@ $bodyClass  = 'page-capture';
                     <div class="form-group">
                         <label style="display:flex;gap:.5rem;align-items:flex-start;font-size:.82rem;cursor:pointer">
                             <input type="checkbox" name="rgpd" required style="margin-top:.2rem;flex-shrink:0">
-                            <span>J'accepte de recevoir le guide et les actualités immobilières d'Pascal. <a href="/politique-confidentialite" target="_blank" style="color:var(--clr-primary)">Politique de confidentialité</a>. <span style="color:var(--clr-danger)">*</span></span>
+                            <span>J'accepte de recevoir le guide et les actualités immobilières d'Eduardo Desul. <a href="/politique-confidentialite" target="_blank" style="color:var(--clr-primary)">Politique de confidentialité</a>. <span style="color:var(--clr-danger)">*</span></span>
                         </label>
                     </div>
                     <button type="submit" class="btn btn--primary btn--lg btn--full">

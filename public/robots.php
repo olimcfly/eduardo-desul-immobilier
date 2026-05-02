@@ -7,7 +7,13 @@ require_once __DIR__ . '/../core/bootstrap.php';
 header('Content-Type: text/plain; charset=UTF-8');
 
 $baseUrl = defined('APP_URL') ? rtrim((string) APP_URL, '/') : '';
-$sitemapUrl = ($baseUrl !== '' ? $baseUrl : '') . '/sitemap.xml';
+if ($baseUrl === '' && !empty($_SERVER['HTTP_HOST'])) {
+    $proto = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https')
+        ? 'https' : 'http';
+    $baseUrl = $proto . '://' . (string) $_SERVER['HTTP_HOST'];
+}
+$sitemapUrl = $baseUrl . '/sitemap.xml';
 
 echo "User-agent: *\n";
 echo "Allow: /\n\n";

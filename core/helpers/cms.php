@@ -37,3 +37,46 @@ if (!function_exists('get_page_content')) {
         return is_array($decoded) ? $decoded : [];
     }
 }
+
+if (!function_exists('page_content_registry')) {
+    /** @return array<string, mixed> */
+    function page_content_registry(): array
+    {
+        static $reg = null;
+        if ($reg !== null) {
+            return $reg;
+        }
+        $path = dirname(__DIR__, 2) . '/config/page_content_registry.php';
+        if (!is_file($path)) {
+            return $reg = [];
+        }
+        $loaded = require $path;
+
+        return $reg = is_array($loaded) ? $loaded : [];
+    }
+}
+
+if (!function_exists('pcms')) {
+    /**
+     * Texte éditable (table page_contents), avec repli sur la valeur par défaut du template.
+     * Nécessite $GLOBALS['__cms_page_text_slug'] (défini par public/index.php page()).
+     * Champs enrichis (admin) : afficher sans htmlspecialchars — utiliser pcms() dans une balise PHP d’écho, pas e(pcms()).
+     */
+    function pcms(string $section, string $field, string $default = ''): string
+    {
+        $slug = (string) ($GLOBALS['__cms_page_text_slug'] ?? '');
+        if ($slug === '') {
+            return function_exists('replacePlaceholders') ? replacePlaceholders($default) : $default;
+        }
+        try {
+            $val = PageContentService::getField($slug, $section, $field);
+        } catch (Throwable) {
+            $val = null;
+        }
+        if ($val === null || $val === '') {
+            return function_exists('replacePlaceholders') ? replacePlaceholders($default) : $default;
+        }
+
+        return function_exists('replacePlaceholders') ? replacePlaceholders($val) : $val;
+    }
+}

@@ -18,6 +18,7 @@ function renderContent(): void
     // Vérification clés API configurées
     $apis = [
         'openai'      => (bool) setting('api_openai'),
+        'openrouter'  => (bool) (trim((string) setting('api_openrouter', '')) !== '' || trim((string) ($_ENV['OPENROUTER_API_KEY'] ?? '')) !== ''),
         'google_maps' => (bool) setting('api_google_maps'),
         'gmb'         => (bool) setting('api_gmb_client_id'),
         'facebook'    => (bool) setting('api_fb_access_token'),
@@ -29,12 +30,10 @@ function renderContent(): void
     ?>
 
     <!-- ── EN-TÊTE ─────────────────────────────────────────── -->
-    <div class="page-header">
-        <h1>
-            <i class="fas fa-gear page-icon"></i>
-            <span class="page-title-accent">Paramètres</span>
-        </h1>
-        <p class="page-description"><?= htmlspecialchars($pageDescription ?? '') ?></p>
+    <div class="start-hero">
+        <div class="start-hero-badge">Configuration</div>
+        <h1>Paramètres</h1>
+        <p><?= htmlspecialchars($pageDescription ?? '') ?>, profil, site public, intégrations et sécurité.</p>
     </div>
 
     <!-- ── PROFIL RÉSUMÉ ───────────────────────────────────── -->
@@ -117,7 +116,7 @@ function renderContent(): void
             </div>
             <div class="sc-body">
                 <h3>Intégrations & API</h3>
-                <p>OpenAI, Google Maps, GMB, Facebook, Cloudinary, GSC.</p>
+                <p>OpenAI, OpenRouter, Google Maps, GMB, Facebook, Cloudinary, GSC.</p>
                 <div class="sc-tags">
                     <span class="sc-tag">API</span>
                     <span class="sc-tag <?= $apis_ok < $apis_total ? 'sc-tag-warn' : 'sc-tag-ok' ?>">
@@ -160,6 +159,22 @@ function renderContent(): void
             <div class="sc-arrow"><i class="fas fa-chevron-right"></i></div>
         </div>
 
+        <!-- Bot Telegram -->
+        <div class="settings-card" onclick="loadSettingsSection('telegram')">
+            <div class="sc-icon" style="background:#e3f2fd; color:#0088cc">
+                <i class="fab fa-telegram"></i>
+            </div>
+            <div class="sc-body">
+                <h3>Bot Telegram</h3>
+                <p>Configuration du bot, token, users approuvés, historique.</p>
+                <div class="sc-tags">
+                    <span class="sc-tag">Bot</span>
+                    <span class="sc-tag">Mobile</span>
+                </div>
+            </div>
+            <div class="sc-arrow"><i class="fas fa-chevron-right"></i></div>
+        </div>
+
         <!-- Sécurité -->
         <div class="settings-card" onclick="loadSettingsSection('securite')">
             <div class="sc-icon" style="background:#ffebee; color:#b71c1c">
@@ -193,6 +208,16 @@ function renderContent(): void
 
     </div>
 
+    <div class="start-cta">
+        <div class="start-cta-text">
+            <strong>Priorité de configuration</strong>
+            <span>Commencez par le profil et les intégrations API pour garantir le bon fonctionnement des modules.</span>
+        </div>
+        <button type="button" class="start-cta-btn" onclick="loadSettingsSection('profil')">
+            <i class="fas fa-user-gear"></i> Ouvrir le profil
+        </button>
+    </div>
+
     <!-- ── PANNEAU LATÉRAL (drawer) ─────────────────────────── -->
     <div class="settings-drawer" id="settings-drawer">
         <div class="drawer-backdrop" onclick="closeSettingsDrawer()"></div>
@@ -212,15 +237,77 @@ function renderContent(): void
     </div>
 
     <style>
-    /* ── PAGE HEADER ──────────────────────────────────────── */
-    .page-header { margin-bottom: 28px; }
-    .page-header h1 {
-        font-size: 26px; font-weight: 700; color: #1a2332;
-        display: flex; align-items: center; gap: 10px;
+    /* ── HERO ─────────────────────────────────────────────── */
+    .start-hero {
+        background: linear-gradient(135deg, #0f2237 0%, #1a3a5c 100%);
+        border-radius: 16px;
+        padding: 36px 40px;
+        color: #fff;
+        margin-bottom: 32px;
+        box-shadow: 0 4px 20px rgba(15,34,55,.18);
     }
-    .page-icon { font-size: 22px; color: #3498db; }
-    .page-title-accent { color: #1a2332; }
-    .page-description { color: #7f8c8d; margin-top: 6px; font-size: 14px; }
+    .start-hero-badge {
+        display: inline-block;
+        background: rgba(201,168,76,.2);
+        color: #c9a84c;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+        padding: 4px 12px;
+        border-radius: 20px;
+        margin-bottom: 14px;
+        border: 1px solid rgba(201,168,76,.35);
+    }
+    .start-hero h1 {
+        font-size: 28px;
+        font-weight: 700;
+        color: #fff;
+        margin: 0 0 12px;
+        line-height: 1.25;
+    }
+    .start-hero p {
+        font-size: 15px;
+        color: rgba(255,255,255,.7);
+        line-height: 1.65;
+        max-width: 680px;
+        margin: 0;
+    }
+    .start-cta {
+        background: #fff;
+        border-radius: 12px;
+        padding: 24px 26px;
+        box-shadow: 0 1px 6px rgba(0,0,0,.07);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        flex-wrap: wrap;
+        margin: 28px 0;
+    }
+    .start-cta-text strong {
+        display: block;
+        font-size: 15px;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 4px;
+    }
+    .start-cta-text span { font-size: 13px; color: #64748b; }
+    .start-cta-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 11px 22px;
+        background: #c9a84c;
+        color: #0f2237;
+        border: 0;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 700;
+        text-decoration: none;
+        white-space: nowrap;
+        cursor: pointer;
+    }
 
     /* ── PROFIL BANNER ────────────────────────────────────── */
     .settings-profile-banner {
@@ -462,6 +549,7 @@ function renderContent(): void
     .toast-error   { background: #e74c3c; }
 
     @media (max-width: 640px) {
+        .start-hero { padding: 24px 20px; }
         .settings-grid { grid-template-columns: 1fr; }
         .settings-profile-banner { flex-direction: column; text-align: center; }
     }
@@ -480,6 +568,7 @@ function renderContent(): void
         api: 'Intégrations & API',
         notif: 'Notifications',
         smtp: 'Email & SMTP',
+        telegram: 'Bot Telegram',
         securite: 'Sécurité',
         danger: 'Zone de danger',
     };

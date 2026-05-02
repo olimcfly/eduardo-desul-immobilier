@@ -36,9 +36,9 @@ if (preg_match('/^\d+\-\d+$/', $searchBudget) === 1) {
 }
 
 try {
-    $sql = "SELECT id, slug, titre, type_bien, prix, surface, pieces, chambres, ville, secteur, photo_principale, statut
+    $sql = "SELECT id, slug, titre, type_transaction, type_bien, prix, surface, pieces, chambres, ville, secteur, photo_principale, statut
             FROM biens
-            WHERE statut <> 'archive'";
+            WHERE statut = 'actif'";
 
     $params = [];
     if ($searchQuery !== '') {
@@ -62,7 +62,7 @@ try {
         $params[':max_budget'] = $maxBudget;
     }
 
-    $sql .= " ORDER BY created_at DESC LIMIT 50";
+    $sql .= " ORDER BY sort_order ASC, created_at DESC LIMIT 50";
 
     $stmt = $db->prepare($sql);
     $stmt->execute($params);
@@ -128,7 +128,7 @@ $nbBiensTotal = count($biens);
                                  loading="lazy"
                                  onerror="this.onerror=null;this.src='<?= $placeholderFallback ?>'">
 
-                            <?php $txType = $bien['transaction_type'] ?? ''; ?>
+                            <?php $txType = $bien['type_transaction'] ?? ''; ?>
                             <span class="bien-badge <?= strtolower($txType) === 'vente' ? 'vente' : 'location' ?>">
                                 <?= htmlspecialchars($txType) ?>
                             </span>
@@ -154,7 +154,7 @@ $nbBiensTotal = count($biens);
 
                             <div class="bien-card__price">
                                 <?= number_format($bien['prix'], 0, ',', ' ') ?> €
-                                <?php if (($bien['transaction_type'] ?? '') === 'Location'): ?>
+                                <?php if (($bien['type_transaction'] ?? '') === 'location'): ?>
                                     <span>/mois</span>
                                 <?php endif; ?>
                             </div>

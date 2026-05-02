@@ -102,8 +102,8 @@ $metaDesc   = 'Découvrez les avis vérifiés de nos clients satisfaits. ' . $_s
                     'note' => 5,
                     'date' => 'Avril 2024',
                     'service' => 'vente',
-                    'ville' => 'Beaurecueil',
-                    'text' => 'Notre bastide provençale vendue en 10 jours au prix demandé ! Pascal a su mettre en valeur notre bien et trouver l\'acheteur idéal. Son approche clef en main nous a évité bien des tracas. Merci pour ce professionnalisme remarquable !',
+                    'ville' => 'Bordeaux',
+                    'text' => 'Notre maison vendue en 10 jours au prix demandé ! Eduardo Desul a su mettre en valeur notre bien et trouver l\'acheteur idéal. Son approche clef en main nous a évité bien des tracas. Merci pour ce professionnalisme remarquable !',
                     'photo' => 'https://randomuser.me/api/portraits/men/32.jpg'
                 ],
             ];

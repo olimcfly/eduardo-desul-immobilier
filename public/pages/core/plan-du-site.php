@@ -4,7 +4,10 @@ declare(strict_types=1);
 $siteSettings = $siteSettings ?? [];
 
 $advisorName = $advisorName ?? ($siteSettings['advisor_name'] ?? ($_ENV['ADVISOR_NAME'] ?? 'Votre conseiller'));
-$advisorCity = $advisorCity ?? ($siteSettings['city'] ?? ($_ENV['APP_CITY'] ?? 'Votre ville'));
+$advisorCity = trim((string) ($advisorCity ?? setting('zone_city', APP_CITY ?: 'Bordeaux')));
+if ($advisorCity === '') {
+    $advisorCity = 'Bordeaux';
+}
 
 $pageTitle = 'Plan du site';
 $metaDesc = "Plan du site HTML de {$advisorName} : accès rapide à toutes les pages principales.";
@@ -19,7 +22,7 @@ $mainPages = $siteSettings['sitemap_main_pages'] ?? [
     ['label' => 'Ressources', 'url' => '/ressources'],
     ['label' => 'Blog', 'url' => '/blog'],
     ['label' => 'Actualités', 'url' => '/actualites'],
-    ['label' => 'Avis clients', 'url' => '/avis-clients'],
+    ['label' => 'Avis clients', 'url' => '/avis'],
 ];
 
 $legalPages = $siteSettings['sitemap_legal_pages'] ?? [

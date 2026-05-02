@@ -6,7 +6,7 @@ Auth::requireAuth();
 
 $section = preg_replace('/[^a-z]/', '', (string)($_GET['section'] ?? 'profil'));
 
-$allowed = ['profil', 'site', 'zone', 'api', 'notif', 'smtp', 'securite', 'danger'];
+$allowed = ['profil', 'site', 'zone', 'api', 'notif', 'smtp', 'telegram', 'securite', 'danger'];
 
 if (!in_array($section, $allowed, true)) {
     http_response_code(400);

@@ -115,6 +115,10 @@ foreach ($calendarBuckets as &$dayEntries) {
 unset($dayEntries);
 
 ?>
+<?php
+$current = 'rdv';
+require __DIR__ . '/views/_subnav.php';
+?>
 <style>
     .rdv-toolbar{display:flex;justify-content:space-between;align-items:center;gap:1rem;flex-wrap:wrap;margin-bottom:1rem}
     .rdv-back{display:inline-flex;align-items:center;gap:.45rem;text-decoration:none;color:#334155;font-weight:700}
@@ -151,7 +155,7 @@ unset($dayEntries);
 </div>
 
 <div class="rdv-toolbar">
-    <a href="/admin?module=convertir" class="rdv-back"><i class="fas fa-arrow-left"></i> Retour aux sous-modules</a>
+    <a href="/admin?module=convertir" class="rdv-back"><i class="fas fa-arrow-left"></i> Retour au hub</a>
     <strong><?= $stats['total'] ?> lead(s) dans l'agenda</strong>
 </div>
 

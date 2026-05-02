@@ -63,7 +63,7 @@ foreach ($guidesByPersona as $catalog) {
             <a href="/estimation-gratuite" class="ressource-card" style="text-decoration:none;color:inherit">
                 <div class="ressource-card__icon">📊</div>
                 <h3 class="ressource-card__title">Estimation gratuite</h3>
-                <p class="ressource-card__desc">Découvrez la valeur réelle de votre bien grâce à une évaluation personnalisée par Pascal.</p>
+                <p class="ressource-card__desc">Découvrez la valeur réelle de votre bien grâce à une évaluation personnalisée par Eduardo Desul.</p>
                 <span class="btn btn--accent btn--sm">Estimer maintenant →</span>
             </a>
             <a href="/guide-offert" class="ressource-card" style="text-decoration:none;color:inherit">

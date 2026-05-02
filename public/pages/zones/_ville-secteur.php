@@ -19,7 +19,7 @@ $typeLabel   = $type === 'quartier' ? 'Quartier de Bordeaux' : 'Gironde Métropo
 $idPrefix    = strtolower(preg_replace('/[^a-z0-9]/', '-', $nom));
 
 $pageTitle = 'Immobilier ' . $nom . ' — ' . ADVISOR_NAME;
-$metaDesc  = $ville['metaDesc'] ?? 'Expert immobilier à ' . $nom . '. Estimation gratuite, vente et achat de biens. Connaissance du marché local par Eduardo De Sul, conseiller indépendant.';
+$metaDesc  = $ville['metaDesc'] ?? 'Expert immobilier à ' . $nom . '. Estimation gratuite, vente et achat de biens. Connaissance du marché local par Eduardo Desul, conseiller indépendant.';
 $extraCss  = ['/assets/css/villes.css'];
 
 $pageContent = '
@@ -144,7 +144,7 @@ $pageContent = '
     <div class="container">
         <div class="cta-banner__content">
             <h2 class="cta-banner__title">Votre projet immobilier à ' . htmlspecialchars($nom) . '</h2>
-            <p class="cta-banner__text">Contactez Eduardo De Sul pour une consultation gratuite et sans engagement.</p>
+            <p class="cta-banner__text">Contactez Eduardo Desul pour une consultation gratuite et sans engagement.</p>
             <div class="cta-banner__actions">
                 <a href="/contact" class="btn btn--accent">Me contacter</a>
                 <a href="/estimation-gratuite" class="btn btn--outline-white">Estimation gratuite</a>

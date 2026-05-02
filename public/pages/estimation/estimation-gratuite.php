@@ -4,6 +4,26 @@ if (!defined('ROOT_PATH')) {
     require_once __DIR__ . '/../../../core/bootstrap.php';
 }
 
+function estimationPostalPrefix(string $localite): string
+{
+    if (preg_match('/\b(\d{5})\b/', $localite, $matches)) {
+        return substr($matches[1], 0, 2);
+    }
+
+    return '';
+}
+
+function estimationNumericValue(?string $value): ?int
+{
+    $value = trim((string) $value);
+    if ($value === '') {
+        return null;
+    }
+
+    $number = (int) preg_replace('/\D+/', '', $value);
+    return $number > 0 ? $number : null;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     verifyCsrf();
 
@@ -16,9 +36,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $lng       = trim($_POST['lng']        ?? '');
 
     if ($typeBien && $surface && $localite && $projet) {
+        $pdo = db();
+        $postalPrefix = estimationPostalPrefix($localite);
 
         // ── Capture anonyme pour géolocalisation (aucun email/tel) ──
-        $db->prepare("
+        $pdo->prepare("
             INSERT INTO estimation_zones
                 (type_bien, surface, localite, budget, projet, lat, lng, ip, created_at)
             VALUES
@@ -34,27 +56,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':ip'        => $_SERVER['REMOTE_ADDR'] ?? '',
         ]);
 
-        $zoneId = $db->lastInsertId();
+        $zoneId = $pdo->lastInsertId();
+        $crmLeadId = 0;
 
         // ── Calcul fourchette DVF ──────────────────────────────────
-        $dvf = $db->prepare("
+        $locationSql = $postalPrefix !== ''
+            ? 'AND postal_code LIKE :cp'
+            : 'AND city LIKE :city';
+        $dvf = $pdo->prepare("
             SELECT
-                ROUND(AVG(prix_m2))   AS prix_moyen,
-                ROUND(MIN(prix_m2))   AS prix_min,
-                ROUND(MAX(prix_m2))   AS prix_max,
+                ROUND(AVG(price_m2))   AS prix_moyen,
+                ROUND(MIN(price_m2))   AS prix_min,
+                ROUND(MAX(price_m2))   AS prix_max,
                 COUNT(*)              AS nb_transactions
             FROM dvf_transactions
-            WHERE type_bien   = :type_bien
-            AND   code_postal LIKE :cp
-            AND   date_vente >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
+            WHERE property_type   = :type_bien
+            {$locationSql}
+            AND   mutation_date >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
             AND   surface BETWEEN :surf_min AND :surf_max
         ");
-        $dvf->execute([
+        $dvfParams = [
             ':type_bien' => $typeBien,
-            ':cp'        => substr($localite, 0, 2) . '%',
             ':surf_min'  => max(0, (int)$surface - 20),
             ':surf_max'  => (int)$surface + 20,
-        ]);
+        ];
+        if ($postalPrefix !== '') {
+            $dvfParams[':cp'] = $postalPrefix . '%';
+        } else {
+            $dvfParams[':city'] = '%' . preg_replace('/\s+/', '%', $localite) . '%';
+        }
+        $dvf->execute($dvfParams);
         $dvfData = $dvf->fetch(PDO::FETCH_ASSOC);
 
         // ── Calcul fourchette ──────────────────────────────────────
@@ -71,25 +102,72 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         // ── Comparables récents ────────────────────────────────────
-        $comparables = $db->prepare("
-            SELECT adresse, surface, prix, prix_m2, date_vente
+        $comparables = $pdo->prepare("
+            SELECT address_label, surface, value_amount, price_m2, mutation_date
             FROM   dvf_transactions
-            WHERE  type_bien   = :type_bien
-            AND    code_postal LIKE :cp
-            AND    date_vente >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
+            WHERE  property_type   = :type_bien
+            {$locationSql}
+            AND    mutation_date >= DATE_SUB(NOW(), INTERVAL 12 MONTH)
             ORDER  BY ABS(surface - :surface) ASC
             LIMIT  5
         ");
-        $comparables->execute([
+        $comparableParams = [
             ':type_bien' => $typeBien,
-            ':cp'        => substr($localite, 0, 2) . '%',
             ':surface'   => (int)$surface,
-        ]);
+        ];
+        if ($postalPrefix !== '') {
+            $comparableParams[':cp'] = $postalPrefix . '%';
+        } else {
+            $comparableParams[':city'] = '%' . preg_replace('/\s+/', '%', $localite) . '%';
+        }
+        $comparables->execute($comparableParams);
         $comps = $comparables->fetchAll(PDO::FETCH_ASSOC);
+
+        // ── Enregistrement CRM même sans contact ───────────────────
+        $metadata = [
+            'zone_id' => (int) $zoneId,
+            'type_bien' => $typeBien,
+            'surface' => $surface,
+            'localite' => $localite,
+            'postal_prefix' => $postalPrefix,
+            'budget_client' => $budget,
+            'projet' => $projet,
+            'lat' => $lat,
+            'lng' => $lng,
+            'estimation_min' => $fourchette['min'] ?? null,
+            'estimation_moyenne' => $fourchette['moy'] ?? null,
+            'estimation_max' => $fourchette['max'] ?? null,
+            'prix_m2_moyen' => $fourchette['pm2'] ?? null,
+            'comparables_count' => (int) ($fourchette['nb'] ?? 0),
+            'origin_path' => $_SERVER['REQUEST_URI'] ?? '/estimation-gratuite',
+            'contact_status' => 'sans_contact',
+        ];
+
+        try {
+            $crmLeadId = LeadService::capture([
+                'source_type' => LeadService::SOURCE_ESTIMATION,
+                'pipeline' => LeadService::SOURCE_ESTIMATION,
+                'stage' => 'nouveau',
+                'priority' => $fourchette ? 'normal' : 'haute',
+                'first_name' => 'Estimation',
+                'last_name' => 'sans contact',
+                'email' => 'estimation-' . (int) $zoneId . '@no-contact.local',
+                'phone' => '',
+                'intent' => 'Estimation gratuite sans contact',
+                'property_type' => $typeBien,
+                'property_address' => $localite,
+                'notes' => 'Estimation gratuite générée sans coordonnées. Secteur : ' . $localite,
+                'consent' => 0,
+                'metadata' => $metadata,
+            ]);
+        } catch (Throwable $e) {
+            error_log('[estimation-gratuite] LeadService::capture anonymous: ' . $e->getMessage());
+        }
 
         // ── Stockage session pour page résultat ───────────────────
         $_SESSION['estimation'] = [
             'zone_id'     => $zoneId,
+            'crm_lead_id' => $crmLeadId,
             'type_bien'   => $typeBien,
             'surface'     => $surface,
             'localite'    => $localite,
@@ -103,8 +181,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$pageTitle = 'Estimation gratuite — Eduardo Desul | Conseiller Immobilier Bordeaux';
-$metaDesc  = 'Obtenez une fourchette d\'estimation basée sur les ventes réelles de Bordeaux et sa métropole (33). Gratuit, instantané, sans inscription.';
+$pageTitle = 'Estimation immobilière gratuite à Bordeaux | Eduardo Desul';
+$metaDesc  = 'Obtenez une estimation personnalisée de votre bien à Bordeaux et dans la métropole bordelaise avec Eduardo Desul. Gratuit, clair et sans engagement.';
 $extraCss  = ['/assets/css/estimation.css'];
 $extraJs   = ['/assets/js/estimation.js'];
 
@@ -383,5 +461,5 @@ ob_start();
 
 <?php
 $pageContent = ob_get_clean();
-require_once __DIR__ . '/../templates/layout.php';
+require_once __DIR__ . '/../../templates/layout.php';
 ?>

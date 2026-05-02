@@ -29,6 +29,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ],
         ]);
 
+        // Track conversion
+        ConversionTrackingService::track(
+            ConversionTrackingService::TYPE_ESTIMATION_SIMPLE,
+            email: $email,
+            firstName: $prenom,
+            phone: trim((string)($_POST['telephone'] ?? null)),
+            metadata: [
+                'type_bien' => trim((string)($_POST['type_bien'] ?? '')),
+                'surface' => trim((string)($_POST['surface'] ?? '')),
+                'pieces' => trim((string)($_POST['pieces'] ?? '')),
+                'demande_rdv' => $wantsMeeting ? 1 : 0,
+            ]
+        );
+
         redirect('/merci');
     }
 }
@@ -47,7 +61,7 @@ $bodyClass  = 'page-capture';
                 <h1 style="color:white;font-size:clamp(1.75rem,4vw,3rem);margin-bottom:1rem">Quelle est la valeur<br>de votre bien ?</h1>
                 <p style="opacity:.85;font-size:1.1rem;margin-bottom:2rem">Obtenez une estimation personnalisée de votre bien à Bordeaux, basée sur les données réelles du marché.</p>
                 <div style="display:flex;flex-direction:column;gap:.75rem">
-                    <?php foreach (['Estimation basée sur les transactions récentes','Rapport détaillé envoyé sous 48h','Pascal vous rappelle pour affiner l\'estimation','Gratuit, sans engagement, sans spam'] as $item): ?>
+                    <?php foreach (['Estimation basée sur les transactions récentes','Rapport détaillé envoyé sous 48h','Eduardo Desul vous rappelle pour affiner l\'estimation','Gratuit, sans engagement, sans spam'] as $item): ?>
                     <div style="display:flex;gap:.75rem;align-items:center;font-size:.9rem">
                         <span style="color:var(--clr-accent);font-weight:700;font-size:1.1rem">✓</span>
                         <?= e($item) ?>

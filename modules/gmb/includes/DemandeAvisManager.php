@@ -2,14 +2,22 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/gmb_schema.php';
+
 class DemandeAvisManager
 {
     public function __construct(private readonly PDO $pdo, private readonly int $userId)
     {
     }
 
+    private function ensureSchema(): void
+    {
+        gmb_ensure_schema($this->pdo);
+    }
+
     public function create(array $payload): int
     {
+        $this->ensureSchema();
         $sql = 'INSERT INTO gmb_demandes_avis
             (user_id, client_nom, client_email, client_tel, bien_adresse, canal, template_id, token)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
@@ -31,6 +39,7 @@ class DemandeAvisManager
 
     public function findById(int $demandeId): array
     {
+        $this->ensureSchema();
         $stmt = $this->pdo->prepare('SELECT * FROM gmb_demandes_avis WHERE id = ? AND user_id = ? LIMIT 1');
         $stmt->execute([$demandeId, $this->userId]);
         $row = $stmt->fetch();
@@ -40,6 +49,7 @@ class DemandeAvisManager
 
     public function findTemplateById(int $templateId, string $canal = 'email'): array
     {
+        $this->ensureSchema();
         $stmt = $this->pdo->prepare('SELECT * FROM gmb_templates WHERE id = ? AND user_id = ? AND canal = ? LIMIT 1');
         $stmt->execute([$templateId, $this->userId, $canal]);
         $row = $stmt->fetch();
@@ -49,12 +59,14 @@ class DemandeAvisManager
 
     public function markSent(int $demandeId): bool
     {
-        $stmt = $this->pdo->prepare('UPDATE gmb_demandes_avis SET statut = "envoye", envoye_at = NOW() WHERE id = ? AND user_id = ?');
+        $this->ensureSchema();
+        $stmt = $this->pdo->prepare("UPDATE gmb_demandes_avis SET statut = 'envoye', envoye_at = NOW() WHERE id = ? AND user_id = ?");
         return $stmt->execute([$demandeId, $this->userId]);
     }
 
     public function trackReviewRequest(int $demandeId, string $email, string $status, ?string $errorMessage = null): bool
     {
+        $this->ensureSchema();
         $stmt = $this->pdo->prepare('INSERT INTO gmb_review_requests
             (user_id, demande_id, email, statut, date_envoi, error_message)
             VALUES (?, ?, ?, ?, ?, ?)');
@@ -71,6 +83,7 @@ class DemandeAvisManager
 
     public function templates(string $canal = 'email'): array
     {
+        $this->ensureSchema();
         $stmt = $this->pdo->prepare('SELECT * FROM gmb_templates WHERE user_id = ? AND canal = ? AND actif = 1 ORDER BY created_at DESC');
         $stmt->execute([$this->userId, $canal]);
         return $stmt->fetchAll();
@@ -78,6 +91,7 @@ class DemandeAvisManager
 
     public function saveTemplate(array $payload): bool
     {
+        $this->ensureSchema();
         $sql = 'INSERT INTO gmb_templates (user_id, nom, canal, sujet, contenu, actif) VALUES (?, ?, ?, ?, ?, ?)
                 ON DUPLICATE KEY UPDATE nom = VALUES(nom), sujet = VALUES(sujet), contenu = VALUES(contenu), actif = VALUES(actif)';
         $stmt = $this->pdo->prepare($sql);
@@ -87,7 +101,7 @@ class DemandeAvisManager
             ($payload['canal'] ?? 'email') === 'sms' ? 'sms' : 'email',
             trim((string) ($payload['sujet'] ?? '')),
             trim((string) ($payload['contenu'] ?? '')),
-            !empty($payload['actif']) ? 1 : 0,
+            array_key_exists('actif', $payload) ? (!empty($payload['actif']) ? 1 : 0) : 1,
         ]);
     }
 }

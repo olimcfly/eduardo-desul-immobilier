@@ -1,7 +1,7 @@
 <?php
 $pageTitle    = 'Immobilier Quartier Mazarin Bordeaux - Expert | ' . ADVISOR_NAME;
-$metaDesc     = 'Expert immobilier dans le quartier Mazarin à Bordeaux. Le quartier le plus prestigieux d\'Aix — hôtels particuliers, appartements haussmanniens, rues arborées.';
-$metaKeywords = 'immobilier quartier Mazarin Bordeaux, appartement Mazarin, hôtel particulier Mazarin, expert immobilier Mazarin Aix';
+$metaDesc     = 'Expert immobilier dans le quartier Mazarin à Bordeaux. Analyse locale, estimation, vente et achat avec Eduardo Desul.';
+$metaKeywords = 'immobilier quartier Mazarin Bordeaux, appartement Mazarin Bordeaux, hôtel particulier Bordeaux, expert immobilier Mazarin Bordeaux';
 $extraCss     = ['/assets/css/villes.css'];
 
 $pageContent = '
@@ -24,7 +24,7 @@ $pageContent = '
     <div class="container">
         <div class="section__header">
             <span class="section-label">Mazarin</span>
-            <h2 class="section-title">Le quartier le plus prestigieux d\'Aix</h2>
+            <h2 class="section-title">Un secteur de caractère à qualifier à Bordeaux</h2>
             <p class="section-subtitle">Construit au XVIIe siècle sur ordre de l\'archevêque Michel Mazarin, ce quartier aristocratique est classé secteur sauvegardé. Ses hôtels particuliers, fontaines et hôtels de ville forment un ensemble architectural unique en France.</p>
         </div>
         <div class="grid-2">
@@ -105,5 +105,3 @@ $pageContent = '
 </section>
 ';
 ?>
-
-<?php include(__DIR__ . '/../../../templates/page.php'); ?>

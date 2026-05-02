@@ -1,7 +1,7 @@
 <?php
 $pageTitle    = 'Immobilier Les Milles Bordeaux - Expert | ' . ADVISOR_NAME;
 $metaDesc     = 'Expert immobilier aux Milles, secteur résidentiel et d\'activités au sud d\'Bordeaux. Appartements, maisons et locaux professionnels à proximité du technopôle.';
-$metaKeywords = 'immobilier Les Milles, appartement Les Milles Aix, maison Les Milles, expert immobilier sud Bordeaux, technopôle Milles';
+$metaKeywords = 'immobilier Les Milles Bordeaux, appartement Les Milles, maison Les Milles, expert immobilier sud Bordeaux, secteur Milles';
 $extraCss     = ['/assets/css/villes.css'];
 
 $pageContent = '
@@ -11,7 +11,7 @@ $pageContent = '
         <div class="hero__content" data-animate>
             <span class="section-label hero__label">Les Milles — Bordeaux</span>
             <h1 id="les-milles-hero-title">L\'immobilier aux Milles</h1>
-            <p class="hero__subtitle">Secteur résidentiel et économique au sud d\'Bordeaux, Les Milles abrite le technopôle de l\'Arbois, des résidences modernes et une offre immobilière diversifiée à des prix plus accessibles que le centre d\'Aix.</p>
+            <p class="hero__subtitle">Fiche secteur à valider localement pour Bordeaux Métropole : périmètre, transports, prix et typologie de biens doivent être confirmés avant publication.</p>
             <div class="hero__actions">
                 <a href="/estimation-gratuite" class="btn btn--primary">Demander une estimation gratuite</a>
                 <a href="/contact" class="btn btn--outline">Nous contacter</a>
@@ -25,13 +25,13 @@ $pageContent = '
         <div class="section__header">
             <span class="section-label">Les Milles</span>
             <h2 class="section-title">Un secteur en plein développement</h2>
-            <p class="section-subtitle">Les Milles est un secteur en pleine mutation, combinant zones résidentielles, parc d\'activités technologiques (technopôle de l\'Arbois) et projets de développement urbain. Sa proximité avec l\'aéroport de Marseille-Gironde et les axes autoroutiers en fait une localisation stratégique.</p>
+            <p class="section-subtitle">Si ce secteur cible une zone d’activités ou un quartier bordelais portant un nom proche, remplacez ce texte par des données locales : transports, prix, offre de biens et repères de quartier.</p>
         </div>
         <div class="grid-2">
             <div class="card card--alt" data-animate>
                 <div class="card__icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg></div>
                 <h3 class="card__title">Localisation stratégique</h3>
-                <p class="card__text">À 15 minutes d\'Aix et de l\'aéroport, accès direct à l\'A8 — idéal pour les actifs.</p>
+                <p class="card__text">Vérifiez les accès réels (rocade, tram, bus) depuis votre adresse cible sur la métropole bordelaise.</p>
             </div>
             <div class="card card--alt" data-animate>
                 <div class="card__icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg></div>
@@ -105,5 +105,3 @@ $pageContent = '
 </section>
 ';
 ?>
-
-<?php include(__DIR__ . '/../../../templates/page.php'); ?>

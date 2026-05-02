@@ -2,6 +2,9 @@
 $pageTitle  = 'Mentions légales — ' . APP_NAME;
 $metaDesc   = 'Mentions légales du site ' . APP_NAME . '.';
 $metaRobots = 'noindex, nofollow';
+$advisorPhone = trim((string) setting('advisor_phone', setting('profil_telephone', APP_PHONE)));
+$advisorEmail = trim((string) setting('advisor_email', setting('profil_email', APP_EMAIL)));
+$advisorRsac = trim((string) setting('advisor_rsac', setting('profil_rsac', ADVISOR_RSAC)));
 ?>
 <div class="page-header">
     <div class="container">
@@ -16,8 +19,9 @@ $metaRobots = 'noindex, nofollow';
             <p><strong><?= e(APP_NAME) ?></strong><br>
             Conseiller immobilier indépendant<br>
             <?= e(APP_ADDRESS) ?><br>
-            <?php if (APP_EMAIL): ?>Email : <a href="mailto:<?= e(APP_EMAIL) ?>"><?= e(APP_EMAIL) ?></a><br><?php endif; ?>
-            <?php if (APP_PHONE): ?>Téléphone : <?= e(APP_PHONE) ?><br><?php endif; ?>
+            <?php if ($advisorEmail !== ''): ?>Email : <a href="mailto:<?= e($advisorEmail) ?>"><?= e($advisorEmail) ?></a><br><?php endif; ?>
+            <?php if ($advisorPhone !== ''): ?>Téléphone : <?= e($advisorPhone) ?><br><?php endif; ?>
+            <?php if ($advisorRsac !== ''): ?>RCS / RSAC : <?= e($advisorRsac) ?><br><?php endif; ?>
             <?php if (APP_SIRET): ?>SIRET : <?= e(APP_SIRET) ?><?php endif; ?>
             </p>
             <h2>Activité réglementée</h2>
@@ -29,7 +33,7 @@ $metaRobots = 'noindex, nofollow';
             <h2>Responsabilité</h2>
             <p>Les informations présentes sur ce site sont données à titre indicatif. <?= APP_NAME ?> ne saurait être tenu responsable des erreurs ou omissions éventuelles, ni des dommages résultant de l'utilisation de ces informations.</p>
             <h2>Contact</h2>
-            <p>Pour toute question relative au site : <a href="mailto:<?= e(APP_EMAIL) ?>"><?= e(APP_EMAIL) ?></a></p>
+            <p>Pour toute question relative au site : <a href="mailto:<?= e($advisorEmail !== '' ? $advisorEmail : APP_EMAIL) ?>"><?= e($advisorEmail !== '' ? $advisorEmail : APP_EMAIL) ?></a></p>
             <p><em>Dernière mise à jour : <?= date('d/m/Y') ?></em></p>
         </div>
     </div>

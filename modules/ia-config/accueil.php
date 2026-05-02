@@ -169,9 +169,50 @@ function renderContent(): void
     $apiKey = (string)($activeConfig['api_key'] ?? '');
     $model = (string)($activeConfig['model'] ?? ($models[$provider] ?? 'gpt-4o-mini'));
     ?>
-    <div class="page-header">
-        <h1><i class="fas fa-microchip page-icon"></i> Configuration IA</h1>
+    <style>
+        .start-hero { background: linear-gradient(135deg, #0f2237 0%, #1a3a5c 100%); border-radius: 16px; padding: 36px 40px; color: #fff; margin-bottom: 32px; box-shadow: 0 4px 20px rgba(15,34,55,.18); }
+        .start-hero-badge { display: inline-block; background: rgba(201,168,76,.2); color: #c9a84c; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 4px 12px; border-radius: 20px; margin-bottom: 14px; border: 1px solid rgba(201,168,76,.35); }
+        .start-hero h1 { font-size: 28px; font-weight: 700; color: #fff; margin: 0 0 12px; line-height: 1.25; }
+        .start-hero p { font-size: 15px; color: rgba(255,255,255,.7); line-height: 1.65; max-width: 680px; margin: 0; }
+        .start-steps-title { font-size: 12px; font-weight: 700; color: #8a95a3; text-transform: uppercase; letter-spacing: .07em; margin: 0 0 16px; }
+        .start-steps { display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px; }
+        .start-step { display: flex; align-items: flex-start; gap: 18px; background: #fff; border-radius: 12px; padding: 20px 22px; box-shadow: 0 1px 6px rgba(0,0,0,.07); text-decoration: none; color: inherit; border-left: 4px solid #e8ecf0; }
+        .start-step-num { flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #64748b; }
+        .start-step-body { flex: 1; }
+        .start-step-label { font-size: 15px; font-weight: 600; color: #1e293b; margin-bottom: 3px; }
+        .start-step-desc { font-size: 13px; color: #64748b; line-height: 1.5; }
+        .start-step-arrow { flex-shrink: 0; color: #c9a84c; font-size: 16px; margin-top: 8px; }
+        .start-cta { background: #fff; border-radius: 12px; padding: 24px 26px; box-shadow: 0 1px 6px rgba(0,0,0,.07); display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-top: 16px; }
+        .start-cta-text strong { display: block; font-size: 15px; font-weight: 600; color: #1e293b; margin-bottom: 4px; }
+        .start-cta-text span { font-size: 13px; color: #64748b; }
+        .start-cta-btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 22px; background: #c9a84c; color: #0f2237; border-radius: 8px; font-size: 14px; font-weight: 700; text-decoration: none; white-space: nowrap; }
+        @media (max-width: 600px) { .start-hero { padding: 24px 20px; } .start-step { flex-wrap: wrap; } }
+    </style>
+
+    <div class="start-hero">
+        <div class="start-hero-badge">Intégration IA</div>
+        <h1>Configuration IA</h1>
         <p>Gérez le fournisseur IA actif, testez la connexion et suivez les coûts.</p>
+    </div>
+
+    <div class="start-steps-title">Configuration guidée</div>
+    <div class="start-steps">
+        <a href="/admin/?module=ia-config" class="start-step">
+            <div class="start-step-num">1</div>
+            <div class="start-step-body">
+                <div class="start-step-label">Choisir le fournisseur</div>
+                <div class="start-step-desc">Sélectionnez OpenAI, Anthropic ou Mistral selon votre usage.</div>
+            </div>
+            <div class="start-step-arrow"><i class="fas fa-chevron-right"></i></div>
+        </a>
+        <a href="/admin/?module=ia-config" class="start-step">
+            <div class="start-step-num">2</div>
+            <div class="start-step-body">
+                <div class="start-step-label">Tester puis enregistrer</div>
+                <div class="start-step-desc">Validez la clé API avant de rendre la configuration active.</div>
+            </div>
+            <div class="start-step-arrow"><i class="fas fa-chevron-right"></i></div>
+        </a>
     </div>
 
     <?php if ($flash['message'] !== ''): ?>
@@ -240,6 +281,13 @@ function renderContent(): void
         .status-disconnected { color: #dc2626; }
         @media (max-width: 960px) { .ia-config-grid { grid-template-columns: 1fr; } }
     </style>
+    <div class="start-cta">
+        <div class="start-cta-text">
+            <strong>Vérifier la connexion IA</strong>
+            <span>Utilisez le bouton de test avant d’enregistrer une nouvelle clé ou un nouveau modèle.</span>
+        </div>
+        <a href="/admin/?module=ia-config" class="start-cta-btn"><i class="fas fa-rotate"></i> Recharger</a>
+    </div>
     <?php
 }
 

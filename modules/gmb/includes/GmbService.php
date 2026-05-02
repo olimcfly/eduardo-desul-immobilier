@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/gmb_schema.php';
 require_once __DIR__ . '/GmbApiClient.php';
 require_once __DIR__ . '/AvisManager.php';
 require_once __DIR__ . '/DemandeAvisManager.php';
@@ -17,10 +18,10 @@ class GmbService
     public function __construct(private readonly int $userId)
     {
         $this->pdo = db();
+        gmb_ensure_schema($this->pdo);
         $this->api = new GmbApiClient($this->userId);
         $this->avisManager = new AvisManager($this->pdo, $this->userId);
         $this->demandeManager = new DemandeAvisManager($this->pdo, $this->userId);
-        $this->ensureSyncQueueTable();
     }
 
     public function getFiche(): array
@@ -33,6 +34,16 @@ class GmbService
 
     public function saveFiche(array $payload): bool
     {
+        $siteWeb = trim((string) ($payload['site_web'] ?? ''));
+        if ($siteWeb !== '' && filter_var($siteWeb, FILTER_VALIDATE_URL) === false) {
+            throw new InvalidArgumentException('URL du site web invalide.');
+        }
+
+        $telephone = trim((string) ($payload['telephone'] ?? ''));
+        if ($telephone !== '' && !preg_match('/^[0-9+().\\s-]{6,30}$/', $telephone)) {
+            throw new InvalidArgumentException('Téléphone invalide.');
+        }
+
         $sql = 'INSERT INTO gmb_fiche
             (user_id, gmb_location_id, gmb_account_id, nom_etablissement, categorie, adresse, ville, code_postal, telephone, site_web, description, horaires, photos, statut, last_sync)
             VALUES (:user_id, :gmb_location_id, :gmb_account_id, :nom_etablissement, :categorie, :adresse, :ville, :code_postal, :telephone, :site_web, :description, :horaires, :photos, :statut, :last_sync)
@@ -57,14 +68,14 @@ class GmbService
             'user_id' => $this->userId,
             'gmb_location_id' => trim((string) ($payload['gmb_location_id'] ?? '')),
             'gmb_account_id' => trim((string) ($payload['gmb_account_id'] ?? '')),
-            'nom_etablissement' => trim((string) ($payload['nom_etablissement'] ?? '')),
-            'categorie' => trim((string) ($payload['categorie'] ?? '')),
-            'adresse' => trim((string) ($payload['adresse'] ?? '')),
-            'ville' => trim((string) ($payload['ville'] ?? '')),
-            'code_postal' => trim((string) ($payload['code_postal'] ?? '')),
-            'telephone' => trim((string) ($payload['telephone'] ?? '')),
-            'site_web' => trim((string) ($payload['site_web'] ?? '')),
-            'description' => trim((string) ($payload['description'] ?? '')),
+            'nom_etablissement' => mb_substr(trim((string) ($payload['nom_etablissement'] ?? '')), 0, 200),
+            'categorie' => mb_substr(trim((string) ($payload['categorie'] ?? '')), 0, 200),
+            'adresse' => mb_substr(trim((string) ($payload['adresse'] ?? '')), 0, 500),
+            'ville' => mb_substr(trim((string) ($payload['ville'] ?? '')), 0, 100),
+            'code_postal' => mb_substr(trim((string) ($payload['code_postal'] ?? '')), 0, 10),
+            'telephone' => $telephone,
+            'site_web' => $siteWeb,
+            'description' => mb_substr(trim((string) ($payload['description'] ?? '')), 0, 2000),
             'horaires' => json_encode($payload['horaires'] ?? [], JSON_UNESCAPED_UNICODE),
             'photos' => json_encode($payload['photos'] ?? [], JSON_UNESCAPED_UNICODE),
             'statut' => in_array(($payload['statut'] ?? ''), ['actif', 'suspendu', 'non_verifie'], true) ? $payload['statut'] : 'non_verifie',
@@ -81,9 +92,9 @@ class GmbService
 
     public function enqueueSyncJob(string $source = 'manual'): int
     {
-        $stmt = $this->pdo->prepare('INSERT INTO gmb_sync_jobs
+        $stmt = $this->pdo->prepare("INSERT INTO gmb_sync_jobs
             (user_id, status, source, attempts, payload, created_at, updated_at)
-            VALUES (?, "pending", ?, 0, ?, NOW(), NOW())');
+            VALUES (?, 'pending', ?, 0, ?, NOW(), NOW())");
 
         $stmt->execute([
             $this->userId,
@@ -176,6 +187,25 @@ class GmbService
 
     public function createDemandeAvis(array $payload): int
     {
+        $clientNom = mb_substr(trim((string) ($payload['client_nom'] ?? '')), 0, 200);
+        $clientEmail = trim((string) ($payload['client_email'] ?? ''));
+        $clientTel = trim((string) ($payload['client_tel'] ?? ''));
+
+        if ($clientNom === '') {
+            throw new InvalidArgumentException('Nom client obligatoire.');
+        }
+        if ($clientEmail !== '' && !filter_var($clientEmail, FILTER_VALIDATE_EMAIL)) {
+            throw new InvalidArgumentException('Email client invalide.');
+        }
+        if ($clientTel !== '' && !preg_match('/^[0-9+().\\s-]{6,30}$/', $clientTel)) {
+            throw new InvalidArgumentException('Téléphone client invalide.');
+        }
+
+        $payload['client_nom'] = $clientNom;
+        $payload['client_email'] = $clientEmail;
+        $payload['client_tel'] = $clientTel;
+        $payload['bien_adresse'] = mb_substr(trim((string) ($payload['bien_adresse'] ?? '')), 0, 300);
+
         $demandeId = $this->demandeManager->create($payload);
         $demande = $this->demandeManager->findById($demandeId);
 
@@ -239,6 +269,14 @@ Merci infiniment."));
 
     public function saveTemplate(array $payload): bool
     {
+        $payload['nom'] = mb_substr(trim((string) ($payload['nom'] ?? '')), 0, 200);
+        $payload['sujet'] = mb_substr(trim((string) ($payload['sujet'] ?? '')), 0, 300);
+        $payload['contenu'] = mb_substr(trim((string) ($payload['contenu'] ?? '')), 0, 4000);
+
+        if ($payload['nom'] === '' || $payload['contenu'] === '') {
+            throw new InvalidArgumentException('Nom et contenu du template obligatoires.');
+        }
+
         return $this->demandeManager->saveTemplate($payload);
     }
 
@@ -247,9 +285,37 @@ Merci infiniment."));
         return $this->demandeManager->templates($canal);
     }
 
-    public function getStats(string $startDate, string $endDate): array
+    public function getStats(?string $startDate = null, ?string $endDate = null): array
     {
-        $apiStats = $this->api->fetchStats($startDate, $endDate);
+        $stmt = $this->pdo->prepare('SELECT date_stat, impressions, clics_site, appels, itineraires, photos_vues, recherches_dir, recherches_disc
+            FROM gmb_statistiques
+            WHERE user_id = ?
+            ORDER BY date_stat DESC
+            LIMIT 1');
+        $stmt->execute([$this->userId]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return is_array($row) ? $row : [];
+    }
+
+    public function saveManualStats(array $payload): array
+    {
+        $month = trim((string) ($payload['stats_month'] ?? ''));
+        if (!preg_match('/^\d{4}-\d{2}$/', $month)) {
+            throw new InvalidArgumentException('Mois statistique invalide.');
+        }
+
+        $date = $month . '-01';
+        $fields = ['impressions', 'clics_site', 'appels', 'itineraires', 'photos_vues', 'recherches_dir', 'recherches_disc'];
+        $stats = ['date_stat' => $date];
+        foreach ($fields as $field) {
+            $raw = $payload[$field] ?? 0;
+            if (!is_numeric($raw) || (int) $raw < 0) {
+                throw new InvalidArgumentException('Les statistiques doivent être des nombres positifs.');
+            }
+            $stats[$field] = (int) $raw;
+        }
+
         $stmt = $this->pdo->prepare('INSERT INTO gmb_statistiques
             (user_id, date_stat, impressions, clics_site, appels, itineraires, photos_vues, recherches_dir, recherches_disc)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -264,49 +330,29 @@ Merci infiniment."));
 
         $stmt->execute([
             $this->userId,
-            $apiStats['date_stat'],
-            $apiStats['impressions'],
-            $apiStats['clics_site'],
-            $apiStats['appels'],
-            $apiStats['itineraires'],
-            $apiStats['photos_vues'],
-            $apiStats['recherches_dir'],
-            $apiStats['recherches_disc'],
+            $stats['date_stat'],
+            $stats['impressions'],
+            $stats['clics_site'],
+            $stats['appels'],
+            $stats['itineraires'],
+            $stats['photos_vues'],
+            $stats['recherches_dir'],
+            $stats['recherches_disc'],
         ]);
 
-        return $apiStats;
-    }
-
-    private function ensureSyncQueueTable(): void
-    {
-        $this->pdo->exec('CREATE TABLE IF NOT EXISTS gmb_sync_jobs (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            user_id INT NOT NULL,
-            status ENUM("pending","running","done","error") NOT NULL DEFAULT "pending",
-            source VARCHAR(50) NOT NULL DEFAULT "manual",
-            attempts SMALLINT UNSIGNED NOT NULL DEFAULT 0,
-            payload JSON DEFAULT NULL,
-            result JSON DEFAULT NULL,
-            error_message TEXT DEFAULT NULL,
-            started_at DATETIME DEFAULT NULL,
-            finished_at DATETIME DEFAULT NULL,
-            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            INDEX idx_user_created (user_id, created_at),
-            INDEX idx_status_created (status, created_at)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci');
+        return $stats;
     }
 
     private function lockNextPendingJob(): ?array
     {
         $this->pdo->beginTransaction();
 
-        $stmt = $this->pdo->prepare('SELECT *
+        $stmt = $this->pdo->prepare("SELECT *
             FROM gmb_sync_jobs
-            WHERE user_id = ? AND status = "pending"
+            WHERE user_id = ? AND status = 'pending'
             ORDER BY id ASC
             LIMIT 1
-            FOR UPDATE');
+            FOR UPDATE");
         $stmt->execute([$this->userId]);
         $job = $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
 
@@ -315,9 +361,9 @@ Merci infiniment."));
             return null;
         }
 
-        $update = $this->pdo->prepare('UPDATE gmb_sync_jobs
-            SET status = "running", attempts = attempts + 1, started_at = NOW(), updated_at = NOW()
-            WHERE id = ?');
+        $update = $this->pdo->prepare("UPDATE gmb_sync_jobs
+            SET status = 'running', attempts = attempts + 1, started_at = NOW(), updated_at = NOW()
+            WHERE id = ?");
         $update->execute([(int) $job['id']]);
 
         $this->pdo->commit();
@@ -327,9 +373,9 @@ Merci infiniment."));
 
     private function markJobDone(int $jobId, array $result): void
     {
-        $stmt = $this->pdo->prepare('UPDATE gmb_sync_jobs
-            SET status = "done", result = ?, error_message = NULL, finished_at = NOW(), updated_at = NOW()
-            WHERE id = ?');
+        $stmt = $this->pdo->prepare("UPDATE gmb_sync_jobs
+            SET status = 'done', result = ?, error_message = NULL, finished_at = NOW(), updated_at = NOW()
+            WHERE id = ?");
 
         $stmt->execute([
             json_encode($result, JSON_UNESCAPED_UNICODE),
@@ -339,9 +385,9 @@ Merci infiniment."));
 
     private function markJobError(int $jobId, string $message): void
     {
-        $stmt = $this->pdo->prepare('UPDATE gmb_sync_jobs
-            SET status = "error", error_message = ?, finished_at = NOW(), updated_at = NOW()
-            WHERE id = ?');
+        $stmt = $this->pdo->prepare("UPDATE gmb_sync_jobs
+            SET status = 'error', error_message = ?, finished_at = NOW(), updated_at = NOW()
+            WHERE id = ?");
 
         $stmt->execute([
             mb_substr($message, 0, 5000),

@@ -1,5 +1,6 @@
 <?php
-require_once __DIR__ . '/../../../config/database.php';
+if (!function_exists('db')) { require_once __DIR__ . '/../../../core/config/database.php'; }
+$pdo = db();
 $website_id = 1;
 
 $statut_filter = $_GET['statut'] ?? '';

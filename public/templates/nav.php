@@ -15,6 +15,7 @@ if (!function_exists('url')) {
 }
 
 $currentUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$advisorPhone = trim((string) setting('advisor_phone', setting('profil_telephone', APP_PHONE)));
 
 $navItems = [
 
@@ -52,15 +53,24 @@ $navItems = [
             ['path' => '/secteurs/villes/merignac',  'href' => url('/secteurs/villes/merignac'),  'label' => 'Mérignac'],
             ['path' => '/secteurs/villes/talence',   'href' => url('/secteurs/villes/talence'),   'label' => 'Talence'],
             ['path' => '/secteurs/villes/pessac',    'href' => url('/secteurs/villes/pessac'),    'label' => 'Pessac'],
-            ['path' => '/secteurs/villes/begles',    'href' => url('/secteurs/villes/begles'),    'label' => 'Bègles'],
-            ['path' => '/secteurs/villes/le-bouscat','href' => url('/secteurs/villes/le-bouscat'),'label' => 'Le Bouscat'],
-            ['path' => '/secteurs/villes/cauderan',  'href' => url('/secteurs/villes/cauderan'),  'label' => 'Caudéran'],
+            ['path' => '/secteurs/villes/floirac',    'href' => url('/secteurs/villes/floirac'),    'label' => 'Floirac'],
+            ['path' => '/secteurs/villes/lormont',   'href' => url('/secteurs/villes/lormont'),   'label' => 'Lormont'],
+            ['path' => '/secteurs/villes/eysines',   'href' => url('/secteurs/villes/eysines'),   'label' => 'Eysines'],
+            ['path' => '/secteurs/villes/saint-medard', 'href' => url('/secteurs/villes/saint-medard'), 'label' => 'Saint-Médard-en-Jalles'],
+            ['path' => '/secteurs/villes/villenave-dornon', 'href' => url('/secteurs/villes/villenave-dornon'), 'label' => "Villenave-d'Ornon"],
+            ['path' => '/secteurs/villes/bouliac',   'href' => url('/secteurs/villes/bouliac'),   'label' => 'Bouliac'],
+            ['path' => '/secteurs/villes/carbon-blanc', 'href' => url('/secteurs/villes/carbon-blanc'), 'label' => 'Carbon-Blanc'],
+            ['path' => '/secteurs/villes/blanquefort', 'href' => url('/secteurs/villes/blanquefort'), 'label' => 'Blanquefort'],
 
             // ── Section Quartiers ─────────────────────────────────
             ['type' => 'label', 'label' => 'Quartiers de Bordeaux'],
             ['path' => '/secteurs/quartiers/chartrons',     'href' => url('/secteurs/quartiers/chartrons'),     'label' => 'Chartrons'],
-            ['path' => '/secteurs/quartiers/saint-michel',  'href' => url('/secteurs/quartiers/saint-michel'),  'label' => 'Saint-Michel'],
             ['path' => '/secteurs/quartiers/cauderan',      'href' => url('/secteurs/quartiers/cauderan'),      'label' => 'Caudéran'],
+            ['path' => '/secteurs/quartiers/belcier',       'href' => url('/secteurs/quartiers/belcier'),       'label' => 'Belcier'],
+            ['path' => '/secteurs/quartiers/saint-augustin', 'href' => url('/secteurs/quartiers/saint-augustin'), 'label' => 'Saint-Augustin'],
+            ['path' => '/secteurs/quartiers/bacalan',        'href' => url('/secteurs/quartiers/bacalan'),        'label' => 'Bacalan'],
+            ['path' => '/secteurs/quartiers/capucins',      'href' => url('/secteurs/quartiers/capucins'),      'label' => 'Capucins'],
+            ['path' => '/secteurs/quartiers/saint-michel',  'href' => url('/secteurs/quartiers/saint-michel'),  'label' => 'Saint-Michel'],
             ['path' => '/secteurs/quartiers/bastide',       'href' => url('/secteurs/quartiers/bastide'),       'label' => 'La Bastide'],
             ['path' => '/secteurs/quartiers/saint-seurin',  'href' => url('/secteurs/quartiers/saint-seurin'),  'label' => 'Saint-Seurin'],
             ['path' => '/secteurs/quartiers/nansouty',      'href' => url('/secteurs/quartiers/nansouty'),      'label' => 'Nansouty'],
@@ -244,11 +254,11 @@ $navItems = [
             </a>
         </li>
 
-        <?php if (defined('APP_PHONE') && APP_PHONE): ?>
+        <?php if ($advisorPhone !== ''): ?>
         <li style="padding:0 1rem .5rem">
-            <a href="tel:<?= htmlspecialchars(preg_replace('/\s+/', '', APP_PHONE)) ?>" class="btn btn--outline btn--full">
+            <a href="tel:<?= htmlspecialchars(preg_replace('/\s+/', '', $advisorPhone)) ?>" class="btn btn--outline btn--full">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:.25rem" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 14a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 3.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 10a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
-                <?= htmlspecialchars(APP_PHONE) ?>
+                <?= htmlspecialchars($advisorPhone) ?>
             </a>
         </li>
         <?php endif; ?>

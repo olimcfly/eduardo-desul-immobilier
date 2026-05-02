@@ -266,7 +266,7 @@ $extraJs   = ['/assets/js/estimation.js'];
                                 name="telephone"
                                 class="form-control"
                                 autocomplete="tel">
-                            <div class="form-hint">Pour un échange direct avec Pascal.</div>
+                            <div class="form-hint">Pour un échange direct avec Eduardo Desul.</div>
                         </div>
 
                         <div class="form-group">
@@ -316,10 +316,10 @@ $extraJs   = ['/assets/js/estimation.js'];
                     <h3>Pourquoi estimer avec moi ?</h3>
                     <?php
                     $whyItems = [
-                        ['🎯', 'Précision garantie',        'Analyse basée sur les transactions réelles du marché du Pays d\'Aix.'],
+                        ['🎯', 'Précision garantie',        'Analyse basée sur les transactions réelles du marché bordelais.'],
                         ['⚡', 'Réponse sous 48h',          'Un rapport personnalisé dans votre boîte mail rapidement.'],
                         ['🔒', 'Gratuit & sans engagement', 'Aucune obligation de vendre, aucune surprise.'],
-                        ['🤝', 'Accompagnement humain',     'Pascal vous recontacte personnellement pour affiner l\'estimation.'],
+                        ['🤝', 'Accompagnement humain',     'Eduardo Desul vous recontacte personnellement pour affiner l\'estimation.'],
                     ];
                     foreach ($whyItems as [$icon, $title, $desc]): ?>
                     <div class="why-item">
@@ -335,9 +335,9 @@ $extraJs   = ['/assets/js/estimation.js'];
                 <div class="advisor-box">
                     <div class="advisor-avatar" aria-hidden="true">👤</div>
                     <h4><?= e(defined('ADVISOR_NAME') ? ADVISOR_NAME : ADVISOR_NAME) ?></h4>
-                    <div class="role">Expert immobilier 360° — Pays d\'Aix</div>
+                    <div class="role">Expert immobilier 360° — Bordeaux Métropole</div>
                     <p class="advisor-desc">
-                        Plus de 15 ans d'expérience sur le marché du Pays d\'Aix.
+                        Plus de 15 ans d'expérience sur le marché bordelais.
                         200+ transactions réussies.
                     </p>
                     <?php if (!empty(APP_PHONE)): ?>

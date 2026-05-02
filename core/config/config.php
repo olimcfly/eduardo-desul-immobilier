@@ -22,7 +22,7 @@ if ($looksLocalUrl) {
     if ($host !== '') {
         $configuredAppUrl = $scheme . '://' . $host;
     } else {
-        $configuredAppUrl = 'http://localhost';
+        $configuredAppUrl = 'https://eduardo-desul-immobilier.fr';
     }
 }
 
@@ -30,7 +30,7 @@ define('APP_URL',       rtrim($configuredAppUrl, '/'));
 define('APP_EMAIL',     $_ENV['APP_EMAIL'] ?? '');
 define('APP_PHONE',     $_ENV['APP_PHONE'] ?? '');
 define('APP_ADDRESS',   $_ENV['APP_ADDRESS'] ?? '');
-define('APP_CITY',      $_ENV['APP_CITY'] ?? '');
+define('APP_CITY',      $_ENV['APP_CITY'] ?? 'Bordeaux');
 define('APP_SIRET',     $_ENV['APP_SIRET'] ?? '');
 
 define('ADVISOR_NAME',  $_ENV['ADVISOR_NAME'] ?? '');

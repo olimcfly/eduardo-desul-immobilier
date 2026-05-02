@@ -1,6 +1,7 @@
 <?php
-require_once __DIR__ . '/../../../config/database.php';
+if (!function_exists('db')) { require_once __DIR__ . '/../../../core/config/database.php'; }
 require_once __DIR__ . '/../services/PersonaResolver.php';
+$pdo = db();
 
 $id               = $_POST['id'] ?? null;
 $website_id       = 1; // à rendre dynamique plus tard

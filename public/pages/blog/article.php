@@ -1,104 +1,97 @@
 <?php
-// core/helpers/articles.php
+declare(strict_types=1);
 
-function _get_pdo(): \PDO
-{
-    if (function_exists('db'))           return db();
-    if (isset($GLOBALS['pdo']))          return $GLOBALS['pdo'];
-    if (class_exists('\Core\Database'))  return \Core\Database::getInstance();
-    throw new \RuntimeException('PDO introuvable');
+require_once ROOT_PATH . '/core/helpers/articles.php';
+
+$slug = trim((string) ($slug ?? ''));
+$preview = isset($_GET['preview']) && ($_GET['preview'] === '1' || $_GET['preview'] === 'true');
+$canPreview = $preview && !empty($_SESSION['user_id']) && !empty($_SESSION['user_role']);
+$article = get_article_by_slug($slug, $canPreview);
+
+if (!$article) {
+    http_response_code(404);
+    $pageTitle = 'Article introuvable | ' . APP_NAME;
+    $metaDesc = 'Cet article n’existe pas ou n’est plus disponible.';
+    require ROOT_PATH . '/public/pages/404.php';
+    return;
 }
 
-// ─────────────────────────────────────────────
-// LISTE — page /blog
-// ─────────────────────────────────────────────
-function get_articles_list(int $limit = 12): array
-{
-    $pdo = _get_pdo();
+$articleTitle = trim((string) ($article['seo_title'] ?: $article['h1'] ?: $article['title']));
+$articleDescription = trim((string) ($article['meta_description'] ?: $article['excerpt']));
+$canonicalPath = '/blog/' . rawurlencode((string) $article['slug']);
 
-    $sql = "
-        SELECT
-            id,
-            COALESCE(h1, title)                     AS title,
-            slug,
-            article_type                            AS type,
-            topic_family,
-            COALESCE(
-                meta_desc,
-                LEFT(content_brief, 160),
-                ''
-            )                                       AS excerpt,
-            cover_image                             AS image,
-            COALESCE(published_at, created_at)      AS date
-        FROM seo_articles_plan
-        WHERE status    = 'published'
-          AND site_id   = 1
-        ORDER BY COALESCE(published_at, created_at) DESC
-        LIMIT :limit
-    ";
+$pageTitle = $articleTitle;
+$metaDesc = $articleDescription;
+$canonical = $article['canonical_url'] !== ''
+    ? (str_starts_with($article['canonical_url'], 'http') ? $article['canonical_url'] : rtrim(APP_URL, '/') . '/' . ltrim($article['canonical_url'], '/'))
+    : rtrim(APP_URL, '/') . $canonicalPath;
+$metaRobots = ((int) $article['robots_index'] === 1 ? 'index' : 'noindex')
+    . ', '
+    . ((int) $article['robots_follow'] === 1 ? 'follow' : 'nofollow');
+$ogType = 'article';
+$ogTitle = trim((string) ($article['og_title'] ?: $articleTitle));
+$ogDescription = trim((string) ($article['og_description'] ?: $articleDescription));
+$ogImage = $article['og_image'] !== ''
+    ? (str_starts_with($article['og_image'], 'http') ? $article['og_image'] : rtrim(APP_URL, '/') . '/' . ltrim($article['og_image'], '/'))
+    : '';
+$bodyClass = 'page-blog-article';
+$extraCss = ['/assets/css/guide.css'];
 
-    try {
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindValue(':limit', $limit, \PDO::PARAM_INT);
-        $stmt->execute();
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
-    } catch (\PDOException $e) {
-        error_log('[get_articles_list] ' . $e->getMessage());
-        return [];
+$schemaImage = $ogImage !== '' ? [$ogImage] : [];
+$articleSchema = [
+    '@context' => 'https://schema.org',
+    '@type' => $article['schema_type'] ?: 'Article',
+    'headline' => $article['h1'] ?: $article['title'],
+    'description' => $articleDescription,
+    'image' => $schemaImage,
+    'author' => [
+        '@type' => 'Person',
+        'name' => $article['author_name'] ?: ADVISOR_NAME,
+    ],
+    'datePublished' => $article['published_at'] ?: $article['created_at'],
+    'dateModified' => $article['updated_at'] ?: $article['published_at'] ?: $article['created_at'],
+    'mainEntityOfPage' => [
+        '@type' => 'WebPage',
+        '@id' => $canonical,
+    ],
+];
+
+$jsonLdBlocks = [$articleSchema];
+if (!empty($article['faq']) && is_array($article['faq'])) {
+    $faqItems = [];
+    foreach ($article['faq'] as $item) {
+        $question = trim((string) ($item['question'] ?? $item['q'] ?? ''));
+        $answer = trim((string) ($item['answer'] ?? $item['a'] ?? ''));
+        if ($question === '' || $answer === '') {
+            continue;
+        }
+        $faqItems[] = [
+            '@type' => 'Question',
+            'name' => $question,
+            'acceptedAnswer' => [
+                '@type' => 'Answer',
+                'text' => $answer,
+            ],
+        ];
+    }
+    if ($faqItems !== []) {
+        $jsonLdBlocks[] = [
+            '@context' => 'https://schema.org',
+            '@type' => 'FAQPage',
+            'mainEntity' => $faqItems,
+        ];
     }
 }
+?>
 
-// ─────────────────────────────────────────────
-// ARTICLE INDIVIDUEL — page /blog/{slug}
-// ─────────────────────────────────────────────
-function get_article_by_slug(string $slug): ?array
-{
-    if (empty(trim($slug))) return null;
+<?php if ($canPreview && $article['status'] !== 'published'): ?>
+    <div class="container" style="margin-top:1rem">
+        <div class="card" style="padding:1rem;border-left:4px solid #c9a84c">
+            Prévisualisation admin : cet article est actuellement en statut <strong><?= e($article['status']) ?></strong>.
+        </div>
+    </div>
+<?php endif; ?>
 
-    $pdo = _get_pdo();
+<?php $extraHead = ($extraHead ?? '') . implode("\n", array_map(static fn (array $jsonLdBlock): string => '<script type="application/ld+json">' . json_encode($jsonLdBlock, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . '</script>', $jsonLdBlocks)); ?>
 
-    $sql = "
-        SELECT
-            id,
-            article_type                                AS type,
-            topic_family,
-
-            -- SEO
-            COALESCE(meta_title, h1, title)             AS seo_title,
-            COALESCE(h1, title)                         AS titre,
-            meta_desc,
-            primary_keyword,
-            secondary_keywords_json,
-
-            slug,
-
-            -- Contenu
-            COALESCE(content_html, content_brief, '')   AS contenu,
-            word_count                                  AS mots,
-
-            -- Image
-            cover_image                                 AS image,
-
-            -- Dates
-            published_at                                AS date_publication,
-            created_at,
-            updated_at
-
-        FROM seo_articles_plan
-        WHERE slug   = :slug
-          AND status = 'published'
-          AND site_id = 1
-        LIMIT 1
-    ";
-
-    try {
-        $stmt = $pdo->prepare($sql);
-        $stmt->bindValue(':slug', trim($slug));
-        $stmt->execute();
-        $row = $stmt->fetch(\PDO::FETCH_ASSOC);
-        return $row ?: null;
-    } catch (\PDOException $e) {
-        error_log('[get_article_by_slug] ' . $e->getMessage());
-        return null;
-    }
-}
+<?php require ROOT_PATH . '/public/templates/pages/blog-single.php'; ?>

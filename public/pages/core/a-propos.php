@@ -1,12 +1,15 @@
 <?php
 declare(strict_types=1);
 
-$advisorName = $advisorName ?? ($siteSettings['advisor_name'] ?? ($_ENV['ADVISOR_NAME'] ?? 'Votre conseiller immobilier'));
+$advisorName = $advisorName ?? ($siteSettings['advisor_name'] ?? ($_ENV['ADVISOR_NAME'] ?? 'Eduardo Desul'));
 $advisorTitle = $advisorTitle ?? ($siteSettings['advisor_title'] ?? ($_ENV['ADVISOR_TITLE'] ?? 'Conseiller immobilier local'));
 $advisorPhone = $advisorPhone ?? ($siteSettings['phone'] ?? ($_ENV['APP_PHONE'] ?? ''));
 $advisorPhoneDisplay = $advisorPhoneDisplay ?? $advisorPhone;
 $advisorEmail = $advisorEmail ?? ($siteSettings['email'] ?? ($_ENV['APP_EMAIL'] ?? ''));
-$advisorCity = $advisorCity ?? ($siteSettings['city'] ?? ($_ENV['APP_CITY'] ?? 'Votre ville'));
+$advisorCity = trim((string) ($advisorCity ?? setting('zone_city', APP_CITY ?: 'Bordeaux')));
+if ($advisorCity === '') {
+    $advisorCity = 'Bordeaux';
+}
 $advisorImage = $advisorImage ?? ($siteSettings['advisor_image'] ?? '/assets/images/placeholder.php');
 $advisorSecondaryImage = $advisorSecondaryImage ?? ($siteSettings['advisor_secondary_image'] ?? $advisorImage);
 $advisorTerritoryImage = $advisorTerritoryImage ?? ($siteSettings['advisor_territory_image'] ?? $advisorImage);
@@ -33,8 +36,8 @@ $ctaPrimaryUrl = $siteSettings['about_cta_primary_url'] ?? '/contact';
 $ctaSecondaryLabel = $siteSettings['about_cta_secondary_label'] ?? 'Demander une estimation';
 $ctaSecondaryUrl = $siteSettings['about_cta_secondary_url'] ?? '/estimation-gratuite';
 
-$pageTitle = "À propos — {$advisorName} | Immobilier à {$advisorCity}";
-$metaDesc = "Découvrez {$advisorName}, {$advisorTitle} à {$advisorCity}. Un accompagnement immobilier local, humain et structuré pour vendre, acheter ou estimer votre bien.";
+$pageTitle = "À propos d’Eduardo Desul, conseiller immobilier à {$advisorCity}";
+$metaDesc = "Découvrez l’approche d’Eduardo Desul pour accompagner les vendeurs, acheteurs et investisseurs à {$advisorCity} avec méthode, écoute et stratégie.";
 
 $territories = $siteSettings['territories'] ?? [
     $advisorCity,

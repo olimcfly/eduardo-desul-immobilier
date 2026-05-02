@@ -1,6 +1,6 @@
 <?php
-$pageTitle = 'Guide du vendeur immobilier — ' . ADVISOR_NAME . '';
-$metaDesc  = 'Guide complet pour vendre votre bien immobilier à Bordeaux : estimation, diagnostics, home staging, négociation.';
+$pageTitle = 'Vendre un bien immobilier à Bordeaux | Guide Eduardo Desul';
+$metaDesc  = 'Guide pratique pour vendre votre bien immobilier à Bordeaux : estimation, diagnostics, préparation, diffusion, visites, négociation et signature.';
 $extraCss  = ['/assets/css/guide.css'];
 ?>
 
@@ -26,11 +26,11 @@ $extraCss  = ['/assets/css/guide.css'];
                             ['Préparer votre bien (home staging)', 'Dépersonnalisez, désencombrez, nettoyez en profondeur. Faites les petites réparations visibles. L\'objectif : que l\'acheteur puisse se projeter. Un bien bien présenté se vend 15% plus vite.'],
                             ['Photos professionnelles & annonce', 'Des photos lumineuses et qualitatives sont indispensables. 95% des acheteurs débutent leur recherche sur internet. Une belle annonce génère 3 fois plus de contacts.'],
                             ['Sélectionner les acheteurs sérieux', 'Pas question de faire visiter à tout le monde. Un bon conseiller filtre les contacts pour ne vous présenter que des acquéreurs qualifiés : budget validé, projet cohérent.'],
-                            ['Négocier les offres', 'Recevoir une offre d\'achat est une étape délicate. Pascal vous conseille sur comment évaluer chaque offre et négocier les meilleures conditions (prix, conditions suspensives, délais).'],
+                            ['Négocier les offres', 'Recevoir une offre d\'achat est une étape délicate. Eduardo Desul vous conseille sur comment évaluer chaque offre et négocier les meilleures conditions (prix, conditions suspensives, délais).'],
                             ['Signature du compromis', 'Le compromis de vente engage les deux parties. Votre conseiller vérifie toutes les clauses et vous explique chaque point. L\'acheteur dispose ensuite d\'un délai de rétractation de 10 jours.'],
-                            ['Obtention du financement acquéreur', 'Si la vente est sous condition suspensive d\'obtention de prêt, ce délai peut prendre 45 à 60 jours. Pascal fait le point régulièrement avec les deux parties.'],
-                            ['Signature de l\'acte authentique', 'Chez le notaire, vous remettez les clés et encaissez le prix de vente. C\'est la concrétisation de votre projet ! Pascal est présent à vos côtés jusqu\'au bout.'],
-                            ['Formalités post-vente', 'Résiliation des contrats liés au bien (assurance, énergie, eau), déclaration fiscale de la plus-value éventuelle. Pascal vous guide dans ces démarches.'],
+                            ['Obtention du financement acquéreur', 'Si la vente est sous condition suspensive d\'obtention de prêt, ce délai peut prendre 45 à 60 jours. Eduardo Desul fait le point régulièrement avec les deux parties.'],
+                            ['Signature de l\'acte authentique', 'Chez le notaire, vous remettez les clés et encaissez le prix de vente. C\'est la concrétisation de votre projet ! Eduardo Desul est présent à vos côtés jusqu\'au bout.'],
+                            ['Formalités post-vente', 'Résiliation des contrats liés au bien (assurance, énergie, eau), déclaration fiscale de la plus-value éventuelle. Eduardo Desul vous guide dans ces démarches.'],
                         ];
                         foreach ($etapes as $e): ?>
                         <div class="guide-step">

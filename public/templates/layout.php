@@ -1,6 +1,27 @@
 <?php
-$zoneCity = setting('zone_city', APP_CITY);
-$siteMetaDescription = setting('site_meta_description', 'Conseiller immobilier indépendant dans votre secteur.');
+$currentPath = strtok((string) ($_SERVER['REQUEST_URI'] ?? '/'), '?') ?: '/';
+$appUrl = rtrim((string) APP_URL, '/');
+$canonicalUrl = $canonical ?? ($appUrl . '/' . ltrim($currentPath, '/'));
+$zoneCity = trim((string) setting('zone_city', APP_CITY ?: 'Bordeaux'));
+if ($zoneCity === '') {
+    $zoneCity = 'Bordeaux';
+}
+$siteMetaDescription = setting('site_meta_description', 'Conseiller immobilier indépendant à ' . $zoneCity . '.');
+$advisorPhone = trim((string) setting('advisor_phone', setting('profil_telephone', APP_PHONE)));
+$advisorEmail = trim((string) setting('advisor_email', setting('profil_email', APP_EMAIL)));
+$advisorFirst = trim((string) setting('advisor_firstname', setting('profil_prenom', '')));
+$advisorLast = trim((string) setting('advisor_lastname', setting('profil_nom', '')));
+$advisorName = trim($advisorFirst . ' ' . $advisorLast);
+if ($advisorName === '') {
+    $advisorName = ADVISOR_NAME ?: 'Eduardo Desul';
+}
+$noIndexPrefixes = ['/admin', '/login', '/logout', '/api', '/ajax'];
+foreach ($noIndexPrefixes as $noIndexPrefix) {
+    if ($currentPath === $noIndexPrefix || str_starts_with($currentPath, $noIndexPrefix . '/')) {
+        $metaRobots = 'noindex, nofollow';
+        break;
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -10,17 +31,17 @@ $siteMetaDescription = setting('site_meta_description', 'Conseiller immobilier i
     <title><?= e($pageTitle ?? APP_NAME) ?></title>
     <meta name="description" content="<?= e($metaDesc ?? $siteMetaDescription) ?>">
     <meta name="robots" content="<?= e($metaRobots ?? 'index, follow') ?>">
-    <link rel="canonical" href="<?= e($canonical ?? APP_URL . strtok($_SERVER['REQUEST_URI'], '?')) ?>">
+    <link rel="canonical" href="<?= e($canonicalUrl) ?>">
     <link rel="icon" type="image/svg+xml" href="/assets/images/favicon.svg">
     <?php if (!empty($_ENV['SEARCH_CONSOLE_VERIFICATION'])): ?>
     <meta name="google-site-verification" content="<?= e((string) $_ENV['SEARCH_CONSOLE_VERIFICATION']) ?>">
     <?php endif; ?>
 
     <!-- Open Graph -->
-    <meta property="og:title"       content="<?= e($pageTitle ?? APP_NAME) ?>">
-    <meta property="og:description" content="<?= e($metaDesc ?? ('Conseiller immobilier à ' . ($zoneCity ?: 'votre secteur'))) ?>">
+    <meta property="og:title"       content="<?= e($ogTitle ?? $pageTitle ?? APP_NAME) ?>">
+    <meta property="og:description" content="<?= e($ogDescription ?? $metaDesc ?? ('Conseiller immobilier à ' . $zoneCity)) ?>">
     <meta property="og:type"        content="<?= e($ogType ?? 'website') ?>">
-    <meta property="og:url"         content="<?= e(APP_URL . $_SERVER['REQUEST_URI']) ?>">
+    <meta property="og:url"         content="<?= e($canonicalUrl) ?>">
     <meta property="og:locale"      content="fr_FR">
     <meta property="og:site_name"   content="<?= e(APP_NAME) ?>">
     <?php if (!empty($ogImage)): ?>
@@ -40,8 +61,8 @@ $siteMetaDescription = setting('site_meta_description', 'Conseiller immobilier i
         "name": "<?= e(APP_NAME) ?>",
         "description": "<?= e($siteMetaDescription) ?>",
         "url": "<?= e(APP_URL) ?>",
-        "telephone": "<?= e(APP_PHONE) ?>",
-        "email": "<?= e(APP_EMAIL) ?>",
+        "telephone": "<?= e($advisorPhone) ?>",
+        "email": "<?= e($advisorEmail) ?>",
         "address": {
             "@type": "PostalAddress",
             "addressLocality": "<?= e($zoneCity) ?>",
@@ -51,17 +72,22 @@ $siteMetaDescription = setting('site_meta_description', 'Conseiller immobilier i
             "@type": "City",
             "name": "<?= e($zoneCity) ?>"
         }
-        <?php if (!empty($jsonLd)): ?>,<?= $jsonLd ?><?php endif; ?>
+    <?php if (!empty($jsonLd)): ?>,<?= $jsonLd ?><?php endif; ?>
     }
     </script>
+
+    <?php if (!empty($extraHead)): ?>
+    <?= $extraHead . "\n" ?>
+    <?php endif; ?>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-    <!-- CSS -->
+    <!-- CSS : main (base) + nav (menu : .nav / .submenu — aligné sur public/templates/nav.php) -->
     <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/css/nav.css">
     <?php foreach ($extraCss ?? [] as $css): ?>
     <link rel="stylesheet" href="<?= e($css) ?>">
     <?php endforeach; ?>
@@ -122,8 +148,8 @@ $siteMetaDescription = setting('site_meta_description', 'Conseiller immobilier i
 
 <script>
 window.__APP_SETTINGS__ = {
-    advisorName: <?= json_encode(trim((string) setting('advisor_firstname', '') . ' ' . (string) setting('advisor_lastname', '')) ?: (ADVISOR_NAME ?: APP_NAME), JSON_UNESCAPED_UNICODE) ?>,
-    zoneCity: <?= json_encode((string) setting('zone_city', APP_CITY), JSON_UNESCAPED_UNICODE) ?>
+    advisorName: <?= json_encode($advisorName, JSON_UNESCAPED_UNICODE) ?>,
+    zoneCity: <?= json_encode($zoneCity, JSON_UNESCAPED_UNICODE) ?>
 };
 </script>
 

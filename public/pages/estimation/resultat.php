@@ -34,7 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $telephone = trim($_POST['telephone'] ?? '');
 
     if ($email && $prenom && filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        LeadService::capture([
+        $leadPayload = [
             'source_type' => LeadService::SOURCE_ESTIMATION,
             'pipeline'    => LeadService::SOURCE_ESTIMATION,
             'stage'       => 'qualifie',
@@ -43,6 +43,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'email'       => $email,
             'phone'       => $telephone,
             'intent'      => 'Estimation + RDV',
+            'property_type' => $typeBien,
+            'property_address' => $localite,
             'consent'     => !empty($_POST['rgpd']),
             'metadata'    => [
                 'zone_id'           => $est['zone_id'] ?? null,
@@ -61,7 +63,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'situation'         => trim($_POST['situation']       ?? ''),
                 'creneau_prefere'   => trim($_POST['creneau_prefere'] ?? ''),
             ],
-        ]);
+        ];
+
+        $existingLeadId = (int) ($est['crm_lead_id'] ?? 0);
+        if ($existingLeadId > 0) {
+            try {
+                $stmt = db()->prepare(
+                    'UPDATE crm_leads
+                     SET stage = :stage,
+                         priority = :priority,
+                         first_name = :first_name,
+                         last_name = :last_name,
+                         email = :email,
+                         phone = :phone,
+                         intent = :intent,
+                         property_type = :property_type,
+                         property_address = :property_address,
+                         metadata_json = :metadata_json,
+                         notes = :notes,
+                         consent = :consent,
+                         updated_at = NOW()
+                     WHERE id = :id
+                     LIMIT 1'
+                );
+                $stmt->execute([
+                    ':stage' => 'qualifie',
+                    ':priority' => 'haute',
+                    ':first_name' => $leadPayload['first_name'],
+                    ':last_name' => $leadPayload['last_name'],
+                    ':email' => $leadPayload['email'],
+                    ':phone' => $leadPayload['phone'],
+                    ':intent' => $leadPayload['intent'],
+                    ':property_type' => $leadPayload['property_type'] ?? '',
+                    ':property_address' => $leadPayload['property_address'] ?? '',
+                    ':metadata_json' => json_encode($leadPayload['metadata'], JSON_UNESCAPED_UNICODE),
+                    ':notes' => 'Coordonnées ajoutées après estimation gratuite.',
+                    ':consent' => !empty($leadPayload['consent']) ? 1 : 0,
+                    ':id' => $existingLeadId,
+                ]);
+            } catch (Throwable $e) {
+                error_log('[estimation-resultat] update anonymous lead: ' . $e->getMessage());
+                LeadService::capture($leadPayload);
+            }
+        } else {
+            LeadService::capture($leadPayload);
+        }
 
         // ── Nettoyage session ──────────────────────────────────────
         unset($_SESSION['estimation']);
@@ -230,11 +276,11 @@ ob_start();
                             <tbody>
                                 <?php foreach ($comparables as $comp): ?>
                                 <tr>
-                                    <td><?= e($comp['adresse'] ?? '—') ?></td>
+                                    <td><?= e($comp['address_label'] ?? '—') ?></td>
                                     <td><?= e($comp['surface']) ?> m²</td>
-                                    <td><?= number_format((int)$comp['prix'], 0, ',', ' ') ?> €</td>
-                                    <td><?= number_format((int)$comp['prix_m2'], 0, ',', ' ') ?> €/m²</td>
-                                    <td><?= date('m/Y', strtotime($comp['date_vente'])) ?></td>
+                                    <td><?= number_format((int)$comp['value_amount'], 0, ',', ' ') ?> €</td>
+                                    <td><?= number_format((int)$comp['price_m2'], 0, ',', ' ') ?> €/m²</td>
+                                    <td><?= date('m/Y', strtotime($comp['mutation_date'])) ?></td>
                                 </tr>
                                 <?php endforeach; ?>
                             </tbody>
@@ -302,14 +348,14 @@ ob_start();
                                 'icon'  => '🏷️',
                                 'title' => 'Guide complet vendeur',
                                 'desc'  => '28 étapes pour réussir votre vente au meilleur prix.',
-                                'link'  => '/guide-vendeur',
+                                'link'  => '/vendre',
                                 'cta'   => 'Lire le guide',
                             ],
                             [
                                 'icon'  => '🔑',
                                 'title' => 'Guide complet acheteur',
                                 'desc'  => 'De la recherche à la signature, tout ce qu\'il faut savoir.',
-                                'link'  => '/guide-acheteur',
+                                'link'  => '/acheter',
                                 'cta'   => 'Lire le guide',
                             ],
                             [

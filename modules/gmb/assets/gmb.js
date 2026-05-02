@@ -2,12 +2,38 @@
     'use strict';
 
     async function postForm(url, formData) {
+        if (!formData.has('csrf_token') && window.GMB_CSRF_TOKEN) {
+            formData.append('csrf_token', window.GMB_CSRF_TOKEN);
+        }
+
         const response = await fetch(url, {
             method: 'POST',
+            credentials: 'same-origin',
             headers: { 'X-Requested-With': 'XMLHttpRequest' },
             body: formData,
         });
-        return response.json();
+
+        let data = {};
+        try {
+            data = await response.json();
+        } catch (error) {
+            data = { success: false, message: 'Réponse serveur invalide.', data: {} };
+        }
+
+        if (!response.ok && data.success !== false) {
+            data.success = false;
+            data.message = data.message || 'Erreur serveur.';
+        }
+
+        return data;
+    }
+
+    function updateStats(stats) {
+        if (!stats) return;
+        Object.keys(stats).forEach(function (key) {
+            const node = document.querySelector('[data-stat="' + key + '"]');
+            if (node) node.textContent = stats[key];
+        });
     }
 
     document.addEventListener('submit', async function (event) {
@@ -28,6 +54,17 @@
             event.preventDefault();
             const data = await postForm('/modules/gmb/ajax/save-template.php', new FormData(form));
             alert(data.message || 'Template sauvegardé.');
+        }
+
+        if (form.id === 'gmb-stats-form') {
+            event.preventDefault();
+            const fd = new FormData(form);
+            fd.append('action', 'save');
+            const data = await postForm('/modules/gmb/ajax/get-stats.php', fd);
+            if (data.success) {
+                updateStats(data.data && data.data.stats);
+            }
+            alert(data.message || 'Statistiques enregistrées.');
         }
     });
 
@@ -60,14 +97,12 @@
 
         if (btn.dataset.action === 'get-stats') {
             const data = await postForm('/modules/gmb/ajax/get-stats.php', new FormData());
-            if (!data.success || !data.stats) {
+            if (!data.success) {
                 alert(data.message || 'Erreur stats.');
                 return;
             }
-            Object.keys(data.stats).forEach(function (key) {
-                const node = document.querySelector('[data-stat="' + key + '"]');
-                if (node) node.textContent = data.stats[key];
-            });
+            updateStats(data.data && data.data.stats);
+            alert(data.message || 'Dernières données affichées.');
         }
     });
 })();

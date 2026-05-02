@@ -23,9 +23,50 @@ $importStats = DvfEstimatorService::importStats();
 function renderContent() {
     global $importFeedback, $requests, $importStats, $filters;
     ?>
-    <div class="page-header">
-        <h1><i class="fas fa-chart-area page-icon"></i> Estimation <span class="page-title-accent">DVF</span></h1>
-        <p>Importez DVF, suivez les demandes et pilotez les estimations.</p>
+    <style>
+        .start-hero { background: linear-gradient(135deg, #0f2237 0%, #1a3a5c 100%); border-radius: 16px; padding: 36px 40px; color: #fff; margin-bottom: 32px; box-shadow: 0 4px 20px rgba(15,34,55,.18); }
+        .start-hero-badge { display: inline-block; background: rgba(201,168,76,.2); color: #c9a84c; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 4px 12px; border-radius: 20px; margin-bottom: 14px; border: 1px solid rgba(201,168,76,.35); }
+        .start-hero h1 { font-size: 28px; font-weight: 700; color: #fff; margin: 0 0 12px; line-height: 1.25; }
+        .start-hero p { font-size: 15px; color: rgba(255,255,255,.7); line-height: 1.65; max-width: 680px; margin: 0; }
+        .start-steps-title { font-size: 12px; font-weight: 700; color: #8a95a3; text-transform: uppercase; letter-spacing: .07em; margin: 0 0 16px; }
+        .start-steps { display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px; }
+        .start-step { display: flex; align-items: flex-start; gap: 18px; background: #fff; border-radius: 12px; padding: 20px 22px; box-shadow: 0 1px 6px rgba(0,0,0,.07); text-decoration: none; color: inherit; border-left: 4px solid #e8ecf0; }
+        .start-step-num { flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: #64748b; }
+        .start-step-body { flex: 1; }
+        .start-step-label { font-size: 15px; font-weight: 600; color: #1e293b; margin-bottom: 3px; }
+        .start-step-desc { font-size: 13px; color: #64748b; line-height: 1.5; }
+        .start-step-arrow { flex-shrink: 0; color: #c9a84c; font-size: 16px; margin-top: 8px; }
+        .start-cta { background: #fff; border-radius: 12px; padding: 24px 26px; box-shadow: 0 1px 6px rgba(0,0,0,.07); display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; margin-top: 16px; }
+        .start-cta-text strong { display: block; font-size: 15px; font-weight: 600; color: #1e293b; margin-bottom: 4px; }
+        .start-cta-text span { font-size: 13px; color: #64748b; }
+        .start-cta-btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 22px; background: #c9a84c; color: #0f2237; border-radius: 8px; font-size: 14px; font-weight: 700; text-decoration: none; white-space: nowrap; }
+        @media (max-width: 600px) { .start-hero { padding: 24px 20px; } .start-step { flex-wrap: wrap; } }
+    </style>
+
+    <div class="start-hero">
+        <div class="start-hero-badge">Données DVF</div>
+        <h1>Estimation DVF</h1>
+        <p>Importez DVF, suivez les demandes et pilotez les estimations depuis un espace unique.</p>
+    </div>
+
+    <div class="start-steps-title">Flux de traitement</div>
+    <div class="start-steps">
+        <a href="/admin/?module=estimation_dvf" class="start-step">
+            <div class="start-step-num">1</div>
+            <div class="start-step-body">
+                <div class="start-step-label">Importer les données DVF</div>
+                <div class="start-step-desc">Chargez le CSV, contrôlez les erreurs et gardez un historique des imports.</div>
+            </div>
+            <div class="start-step-arrow"><i class="fas fa-chevron-right"></i></div>
+        </a>
+        <a href="/admin/?module=estimation_dvf" class="start-step">
+            <div class="start-step-num">2</div>
+            <div class="start-step-body">
+                <div class="start-step-label">Filtrer les demandes</div>
+                <div class="start-step-desc">Retrouvez les demandes par ville, type de bien et statut.</div>
+            </div>
+            <div class="start-step-arrow"><i class="fas fa-chevron-right"></i></div>
+        </a>
     </div>
 
     <?php if ($importFeedback): ?>
@@ -51,7 +92,7 @@ function renderContent() {
 
     <div class="card" style="padding:1rem;margin-bottom:1rem;">
         <h3>Filtres demandes</h3>
-        <form method="GET" action="/admin/index.php" style="display:grid;gap:.75rem;grid-template-columns:repeat(5,minmax(0,1fr));">
+        <form method="GET" action="/admin/" style="display:grid;gap:.75rem;grid-template-columns:repeat(5,minmax(0,1fr));">
             <input type="hidden" name="module" value="estimation_dvf">
             <input type="text" name="city" class="form-control" placeholder="Ville" value="<?= e($filters['city']) ?>">
             <select name="property_type" class="form-control">
@@ -137,6 +178,13 @@ function renderContent() {
             <?php endforeach; ?>
             </tbody>
         </table>
+    </div>
+    <div class="start-cta">
+        <div class="start-cta-text">
+            <strong>Maintenir les données à jour</strong>
+            <span>Relancez un import dès qu’un nouveau fichier DVF est disponible.</span>
+        </div>
+        <a href="/admin/?module=estimation_dvf" class="start-cta-btn"><i class="fas fa-upload"></i> Revenir à l’import</a>
     </div>
     <?php
 }

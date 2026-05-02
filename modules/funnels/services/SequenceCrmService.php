@@ -39,6 +39,37 @@ class SequenceCrmService
     }
 
     /**
+     * Inscrit un lead sans envoyer le 1er mail tout de suite (ex. accusé manuel + IA le jour J).
+     * Le 1er step part quand next_send_at est atteint (cron processDue).
+     */
+    public function enrollDeferred(int $leadId, int $sequenceId, int $firstEmailInDays, array $vars = []): bool
+    {
+        $seq = $this->getSequence($sequenceId);
+        if (!$seq || $seq['status'] !== 'active') {
+            return false;
+        }
+
+        $existing = $this->getEnrollment($leadId, $sequenceId);
+        if ($existing && $existing['status'] === 'active') {
+            return false;
+        }
+
+        $firstInDays = max(0, $firstEmailInDays);
+        $nextAt = (new \DateTimeImmutable('now', new \DateTimeZone('Europe/Paris')))
+            ->modify('+' . $firstInDays . ' days')
+            ->format('Y-m-d H:i:s');
+
+        $stmt = $this->db->prepare('
+            INSERT INTO crm_sequence_enrollments
+                (sequence_id, lead_id, current_step, status, next_send_at)
+            VALUES (:seq_id, :lead_id, 0, "active", :next_at)
+        ');
+        $stmt->execute([':seq_id' => $sequenceId, ':lead_id' => $leadId, ':next_at' => $nextAt]);
+
+        return true;
+    }
+
+    /**
      * Traite le prochain step dû pour un enrollment.
      * À appeler depuis le cron.
      */

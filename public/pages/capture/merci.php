@@ -9,14 +9,14 @@ $bodyClass  = 'page-merci';
             <div style="font-size:5rem;margin-bottom:1.5rem">🎉</div>
             <h1>Merci !</h1>
             <p style="font-size:1.15rem;color:var(--clr-text-muted);margin-bottom:2rem">
-                Votre demande a bien été reçue. Pascal vous contactera personnellement dans les <strong>24 à 48 heures</strong> pour donner suite à votre demande.
+                Votre demande a bien été reçue. Eduardo Desul vous contactera personnellement dans les <strong>24 à 48 heures</strong> pour donner suite à votre demande.
             </p>
 
             <div style="background:var(--clr-bg);border-radius:var(--radius-xl);padding:2rem;border:1px solid var(--clr-border);margin-bottom:2rem;text-align:left">
                 <h3 style="margin-bottom:1rem">Et maintenant ?</h3>
                 <?php foreach ([
                     ['📧', 'Vérifiez votre email', 'Un email de confirmation vous a été envoyé avec les détails de votre demande.'],
-                    ['📞', 'Attendez l\'appel d\'Pascal', 'Pascal vous appellera dans les 24h pour un échange personnalisé.'],
+                    ['📞', 'Attendez l\'appel d\'Eduardo Desul', 'Eduardo Desul vous appellera dans les 24h pour un échange personnalisé.'],
                     ['🔍', 'Explorez le site', 'Profitez-en pour découvrir nos annonces et nos ressources.'],
                 ] as [$icon, $titre, $desc]): ?>
                 <div style="display:flex;gap:1rem;margin-bottom:1rem;align-items:flex-start">
@@ -36,7 +36,7 @@ $bodyClass  = 'page-merci';
 
             <?php if (APP_PHONE): ?>
             <p style="margin-top:2rem;font-size:.875rem;color:var(--clr-text-muted)">
-                Une question urgente ? Appelez directement Pascal :<br>
+                Une question urgente ? Appelez directement Eduardo Desul :<br>
                 <a href="tel:<?= e(preg_replace('/\s+/', '', APP_PHONE)) ?>" style="color:var(--clr-primary);font-weight:700;font-size:1rem"><?= e(APP_PHONE) ?></a>
             </p>
             <?php endif; ?>

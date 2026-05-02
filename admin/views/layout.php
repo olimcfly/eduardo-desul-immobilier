@@ -15,9 +15,15 @@ if ($advisorDisplayName === '') {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" href="<?= e(asset_url('/admin/assets/css/dashboard.css')) ?>">
     <link rel="stylesheet" href="<?= e(asset_url('/admin/assets/css/settings.css')) ?>">
-    <link rel="stylesheet" href="<?= e(asset_url('/admin/assets/css/hub-unified.css')) ?>">
+    <link rel="stylesheet" href="<?= e(asset_url('/admin/assets/css/hub-page.css')) ?>">
+    <link rel="stylesheet" href="<?= e(asset_url('/admin/assets/css/tooltip.css')) ?>">
 </head>
-<body data-current-module="<?= htmlspecialchars($module ?? 'dashboard') ?>">
+<body data-current-module="<?= htmlspecialchars($module ?? 'dashboard') ?>"
+      <?php if (isset($adminModulePlugin) && $adminModulePlugin instanceof AdminModulePlugin): ?>
+      data-plugin-slug="<?= htmlspecialchars($adminModulePlugin->slug, ENT_QUOTES, 'UTF-8') ?>"
+      data-plugin-name="<?= htmlspecialchars($adminModulePlugin->name, ENT_QUOTES, 'UTF-8') ?>"
+      data-plugin-in-sidebar="<?= $adminModulePlugin->inSidebar ? '1' : '0' ?>"
+      <?php endif; ?>>
 <div class="dashboard-container" id="dashboard-container">
 
     <aside class="sidebar" id="sidebar">
@@ -138,6 +144,13 @@ if ($advisorDisplayName === '') {
             </div>
 
         </header>
+
+        <!-- NOTIFICATION DÉVELOPPEMENT -->
+        <?php if (setting('site_development_mode', '1') === '1'): ?>
+        <div style="background: linear-gradient(90deg, #b8860b, #ffd700); color: #1a1a1a; padding: 12px 20px; font-weight: 600; font-size: 14px; border-bottom: 1px solid #d4a505; text-align: center;">
+            ℹ️ <strong>Site en développement</strong> — Le frontend est accessible au public, mais le backend reste en cours de configuration.
+        </div>
+        <?php endif; ?>
 
         <!-- CONTENU -->
         <main class="main-content">

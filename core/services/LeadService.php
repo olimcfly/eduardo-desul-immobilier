@@ -6,6 +6,8 @@ class LeadService
     public const SOURCE_RESSOURCE = 'telechargement';
     public const SOURCE_CONTACT = 'contact';
     public const SOURCE_FINANCEMENT = 'financement';
+    /** Page /avis-de-valeur (distinct du tunnel estimation) */
+    public const SOURCE_AVIS_VALEUR = 'avis_valeur';
     public const SOURCE_AUTRE = 'autre';
 
     private static bool $tableReady = false;
@@ -156,6 +158,7 @@ class LeadService
             self::SOURCE_RESSOURCE => ['nouveau', 'nurturing', 'a_relancer', 'rdv_propose', 'converti', 'inactif'],
             self::SOURCE_CONTACT => ['nouveau', 'a_traiter', 'en_discussion', 'rdv_planifie', 'converti', 'archive'],
             self::SOURCE_FINANCEMENT => ['nouveau', 'en_cours', 'traite'],
+            self::SOURCE_AVIS_VALEUR => ['nouveau', 'a_qualifier', 'rdv_a_planifier', 'rdv_planifie', 'converti', 'perdu'],
             self::SOURCE_AUTRE => ['nouveau', 'a_qualifier', 'en_cours', 'converti', 'archive'],
         ];
     }
@@ -190,6 +193,7 @@ class LeadService
             self::SOURCE_RESSOURCE => 'Téléchargement',
             self::SOURCE_CONTACT => 'Contact',
             self::SOURCE_FINANCEMENT => 'Financement',
+            self::SOURCE_AVIS_VALEUR => 'Avis de valeur',
             self::SOURCE_AUTRE => 'Autre',
         ][$source] ?? ucfirst($source);
     }
@@ -319,7 +323,7 @@ class LeadService
     private static function sanitizeSource(string $source): string
     {
         $source = strtolower(trim($source));
-        $allowed = [self::SOURCE_ESTIMATION, self::SOURCE_RESSOURCE, self::SOURCE_CONTACT, self::SOURCE_FINANCEMENT, self::SOURCE_AUTRE];
+        $allowed = [self::SOURCE_ESTIMATION, self::SOURCE_RESSOURCE, self::SOURCE_CONTACT, self::SOURCE_FINANCEMENT, self::SOURCE_AVIS_VALEUR, self::SOURCE_AUTRE];
         return in_array($source, $allowed, true) ? $source : self::SOURCE_AUTRE;
     }
 
