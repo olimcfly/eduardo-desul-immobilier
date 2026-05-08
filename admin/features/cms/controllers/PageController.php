@@ -14,7 +14,7 @@ class PageController {
     public function edit($page_slug) {
         if (!\Auth::check()) {
             \Session::flash('error', 'Connectez-vous pour accéder à cette page.');
-            header('Location: /admin/login');
+            header('Location: /admin/auth/login.php');
             exit;
         }
 
@@ -29,7 +29,7 @@ class PageController {
     public function save() {
         if (!\Auth::check()) {
             \Session::flash('error', 'Connectez-vous pour accéder à cette page.');
-            header('Location: /admin/login');
+            header('Location: /admin/auth/login.php');
             exit;
         }
 

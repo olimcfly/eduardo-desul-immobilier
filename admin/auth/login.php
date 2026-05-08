@@ -4,9 +4,11 @@ declare(strict_types=1);
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
 
+require_once __DIR__ . '/../../includes/auth.php';
+
 // ── Démarrer la session ──────────────────────────────────────
 if (session_status() === PHP_SESSION_NONE) {
-    session_name('edo_immo_sess');
+    session_name('pascalhamm_sess');
     session_set_cookie_params([
         'lifetime' => 28800,
         'path'     => '/',
@@ -34,22 +36,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($email) || empty($password)) {
         $error = 'Veuillez remplir tous les champs.';
     } else {
-        // Identifiants de test (à remplacer par une vraie base de données)
-        $adminEmail = 'admin@eduardo-desul.fr';
-        $adminPassword = 'admin123'; // À CHANGER en production !
-        
-        if ($email === $adminEmail && $password === $adminPassword) {
-            // Connexion réussie
+        $result = login($email, $password);
+
+        if (!empty($result['success'])) {
             session_regenerate_id(true);
-            $_SESSION['user_id']    = 1;
-            $_SESSION['user_email'] = $email;
-            $_SESSION['user_role']  = 'admin';
-            $_SESSION['user_name']  = 'Administrateur';
-            
+
+            $_SESSION['user_id'] = 1;
+            $_SESSION['user_email'] = (string) (ADMIN_EMAIL ?? $email);
+            $_SESSION['user_role'] = 'superadmin';
+            $_SESSION['user_name'] = 'Superadmin';
+
+            if (!empty($result['force_password_reset'])) {
+                header('Location: /admin/auth/profile.php?first_login=1');
+                exit;
+            }
+
             header('Location: /admin/');
             exit;
         } else {
-            $error = 'Email ou mot de passe incorrect.';
+            $error = (string) ($result['message'] ?? 'Email ou mot de passe incorrect.');
         }
     }
 }
@@ -59,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion Admin - Eduardo Desul Immobilier</title>
+    <title>Connexion Admin - Pascal Hamm Immobilier</title>
     <style>
         * {
             margin: 0;
@@ -209,7 +214,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
     <div class="login-container">
         <div class="login-header">
-            <h1>Eduardo Desul</h1>
+            <h1>Pascal Hamm</h1>
             <p>Tableau de bord administrateur</p>
         </div>
 
@@ -243,7 +248,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <div class="forgot-password-link">
-                <a href="/admin/forgot-password.php">Mot de passe oublié ?</a>
+                <a href="/admin/auth/forgot-password.php">Mot de passe oublié ?</a>
             </div>
 
             <button type="submit" class="submit-btn">Connexion</button>
@@ -251,7 +256,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <div class="login-footer">
             <p style="color: #999; font-size: 12px;">
-                © 2026 Eduardo Desul Immobilier - Tous droits réservés
+                © 2026 Pascal Hamm Immobilier - Tous droits réservés
             </p>
         </div>
     </div>

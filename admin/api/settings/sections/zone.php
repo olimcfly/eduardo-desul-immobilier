@@ -10,18 +10,18 @@ $v = fn(string $k, string $d = '') => htmlspecialchars($s[$k] ?? $d);
     <div class="form-row">
         <div class="form-group">
             <label>Ville principale</label>
-            <input type="text" name="zone_ville" value="<?= $v('zone_ville', 'Bordeaux') ?>">
+            <input type="text" name="zone_ville" value="<?= $v('zone_ville', 'Aix-en-Provence') ?>">
         </div>
         <div class="form-group">
             <label>Département</label>
-            <input type="text" name="zone_departement" value="<?= $v('zone_departement', 'Gironde') ?>">
+            <input type="text" name="zone_departement" value="<?= $v('zone_departement', 'Bouches-du-Rhône') ?>">
         </div>
     </div>
 
     <div class="form-row">
         <div class="form-group">
             <label>Région</label>
-            <input type="text" name="zone_region" value="<?= $v('zone_region', 'Nouvelle-Aquitaine') ?>">
+            <input type="text" name="zone_region" value="<?= $v('zone_region', 'Provence-Alpes-Côte d\'Azur') ?>">
         </div>
         <div class="form-group">
             <label>Rayon (km)</label>
@@ -32,7 +32,7 @@ $v = fn(string $k, string $d = '') => htmlspecialchars($s[$k] ?? $d);
     <div class="form-group">
         <label>Communes couvertes <span class="label-hint">Séparées par des virgules</span></label>
         <textarea name="zone_communes" rows="3"
-            placeholder="Bordeaux, Mérignac, Pessac, Talence, Bègles…"><?= $v('zone_communes') ?></textarea>
+            placeholder="Aix-en-Provence, Gardanne, Les Milles, Vitrolles, Les Pennes-Mirabeau, Bouc-Bel-Air…"><?= $v('zone_communes') ?></textarea>
     </div>
 
     <div class="form-section-title">Coordonnées GPS <span class="label-hint">(pour la carte)</span></div>
@@ -40,11 +40,11 @@ $v = fn(string $k, string $d = '') => htmlspecialchars($s[$k] ?? $d);
     <div class="form-row">
         <div class="form-group">
             <label>Latitude</label>
-            <input type="text" name="zone_lat" value="<?= $v('zone_lat', '44.8378') ?>" placeholder="44.8378">
+            <input type="text" name="zone_lat" value="<?= $v('zone_lat', '43.5297') ?>" placeholder="43.5297">
         </div>
         <div class="form-group">
             <label>Longitude</label>
-            <input type="text" name="zone_lng" value="<?= $v('zone_lng', '-0.5792') ?>" placeholder="-0.5792">
+            <input type="text" name="zone_lng" value="<?= $v('zone_lng', '5.4474') ?>" placeholder="5.4474">
         </div>
     </div>
 

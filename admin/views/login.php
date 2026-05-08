@@ -116,7 +116,7 @@
         </div>
         <?php endif; ?>
 
-        <form method="POST" action="/admin/login" novalidate autocomplete="on">
+        <form method="POST" action="/admin/auth/login.php" novalidate autocomplete="on">
 
             <div class="form-group">
                 <label class="form-label" for="email">Adresse e-mail</label>
@@ -149,7 +149,7 @@
                         </svg>
                     </button>
                 </div>
-                <a href="/admin/forgot-password" class="forgot-link">Mot de passe oublié ?</a>
+                <a href="/admin/auth/forgot-password.php" class="forgot-link">Mot de passe oublié ?</a>
             </div>
 
             <button type="submit" class="btn-login">Se connecter</button>

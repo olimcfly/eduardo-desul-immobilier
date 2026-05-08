@@ -61,7 +61,7 @@
         <div class="flash flash--<?= htmlspecialchars($flash['type']) ?>"><?= htmlspecialchars($flash['message']) ?></div>
         <?php endif; ?>
 
-        <form method="POST" action="/admin/forgot-password" novalidate>
+        <form method="POST" action="/admin/auth/forgot-password.php" novalidate>
             <div class="form-group">
                 <label class="form-label" for="email">Votre adresse e-mail admin</label>
                 <input id="email" name="email" type="email" class="form-input"
@@ -76,7 +76,7 @@
     </div>
 
     <div class="login-footer">
-        <a href="/admin/login">&larr; Retour à la connexion</a>
+        <a href="/admin/auth/login.php">&larr; Retour à la connexion</a>
     </div>
 
 </div>

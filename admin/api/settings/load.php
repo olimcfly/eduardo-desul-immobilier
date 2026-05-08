@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-require_once __DIR__ . '/../../../core/bootstrap.php';
+require_once dirname(__DIR__, 3) . '/core/bootstrap.php';
 Auth::requireAuth();
 
 $section = preg_replace('/[^a-z]/', '', (string)($_GET['section'] ?? 'profil'));
 
-$allowed = ['profil', 'site', 'zone', 'api', 'notif', 'smtp', 'telegram', 'securite', 'danger'];
+$allowed = ['profil', 'site', 'zone', 'api', 'tracking', 'notif', 'smtp', 'telegram', 'securite', 'danger'];
 
 if (!in_array($section, $allowed, true)) {
     http_response_code(400);
@@ -14,7 +14,11 @@ if (!in_array($section, $allowed, true)) {
     exit;
 }
 
-$file = __DIR__ . '/sections/' . $section . '.php';
+if ($section === 'api') {
+    $file = __DIR__ . '/sections/api/index.php';
+} else {
+    $file = __DIR__ . '/sections/' . $section . '.php';
+}
 
 if (!file_exists($file)) {
     http_response_code(404);

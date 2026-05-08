@@ -188,7 +188,7 @@ document.getElementById('danger-confirm-btn').addEventListener('click', function
         closeDangerModal();
         if (data.success) {
             if (_dangerAction === 'delete_all') {
-                window.location.href = '/admin/login';
+                window.location.href = '/admin/auth/login.php';
                 return;
             }
             // Toast via parent

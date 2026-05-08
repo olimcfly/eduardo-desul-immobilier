@@ -1,8 +1,7 @@
 <?php
-
 declare(strict_types=1);
 
-require_once __DIR__ . '/../includes/auth_functions.php';
+require_once __DIR__ . '/../../includes/auth.php';
 
 requireAdminAuth();
 
@@ -94,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
 
-    <p style="margin-top:16px"><a class="btn" href="/admin/logout.php">Se déconnecter</a></p>
+    <p style="margin-top:16px"><a class="btn" href="/admin/auth/logout.php">Se déconnecter</a></p>
 </div>
 </body>
 </html>

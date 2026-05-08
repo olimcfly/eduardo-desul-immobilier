@@ -104,7 +104,7 @@
     </form>
 
     <div class="links">
-        <a href="/admin/login">Renvoyer un code</a>
+        <a href="/admin/auth/login.php">Renvoyer un code</a>
         <a href="/">Retour au site</a>
     </div>
 </div>

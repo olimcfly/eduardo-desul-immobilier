@@ -1,0 +1,5 @@
+[07-May-2026 00:23:46 UTC] PHP Fatal error:  Uncaught Error: Undefined constant "ROOT_PATH" in /home/cool1019/site/modules/funnels/ajax/save_funnel.php:5
+Stack trace:
+#0 /home/cool1019/site/admin/api/funnels/ajax.php(4): require_once()
+#1 {main}
+  thrown in /home/cool1019/site/modules/funnels/ajax/save_funnel.php on line 5

@@ -74,9 +74,9 @@ if (!function_exists('sendEmail')) {
                 $mail->CharSet    = 'UTF-8';
 
                 $fromEmail = $smtp['tech_smtp_username']
-                    ?? 'noreply@eduardo-desul-immobilier.fr';
+                    ?? 'noreply@pascal-hamm-immobilier-aix-en-provence.fr';
 
-                $mail->setFrom($fromEmail, 'Eduardo De Sul Immobilier');
+                $mail->setFrom($fromEmail, 'Pascal Hamm Immobilier');
                 $mail->addAddress($toEmail, $toName);
 
                 $mail->isHTML(true);
@@ -99,7 +99,7 @@ if (!function_exists('sendEmail')) {
         fallback:
         $headers  = "MIME-Version: 1.0\r\n";
         $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
-        $headers .= "From: Eduardo De Sul Immobilier <contact@eduardo-desul-immobilier.fr>\r\n";
+        $headers .= "From: Pascal Hamm Immobilier <contact@pascal-hamm-immobilier-aix-en-provence.fr>\r\n";
         $headers .= "X-Mailer: PHP/" . phpversion() . "\r\n";
 
         $sent = @mail($toEmail, $subject, $htmlBody, $headers);
@@ -135,7 +135,7 @@ if (!function_exists('buildResetEmailHtml')) {
       <!-- Header -->
       <tr><td style="background:#1a3a5c;padding:32px 30px;text-align:center;">
         <h1 style="color:#fff;margin:0;font-size:22px;font-weight:600;">
-          Eduardo De Sul Immobilier
+          Pascal Hamm Immobilier
         </h1>
         <p style="color:rgba(255,255,255,.75);margin:6px 0 0;font-size:13px;">
           Réinitialisation de mot de passe
@@ -179,7 +179,7 @@ if (!function_exists('buildResetEmailHtml')) {
       <!-- Footer -->
       <tr><td style="background:#f8fafc;padding:18px 30px;text-align:center;">
         <p style="color:#c4c9d4;font-size:11px;margin:0;">
-          © 2026 Eduardo De Sul Immobilier — Tous droits réservés
+          © 2026 Pascal Hamm Immobilier — Tous droits réservés
         </p>
       </td></tr>
 

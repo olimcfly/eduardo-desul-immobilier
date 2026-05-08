@@ -1,0 +1,4 @@
+# Empêche une réécriture parente d’envoyer les POST API vers index.php (réponse HTML au lieu du JSON).
+<IfModule mod_rewrite.c>
+RewriteEngine Off
+</IfModule>

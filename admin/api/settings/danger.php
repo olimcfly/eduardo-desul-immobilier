@@ -2,7 +2,7 @@
 // ============================================================
 // API — Zone de danger
 // ============================================================
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../core/bootstrap.php';
+require_once dirname(__DIR__, 3) . '/core/bootstrap.php';
 Auth::requireAuth();
 
 header('Content-Type: application/json');

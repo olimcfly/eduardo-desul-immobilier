@@ -9,7 +9,7 @@ $v = fn(string $k, string $d = '') => htmlspecialchars($s[$k] ?? $d);
 
     <div class="form-group">
         <label>Nom du site</label>
-        <input type="text" name="site_nom" value="<?= $v('site_nom', 'Eduardo Desul Immobilier') ?>">
+        <input type="text" name="site_nom" value="<?= $v('site_nom', 'Pascal Hamm Immobilier') ?>">
     </div>
 
     <div class="form-group">
@@ -32,7 +32,7 @@ $v = fn(string $k, string $d = '') => htmlspecialchars($s[$k] ?? $d);
     <div class="form-group">
         <label>Sur-titre Hero</label>
         <input type="text" name="site_home_hero_label"
-               value="<?= $v('site_home_hero_label', 'Agent immobilier à Bordeaux — Expert en évaluation immobilière') ?>">
+               value="<?= $v('site_home_hero_label', 'Agent immobilier à Aix-en-Provence — Expert en évaluation immobilière') ?>">
     </div>
 
     <div class="form-group">
@@ -43,7 +43,7 @@ $v = fn(string $k, string $d = '') => htmlspecialchars($s[$k] ?? $d);
 
     <div class="form-group">
         <label>Texte Hero</label>
-        <textarea name="site_home_hero_subtitle" rows="5"><?= $v('site_home_hero_subtitle', "Vous souhaitez <strong>vendre votre maison ou appartement</strong> au meilleur prix, ou concrétiser un <strong>achat immobilier</strong> à Bordeaux Métropole ?\nBénéficiez d'une <strong>estimation immobilière gratuite</strong> et d'un accompagnement personnalisé par Eduardo De Sul, certifié <strong>Expert en évaluation immobilière</strong>.") ?></textarea>
+        <textarea name="site_home_hero_subtitle" rows="5"><?= $v('site_home_hero_subtitle', "Vous souhaitez <strong>vendre votre maison ou appartement</strong> au meilleur prix, ou concrétiser un <strong>achat immobilier</strong> sur Aix-en-Provence et les environs ?\nBénéficiez d'une <strong>estimation immobilière gratuite</strong> et d'un accompagnement personnalisé par Pascal Hamm, certifié <strong>Expert en évaluation immobilière</strong>.") ?></textarea>
     </div>
 
     <div class="form-row">

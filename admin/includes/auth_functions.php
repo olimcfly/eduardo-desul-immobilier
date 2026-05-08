@@ -196,8 +196,9 @@ if (!function_exists('isEditor')) {
 // ── Protection de pages ───────────────────────────────────────────────────────
 
 if (!function_exists('requireLogin')) {
-    function requireLogin(string $redirectTo = '/auth/login.php'): void
+    function requireLogin(string $redirectTo = '/admin/auth/login.php'): void
     {
+        $redirectTo = normalizeAdminAuthUrl($redirectTo);
         if (!isLoggedIn()) {
             startSecureSession();
             $_SESSION['redirect_after_login'] = $_SERVER['REQUEST_URI'] ?? '/';
@@ -208,8 +209,9 @@ if (!function_exists('requireLogin')) {
 }
 
 if (!function_exists('requireRole')) {
-    function requireRole(string $role, string $redirectTo = '/auth/login.php'): void
+    function requireRole(string $role, string $redirectTo = '/admin/auth/login.php'): void
     {
+        $redirectTo = normalizeAdminAuthUrl($redirectTo);
         requireLogin($redirectTo);
 
         if (!hasRole($role)) {
@@ -320,6 +322,20 @@ if (!function_exists('logoutUser')) {
             );
         }
         session_destroy();
+    }
+}
+
+if (!function_exists('normalizeAdminAuthUrl')) {
+    function normalizeAdminAuthUrl(string $url): string
+    {
+        return match ($url) {
+            '/admin/login', '/admin/login.php' => '/admin/auth/login.php',
+            '/admin/logout', '/admin/logout.php' => '/admin/auth/logout.php',
+            '/admin/forgot-password.php' => '/admin/auth/forgot-password.php',
+            '/admin/reset-password.php' => '/admin/auth/reset-password.php',
+            '/admin/profile.php' => '/admin/auth/profile.php',
+            default => $url,
+        };
     }
 }
 

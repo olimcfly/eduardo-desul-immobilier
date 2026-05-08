@@ -75,7 +75,7 @@
             <p><?= htmlspecialchars($error) ?></p>
         </div>
         <div style="text-align:center;margin-top:1.25rem">
-            <a href="/admin/forgot-password"
+            <a href="/admin/auth/forgot-password.php"
                style="color:#c9a84c;font-size:.9rem;font-weight:600;text-decoration:none">
                 Faire une nouvelle demande
             </a>
@@ -88,7 +88,7 @@
         <?php endif; ?>
 
         <form method="POST"
-              action="/admin/reset-password?token=<?= urlencode($token) ?>"
+              action="/admin/auth/reset-password.php?token=<?= urlencode($token) ?>"
               novalidate id="resetForm">
 
             <div class="form-group">
@@ -138,7 +138,7 @@
     </div>
 
     <div class="login-footer">
-        <a href="/admin/login">&larr; Retour à la connexion</a>
+        <a href="/admin/auth/login.php">&larr; Retour à la connexion</a>
     </div>
 
 </div>

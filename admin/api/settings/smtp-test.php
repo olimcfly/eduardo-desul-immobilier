@@ -5,7 +5,7 @@
 
 declare(strict_types=1);
 
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../core/bootstrap.php';
+require_once dirname(__DIR__, 3) . '/core/bootstrap.php';
 Auth::requireAuth();
 
 header('Content-Type: application/json; charset=UTF-8');
@@ -23,7 +23,7 @@ $host = (string) setting('smtp_host');
 $port = (int) setting('smtp_port', '465');
 $user = (string) setting('smtp_user');
 $pass = (string) setting('smtp_pass');
-$fromName = (string) setting('smtp_from_name', setting('profil_nom', 'Eduardo Desul'));
+$fromName = (string) setting('smtp_from_name', setting('profil_nom', 'Pascal Hamm'));
 $secure = strtolower((string) setting('smtp_secure', 'ssl'));
 
 if ($host === '' || $user === '') {

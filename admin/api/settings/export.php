@@ -2,7 +2,7 @@
 // ============================================================
 // API — Export des données utilisateur
 // ============================================================
-require_once $_SERVER['DOCUMENT_ROOT'] . '/../core/bootstrap.php';
+require_once dirname(__DIR__, 3) . '/core/bootstrap.php';
 Auth::requireAuth();
 
 $format = preg_replace('/[^a-z]/', '', (string)($_GET['format'] ?? 'json'));

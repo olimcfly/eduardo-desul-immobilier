@@ -1,10 +1,17 @@
 <?php
 $advisorDisplayName = trim((string) setting('advisor_firstname', '') . ' ' . (string) setting('advisor_lastname', ''));
 $helpContext = preg_replace('/[^a-z0-9_-]/', '', (string) ($module ?? 'dashboard'));
-$helpLink = '/admin?module=aide&context=' . rawurlencode($helpContext);
+$helpLink = (function_exists('admin_url') ? admin_url(['module' => 'aide', 'context' => $helpContext]) : '/admin/?module=aide&context=' . rawurlencode($helpContext));
 if ($advisorDisplayName === '') {
     $advisorDisplayName = ADVISOR_NAME ?: APP_NAME;
 }
+$__adminScript = str_replace('\\', '/', (string) ($_SERVER['SCRIPT_NAME'] ?? '/admin/index.php'));
+$adminBasePath = preg_replace('#/[^/]+$#', '', $__adminScript);
+if ($adminBasePath === '' || $adminBasePath === '.') {
+    $adminBasePath = '/admin';
+}
+$adminQueryBase = rtrim($adminBasePath, '/') . '/?';
+$GLOBALS['admin_query_base'] = $adminQueryBase;
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -17,8 +24,14 @@ if ($advisorDisplayName === '') {
     <link rel="stylesheet" href="<?= e(asset_url('/admin/assets/css/settings.css')) ?>">
     <link rel="stylesheet" href="<?= e(asset_url('/admin/assets/css/hub-page.css')) ?>">
     <link rel="stylesheet" href="<?= e(asset_url('/admin/assets/css/tooltip.css')) ?>">
+    <?php if (!empty($extraCss) && is_array($extraCss)): ?>
+        <?php foreach ($extraCss as $cssFile): ?>
+            <link rel="stylesheet" href="<?= e(asset_url((string)$cssFile)) ?>">
+        <?php endforeach; ?>
+    <?php endif; ?>
 </head>
-<body data-current-module="<?= htmlspecialchars($module ?? 'dashboard') ?>"
+<body data-admin-base="<?= htmlspecialchars($adminBasePath, ENT_QUOTES, 'UTF-8') ?>"
+      data-current-module="<?= htmlspecialchars($module ?? 'dashboard') ?>"
       <?php if (isset($adminModulePlugin) && $adminModulePlugin instanceof AdminModulePlugin): ?>
       data-plugin-slug="<?= htmlspecialchars($adminModulePlugin->slug, ENT_QUOTES, 'UTF-8') ?>"
       data-plugin-name="<?= htmlspecialchars($adminModulePlugin->name, ENT_QUOTES, 'UTF-8') ?>"
@@ -66,7 +79,7 @@ if ($advisorDisplayName === '') {
                     <i class="fas fa-bars"></i>
                 </button>
                 <nav class="topbar-breadcrumb" aria-label="Fil d'Ariane">
-                    <a href="/admin?module=dashboard" class="breadcrumb-home" data-module="dashboard" title="Accueil">
+                    <a href="<?= htmlspecialchars(function_exists('admin_url') ? admin_url(['module' => 'dashboard']) : ($adminQueryBase . 'module=dashboard'), ENT_QUOTES, 'UTF-8') ?>" class="breadcrumb-home" data-module="dashboard" title="Accueil">
                         <i class="fas fa-house"></i>
                     </a>
                     <i class="fas fa-chevron-right breadcrumb-sep"></i>
@@ -87,7 +100,7 @@ if ($advisorDisplayName === '') {
             <div class="topbar-right">
                 <div class="ia-header-widget" title="Statut IA : <?= get_ia_status() ?>">
                     <span class="ia-dot <?= get_ia_status() ?>"></span>
-                    <a href="/admin?module=ia-config" class="ia-gear" title="Config IA" aria-label="Config IA">
+                    <a href="<?= htmlspecialchars(function_exists('admin_url') ? admin_url(['module' => 'ia-config']) : ($adminQueryBase . 'module=ia-config'), ENT_QUOTES, 'UTF-8') ?>" class="ia-gear" title="Config IA" aria-label="Config IA">
                         <svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true" focusable="false">
                             <path fill="currentColor" d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.07-.94l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.48 7.48 0 0 0-1.63-.94l-.36-2.54A.5.5 0 0 0 13.89 2h-3.78a.5.5 0 0 0-.49.42l-.36 2.54c-.58.22-1.13.53-1.63.94l-2.39-.96a.5.5 0 0 0-.6.22L2.72 8.48a.5.5 0 0 0 .12.64l2.03 1.58c-.05.31-.07.63-.07.94s.02.63.07.94l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32a.5.5 0 0 0 .6.22l2.39-.96c.5.41 1.05.72 1.63.94l.36 2.54a.5.5 0 0 0 .49.42h3.78a.5.5 0 0 0 .49-.42l.36-2.54c.58-.22 1.13-.53 1.63-.94l2.39.96a.5.5 0 0 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58zM12 15.5A3.5 3.5 0 1 1 12 8a3.5 3.5 0 0 1 0 7.5z"/>
                         </svg>
@@ -126,16 +139,20 @@ if ($advisorDisplayName === '') {
                             </div>
                         </div>
                         <div class="dropdown-divider"></div>
-                        <a href="/admin?module=profil" class="dropdown-item" data-module="profil">
+                        <a href="<?= htmlspecialchars(function_exists('admin_url') ? admin_url(['module' => 'cms', 'st' => 'all']) : ($adminQueryBase . 'module=cms&st=all'), ENT_QUOTES, 'UTF-8') ?>" class="dropdown-item" data-module="cms">
+                            <i class="fas fa-pen-to-square"></i>
+                            Éditer les pages (CMS)
+                        </a>
+                        <a href="<?= htmlspecialchars(function_exists('admin_url') ? admin_url(['module' => 'profil']) : ($adminQueryBase . 'module=profil'), ENT_QUOTES, 'UTF-8') ?>" class="dropdown-item" data-module="profil">
                             <i class="fas fa-user"></i>
                             Mon profil
                         </a>
-                        <a href="/admin?module=parametres" class="dropdown-item" data-module="parametres">
+                        <a href="<?= htmlspecialchars(function_exists('admin_url') ? admin_url(['module' => 'parametres']) : ($adminQueryBase . 'module=parametres'), ENT_QUOTES, 'UTF-8') ?>" class="dropdown-item" data-module="parametres">
                             <i class="fas fa-gear"></i>
                             Paramètres
                         </a>
                         <div class="dropdown-divider"></div>
-                        <a href="/admin/logout" class="dropdown-item dropdown-item-danger">
+                        <a href="/admin/auth/logout.php" class="dropdown-item dropdown-item-danger">
                             <i class="fas fa-right-from-bracket"></i>
                             Se déconnecter
                         </a>
@@ -144,13 +161,6 @@ if ($advisorDisplayName === '') {
             </div>
 
         </header>
-
-        <!-- NOTIFICATION DÉVELOPPEMENT -->
-        <?php if (setting('site_development_mode', '1') === '1'): ?>
-        <div style="background: linear-gradient(90deg, #b8860b, #ffd700); color: #1a1a1a; padding: 12px 20px; font-weight: 600; font-size: 14px; border-bottom: 1px solid #d4a505; text-align: center;">
-            ℹ️ <strong>Site en développement</strong> — Le frontend est accessible au public, mais le backend reste en cours de configuration.
-        </div>
-        <?php endif; ?>
 
         <!-- CONTENU -->
         <main class="main-content">
@@ -190,14 +200,14 @@ if ($advisorDisplayName === '') {
 
 <?php if (!empty($_SESSION['show_welcome_popup'])): unset($_SESSION['show_welcome_popup']);
 $welcomeMessages = [
-    ['emoji'=>'🚀','title'=>'Prêt à conquérir le Bordeaux Métropole ?','text'=>'Le marché immobilier n\'a qu\'à bien se tenir. Vous êtes là, et c\'est suffisant.'],
+    ['emoji'=>'🚀','title'=>'Prêt à conquérir le Pays d\'Aix ?','text'=>'Le marché immobilier n\'a qu\'à bien se tenir. Vous êtes là, et c\'est suffisant.'],
     ['emoji'=>'☀️','title'=>'Bonjour patron !','text'=>'Les biens ne se vendent pas tout seuls. Mais avec vous derrière le clavier, c\'est presque pareil.'],
-    ['emoji'=>'🏡','title'=>'Maison. Appartement. Empire.','text'=>'La session est ouverte. Bordeaux attend vos ordres.'],
+    ['emoji'=>'🏡','title'=>'Maison. Appartement. Empire.','text'=>'La session est ouverte. Aix-en-Provence attend vos ordres.'],
     ['emoji'=>'💼','title'=>'Connexion réussie. Mission : cartonner.','text'=>'Agenda chargé ou moment calme ? Dans tous les cas, bienvenue dans le QG.'],
     ['emoji'=>'🎯','title'=>'Le chasseur est dans la place.','text'=>'Biens, leads, clients — tout ça ne sait pas encore ce qui l\'attend.'],
     ['emoji'=>'🌟','title'=>'Une nouvelle journée, de nouvelles commissions.','text'=>'On ne va pas se mentir, c\'est pour ça qu\'on est là. Bonne session !'],
-    ['emoji'=>'⚡','title'=>'Alerte : expert immobilier connecté.','text'=>'Les autres conseillers du Bordeaux Métropole peuvent commencer à s\'inquiéter.'],
-    ['emoji'=>'🦁','title'=>'Le roi est de retour dans son territoire.','text'=>'Bordeaux, Luynes, Puyricard… Le Bordeaux Métropole appartient à ceux qui le connaissent.'],
+    ['emoji'=>'⚡','title'=>'Alerte : expert immobilier connecté.','text'=>'Les autres conseillers du Pays d\'Aix peuvent commencer à s\'inquiéter.'],
+    ['emoji'=>'🦁','title'=>'Le roi est de retour dans son territoire.','text'=>'Aix-en-Provence, Luynes, Puyricard… Le Pays d\'Aix appartient à ceux qui le connaissent.'],
     ['emoji'=>'🎪','title'=>'Et le show commence !','text'=>'Rideau ouvert, clients briefés, biens prêts. Il ne manquait plus que vous.'],
     ['emoji'=>'🧠','title'=>'Connexion établie. Neurones en route.','text'=>'Statistiques, leads, contenus… votre cerveau immobilier est en ligne.'],
     ['emoji'=>'🏆','title'=>'L\'équipe gagnante est de retour.','text'=>'Spoiler : l\'équipe gagnante, c\'est vous. Et votre ordinateur.'],

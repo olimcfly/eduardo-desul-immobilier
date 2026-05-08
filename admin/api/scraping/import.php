@@ -1,150 +1,266 @@
 <?php
-
 declare(strict_types=1);
+/**
+ * Même logique que l'ancien import de scraping — bootstrap depuis site/admin/api/scraping/.
+ */
+ob_start();
+require_once dirname(__DIR__, 3) . '/core/bootstrap.php';
+ob_clean();
 
-require_once __DIR__ . '/../../../core/bootstrap.php';
+set_exception_handler(function (Throwable $e) {
+    ob_clean();
+    header('Content-Type: application/json; charset=utf-8');
+    http_response_code(500);
+    echo json_encode(['success' => false, 'message' => 'Erreur: ' . $e->getMessage()]);
+    exit;
+});
 
 header('Content-Type: application/json; charset=utf-8');
 
-function scrapingImportJson(array $payload, int $status = 200): never
-{
-    http_response_code($status);
-    echo json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
+    http_response_code(405);
+    echo json_encode(['success' => false, 'message' => 'Méthode non autorisée.']);
     exit;
 }
 
-function scrapingImportInput(): array
-{
-    $raw = file_get_contents('php://input') ?: '';
-    $data = json_decode($raw, true);
-
-    return is_array($data) ? $data : [];
-}
-
-function scrapingImportSlug(string $title, PDO $pdo): string
-{
-    $base = slugify($title);
-    if ($base === '') {
-        $base = 'bien-exp-france';
-    }
-
-    $slug = $base;
-    $i = 2;
-    $stmt = $pdo->prepare('SELECT id FROM biens WHERE slug = :slug LIMIT 1');
-    while (true) {
-        $stmt->execute([':slug' => $slug]);
-        if (!$stmt->fetchColumn()) {
-            return $slug;
-        }
-        $slug = $base . '-' . $i;
-        $i++;
-    }
-}
-
-function scrapingImportType(string $type): string
-{
-    $allowed = ['appartement', 'maison', 'terrain', 'local', 'immeuble', 'autre'];
-
-    return in_array($type, $allowed, true) ? $type : 'autre';
-}
-
 if (!Auth::check()) {
-    scrapingImportJson(['success' => false, 'message' => 'Authentification requise.'], 401);
+    http_response_code(401);
+    echo json_encode(['success' => false, 'message' => 'Non authentifié.']);
+    exit;
 }
 
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    scrapingImportJson(['success' => false, 'message' => 'Méthode non autorisée.'], 405);
+$payload = json_decode((string) file_get_contents('php://input'), true);
+if (!is_array($payload)) {
+    http_response_code(400);
+    echo json_encode(['success' => false, 'message' => 'Payload invalide.']);
+    exit;
 }
 
-$input = scrapingImportInput();
-if (!hash_equals(csrfToken(), (string) ($input['csrf_token'] ?? ''))) {
-    scrapingImportJson(['success' => false, 'message' => 'Token CSRF invalide.'], 403);
+if (!hash_equals((string) ($_SESSION['csrf_token'] ?? ''), (string) ($payload['csrf_token'] ?? ''))) {
+    http_response_code(419);
+    echo json_encode(['success' => false, 'message' => 'Session expirée.']);
+    exit;
 }
 
-$ids = $input['ids'] ?? [];
-if (!is_array($ids) || $ids === []) {
-    scrapingImportJson(['success' => false, 'message' => 'Aucun bien sélectionné.'], 422);
+$ids    = is_array($payload['ids'] ?? null) ? $payload['ids'] : [];
+$source = in_array($payload['source'] ?? '', ['own', 'partage'], true) ? $payload['source'] : 'own';
+
+if (empty($ids)) {
+    echo json_encode(['success' => false, 'message' => 'Aucun bien sélectionné.']);
+    exit;
 }
 
-$results = $_SESSION['scraping_exp_results'] ?? [];
-if (!is_array($results) || $results === []) {
-    scrapingImportJson(['success' => false, 'message' => 'Relancez une recherche avant import.'], 422);
+$ids = array_slice(array_map('strval', $ids), 0, 50); // max 50 par appel
+
+// ── Supabase ──────────────────────────────────────────────────
+define('EXP_SUPABASE_URL', $_ENV['SUPABASE_URL'] ?? '');
+define('EXP_SUPABASE_KEY', $_ENV['SUPABASE_ANON_KEY'] ?? '');
+
+function supabaseGet(string $path): array
+{
+    $url = EXP_SUPABASE_URL . $path;
+    $ctx = stream_context_create([
+        'http' => [
+            'method'  => 'GET',
+            'header'  => "apikey: " . EXP_SUPABASE_KEY . "\r\nAuthorization: Bearer " . EXP_SUPABASE_KEY . "\r\n",
+            'timeout' => 20,
+            'ignore_errors' => true,
+        ],
+        'ssl' => ['verify_peer' => false],
+    ]);
+    $raw = @file_get_contents($url, false, $ctx);
+    if ($raw === false) return [];
+    $data = json_decode($raw, true);
+    if (!is_array($data) || isset($data['code']) || isset($data['error'])) {
+        return [];
+    }
+    if (array_keys($data) !== range(0, count($data) - 1)) {
+        return [];
+    }
+    return $data;
 }
+
+function stripHtml(string $html): string
+{
+    return trim(preg_replace('/\s+/', ' ', strip_tags($html)));
+}
+
+require_once dirname(__DIR__, 3) . '/core/helpers/scraping_import_biens.php';
+
+// ── Récupérer les données complètes depuis Supabase ───────────
+$idList  = implode(',', array_map('rawurlencode', $ids));
+$select  = 'id,title,address,city,zipcode,price,square_feet,bedrooms,bathrooms,total_rooms,'
+         . 'property_type,listing_type,images,source_id,'
+         . 'agent_first_name,agent_last_name,'
+         . 'geo_lat,geo_lon,energy_efficiency_class,has_balcony,has_terrace,'
+         . 'construction_year,description';
+
+$rows = supabaseGet('/rest/v1/listings?id=in.(' . $idList . ')&select=' . $select);
+
+if (empty($rows)) {
+    echo json_encode(['success' => false, 'message' => 'Impossible de récupérer les données.']);
+    exit;
+}
+
+// ── Identifier les déjà importés ──────────────────────────────
+$existingIds = [];
+try {
+    $existingPlaceholders = implode(',', array_fill(0, count($ids), '?'));
+    $existingStmt = db()->prepare(
+        "SELECT source_externe_id FROM biens WHERE source_externe_id IN ($existingPlaceholders)"
+    );
+    $existingStmt->execute($ids);
+    $existingIds = array_flip($existingStmt->fetchAll(PDO::FETCH_COLUMN));
+} catch (Throwable $e) {
+    error_log('[scraping import] existing check: ' . $e->getMessage());
+}
+
+// Ne pas lier users.id ici : sur certaines bases agent_id référence la table agents (IA), pas users — sinon erreur SQL 1452.
+$imported = 0;
+$skipped  = 0;
 
 $pdo = db();
-$imported = 0;
-$skipped = 0;
+$biensCols = scraping_import_biens_column_set($pdo);
 
-foreach ($ids as $id) {
-    $id = (string) $id;
-    $item = $results[$id] ?? null;
-    if (!is_array($item)) {
+$typeMap = [
+    'Maison'      => 'maison',
+    'Appartement' => 'appartement',
+    'Terrain'     => 'terrain',
+    'Commerce'    => 'local',
+    'Bureau'      => 'local',
+];
+$listingTypeMap = ['sale' => 'vente', 'rent' => 'location'];
+
+foreach ($rows as $row) {
+    $extId = (string) ($row['id'] ?? '');
+    if (isset($existingIds[$extId])) {
         $skipped++;
         continue;
     }
 
-    $exists = $pdo->prepare("SELECT id FROM biens WHERE source_provider = 'exp_france' AND source_id = :source_id LIMIT 1");
-    $exists->execute([':source_id' => (string) ($item['source_id'] ?? '')]);
-    if ($exists->fetchColumn()) {
-        $skipped++;
-        continue;
+    $images = is_array($row['images']) ? $row['images'] : [];
+    $cover  = '';
+    foreach ($images as $img) {
+        if (!is_array($img)) continue;
+        if (!empty($img['is_front_cover'])) { $cover = (string) ($img['url'] ?? ''); break; }
+    }
+    if ($cover === '' && is_array($images[0] ?? null) && !empty($images[0]['url'])) {
+        $cover = (string) $images[0]['url'];
     }
 
-    $title = trim((string) ($item['titre'] ?? 'Bien eXp France'));
-    $slug = scrapingImportSlug($title, $pdo);
-    $photos = array_values(array_filter($item['photos'] ?? [], 'is_string'));
+    $rawType  = (string) ($row['property_type'] ?? '');
+    $typeNorm = $typeMap[$rawType] ?? 'autre';
+    $transact = $listingTypeMap[$row['listing_type'] ?? 'sale'] ?? 'vente';
+    $agentNom = trim(($row['agent_first_name'] ?? '') . ' ' . ($row['agent_last_name'] ?? ''));
+    $ref      = (string) ($row['source_id'] ?? $extId);
+    $titre    = (string) ($row['title'] ?? 'Bien sans titre');
+    $slug     = slugify($titre) . '-' . substr($extId, 0, 8);
 
-    $stmt = $pdo->prepare(
-        'INSERT INTO biens (
-            slug, reference, source_provider, source_id, source_url, titre, type_transaction, type_bien,
-            prix, surface, pieces, chambres, sdb, ville, code_postal, latitude, longitude,
-            description, statut, sort_order, photo_principale, created_at, updated_at
-        ) VALUES (
-            :slug, :reference, :source_provider, :source_id, :source_url, :titre, :type_transaction, :type_bien,
-            :prix, :surface, :pieces, :chambres, :sdb, :ville, :code_postal, :latitude, :longitude,
-            :description, :statut, 0, :photo_principale, NOW(), NOW()
-        )'
-    );
-    $stmt->execute([
-        ':slug' => $slug,
-        ':reference' => (string) ($item['reference'] ?? ''),
-        ':source_provider' => 'exp_france',
-        ':source_id' => (string) ($item['source_id'] ?? ''),
-        ':source_url' => (string) ($item['source_url'] ?? ''),
-        ':titre' => $title,
-        ':type_transaction' => 'vente',
-        ':type_bien' => scrapingImportType((string) ($item['property_type'] ?? '')),
-        ':prix' => (float) ($item['prix'] ?? 0),
-        ':surface' => (float) ($item['surface'] ?? 0),
-        ':pieces' => (int) ($item['pieces'] ?? 0),
-        ':chambres' => (int) ($item['chambres'] ?? 0),
-        ':sdb' => (int) ($item['sdb'] ?? 0),
-        ':ville' => (string) ($item['ville'] ?? ''),
-        ':code_postal' => (string) ($item['code_postal'] ?? ''),
-        ':latitude' => $item['lat'] ?? null,
-        ':longitude' => $item['lng'] ?? null,
-        ':description' => (string) ($item['description'] ?? ''),
-        ':statut' => 'pending',
-        ':photo_principale' => (string) ($item['cover_url'] ?? ''),
-    ]);
+    // S'assurer que la référence est unique (si la colonne existe)
+    if (isset($biensCols['reference'])) {
+        try {
+            $checkStmt = $pdo->prepare('SELECT id FROM biens WHERE reference = :ref LIMIT 1');
+            $checkStmt->execute([':ref' => $ref]);
+            if ($checkStmt->fetch()) {
+                $ref = $ref . '-' . substr($extId, 0, 6);
+            }
+        } catch (Throwable $e) {
+            error_log('[scraping import] reference check: ' . $e->getMessage());
+        }
+    }
+    // Slug unique
+    $checkSlug = $pdo->prepare("SELECT id FROM biens WHERE slug = :slug LIMIT 1");
+    $checkSlug->execute([':slug' => $slug]);
+    if ($checkSlug->fetch()) {
+        $slug = $slug . '-' . substr(md5($extId), 0, 4);
+    }
 
-    $bienId = (int) $pdo->lastInsertId();
-    $photoStmt = $pdo->prepare('INSERT INTO bien_photos (bien_id, chemin, alt, position, created_at) VALUES (:bien_id, :chemin, :alt, :position, NOW())');
-    foreach (array_slice($photos, 0, 20) as $position => $photoUrl) {
-        $photoStmt->execute([
-            ':bien_id' => $bienId,
-            ':chemin' => $photoUrl,
-            ':alt' => $title,
-            ':position' => $position,
-        ]);
+    $dpeRaw = strtoupper(trim((string) ($row['energy_efficiency_class'] ?? '')));
+    $dpeOne = $dpeRaw !== '' ? substr($dpeRaw, 0, 1) : null;
+
+    $lat = isset($row['geo_lat']) && $row['geo_lat'] !== '' && (float) $row['geo_lat'] != 0.0
+        ? (float) $row['geo_lat'] : null;
+    $lon = isset($row['geo_lon']) && $row['geo_lon'] !== '' && (float) $row['geo_lon'] != 0.0
+        ? (float) $row['geo_lon'] : null;
+
+    $rowInsert = [
+        'slug'                => $slug,
+        'titre'               => $titre,
+        'description'         => stripHtml((string) ($row['description'] ?? '')),
+        'type_transaction'    => $transact,
+        'type_bien'           => $typeNorm,
+        'prix'                => (float) ($row['price'] ?? 0),
+        'surface'             => (float) ($row['square_feet'] ?? 0),
+        'pieces'              => (int) ($row['total_rooms'] ?? 0) ?: null,
+        'chambres'            => (int) ($row['bedrooms'] ?? 0) ?: null,
+        'sdb'                 => (int) ($row['bathrooms'] ?? 0) ?: null,
+        'adresse'             => (string) ($row['address'] ?? ''),
+        'ville'               => (string) ($row['city'] ?? ''),
+        'code_postal'         => (string) ($row['zipcode'] ?? ''),
+        'latitude'            => $lat,
+        'longitude'           => $lon,
+        'statut'              => 'actif',
+        'publier_vitrine'     => 0,
+        'dpe_classe'          => $dpeOne,
+        'reference'           => $ref,
+        'a_balcon'            => empty($row['has_balcony']) ? 0 : 1,
+        'a_terrasse'          => empty($row['has_terrace']) ? 0 : 1,
+        'annee_construction'  => (int) ($row['construction_year'] ?? 0) ?: null,
+        'photo_principale'    => $cover !== '' ? $cover : null,
+        'agent_id'            => null,
+        'source'              => $source,
+        'source_externe_id'   => $extId,
+        'source_agent_nom'    => $agentNom !== '' ? $agentNom : null,
+    ];
+
+    try {
+        [$sql, $params] = scraping_import_build_insert($pdo, $rowInsert);
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+    } catch (PDOException $e) {
+        error_log('[scraping import] ' . $e->getMessage());
+        $msg = $e->getMessage();
+        if (stripos($msg, 'Unknown column') !== false) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Schéma biens incompatible. Exécutez les migrations (reference, a_balcon, 038_scraping, etc.).',
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+        if (stripos($msg, "doesn't have a default value") !== false) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'INSERT bloqué : une colonne obligatoire manque dans l’import. ' . (defined('APP_DEBUG') && APP_DEBUG ? $msg : 'Voir error_log ou activez APP_DEBUG.'),
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+        if (stripos($msg, 'foreign key') !== false || stripos($msg, '1452') !== false) {
+            echo json_encode([
+                'success' => false,
+                'message' => 'Import refusé (contrainte SQL). Détail : ' . (defined('APP_DEBUG') && APP_DEBUG ? $msg : 'voir error_log serveur'),
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+        throw $e;
+    } catch (RuntimeException $e) {
+        echo json_encode(['success' => false, 'message' => $e->getMessage()], JSON_UNESCAPED_UNICODE);
+        exit;
     }
 
     $imported++;
 }
 
-scrapingImportJson([
-    'success' => true,
-    'message' => $imported . ' bien(s) importé(s) en brouillon.',
+$msg = $imported > 0
+    ? "{$imported} bien(s) importé(s) avec succès."
+    : "Tous les biens sélectionnés étaient déjà importés.";
+
+if ($skipped > 0) {
+    $msg .= " ({$skipped} ignoré(s) car déjà présent(s)).";
+}
+
+echo json_encode([
+    'success'  => true,
     'imported' => $imported,
-    'skipped' => $skipped,
-]);
+    'skipped'  => $skipped,
+    'message'  => $msg,
+], JSON_UNESCAPED_UNICODE);

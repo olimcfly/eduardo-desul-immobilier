@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 error_reporting(E_ALL);
 ini_set('display_errors', '1');
+ob_start();
 
 // ── Charger la fonction de gestion de session ────────────────
 require_once __DIR__ . '/session-helper.php';
@@ -12,13 +13,28 @@ startAdminSession();
 
 // ── Vérifier authentification ────────────────────────────────
 if (!isAdminLoggedIn()) {
-    redirectAdmin('/admin/login');
+    redirectAdmin('/admin/auth/login.php');
 }
 
 // ── Définir les constantes ──────────────────────────────────
-// Résoudre le symlink si on y accède via /public/admin
-$adminDir = realpath(__DIR__);
-define('ROOT_PATH', dirname($adminDir));
+// Racine projet = dossier qui contient core/ (remonter jusqu’à trouver core/)
+$adminDir = realpath(__DIR__) ?: __DIR__;
+$rootCandidate = $adminDir;
+for ($i = 0; $i < 8; $i++) {
+    if (is_file($rootCandidate . '/core/AdminModulePlugin.php')) {
+        break;
+    }
+    $parent = dirname($rootCandidate);
+    if ($parent === $rootCandidate) {
+        break;
+    }
+    $rootCandidate = $parent;
+}
+if (!is_file($rootCandidate . '/core/AdminModulePlugin.php')) {
+    http_response_code(500);
+    exit('Configuration invalide : ROOT_PATH introuvable (core/AdminModulePlugin.php manquant).');
+}
+define('ROOT_PATH', $rootCandidate);
 
 // ── Charger les variables d'environnement ────────────────────
 $envFile = ROOT_PATH . '/.env';
@@ -48,48 +64,34 @@ if (file_exists(ROOT_PATH . '/core/helpers/helpers.php')) {
     require_once ROOT_PATH . '/core/helpers/helpers.php';
 }
 
-// ── Définir les fonctions manquantes si nécessaire ───────────
-if (!function_exists('setting')) {
-    function setting(string $key, $default = null) {
-        return $default;
-    }
-}
-
-if (!function_exists('replacePlaceholders')) {
-    function replacePlaceholders(string $text): string {
-        return $text;
-    }
-}
-
-if (!function_exists('asset_url')) {
-    function asset_url(string $path): string {
-        return $path;
-    }
-}
-
-if (!function_exists('e')) {
-    function e(string $text): string {
-        return htmlspecialchars($text, ENT_QUOTES, 'UTF-8');
-    }
-}
-
-if (!function_exists('get_ia_status')) {
-    function get_ia_status(): string {
-        return 'inactive';
-    }
-}
-
-// ── Charger la config globale pour avoir les constantes ──────
+// ── Config (constantes APP_*, ADVISOR_*, etc.) ────────────────
 if (file_exists(ROOT_PATH . '/core/config/config.php')) {
     require_once ROOT_PATH . '/core/config/config.php';
 }
 
+// ── Paramètres DB — requis pour le module profil et le layout
+if (file_exists(ROOT_PATH . '/includes/settings.php')) {
+    require_once ROOT_PATH . '/includes/settings.php';
+}
+
 // ── Définir les constantes manquantes ────────────────────────
 if (!defined('ADVISOR_NAME')) {
-    define('ADVISOR_NAME', 'Eduardo Desul');
+    define('ADVISOR_NAME', 'Pascal Hamm');
 }
 if (!defined('APP_NAME')) {
-    define('APP_NAME', 'Eduardo Desul Immobilier');
+    define('APP_NAME', 'Pascal Hamm Immobilier');
+}
+
+$requestPath = parse_url((string) ($_SERVER['REQUEST_URI'] ?? ''), PHP_URL_PATH) ?: '';
+
+// ── Charger Auth avant les routes spéciales qui en dépendent ──
+if (file_exists(ROOT_PATH . '/core/Auth.php')) {
+    require_once ROOT_PATH . '/core/Auth.php';
+}
+
+if (preg_match('#/admin/google-business/callback/?$#', $requestPath)) {
+    require ROOT_PATH . '/admin/google-business/callback.php';
+    exit;
 }
 
 // ── Charger les classes core essentielles ───────────────────
@@ -97,8 +99,26 @@ if (file_exists(ROOT_PATH . '/core/Session.php')) {
     require_once ROOT_PATH . '/core/Session.php';
 }
 
-if (file_exists(ROOT_PATH . '/core/Auth.php')) {
-    require_once ROOT_PATH . '/core/Auth.php';
+if (file_exists(ROOT_PATH . '/core/TenantContext.php')) {
+    require_once ROOT_PATH . '/core/TenantContext.php';
+}
+if (file_exists(ROOT_PATH . '/core/helpers/saas_session.php')) {
+    require_once ROOT_PATH . '/core/helpers/saas_session.php';
+}
+if (function_exists('db')) {
+    try {
+        saas_ensure_tenant_session(db());
+    } catch (Throwable $e) {
+        error_log('saas_ensure_tenant_session: ' . $e->getMessage());
+    }
+}
+if (($_SESSION['user_role'] ?? '') === 'superadmin' && isset($_GET['tenant_scope'])) {
+    $ts = (string) $_GET['tenant_scope'];
+    if ($ts === 'all') {
+        TenantContext::setViewAllOrganizations(true);
+    } elseif ($ts === 'active') {
+        TenantContext::setViewAllOrganizations(false);
+    }
 }
 
 // ── Charger les services ────────────────────────────────────
@@ -119,6 +139,7 @@ if (!class_exists('Auth')) {
     class Auth {
         public static function user() {
             return [
+                'id' => (int) ($_SESSION['user_id'] ?? 0),
                 'name' => $_SESSION['user_name'] ?? $_SESSION['user_email'] ?? 'Utilisateur',
                 'email' => $_SESSION['user_email'] ?? '',
                 'role' => $_SESSION['user_role'] ?? 'user',
@@ -134,7 +155,7 @@ $module = preg_replace('/[^a-z0-9_-]/i', '', $module);
 if ($module === 'guide-local-crm') {
     $q = $_GET;
     $q['module'] = 'annuaire-local';
-    header('Location: /admin?' . http_build_query($q), true, 301);
+    header('Location: ' . (function_exists('admin_url') ? admin_url($q) : ('/admin/?' . http_build_query($q))), true, 301);
     exit;
 }
 

@@ -7,7 +7,7 @@ require_once __DIR__ . '/../../session-helper.php';
 startAdminSession();
 
 if (!isAdminLoggedIn()) {
-    redirectAdmin('/admin/login');
+    redirectAdmin('/admin/auth/login.php');
 }
 
 // Filtre par source
@@ -33,155 +33,107 @@ $pageTitle = 'CRM - Leads';
 $currentModule = 'crm';
 ?>
 
-<div class="admin-page">
-    <div class="page-header">
-        <h1>📊 CRM - Gestion des Leads</h1>
-        <p>Tableau de bord des leads enregistrées depuis vos formulaires.</p>
-    </div>
+<div class="crm-page admin-page admin-container">
+    <header class="crm-page-header">
+        <div>
+            <div class="crm-page-kicker"><i class="fas fa-chart-line"></i> CRM</div>
+            <h1 class="crm-page-title">CRM - Gestion des Leads</h1>
+            <p class="crm-page-subtitle">Tableau de bord des leads enregistrées depuis vos formulaires.</p>
+        </div>
+    </header>
 
-    <!-- Statistiques -->
-    <div class="stats-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;margin-bottom:2rem">
-        <div class="stat-card" style="background:#f8f9fa;border:1px solid #dee2e6;border-radius:8px;padding:1.5rem;text-align:center">
-            <div style="font-size:2rem;font-weight:700;color:#1f3a5e"><?= $statsAll ?></div>
-            <div style="font-size:0.85rem;color:#6c757d;margin-top:0.5rem">Leads totales</div>
+    <section class="crm-card crm-card--padded">
+        <div class="crm-filters__chips">
+            <a href="/admin?module=crm" class="crm-btn <?= empty($filter) ? 'crm-btn-primary' : 'crm-btn-secondary' ?>">
+                <span class="crm-badge crm-badge--neutral"><?= (int) $statsAll ?></span>
+                Tous
+            </a>
+            <a href="/admin?module=crm&source=estimation" class="crm-btn <?= $filter === 'estimation' ? 'crm-btn-primary' : 'crm-btn-secondary' ?>">
+                <span class="crm-badge crm-badge--primary"><?= (int) $statsEstimation ?></span>
+                Estimations
+            </a>
+            <a href="/admin?module=crm&source=contact" class="crm-btn <?= $filter === 'contact' ? 'crm-btn-primary' : 'crm-btn-secondary' ?>">
+                <span class="crm-badge crm-badge--neutral"><?= (int) $statsContact ?></span>
+                Contacts
+            </a>
+            <a href="/admin?module=crm&source=telechargement" class="crm-btn <?= $filter === 'telechargement' ? 'crm-btn-primary' : 'crm-btn-secondary' ?>">
+                <span class="crm-badge crm-badge--success"><?= (int) $statsTelechargement ?></span>
+                Téléchargements
+            </a>
         </div>
-        <div class="stat-card" style="background:#e7f3ff;border:1px solid #b3e5fc;border-radius:8px;padding:1.5rem;text-align:center">
-            <div style="font-size:2rem;font-weight:700;color:#0277bd"><?= $statsEstimation ?></div>
-            <div style="font-size:0.85rem;color:#0277bd;margin-top:0.5rem">Estimations</div>
-        </div>
-        <div class="stat-card" style="background:#f3e5f5;border:1px solid #ce93d8;border-radius:8px;padding:1.5rem;text-align:center">
-            <div style="font-size:2rem;font-weight:700;color:#6a1b9a"><?= $statsContact ?></div>
-            <div style="font-size:0.85rem;color:#6a1b9a;margin-top:0.5rem">Contacts</div>
-        </div>
-        <div class="stat-card" style="background:#fff3e0;border:1px solid #ffe0b2;border-radius:8px;padding:1.5rem;text-align:center">
-            <div style="font-size:2rem;font-weight:700;color:#e65100"><?= $statsTelechargement ?></div>
-            <div style="font-size:0.85rem;color:#e65100;margin-top:0.5rem">Téléchargements</div>
-        </div>
-    </div>
+    </section>
 
-    <!-- Filtres -->
-    <div style="margin-bottom:2rem;padding:1rem;background:#f8f9fa;border-radius:8px;border:1px solid #dee2e6">
-        <div style="display:flex;gap:1rem;flex-wrap:wrap">
-            <a href="/admin?module=crm" class="btn <?= empty($filter) ? 'btn--accent' : 'btn--outline' ?>" style="padding:0.5rem 1rem;font-size:0.9rem">
-                Tous (<?= $statsAll ?>)
-            </a>
-            <a href="/admin?module=crm&source=estimation" class="btn <?= $filter === 'estimation' ? 'btn--accent' : 'btn--outline' ?>" style="padding:0.5rem 1rem;font-size:0.9rem">
-                Estimations (<?= $statsEstimation ?>)
-            </a>
-            <a href="/admin?module=crm&source=contact" class="btn <?= $filter === 'contact' ? 'btn--accent' : 'btn--outline' ?>" style="padding:0.5rem 1rem;font-size:0.9rem">
-                Contacts (<?= $statsContact ?>)
-            </a>
-            <a href="/admin?module=crm&source=telechargement" class="btn <?= $filter === 'telechargement' ? 'btn--accent' : 'btn--outline' ?>" style="padding:0.5rem 1rem;font-size:0.9rem">
-                Téléchargements (<?= $statsTelechargement ?>)
-            </a>
+    <?php if (empty($leads)): ?>
+        <div class="crm-card crm-card--padded" style="text-align:center;color:var(--ui-muted);">
+            <p style="font-size:1.05rem;font-weight:800;color:var(--ui-text);margin-bottom:6px;">Aucune lead pour le moment.</p>
+            <p>Les formulaires remplis s'afficheront ici.</p>
         </div>
-    </div>
-
-    <!-- Tableau des leads -->
-    <div style="overflow-x:auto;background:white;border-radius:8px;border:1px solid #dee2e6">
-        <?php if (empty($leads)): ?>
-            <div style="padding:2rem;text-align:center;color:#6c757d">
-                <p style="font-size:1.1rem;margin-bottom:0.5rem">Aucune lead pour le moment.</p>
-                <p style="font-size:0.9rem">Les formulaires remplis s'afficheront ici.</p>
-            </div>
-        <?php else: ?>
-            <table style="width:100%;border-collapse:collapse">
-                <thead style="background:#f8f9fa;border-bottom:2px solid #dee2e6">
+    <?php else: ?>
+        <div class="crm-card crm-table-wrapper">
+            <table class="crm-table">
+                <thead>
                     <tr>
-                        <th style="padding:1rem;text-align:left;font-weight:600;color:#333">ID</th>
-                        <th style="padding:1rem;text-align:left;font-weight:600;color:#333">Prénom</th>
-                        <th style="padding:1rem;text-align:left;font-weight:600;color:#333">Email</th>
-                        <th style="padding:1rem;text-align:left;font-weight:600;color:#333">Téléphone</th>
-                        <th style="padding:1rem;text-align:left;font-weight:600;color:#333">Type</th>
-                        <th style="padding:1rem;text-align:left;font-weight:600;color:#333">Source</th>
-                        <th style="padding:1rem;text-align:left;font-weight:600;color:#333">Stage</th>
-                        <th style="padding:1rem;text-align:left;font-weight:600;color:#333">Date</th>
-                        <th style="padding:1rem;text-align:center;font-weight:600;color:#333">Actions</th>
+                        <th>ID</th>
+                        <th>Prénom</th>
+                        <th>Email</th>
+                        <th>Téléphone</th>
+                        <th>Type</th>
+                        <th>Source</th>
+                        <th>Stage</th>
+                        <th>Date</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php foreach ($leads as $lead): ?>
-                    <tr style="border-bottom:1px solid #dee2e6">
-                        <td style="padding:1rem;color:#666"><?= htmlspecialchars($lead['id']) ?></td>
-                        <td style="padding:1rem;color:#333;font-weight:500">
-                            <?= htmlspecialchars($lead['first_name'] . ' ' . ($lead['last_name'] ?? '')) ?>
-                        </td>
-                        <td style="padding:1rem;color:#0277bd">
-                            <a href="mailto:<?= htmlspecialchars($lead['email']) ?>" style="text-decoration:none;color:#0277bd">
-                                <?= htmlspecialchars($lead['email']) ?>
-                            </a>
-                        </td>
-                        <td style="padding:1rem;color:#666">
+                    <tr>
+                        <td><?= htmlspecialchars($lead['id']) ?></td>
+                        <td><?= htmlspecialchars($lead['first_name'] . ' ' . ($lead['last_name'] ?? '')) ?></td>
+                        <td><a href="mailto:<?= htmlspecialchars($lead['email']) ?>"><?= htmlspecialchars($lead['email']) ?></a></td>
+                        <td>
                             <?php if ($lead['phone']): ?>
-                                <a href="tel:<?= htmlspecialchars($lead['phone']) ?>" style="text-decoration:none;color:#666">
-                                    <?= htmlspecialchars($lead['phone']) ?>
-                                </a>
+                                <a href="tel:<?= htmlspecialchars($lead['phone']) ?>"><?= htmlspecialchars($lead['phone']) ?></a>
                             <?php else: ?>
-                                <span style="color:#ccc">—</span>
+                                <span style="color:var(--ui-muted);">—</span>
                             <?php endif; ?>
                         </td>
-                        <td style="padding:1rem;color:#666">
-                            <span style="background:#f0f4f8;padding:0.25rem 0.75rem;border-radius:4px;font-size:0.85rem">
-                                <?= htmlspecialchars($lead['property_type'] ?? '—') ?>
-                            </span>
-                        </td>
-                        <td style="padding:1rem">
-                            <span style="background:#e7f3ff;color:#0277bd;padding:0.25rem 0.75rem;border-radius:4px;font-size:0.85rem">
-                                <?= htmlspecialchars($lead['source_type']) ?>
-                            </span>
-                        </td>
-                        <td style="padding:1rem;color:#666">
-                            <span style="background:#fce4ec;color:#c2185b;padding:0.25rem 0.75rem;border-radius:4px;font-size:0.85rem">
-                                <?= htmlspecialchars($lead['stage'] ?? 'non défini') ?>
-                            </span>
-                        </td>
-                        <td style="padding:1rem;color:#999;font-size:0.9rem">
-                            <?= date('d/m/Y H:i', strtotime($lead['created_at'])) ?>
-                        </td>
-                        <td style="padding:1rem;text-align:center">
-                            <a href="/admin?module=crm&action=view&id=<?= $lead['id'] ?>"
-                               style="color:#0277bd;text-decoration:none;font-size:0.9rem">
-                                Détails
-                            </a>
-                        </td>
+                        <td><span class="crm-badge crm-badge--neutral"><?= htmlspecialchars($lead['property_type'] ?? '—') ?></span></td>
+                        <td><span class="crm-badge crm-badge--primary"><?= htmlspecialchars($lead['source_type']) ?></span></td>
+                        <td><span class="crm-badge crm-badge--warning"><?= htmlspecialchars($lead['stage'] ?? 'non défini') ?></span></td>
+                        <td><?= date('d/m/Y H:i', strtotime($lead['created_at'])) ?></td>
+                        <td><a href="/admin?module=crm&action=view&id=<?= $lead['id'] ?>" class="crm-btn crm-btn-primary">Détails</a></td>
                     </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
-        <?php endif; ?>
-    </div>
+        </div>
 
-    <!-- Note -->
-    <div style="margin-top:2rem;padding:1rem;background:#e8f5e9;border-left:4px solid #4caf50;border-radius:4px">
-        <strong>ℹ️ Info:</strong> Les leads sont enregistrées automatiquement depuis les formulaires d'estimation, contact et autres conversions.
+        <div class="crm-mobile-list">
+            <?php foreach ($leads as $lead): ?>
+                <article class="crm-card crm-mobile-card">
+                    <div class="crm-mobile-card__top">
+                        <div>
+                            <div class="crm-mobile-card__title"><?= htmlspecialchars($lead['first_name'] . ' ' . ($lead['last_name'] ?? '')) ?></div>
+                            <div class="crm-mobile-card__meta"><?= htmlspecialchars($lead['email']) ?></div>
+                        </div>
+                        <span class="crm-badge crm-badge--warning"><?= htmlspecialchars($lead['stage'] ?? 'non défini') ?></span>
+                    </div>
+                    <div class="crm-mobile-card__meta">
+                        <div><strong>ID :</strong> <?= htmlspecialchars($lead['id']) ?></div>
+                        <div><strong>Téléphone :</strong> <?= !empty($lead['phone']) ? htmlspecialchars($lead['phone']) : '—' ?></div>
+                        <div><strong>Type :</strong> <?= htmlspecialchars($lead['property_type'] ?? '—') ?></div>
+                        <div><strong>Source :</strong> <?= htmlspecialchars($lead['source_type']) ?></div>
+                        <div><strong>Date :</strong> <?= date('d/m/Y H:i', strtotime($lead['created_at'])) ?></div>
+                    </div>
+                    <div class="crm-mobile-card__actions">
+                        <a href="/admin?module=crm&action=view&id=<?= $lead['id'] ?>" class="crm-btn crm-btn-primary">Détails</a>
+                    </div>
+                </article>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+
+    <div class="crm-card crm-card--padded" style="border-left:4px solid var(--ui-success);background:var(--ui-success-weak);color:#14532d;">
+        <strong>Info</strong> Les leads sont enregistrées automatiquement depuis les formulaires d'estimation, contact et autres conversions.
     </div>
 </div>
-
-<style>
-.btn {
-    display: inline-block;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    text-decoration: none;
-    border: 1px solid #dee2e6;
-    background: white;
-    color: #333;
-    cursor: pointer;
-    transition: all 0.2s;
-    font-size: 0.9rem;
-}
-.btn:hover {
-    border-color: #0277bd;
-    color: #0277bd;
-}
-.btn--accent {
-    background: #0277bd !important;
-    color: white !important;
-    border-color: #0277bd !important;
-}
-.btn--outline {
-    background: white;
-    color: #333;
-    border-color: #dee2e6;
-}
-</style>
